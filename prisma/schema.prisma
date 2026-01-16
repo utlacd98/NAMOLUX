@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  clerkId       String        @unique
+  email         String        @unique
+  credits       Int           @default(3) // Start with 3 free credits
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  transactions  Transaction[]
+  usageHistory  Usage[]
+
+  @@index([clerkId])
+  @@index([email])
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String   // "purchase" | "bonus" | "refund"
+  credits         Int
+  amount          Float?   // USD amount
+  stripeSessionId String?  @unique
+  status          String   // "pending" | "completed" | "failed"
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([stripeSessionId])
+}
+
+model Usage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // "domain_generation" | "seo_audit"
+  credits   Int      // Credits used
+  metadata  Json?    // Store details like keyword, URL, etc.
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+

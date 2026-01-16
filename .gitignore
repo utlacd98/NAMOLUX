@@ -1,0 +1,48 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# prisma
+/prisma/dev.db
+/prisma/dev.db-journal
+/prisma/migrations
+
+# documentation with secrets
+DEPLOY_NAMOLUX.md
+DEPLOY_NOW.md
+PRICING_AND_SETUP.md
+VERCEL_DEPLOYMENT.md
+VERCEL_ENV_VARS.txt
+AUTHENTICATION_PAYMENT_SUMMARY.md
+SETUP_AUTH_PAYMENTS.md
+SETUP_COMPLETE.md
+REMAINING_SETUP.md
+QUICK_SETUP_CHECKLIST.md
+SECURITY_VERIFICATION.md
