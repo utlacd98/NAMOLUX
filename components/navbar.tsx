@@ -18,7 +18,7 @@ const navLinks = [
 ]
 
 export function Navbar() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, mounted } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { isSignedIn } = useUser()
@@ -93,8 +93,11 @@ export function Navbar() {
               onClick={toggleTheme}
               className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              suppressHydrationWarning
             >
-              {theme === "dark" ? (
+              {!mounted ? (
+                <Sun className="h-5 w-5" aria-hidden="true" />
+              ) : theme === "dark" ? (
                 <Sun className="h-5 w-5" aria-hidden="true" />
               ) : (
                 <Moon className="h-5 w-5" aria-hidden="true" />

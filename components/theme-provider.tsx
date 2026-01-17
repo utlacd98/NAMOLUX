@@ -8,9 +8,14 @@ type Theme = "dark" | "light"
 interface ThemeContextValue {
   theme: Theme
   toggleTheme: () => void
+  mounted: boolean
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextValue>({
+  theme: "dark",
+  toggleTheme: () => {},
+  mounted: false,
+})
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -43,16 +48,13 @@ export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProvider
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={mounted ? theme : defaultTheme}>{children}</div>
+    <ThemeContext.Provider value={{ theme, toggleTheme, mounted }}>
+      {children}
     </ThemeContext.Provider>
   )
 }
 
 export function useTheme() {
   const context = useContext(ThemeContext)
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider")
-  }
   return context
 }
