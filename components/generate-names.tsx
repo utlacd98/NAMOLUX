@@ -25,9 +25,11 @@ import {
   Shuffle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { FounderSignalBadge } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
+import { getShufflePool, shuffleSeedSuggestions } from "@/lib/shuffle-banks"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -190,29 +192,6 @@ const VIBE_MODIFIERS: Record<string, string[]> = {
   minimal: ["core", "base", "plain"],
 }
 
-const VIBE_SHUFFLE_TERMS: Record<string, string[]> = {
-  luxury: ["velvet", "gold", "elite", "luxe", "royal"],
-  futuristic: ["neo", "flux", "orbit", "quant", "nova"],
-  playful: ["pop", "bloom", "spark", "jolly", "zest"],
-  trustworthy: ["anchor", "steady", "proof", "clear", "shield"],
-  minimal: ["mono", "clean", "plain", "pure", "core"],
-}
-
-const INDUSTRY_SHUFFLE_TERMS: Record<string, string[]> = {
-  Technology: ["stack", "byte", "logic", "grid", "cloud"],
-  "Health & Wellness": ["vital", "well", "pulse", "care", "fit"],
-  Finance: ["ledger", "vault", "coin", "yield", "fund"],
-  "E-commerce": ["cart", "store", "shop", "basket", "trade"],
-  Education: ["learn", "tutor", "skill", "study", "class"],
-  Creative: ["craft", "pixel", "canvas", "story", "frame"],
-  "Real Estate": ["nest", "estate", "brick", "roof", "plot"],
-  "Food & Beverage": ["taste", "fresh", "plate", "sip", "chef"],
-  "SaaS & Software": ["app", "suite", "sync", "stack", "flow"],
-  "AI & Machine Learning": ["mind", "model", "neural", "agent", "vector"],
-}
-
-const GENERIC_SHUFFLE_TERMS = ["hub", "forge", "labs", "kit", "flow", "pilot", "base", "spark", "boost", "works"]
-
 function splitWords(value: string): string[] {
   return value
     .toLowerCase()
@@ -237,17 +216,6 @@ function getIndustryModifier(industry: string): string {
   if (!industry) return ""
   const words = splitWords(industry).filter((word) => !["and", "the", "services"].includes(word))
   return words[0] || ""
-}
-
-function getShufflePool(industry: string, vibe: string): string[] {
-  const pool = [
-    ...GENERIC_SHUFFLE_TERMS,
-    ...(VIBE_SHUFFLE_TERMS[vibe] || []),
-    ...(INDUSTRY_SHUFFLE_TERMS[industry] || []),
-    ...splitWords(industry),
-  ]
-
-  return Array.from(new Set(pool.map((word) => word.toLowerCase().replace(/[^a-z0-9]/g, "")).filter((word) => word.length >= 3)))
 }
 
 function createBlend(first: string, second: string): string {
@@ -304,25 +272,6 @@ function normaliseDomainName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, "")
 }
 
-function buildShuffledKeyword(baseKeyword: string, vibe: string, industry: string): string {
-  const baseWords = splitWords(baseKeyword)
-  const shufflePool = getShufflePool(industry, vibe)
-  const primary = baseWords[0] || shufflePool[0] || "brand"
-  const secondary = (shufflePool.find((word) => word !== primary) || "labs").toLowerCase()
-  const tertiary = (shufflePool.find((word) => word !== primary && word !== secondary) || "hub").toLowerCase()
-
-  const options = [
-    `${primary} ${secondary}`,
-    `${secondary} ${primary}`,
-    `${primary}${secondary}`,
-    `${primary}${tertiary}`,
-    `${createBlend(primary, secondary)} ${tertiary}`,
-  ]
-
-  const randomOption = options[Math.floor(Math.random() * options.length)] || `${primary} ${secondary}`
-  return randomOption.replace(/\s+/g, " ").trim()
-}
-
 function delay(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) {
@@ -361,6 +310,8 @@ export function GenerateNames() {
   const [isAutoFindingComs, setIsAutoFindingComs] = useState(false)
   const [autoFindAttempt, setAutoFindAttempt] = useState(0)
   const [autoFindStatus, setAutoFindStatus] = useState<string | null>(null)
+  const [shuffleSuggestions, setShuffleSuggestions] = useState<string[]>([])
+  const [isShufflePopoverOpen, setIsShufflePopoverOpen] = useState(false)
 
   // New state for filters and history
   const [selectedTldFilter, setSelectedTldFilter] = useState<string | null>(null)
@@ -703,8 +654,15 @@ export function GenerateNames() {
   }
 
   const handleShuffleKeyword = () => {
-    const shuffled = buildShuffledKeyword(keyword, selectedVibe, selectedIndustry)
-    setKeyword(shuffled)
+    const suggestions = shuffleSeedSuggestions(keyword, selectedIndustry, selectedVibe)
+    setShuffleSuggestions(suggestions)
+    setIsShufflePopoverOpen(true)
+    setError(null)
+  }
+
+  const handlePickShuffleSuggestion = (suggestion: string) => {
+    setKeyword(suggestion)
+    setIsShufflePopoverOpen(false)
     setError(null)
   }
 
@@ -874,18 +832,47 @@ export function GenerateNames() {
                       placeholder="e.g., fitness, finance, creative..."
                       className="h-10 w-full flex-1 rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4"
                     />
-                    <button
-                      type="button"
-                      onClick={handleShuffleKeyword}
-                      className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border/50 bg-background/50 px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted sm:h-12 sm:rounded-xl sm:px-4 sm:text-sm"
-                      title="Shuffle keyword ideas"
-                    >
-                      <Shuffle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      <span>Shuffle</span>
-                    </button>
+                    <Popover open={isShufflePopoverOpen} onOpenChange={setIsShufflePopoverOpen}>
+                      <PopoverAnchor asChild>
+                        <button
+                          type="button"
+                          onClick={handleShuffleKeyword}
+                          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border/50 bg-background/50 px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted sm:h-12 sm:rounded-xl sm:px-4 sm:text-sm"
+                          title="Shuffle keyword ideas"
+                        >
+                          <Shuffle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <span>Shuffle</span>
+                        </button>
+                      </PopoverAnchor>
+                      <PopoverContent align="end" className="w-[280px] p-3 sm:w-[320px]">
+                        <p className="text-xs font-medium text-foreground sm:text-sm">Industry-relevant seed ideas</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground sm:text-xs">
+                          Pick one to update your keyword.
+                        </p>
+                        <div className="mt-2 space-y-1.5">
+                          {shuffleSuggestions.map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => handlePickShuffleSuggestion(suggestion)}
+                              className="w-full rounded-md border border-border/40 bg-background/60 px-2.5 py-2 text-left text-xs text-foreground transition-colors hover:bg-muted sm:text-sm"
+                            >
+                              {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleShuffleKeyword}
+                          className="mt-2 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+                        >
+                          Shuffle again
+                        </button>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs">
-                    Need broader options? Shuffle the seed before generating.
+                    Need broader options? Shuffle for industry-relevant seeds.
                   </p>
                   {/* Search History */}
                   {searchHistory.length > 0 && (
