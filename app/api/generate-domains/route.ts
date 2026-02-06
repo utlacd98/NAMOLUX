@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { trackMetric } from "@/lib/metrics"
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialization to avoid build-time errors
+let openaiInstance: OpenAI | null = null
+
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not set")
+    }
+    openaiInstance = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return openaiInstance
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +46,7 @@ Return ONLY a JSON array of domain name suggestions (without .com extension), ea
 
 Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...]`
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -63,12 +75,45 @@ Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...
       domainSuggestions = []
     }
 
+    // Track metric (non-blocking)
+    const userAgent = request.headers.get("user-agent") || undefined
+    const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
+    trackMetric({
+      action: "name_generation",
+      metadata: { keyword, vibe, industry, resultCount: domainSuggestions.length },
+      userAgent,
+      country,
+    })
+
     return NextResponse.json({
       success: true,
       domains: domainSuggestions,
     })
   } catch (error: any) {
     console.error("Error generating domains:", error)
+
+    // Handle specific OpenAI errors
+    if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND') {
+      return NextResponse.json(
+        { error: "Connection error. Please try again." },
+        { status: 503 }
+      )
+    }
+
+    if (error.status === 401) {
+      return NextResponse.json(
+        { error: "API key invalid. Please contact support." },
+        { status: 500 }
+      )
+    }
+
+    if (error.status === 429) {
+      return NextResponse.json(
+        { error: "Rate limited. Please try again in a moment." },
+        { status: 429 }
+      )
+    }
+
     return NextResponse.json(
       { error: error.message || "Failed to generate domain names" },
       { status: 500 }

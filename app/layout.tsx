@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ClerkProvider } from "@clerk/nextjs"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
@@ -10,31 +9,31 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
-  title: "NamoLux – AI Chat Brand Name Generator & Credit-Based Domain Availability Checker",
+  title: "NamoLux - Domain Name Finder & SEO Audit",
   description:
-    "Chat with AI to brainstorm brand names and instantly check .com domain availability. Credit-based pricing with no subscriptions—pay once, use anytime.",
+    "Check domain availability instantly and evaluate every name with Founder Signal scoring. NamoLux helps founders find domains worth building on.",
   keywords: [
-    "AI chat brand name generator",
+    "domain name finder",
     "domain availability checker",
-    "credit-based domain checks",
+    "founder signal scoring",
+    "free domain search",
     ".com domain search",
-    "business name generator",
-    "domain finder",
-    "startup name ideas",
-    "AI naming assistant",
+    "brand name ideas",
+    "startup naming",
+    "seo audit tool",
   ],
   authors: [{ name: "NamoLux" }],
   creator: "NamoLux",
   publisher: "NamoLux",
-  metadataBase: new URL("https://namolux.com"),
+  metadataBase: new URL("https://www.namolux.com"),
   alternates: {
-    canonical: "/",
+    canonical: "./",
   },
   openGraph: {
-    title: "NamoLux – AI Chat Brand Name Generator & Domain Availability Checker",
+    title: "NamoLux - Domain Name Finder & SEO Audit",
     description:
-      "Chat with AI to brainstorm brand names and instantly check .com availability. Credit-based pricing, no subscriptions.",
-    url: "https://namolux.com",
+      "Check domain availability instantly and evaluate every name with Founder Signal scoring.",
+    url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
     type: "website",
@@ -43,14 +42,14 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "NamoLux - AI Chat Brand Name Generator",
+        alt: "NamoLux - Domain Name Finder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux – AI Chat Brand Name Generator",
-    description: "Chat with AI to brainstorm brand names and instantly check .com availability. Credit-based pricing.",
+    title: "NamoLux - Domain Name Finder & SEO Audit",
+    description: "Check domain availability instantly and evaluate every name with Founder Signal scoring.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -64,7 +63,15 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-    generator: 'v0.app'
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/icon.png",
+  },
+  verification: {
+    google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
+  },
+  generator: "v0.app",
 }
 
 export const viewport: Viewport = {
@@ -74,6 +81,8 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 }
 
 export default function RootLayout({
@@ -82,56 +91,29 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "SoftwareApplication",
-                name: "NamoLux",
-                applicationCategory: "BusinessApplication",
-                operatingSystem: "Web",
-                description:
-                  "AI chat brainstorming assistant for brand names with real-time domain availability checks. Credit-based one-time purchase model—no subscriptions.",
-                offers: {
-                  "@type": "AggregateOffer",
-                  lowPrice: "0",
-                  highPrice: "29",
-                  priceCurrency: "GBP",
-                  offerCount: "4",
-                },
-                aggregateRating: {
-                  "@type": "AggregateRating",
-                  ratingValue: "4.9",
-                  ratingCount: "1200",
-                },
-              }),
-            }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                name: "NamoLux",
-                url: "https://namolux.com",
-                logo: "https://namolux.com/logo.png",
-                sameAs: [],
-              }),
-            }}
-          />
-        </head>
-        <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-          <ThemeProvider>
-            {children}
-            <Analytics />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning className="dark">
+      <head>
+        {/* Force dark mode always */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+                (function() {
+                  try {
+                    localStorage.removeItem('theme');
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('dark');
+                  } catch (e) {}
+                })();
+              `,
+          }}
+        />
+      </head>
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
+        <ThemeProvider>
+          {children}
+          <Analytics />
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

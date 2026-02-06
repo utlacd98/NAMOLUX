@@ -7,32 +7,32 @@ import { cn } from "@/lib/utils"
 const features = [
   {
     icon: MessageSquare,
-    title: "AI Chat Brainstorming",
-    description: "Describe your brand vision in natural language and let AI generate creative, relevant name ideas.",
-    highlight: true,
+    title: "AI Domain Generator",
+    description: "Enter a keyword, pick a brand vibe, and let AI generate creative, available domain names tailored to your vision.",
+    highlight: false,
   },
   {
     icon: Zap,
     title: "Auto domain verification",
-    description: "Every suggested name is instantly checked against live registrar data—no manual lookups needed.",
+    description: "Every suggested name is instantly checked via real-time DNS lookups—no manual verification needed.",
     highlight: false,
   },
   {
     icon: Globe,
     title: "Availability-first suggestions",
-    description: "We prioritize names with available .com domains so you never fall in love with a taken name.",
+    description: "We prioritize names with available .com, .io, .co, .ai, and .net domains so you never fall in love with a taken name.",
     highlight: false,
   },
   {
     icon: Download,
     title: "Shortlist & export",
-    description: "Save your favorites and export to CSV, Notion, or Airtable in a single click.",
+    description: "Save your favorites to a shortlist and export to CSV in a single click.",
     highlight: false,
   },
   {
     icon: Palette,
     title: "Vibe modes",
-    description: "Choose from Luxury, Futuristic, Playful, or Trustworthy to match your brand personality.",
+    description: "Choose from Luxury, Futuristic, Playful, Trustworthy, or Minimal to match your brand personality.",
     highlight: false,
   },
   {
@@ -47,7 +47,7 @@ export function Features() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section id="features" className="py-24" aria-labelledby="features-heading">
+    <section id="features" className="overflow-clip py-16 sm:py-24" aria-labelledby="features-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 id="features-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -67,22 +67,22 @@ export function Features() {
               <div
                 key={feature.title}
                 className={cn(
-                  "group relative rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
+                  "group relative rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/20 hover:shadow-md hover:shadow-black/10",
                   "opacity-0",
                   isVisible && "animate-fade-up",
                 )}
                 style={{
-                  animationDelay: `${index * 0.1}s`,
+                  animationDelay: `${index * 0.08}s`,
                   animationFillMode: "forwards",
                 }}
               >
                 {feature.highlight && (
-                  <div className="absolute -top-3 right-4 flex items-center gap-1 rounded-full bg-accent px-2 py-1 text-xs font-medium text-accent-foreground">
+                  <div className="absolute -top-3 right-4 flex items-center gap-1 rounded-full bg-primary/10 border border-primary/20 px-2 py-1 text-xs font-medium text-primary">
                     <Star className="h-3 w-3" aria-hidden="true" />
                     New
                   </div>
                 )}
-                <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 text-primary transition-colors group-hover:bg-primary/20">
+                <div className="mb-4 inline-flex rounded-lg bg-muted p-3 text-primary transition-colors group-hover:bg-primary/10">
                   <Icon className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>

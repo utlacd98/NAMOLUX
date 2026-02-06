@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import {
   ArrowLeft,
   Check,
@@ -15,9 +16,42 @@ import {
   RefreshCw,
   Zap,
   ExternalLink,
+  AlertCircle,
+  Clock,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Search,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { FounderSignalBadge } from "@/components/founder-signal"
+import { SeoPotentialCheck } from "@/components/seo-potential"
+
+// SEO micro-signal calculator (lightweight, inline)
+function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
+  const lowerName = name.toLowerCase()
+  const HIGH_COMPETITION = ["app", "software", "tech", "cloud", "digital", "online", "web", "smart", "pro", "shop", "store", "buy", "health", "fit", "learn", "home"]
+  const NICHE_PATTERNS = [/^[a-z]{2,4}ly$/i, /^[a-z]{3,5}ify$/i, /^[a-z]{2,4}io$/i, /^[a-z]{4,8}hub$/i, /^[a-z]{4,8}lab$/i]
+
+  // Check for strong niche pattern first (highest priority)
+  if (NICHE_PATTERNS.some(p => p.test(lowerName))) {
+    return { icon: "🔥", text: "Strong SEO", type: "positive" }
+  }
+
+  // Check for high competition keywords
+  const matchedHigh = HIGH_COMPETITION.filter(kw => lowerName.includes(kw))
+  if (matchedHigh.length >= 2) {
+    return { icon: "⚠️", text: "High competition", type: "warning" }
+  }
+
+  // Check for niche-friendly (no common keywords)
+  if (matchedHigh.length === 0 && lowerName.length >= 5 && lowerName.length <= 10) {
+    return { icon: "✅", text: "Niche-friendly", type: "positive" }
+  }
+
+  return null
+}
 
 const vibeOptions = [
   { id: "luxury", label: "Luxury", description: "Premium, elegant, sophisticated" },
@@ -58,11 +92,41 @@ const industryOptions = [
 
 interface DomainResult {
   name: string
+  tld: string
+  fullDomain: string
   available: boolean
   score: number
   pronounceable: boolean
   memorability: number
   length: number
+}
+
+interface SocialResult {
+  platform: string
+  platformId: string
+  handle: string
+  available: boolean
+  url: string
+  color: string
+}
+
+// TLD badge colors
+const tldColors: Record<string, string> = {
+  com: "bg-blue-500/20 text-blue-400",
+  io: "bg-purple-500/20 text-purple-400",
+  co: "bg-orange-500/20 text-orange-400",
+  ai: "bg-green-500/20 text-green-400",
+  app: "bg-pink-500/20 text-pink-400",
+  dev: "bg-cyan-500/20 text-cyan-400",
+}
+
+// Social platform icons (emoji fallback)
+const socialIcons: Record<string, string> = {
+  twitter: "𝕏",
+  instagram: "📷",
+  tiktok: "♪",
+  github: "⌨",
+  youtube: "▶",
 }
 
 const generateMockResults = (keyword: string): DomainResult[] => {
@@ -99,7 +163,17 @@ const generateMockResults = (keyword: string): DomainResult[] => {
   return results.sort((a, b) => (b.available ? 1 : 0) - (a.available ? 1 : 0) || b.score - a.score)
 }
 
+// Available TLDs for filtering
+const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"]
+
+// LocalStorage keys
+const STORAGE_KEYS = {
+  SHORTLIST: "namolux_shortlist",
+  SEARCH_HISTORY: "namolux_search_history",
+}
+
 export function GenerateNames() {
+  const searchParams = useSearchParams()
   const [keyword, setKeyword] = useState("")
   const [selectedVibe, setSelectedVibe] = useState("luxury")
   const [selectedIndustry, setSelectedIndustry] = useState("")
@@ -108,10 +182,154 @@ export function GenerateNames() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [shortlist, setShortlist] = useState<string[]>([])
   const [copiedName, setCopiedName] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  // New state for filters and history
+  const [selectedTldFilter, setSelectedTldFilter] = useState<string | null>(null)
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false)
+  const [searchHistory, setSearchHistory] = useState<string[]>([])
+
+  // Social handle checker state
+  const [socialHandle, setSocialHandle] = useState("")
+  const [socialResults, setSocialResults] = useState<SocialResult[]>([])
+  const [isCheckingSocials, setIsCheckingSocials] = useState(false)
+
+  // Bulk check state
+  const [isBulkMode, setIsBulkMode] = useState(false)
+  const [bulkInput, setBulkInput] = useState("")
+
+  // Mobile UI state
+  const [isMobileShortlistOpen, setIsMobileShortlistOpen] = useState(false)
+
+  // SEO Potential Check modal state
+  const [seoCheckDomain, setSeoCheckDomain] = useState<{ name: string; tld: string } | null>(null)
+
+  // Initialise keyword from query string for schema.org SearchAction support.
+  useEffect(() => {
+    const query = (searchParams.get("q") || searchParams.get("keyword") || "").trim()
+    if (query && !keyword) {
+      setKeyword(query)
+    }
+  }, [searchParams, keyword])
+
+  // Load shortlist and search history from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedShortlist = localStorage.getItem(STORAGE_KEYS.SHORTLIST)
+      if (savedShortlist) {
+        setShortlist(JSON.parse(savedShortlist))
+      }
+      const savedHistory = localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY)
+      if (savedHistory) {
+        setSearchHistory(JSON.parse(savedHistory))
+      }
+    } catch (e) {
+      console.error("Error loading from localStorage:", e)
+    }
+  }, [])
+
+  // Save shortlist to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.SHORTLIST, JSON.stringify(shortlist))
+    } catch (e) {
+      console.error("Error saving shortlist:", e)
+    }
+  }, [shortlist])
+
+  // Save search history to localStorage
+  const addToSearchHistory = (term: string) => {
+    const newHistory = [term, ...searchHistory.filter((h) => h !== term)].slice(0, 5)
+    setSearchHistory(newHistory)
+    try {
+      localStorage.setItem(STORAGE_KEYS.SEARCH_HISTORY, JSON.stringify(newHistory))
+    } catch (e) {
+      console.error("Error saving search history:", e)
+    }
+  }
+
+  // Filtered results based on TLD and availability filters
+  const filteredResults = results.filter((result) => {
+    if (selectedTldFilter && result.tld !== selectedTldFilter) return false
+    if (showOnlyAvailable && !result.available) return false
+    return true
+  })
+
+  // Check social handles
+  const checkSocialHandles = async (handle: string) => {
+    if (!handle.trim()) return
+    setIsCheckingSocials(true)
+    setSocialResults([])
+
+    try {
+      const response = await fetch("/api/check-socials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ handle: handle.trim() }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setSocialResults(data.results)
+      }
+    } catch (error) {
+      console.error("Error checking socials:", error)
+    } finally {
+      setIsCheckingSocials(false)
+    }
+  }
+
+  // Bulk check handler
+  const handleBulkCheck = async () => {
+    if (!bulkInput.trim()) return
+
+    // Parse domains - split by newlines, commas, or spaces
+    const domains = bulkInput
+      .split(/[\n,\s]+/)
+      .map((d) => d.trim().replace(/\.[a-z]+$/i, "")) // Remove TLD if included
+      .filter((d) => d.length > 0 && d.length <= 63)
+      .slice(0, 50) // Limit to 50 domains
+
+    if (domains.length === 0) {
+      setError("Please enter at least one valid domain name")
+      return
+    }
+
+    setIsGenerating(true)
+    setError(null)
+    setSelectedTldFilter(null)
+    setShowOnlyAvailable(false)
+
+    try {
+      const response = await fetch("/api/check-domain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domains }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to check domains")
+      }
+
+      const data = await response.json()
+      setResults(data.results)
+    } catch (error: any) {
+      console.error("Error checking domains:", error)
+      setError(error.message || "Failed to check domains")
+    } finally {
+      setIsGenerating(false)
+    }
+  }
 
   const handleGenerate = async () => {
     if (!keyword.trim()) return
     setIsGenerating(true)
+    setError(null)
+    setSelectedTldFilter(null) // Reset filters on new search
+    setShowOnlyAvailable(false)
+
+    // Add to search history
+    addToSearchHistory(keyword.trim())
 
     try {
       // Step 1: Generate domain names using GPT
@@ -128,11 +346,12 @@ export function GenerateNames() {
         }),
       })
 
+      const generateData = await generateResponse.json()
+
       if (!generateResponse.ok) {
-        throw new Error("Failed to generate domain names")
+        throw new Error(generateData.error || "Failed to generate domain names")
       }
 
-      const generateData = await generateResponse.json()
       const domainNames = generateData.domains.map((d: any) => d.name)
 
       // Step 2: Check domain availability
@@ -152,27 +371,34 @@ export function GenerateNames() {
 
       const checkData = await checkResponse.json()
       setResults(checkData.results)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating domains:", error)
-      // Fallback to mock data if API fails
-      setResults(generateMockResults(keyword.toLowerCase()))
+      // Handle network errors specifically
+      if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        setError("Network error. Please check your connection and try again.")
+      } else {
+        setError(error.message || "Failed to generate domains. Please try again.")
+      }
     } finally {
       setIsGenerating(false)
     }
   }
 
-  const toggleShortlist = (name: string) => {
-    setShortlist((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]))
+  const toggleShortlist = (fullDomain: string) => {
+    setShortlist((prev) => (prev.includes(fullDomain) ? prev.filter((n) => n !== fullDomain) : [...prev, fullDomain]))
   }
 
-  const copyToClipboard = (name: string) => {
-    navigator.clipboard.writeText(name + ".com")
-    setCopiedName(name)
+  const copyToClipboard = (fullDomain: string) => {
+    navigator.clipboard.writeText(fullDomain)
+    setCopiedName(fullDomain)
     setTimeout(() => setCopiedName(null), 2000)
   }
 
   const exportShortlist = () => {
-    const text = shortlist.map((name) => name + ".com").join("\n")
+    const shortlistedDomains = results.filter((r) => shortlist.includes(r.fullDomain))
+    if (shortlistedDomains.length === 0) return
+
+    const text = shortlistedDomains.map((d) => d.fullDomain).join("\n")
     const blob = new Blob([text], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -181,51 +407,137 @@ export function GenerateNames() {
     a.click()
   }
 
+  // CSV Export functionality
+  const exportToCSV = () => {
+    if (results.length === 0) return
+
+    // CSV headers
+    const headers = ["Domain Name", "TLD", "Full Domain", "Available", "Score", "Pronounceable", "Memorability", "Length"]
+
+    // CSV rows
+    const rows = results.map((r) => [
+      r.name,
+      r.tld,
+      r.fullDomain,
+      r.available ? "Yes" : "No",
+      r.score.toString(),
+      r.pronounceable ? "Yes" : "No",
+      r.memorability.toString(),
+      r.length.toString(),
+    ])
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n")
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    const date = new Date().toISOString().split("T")[0]
+    a.download = `namolux-domains-${date}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+
+    // Show success feedback
+    setCopiedName("csv-exported")
+    setTimeout(() => setCopiedName(null), 2000)
+  }
+
   return (
-    <div className="noise-overlay relative min-h-screen bg-background">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="animate-luxury-aura absolute top-0 left-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/20 via-secondary/10 to-transparent blur-[120px]" />
+    <div className="noise-overlay relative min-h-screen overflow-clip bg-background">
+      {/* Background - subtle, contained within viewport */}
+      <div className="pointer-events-none absolute inset-0 overflow-clip" aria-hidden="true">
+        <div className="animate-luxury-aura absolute top-0 left-[10%] h-[30vh] w-[30vh] max-h-[300px] max-w-[300px] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/10 via-secondary/5 to-transparent blur-[80px] sm:h-[40vh] sm:w-[40vh] sm:max-h-[400px] sm:max-w-[400px] sm:blur-[100px] md:left-1/4" />
         <div
-          className="animate-luxury-aura absolute right-0 bottom-0 h-[500px] w-[500px] translate-x-1/4 rounded-full bg-gradient-to-tl from-secondary/15 via-primary/5 to-transparent blur-[100px]"
+          className="animate-luxury-aura absolute right-[5%] bottom-0 h-[25vh] w-[25vh] max-h-[250px] max-w-[250px] rounded-full bg-gradient-to-tl from-secondary/8 via-primary/3 to-transparent blur-[70px] sm:h-[35vh] sm:w-[35vh] sm:max-h-[350px] sm:max-w-[350px] sm:blur-[90px]"
           style={{ animationDelay: "-7s" }}
         />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between sm:mb-6 md:mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
+            <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            Back
           </Link>
-          {shortlist.length > 0 && (
-            <Button variant="outline" size="sm" onClick={exportShortlist} className="gap-2 bg-transparent">
-              <Download className="h-4 w-4" />
-              Export ({shortlist.length})
-            </Button>
-          )}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {shortlist.length > 0 && (
+              <Button variant="outline" size="sm" onClick={exportShortlist} className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm">
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Export</span> ({shortlist.length})
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr,400px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr,320px] lg:gap-8">
           {/* Main Content */}
-          <div>
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Generate Domain Names</h1>
-              <p className="mt-2 text-muted-foreground">
-                Enter a keyword and select your brand vibe to generate available domain names.
+          <div className="min-w-0">
+            <div className="mb-4 sm:mb-6">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">Generate Domain Names</h1>
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+                Enter a keyword and let AI generate creative, available domain names for your brand.
               </p>
             </div>
 
-            {/* Input Section */}
-            <div className="mb-8 rounded-2xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
-              <div className="grid gap-6 sm:grid-cols-2">
+            <>
+            <div className="mb-6 rounded-xl border border-border bg-card/80 p-3 backdrop-blur-sm sm:mb-8 sm:rounded-2xl sm:p-4 md:p-6">
+              {/* Mode Toggle */}
+              <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:flex sm:gap-2">
+                <button
+                  onClick={() => setIsBulkMode(false)}
+                  className={cn(
+                    "min-h-[44px] rounded-lg px-3 py-2.5 text-xs font-medium transition-all sm:px-4 sm:text-sm",
+                    !isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                  )}
+                >
+                  ✨ AI Generate
+                </button>
+                <button
+                  onClick={() => setIsBulkMode(true)}
+                  className={cn(
+                    "min-h-[44px] rounded-lg px-3 py-2.5 text-xs font-medium transition-all sm:px-4 sm:text-sm",
+                    isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                  )}
+                >
+                  📋 Bulk Check
+                </button>
+              </div>
+
+              {/* Bulk Mode */}
+              {isBulkMode ? (
+                <div className="space-y-3 sm:space-y-4">
+                  <div>
+                    <label htmlFor="bulk-input" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
+                      Paste domain names (one per line, max 50)
+                    </label>
+                    <textarea
+                      id="bulk-input"
+                      value={bulkInput}
+                      onChange={(e) => setBulkInput(e.target.value)}
+                      placeholder={"mybrand\ncoolstartup\nawesomeapp\ngreatidea"}
+                      rows={5}
+                      className="w-full rounded-lg border border-border/50 bg-background/50 p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:rounded-xl sm:p-4"
+                    />
+                    <p className="mt-1.5 text-[10px] text-muted-foreground sm:mt-2 sm:text-xs">
+                      Enter domain names without TLD. We&apos;ll check all 6 TLDs for each name.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+              <>
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 {/* Keyword Input */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="keyword" className="mb-2 block text-sm font-medium text-foreground">
+                  <label htmlFor="keyword" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
                     Keyword or concept
                   </label>
                   <input
@@ -235,20 +547,38 @@ export function GenerateNames() {
                     onChange={(e) => setKeyword(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
                     placeholder="e.g., fitness, finance, creative..."
-                    className="h-12 w-full rounded-xl border border-border/50 bg-background/50 px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-10 w-full rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4"
                   />
+                  {/* Search History */}
+                  {searchHistory.length > 0 && (
+                    <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
+                        <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        Recent:
+                      </span>
+                      {searchHistory.slice(0, 3).map((term) => (
+                        <button
+                          key={term}
+                          onClick={() => setKeyword(term)}
+                          className="max-w-[80px] truncate rounded-full bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:max-w-none sm:px-2.5 sm:py-1 sm:text-xs"
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Industry Select */}
                 <div>
-                  <label htmlFor="industry" className="mb-2 block text-sm font-medium text-foreground">
+                  <label htmlFor="industry" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
                     Industry (optional)
                   </label>
                   <select
                     id="industry"
                     value={selectedIndustry}
                     onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="h-12 w-full rounded-xl border border-border/50 bg-background/50 px-4 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 [&>option]:bg-background [&>option]:text-foreground"
+                    className="h-10 w-full rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4 [&>option]:bg-background [&>option]:text-foreground"
                   >
                     <option value="" className="bg-background text-muted-foreground">
                       Select industry...
@@ -263,8 +593,8 @@ export function GenerateNames() {
 
                 {/* Name Length */}
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-foreground">Max name length</label>
-                  <div className="flex h-12 items-center gap-2">
+                  <label className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">Max name length</label>
+                  <div className="flex h-10 items-center gap-2 sm:h-12">
                     <input
                       type="range"
                       min={5}
@@ -273,23 +603,23 @@ export function GenerateNames() {
                       onChange={(e) => setMaxLength(Number(e.target.value))}
                       className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
                     />
-                    <span className="w-8 text-sm text-muted-foreground">{maxLength}</span>
+                    <span className="w-6 text-xs text-muted-foreground sm:w-8 sm:text-sm">{maxLength}</span>
                   </div>
                 </div>
               </div>
 
               {/* Vibe Selection */}
-              <div className="mt-6">
-                <label className="mb-3 block text-sm font-medium text-foreground">Brand vibe</label>
-                <div className="flex flex-wrap gap-2">
+              <div className="mt-3 sm:mt-6">
+                <label className="mb-1.5 block text-xs font-medium text-foreground sm:mb-3 sm:text-sm">Brand vibe</label>
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   {vibeOptions.map((vibe) => (
                     <button
                       key={vibe.id}
                       onClick={() => setSelectedVibe(vibe.id)}
                       className={cn(
-                        "rounded-full px-4 py-2 text-sm font-medium transition-all",
+                        "min-h-[36px] rounded-full px-2.5 py-1.5 text-[10px] font-medium transition-all sm:min-h-[40px] sm:px-4 sm:py-2 sm:text-sm",
                         selectedVibe === vibe.id
-                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                          ? "bg-primary text-primary-foreground shadow-sm"
                           : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}
                     >
@@ -298,122 +628,244 @@ export function GenerateNames() {
                   ))}
                 </div>
               </div>
+              </>
+              )}
 
-              {/* Generate Button */}
+              {/* Generate / Bulk Check Button */}
               <Button
-                onClick={handleGenerate}
-                disabled={!keyword.trim() || isGenerating}
-                className="mt-6 h-12 w-full gap-2 text-base font-semibold"
+                onClick={isBulkMode ? handleBulkCheck : handleGenerate}
+                disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : (!keyword.trim() || isGenerating)}
+                className="mt-4 h-11 w-full gap-1.5 text-sm font-semibold sm:mt-6 sm:h-12 sm:gap-2 sm:text-base"
               >
                 {isGenerating ? (
                   <>
-                    <RefreshCw className="h-5 w-5 animate-spin" />
-                    Generating...
+                    <RefreshCw className="h-4 w-4 animate-spin sm:h-5 sm:w-5" />
+                    {isBulkMode ? "Checking..." : "Generating..."}
+                  </>
+                ) : isBulkMode ? (
+                  <>
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Check Domains
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-5 w-5" />
+                    <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
                     Generate Names
                   </>
                 )}
               </Button>
+
+              {/* Error Message */}
+              {error && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-500/10 p-3 text-red-400 sm:mt-4 sm:gap-3 sm:rounded-xl sm:p-4">
+                  <AlertCircle className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                  <p className="text-xs sm:text-sm">{error}</p>
+                </div>
+              )}
             </div>
 
             {/* Results */}
             {results.length > 0 && (
-              <div>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    Results <span className="text-muted-foreground">({results.length})</span>
+              <div className="min-w-0">
+                <div className="mb-3 space-y-2 sm:mb-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:space-y-0">
+                  <h2 className="text-sm font-semibold text-foreground sm:text-lg">
+                    Results <span className="text-xs text-muted-foreground sm:text-base">({filteredResults.length} of {results.length})</span>
                   </h2>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <span className="h-2 w-2 rounded-full bg-green-500" />
-                      Available
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-                      Taken
-                    </span>
+                  <div className="flex items-center justify-between gap-2 sm:gap-4">
+                    {/* CSV Export Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={exportToCSV}
+                      className="flex h-8 min-h-0 items-center gap-1.5 px-2 text-xs sm:h-10 sm:min-h-[40px] sm:gap-2 sm:px-3"
+                    >
+                      {copiedName === "csv-exported" ? (
+                        <>
+                          <CheckCircle className="h-3.5 w-3.5 text-green-400 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Exported!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Export CSV</span>
+                        </>
+                      )}
+                    </Button>
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground sm:gap-2 sm:text-sm">
+                      <span className="flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 sm:h-2 sm:w-2" />
+                        Available
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground sm:h-2 sm:w-2" />
+                        Taken
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  {results.map((result, index) => (
-                    <div
-                      key={result.name}
+                {/* Filter Bar */}
+                <div className="-mx-3 mb-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-2 scrollbar-hide sm:mx-0 sm:mb-4 sm:gap-2 sm:px-0">
+                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground sm:text-sm">
+                    <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
+                    Filter:
+                  </span>
+                  {/* TLD Filters */}
+                  <button
+                    onClick={() => setSelectedTldFilter(null)}
+                    className={cn(
+                      "shrink-0 rounded-full px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-xs",
+                      selectedTldFilter === null
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    )}
+                  >
+                    All
+                  </button>
+                  {ALL_TLDS.map((tld) => (
+                    <button
+                      key={tld}
+                      onClick={() => setSelectedTldFilter(tld)}
                       className={cn(
-                        "group flex items-center justify-between rounded-xl border border-border/30 bg-card/50 p-4 transition-all hover:border-primary/20 hover:bg-card",
+                        "shrink-0 rounded-full px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-xs",
+                        selectedTldFilter === tld
+                          ? tldColors[tld]?.replace("/20", "") || "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      )}
+                    >
+                      .{tld}
+                    </button>
+                  ))}
+                  {/* Availability Filter */}
+                  <span className="shrink-0 text-xs text-muted-foreground">|</span>
+                  <button
+                    onClick={() => setShowOnlyAvailable(!showOnlyAvailable)}
+                    className={cn(
+                      "shrink-0 whitespace-nowrap rounded-full px-2 py-1 text-[10px] font-medium transition-colors sm:px-3 sm:py-1.5 sm:text-xs",
+                      showOnlyAvailable
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    )}
+                  >
+                    {showOnlyAvailable ? "✓ Avail." : "Avail. Only"}
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {filteredResults.map((result, index) => (
+                    <div
+                      key={result.fullDomain}
+                      className={cn(
+                        "group rounded-xl border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card sm:p-4",
                         "animate-fade-up opacity-0",
                       )}
                       style={{
-                        animationDelay: `${index * 0.05}s`,
+                        animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
                         animationFillMode: "forwards",
                       }}
                     >
-                      <div className="flex items-center gap-4">
-                        <span
-                          className={cn(
-                            "flex h-8 w-8 items-center justify-center rounded-full",
-                            result.available ? "bg-green-500/15 text-green-400" : "bg-muted text-muted-foreground",
-                          )}
-                        >
-                          {result.available ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                        </span>
-                        <div>
-                          <span className="text-lg font-semibold text-foreground">{result.name}</span>
-                          <span className="text-muted-foreground">.com</span>
-                          <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                            <span>Score: {result.score}</span>
-                            <span>Memorability: {result.memorability}</span>
-                            {result.pronounceable && (
-                              <span className="flex items-center gap-1 text-green-400">
-                                <CheckCircle className="h-3 w-3" /> Pronounceable
-                              </span>
+                      <div className="flex items-start justify-between gap-2 sm:items-center">
+                        <div className="flex items-start gap-2 sm:items-center sm:gap-4">
+                          <span
+                            className={cn(
+                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8",
+                              result.available ? "bg-green-500/15 text-green-400" : "bg-muted text-muted-foreground",
                             )}
+                          >
+                            {result.available ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                              <span className="truncate text-base font-semibold text-foreground sm:text-lg">{result.name}</span>
+                              <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:text-xs", tldColors[result.tld] || "bg-muted text-muted-foreground")}>
+                                .{result.tld}
+                              </span>
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground sm:gap-3 sm:text-xs">
+                              <span>Score: {result.score}</span>
+                              <span className="hidden sm:inline">Memorability: {result.memorability}</span>
+                              {result.pronounceable && (
+                                <span className="flex items-center gap-1 text-green-400">
+                                  <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
+                                </span>
+                              )}
+                            </div>
+                            {/* Founder Signal Badge */}
+                            <FounderSignalBadge
+                              name={result.name}
+                              tld={result.tld}
+                              pronounceable={result.pronounceable}
+                              memorability={result.memorability}
+                            />
+
+                            {/* SEO Micro-Signal & Check Button */}
+                            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                              {(() => {
+                                const signal = getSeoMicroSignal(result.name)
+                                return signal ? (
+                                  <span className={cn(
+                                    "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                    signal.type === "positive" ? "bg-green-500/15 text-green-400" :
+                                    signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-muted text-muted-foreground"
+                                  )}>
+                                    {signal.icon} {signal.text}
+                                  </span>
+                                ) : null
+                              })()}
+                              <button
+                                onClick={() => setSeoCheckDomain({ name: result.name, tld: result.tld })}
+                                className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
+                              >
+                                <Search className="h-2.5 w-2.5" />
+                                Check SEO Potential
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button
-                          onClick={() => copyToClipboard(result.name)}
-                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          title="Copy domain"
-                        >
-                          {copiedName === result.name ? (
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => toggleShortlist(result.name)}
-                          className={cn(
-                            "rounded-lg p-2 transition-colors hover:bg-muted",
-                            shortlist.includes(result.name)
-                              ? "text-primary"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
-                          title={shortlist.includes(result.name) ? "Remove from shortlist" : "Add to shortlist"}
-                        >
-                          {shortlist.includes(result.name) ? (
-                            <BookmarkCheck className="h-4 w-4" />
-                          ) : (
-                            <Bookmark className="h-4 w-4" />
-                          )}
-                        </button>
-                        {result.available && (
-                          <a
-                            href={`https://www.namecheap.com/domains/registration/results/?domain=${result.name}.com`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            title="Register domain"
+                        {/* Action buttons - always visible on mobile */}
+                        <div className="flex shrink-0 items-center gap-1 sm:gap-2 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
+                          <button
+                            onClick={() => copyToClipboard(result.fullDomain)}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:h-auto sm:w-auto sm:p-2"
+                            title="Copy domain"
                           >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        )}
+                            {copiedName === result.fullDomain ? (
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => toggleShortlist(result.fullDomain)}
+                            className={cn(
+                              "flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-muted sm:h-auto sm:w-auto sm:p-2",
+                              shortlist.includes(result.fullDomain)
+                                ? "text-primary"
+                                : "text-muted-foreground hover:text-foreground",
+                            )}
+                            title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                          >
+                            {shortlist.includes(result.fullDomain) ? (
+                              <BookmarkCheck className="h-4 w-4" />
+                            ) : (
+                              <Bookmark className="h-4 w-4" />
+                            )}
+                          </button>
+                          {result.available && (
+                            <a
+                              href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex h-9 items-center gap-1.5 rounded-lg bg-pink-500/15 px-2.5 text-xs font-semibold text-pink-400 transition-all hover:bg-pink-500/25 hover:scale-105 sm:h-auto sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                              title="Buy this domain on Porkbun"
+                            >
+                              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden xs:inline">Buy Domain</span>
+                              <span className="xs:hidden">Buy</span>
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -421,22 +873,91 @@ export function GenerateNames() {
               </div>
             )}
 
+            {/* Social Handle Checker */}
+            {results.length > 0 && (
+              <div className="mt-6 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm sm:mt-8 sm:p-6">
+                <h3 className="mb-3 text-base font-semibold text-foreground sm:mb-4 sm:text-lg">
+                  🔍 Check Social Handle
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground sm:mb-4 sm:text-sm">
+                  Check if your brand name is available as a username on social platforms.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={socialHandle}
+                    onChange={(e) => setSocialHandle(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && checkSocialHandles(socialHandle)}
+                    placeholder="e.g., yourbrand"
+                    className="h-11 flex-1 rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-10 sm:px-4"
+                  />
+                  <Button
+                    onClick={() => checkSocialHandles(socialHandle)}
+                    disabled={isCheckingSocials || !socialHandle.trim()}
+                    size="sm"
+                    className="h-11 min-w-[80px] sm:h-10"
+                  >
+                    {isCheckingSocials ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin sm:mr-2" />
+                        <span className="hidden sm:inline">Checking...</span>
+                      </>
+                    ) : (
+                      "Check"
+                    )}
+                  </Button>
+                </div>
+
+                {/* Social Results */}
+                {socialResults.length > 0 && (
+                  <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {socialResults.map((social) => (
+                      <a
+                        key={social.platformId}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-lg p-2 transition-colors active:scale-95 sm:p-3 sm:hover:scale-105",
+                          social.available
+                            ? "bg-green-500/10 hover:bg-green-500/20"
+                            : "bg-muted/50 hover:bg-muted"
+                        )}
+                      >
+                        <span className="text-base sm:text-lg">{socialIcons[social.platformId] || "🔗"}</span>
+                        <span className="text-[10px] font-medium text-foreground sm:text-xs">{social.platform}</span>
+                        <span
+                          className={cn(
+                            "text-[10px] sm:text-xs",
+                            social.available ? "text-green-400" : "text-muted-foreground"
+                          )}
+                        >
+                          {social.available ? "Available" : "Taken"}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Empty State */}
             {results.length === 0 && !isGenerating && (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/50 bg-card/30 py-16 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-                  <Zap className="h-8 w-8 text-primary" />
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-4 py-10 text-center sm:rounded-2xl sm:py-16">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 sm:mb-4 sm:h-16 sm:w-16 sm:rounded-2xl">
+                  <Zap className="h-6 w-6 text-primary sm:h-8 sm:w-8" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">Ready to generate</h3>
-                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                <h3 className="text-base font-semibold text-foreground sm:text-lg">Ready to generate</h3>
+                <p className="mt-1 max-w-[280px] text-xs text-muted-foreground sm:max-w-sm sm:text-sm">
                   Enter a keyword above and click generate to discover available domain names.
                 </p>
               </div>
             )}
+            </>
           </div>
 
-          {/* Shortlist Sidebar */}
-          <div className="lg:sticky lg:top-8 lg:self-start">
+          {/* Shortlist Sidebar - Hidden on mobile, shown on lg+ */}
+          <div className="hidden lg:sticky lg:top-8 lg:block lg:self-start">
             <div className="rounded-2xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">Shortlist</h3>
@@ -447,15 +968,26 @@ export function GenerateNames() {
 
               {shortlist.length > 0 ? (
                 <div className="space-y-2">
-                  {shortlist.map((name) => (
-                    <div key={name} className="flex items-center justify-between rounded-lg bg-background/50 p-3">
-                      <span className="font-medium text-foreground">{name}.com</span>
-                      <button
-                        onClick={() => toggleShortlist(name)}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
+                  {shortlist.map((fullDomain) => (
+                    <div key={fullDomain} className="flex items-center justify-between gap-2 rounded-lg bg-background/50 p-3">
+                      <span className="font-medium text-foreground truncate">{fullDomain}</span>
+                      <div className="flex items-center gap-1.5">
+                        <a
+                          href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-xs font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Buy
+                        </a>
+                        <button
+                          onClick={() => toggleShortlist(fullDomain)}
+                          className="text-muted-foreground hover:text-foreground p-1"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                   <Button onClick={exportShortlist} variant="outline" className="mt-4 w-full gap-2 bg-transparent">
@@ -490,7 +1022,77 @@ export function GenerateNames() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Shortlist - Collapsible at bottom */}
+        <div className="mt-6 lg:hidden">
+          <button
+            onClick={() => setIsMobileShortlistOpen(!isMobileShortlistOpen)}
+            className="flex w-full items-center justify-between rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm"
+          >
+            <div className="flex items-center gap-3">
+              <Bookmark className="h-5 w-5 text-primary" />
+              <span className="font-semibold text-foreground">Shortlist</span>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                {shortlist.length} saved
+              </span>
+            </div>
+            {isMobileShortlistOpen ? (
+              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            )}
+          </button>
+
+          {isMobileShortlistOpen && (
+            <div className="mt-2 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm">
+              {shortlist.length > 0 ? (
+                <div className="space-y-2">
+                  {shortlist.map((fullDomain) => (
+                    <div key={fullDomain} className="flex items-center justify-between gap-2 rounded-lg bg-background/50 p-3">
+                      <span className="text-sm font-medium text-foreground truncate">{fullDomain}</span>
+                      <div className="flex items-center gap-1">
+                        <a
+                          href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md bg-pink-500/15 px-3 text-xs font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Buy
+                        </a>
+                        <button
+                          onClick={() => toggleShortlist(fullDomain)}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button onClick={exportShortlist} variant="outline" className="mt-4 w-full gap-2 bg-transparent">
+                    <Download className="h-4 w-4" />
+                    Export List
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-center text-sm text-muted-foreground">
+                  Click the bookmark icon to save domains to your shortlist.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* SEO Potential Check Modal */}
+      {seoCheckDomain && (
+        <SeoPotentialCheck
+          domainName={seoCheckDomain.name}
+          tld={seoCheckDomain.tld}
+          industry={selectedIndustry}
+          onClose={() => setSeoCheckDomain(null)}
+        />
+      )}
     </div>
   )
 }

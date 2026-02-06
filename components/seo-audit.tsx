@@ -22,6 +22,11 @@ import {
   Download,
   ChevronDown,
   ChevronUp,
+  Heading,
+  Type,
+  Code,
+  Bug,
+  ShieldAlert,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -31,6 +36,7 @@ interface AuditItem {
   status: "pass" | "fail" | "warning"
   description: string
   recommendation?: string
+  details?: string[]
 }
 
 interface AuditCategory {
@@ -38,6 +44,32 @@ interface AuditCategory {
   icon: React.ReactNode
   score: number
   items: AuditItem[]
+  priority?: "high" | "medium" | "low"
+}
+
+interface AuditSummary {
+  overallScore: number
+  passCount: number
+  warningCount: number
+  failCount: number
+  grade: string
+  topIssues: string[]
+}
+
+interface PageInfo {
+  title: string
+  description: string
+  wordCount: number
+  loadTime?: number
+}
+
+interface AuditResult {
+  success: boolean
+  url: string
+  categories: AuditCategory[]
+  summary: AuditSummary
+  pageInfo: PageInfo
+  timestamp: string
 }
 
 const generateMockAudit = (url: string): AuditCategory[] => {
@@ -162,12 +194,14 @@ export function SeoAudit() {
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<AuditCategory[] | null>(null)
+  const [auditData, setAuditData] = useState<AuditResult | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
 
   const handleAnalyze = async () => {
     if (!url.trim()) return
     setIsAnalyzing(true)
     setResults(null)
+    setAuditData(null)
 
     try {
       const response = await fetch("/api/seo-audit", {
@@ -184,7 +218,8 @@ export function SeoAudit() {
         throw new Error("Failed to analyze website")
       }
 
-      const data = await response.json()
+      const data: AuditResult = await response.json()
+      setAuditData(data)
 
       // Transform API response to match component structure
       const categories = data.categories.map((cat: any) => ({
@@ -192,6 +227,7 @@ export function SeoAudit() {
         icon: getIconForCategory(cat.name),
         score: cat.score,
         items: cat.items,
+        priority: cat.priority,
       }))
 
       setResults(categories)
@@ -215,9 +251,17 @@ export function SeoAudit() {
       case "Mobile Friendliness":
         return <Smartphone className="h-5 w-5" />
       case "Security":
-        return <Shield className="h-5 w-5" />
+        return <ShieldAlert className="h-5 w-5" />
+      case "Spam & Bot Protection":
+        return <Bug className="h-5 w-5" />
       case "Links":
         return <Link2 className="h-5 w-5" />
+      case "Headings":
+        return <Heading className="h-5 w-5" />
+      case "Content":
+        return <Type className="h-5 w-5" />
+      case "Structured Data":
+        return <Code className="h-5 w-5" />
       default:
         return <Globe className="h-5 w-5" />
     }
@@ -225,6 +269,173 @@ export function SeoAudit() {
 
   const toggleCategory = (name: string) => {
     setExpandedCategories((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]))
+  }
+
+  const downloadReport = () => {
+    if (!results || !auditData) return
+
+    const score = auditData.summary?.overallScore || overallScore
+    const grade = auditData.summary?.grade || getGrade(score)
+    const pageInfo = auditData.pageInfo
+
+    const reportHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO Audit Report - ${auditData.url}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; line-height: 1.6; padding: 40px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 8px; color: #fff; }
+    h2 { font-size: 1.25rem; margin: 24px 0 12px; color: #a855f7; }
+    h3 { font-size: 1rem; margin-bottom: 8px; color: #d4d4d4; }
+    .subtitle { color: #737373; margin-bottom: 32px; }
+    .score-box { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, ${score >= 80 ? '#22c55e33' : score >= 60 ? '#eab30833' : '#ef444433'}, transparent); margin: 24px 0; }
+    .score { font-size: 3rem; font-weight: bold; color: ${score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : '#ef4444'}; }
+    .grade { font-size: 1rem; color: #737373; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+    .info-item { background: #171717; padding: 16px; border-radius: 12px; border: 1px solid #262626; }
+    .info-label { font-size: 0.75rem; color: #737373; text-transform: uppercase; }
+    .info-value { font-size: 1rem; color: #e5e5e5; margin-top: 4px; }
+    .category { background: #171717; border-radius: 12px; border: 1px solid #262626; margin-bottom: 16px; overflow: hidden; }
+    .category-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; }
+    .category-name { font-weight: 600; color: #fff; }
+    .category-score { font-size: 1.25rem; font-weight: bold; }
+    .category-items { border-top: 1px solid #262626; padding: 16px; }
+    .item { display: flex; gap: 12px; padding: 12px; background: #0a0a0a; border-radius: 8px; margin-bottom: 8px; }
+    .item:last-child { margin-bottom: 0; }
+    .status { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .status.pass { background: #22c55e; }
+    .status.warning { background: #eab308; }
+    .status.fail { background: #ef4444; }
+    .item-content { flex: 1; }
+    .item-title { font-weight: 500; color: #e5e5e5; }
+    .item-desc { font-size: 0.875rem; color: #737373; margin-top: 2px; }
+    .item-rec { font-size: 0.875rem; color: #a855f7; margin-top: 4px; }
+    .details { font-size: 0.75rem; color: #525252; margin-top: 4px; padding-left: 12px; border-left: 2px solid #262626; }
+    .priority { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+    .priority.high { background: #ef444433; color: #ef4444; }
+    .priority.medium { background: #eab30833; color: #eab308; }
+    .priority.low { background: #22c55e33; color: #22c55e; }
+    .summary { background: #171717; border-radius: 12px; padding: 24px; border: 1px solid #262626; margin: 24px 0; }
+    .summary-stats { display: flex; gap: 24px; margin-top: 16px; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 1.5rem; font-weight: bold; }
+    .stat-label { font-size: 0.75rem; color: #737373; }
+    .footer { text-align: center; margin-top: 40px; color: #525252; font-size: 0.875rem; }
+    .logo { color: #a855f7; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SEO Audit Report</h1>
+    <p class="subtitle">${auditData.url}</p>
+
+    <div style="text-align: center;">
+      <div class="score-box">
+        <span class="score">${score}</span>
+        <span class="grade">Grade: ${grade}</span>
+      </div>
+    </div>
+
+    ${pageInfo ? `
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Page Title</div>
+        <div class="info-value">${pageInfo.title || 'N/A'}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Word Count</div>
+        <div class="info-value">${pageInfo.wordCount?.toLocaleString() || 'N/A'} words</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Load Time</div>
+        <div class="info-value">${pageInfo.loadTime ? `${(pageInfo.loadTime / 1000).toFixed(2)}s` : 'N/A'}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Analyzed</div>
+        <div class="info-value">${new Date(auditData.timestamp).toLocaleString()}</div>
+      </div>
+    </div>
+    ` : ''}
+
+    ${auditData.summary?.topIssues?.length ? `
+    <div class="summary">
+      <h3>Top Issues to Fix</h3>
+      <ul style="margin-top: 12px; padding-left: 20px;">
+        ${auditData.summary.topIssues.map(issue => `<li style="margin-bottom: 8px; color: #eab308;">${issue}</li>`).join('')}
+      </ul>
+      <div class="summary-stats">
+        <div class="stat">
+          <div class="stat-value" style="color: #22c55e;">${auditData.summary.passCount}</div>
+          <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" style="color: #eab308;">${auditData.summary.warningCount}</div>
+          <div class="stat-label">Warnings</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" style="color: #ef4444;">${auditData.summary.failCount}</div>
+          <div class="stat-label">Failed</div>
+        </div>
+      </div>
+    </div>
+    ` : ''}
+
+    <h2>Detailed Results</h2>
+    ${results.map(category => `
+    <div class="category">
+      <div class="category-header">
+        <div>
+          <span class="category-name">${category.name}</span>
+          ${category.priority ? `<span class="priority ${category.priority}" style="margin-left: 8px;">${category.priority}</span>` : ''}
+        </div>
+        <span class="category-score" style="color: ${category.score >= 80 ? '#22c55e' : category.score >= 60 ? '#eab308' : '#ef4444'}">${category.score}</span>
+      </div>
+      <div class="category-items">
+        ${category.items.map(item => `
+        <div class="item">
+          <div class="status ${item.status}"></div>
+          <div class="item-content">
+            <div class="item-title">${item.title}</div>
+            <div class="item-desc">${item.description}</div>
+            ${item.recommendation ? `<div class="item-rec">→ ${item.recommendation}</div>` : ''}
+            ${item.details?.length ? `<div class="details">${item.details.join('<br>')}</div>` : ''}
+          </div>
+        </div>
+        `).join('')}
+      </div>
+    </div>
+    `).join('')}
+
+    <div class="footer">
+      Generated by <span class="logo">NamoLux</span> SEO Audit Tool<br>
+      ${new Date().toLocaleDateString()}
+    </div>
+  </div>
+</body>
+</html>`
+
+    const blob = new Blob([reportHTML], { type: 'text/html' })
+    const downloadUrl = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.download = `seo-audit-${new URL(auditData.url).hostname}-${new Date().toISOString().split('T')[0]}.html`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(downloadUrl)
+  }
+
+  const getGrade = (score: number): string => {
+    if (score >= 90) return "A+"
+    if (score >= 80) return "A"
+    if (score >= 70) return "B"
+    if (score >= 60) return "C"
+    if (score >= 50) return "D"
+    return "F"
   }
 
   const overallScore = results ? Math.round(results.reduce((acc, cat) => acc + cat.score, 0) / results.length) : 0
@@ -254,11 +465,11 @@ export function SeoAudit() {
 
   return (
     <div className="noise-overlay relative min-h-screen bg-background">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="animate-luxury-aura absolute top-0 right-1/4 h-[600px] w-[600px] translate-x-1/2 rounded-full bg-gradient-to-bl from-primary/20 via-secondary/10 to-transparent blur-[120px]" />
+      {/* Background - Subtle, restrained */}
+      <div className="pointer-events-none absolute inset-0 overflow-clip" aria-hidden="true">
+        <div className="animate-luxury-aura absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-gradient-to-bl from-primary/10 via-secondary/5 to-transparent blur-[120px]" />
         <div
-          className="animate-luxury-aura absolute bottom-0 left-0 h-[500px] w-[500px] -translate-x-1/4 rounded-full bg-gradient-to-tr from-secondary/15 via-primary/5 to-transparent blur-[100px]"
+          className="animate-luxury-aura absolute bottom-0 left-0 h-[350px] w-[350px] -translate-x-1/4 rounded-full bg-gradient-to-tr from-secondary/8 via-primary/3 to-transparent blur-[100px]"
           style={{ animationDelay: "-7s" }}
         />
       </div>
@@ -329,21 +540,83 @@ export function SeoAudit() {
         {/* Results */}
         {results && !isAnalyzing && (
           <div>
-            {/* Overall Score */}
-            <div className="mb-8 flex flex-col items-center justify-center">
-              <div
-                className={cn(
-                  "flex h-32 w-32 flex-col items-center justify-center rounded-full bg-gradient-to-b",
-                  getScoreBg(overallScore),
-                )}
-              >
-                <span className={cn("text-4xl font-bold", getScoreColor(overallScore))}>{overallScore}</span>
-                <span className="text-sm text-muted-foreground">Overall Score</span>
+            {/* Overall Score & Summary */}
+            <div className="mb-8">
+              <div className="flex flex-col items-center justify-center">
+                <div
+                  className={cn(
+                    "flex h-32 w-32 flex-col items-center justify-center rounded-full bg-gradient-to-b",
+                    getScoreBg(auditData?.summary?.overallScore || overallScore),
+                  )}
+                >
+                  <span className={cn("text-4xl font-bold", getScoreColor(auditData?.summary?.overallScore || overallScore))}>
+                    {auditData?.summary?.overallScore || overallScore}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Grade: {auditData?.summary?.grade || getGrade(overallScore)}
+                  </span>
+                </div>
+                <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  {auditData?.pageInfo?.loadTime
+                    ? `Loaded in ${(auditData.pageInfo.loadTime / 1000).toFixed(2)}s`
+                    : "Analyzed just now"
+                  }
+                </div>
               </div>
-              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                Analyzed just now
-              </div>
+
+              {/* Summary Stats */}
+              {auditData?.summary && (
+                <div className="mt-6 flex justify-center gap-8">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">{auditData.summary.passCount}</div>
+                    <div className="text-xs text-muted-foreground">Passed</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-yellow-400">{auditData.summary.warningCount}</div>
+                    <div className="text-xs text-muted-foreground">Warnings</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-400">{auditData.summary.failCount}</div>
+                    <div className="text-xs text-muted-foreground">Failed</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Page Info */}
+              {auditData?.pageInfo && (
+                <div className="mt-6 mx-auto max-w-2xl grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="rounded-lg bg-card/50 border border-border/50 p-3 text-center">
+                    <div className="text-xs text-muted-foreground mb-1">Words</div>
+                    <div className="font-semibold text-foreground">{auditData.pageInfo.wordCount?.toLocaleString()}</div>
+                  </div>
+                  <div className="rounded-lg bg-card/50 border border-border/50 p-3 text-center col-span-2 sm:col-span-2">
+                    <div className="text-xs text-muted-foreground mb-1">Page Title</div>
+                    <div className="font-semibold text-foreground truncate text-sm">{auditData.pageInfo.title}</div>
+                  </div>
+                  <div className="rounded-lg bg-card/50 border border-border/50 p-3 text-center">
+                    <div className="text-xs text-muted-foreground mb-1">Load Time</div>
+                    <div className="font-semibold text-foreground">
+                      {auditData.pageInfo.loadTime ? `${(auditData.pageInfo.loadTime / 1000).toFixed(2)}s` : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Top Issues */}
+              {auditData?.summary?.topIssues?.length > 0 && (
+                <div className="mt-6 mx-auto max-w-2xl rounded-xl bg-yellow-500/10 border border-yellow-500/20 p-4">
+                  <h3 className="font-semibold text-yellow-400 mb-2">Top Issues to Fix</h3>
+                  <ul className="space-y-2">
+                    {auditData.summary.topIssues.slice(0, 3).map((issue, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="text-yellow-400 mt-0.5">→</span>
+                        {issue}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Category Cards */}
@@ -362,7 +635,19 @@ export function SeoAudit() {
                         {category.icon}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{category.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{category.name}</h3>
+                          {category.priority && (
+                            <span className={cn(
+                              "text-[10px] px-1.5 py-0.5 rounded font-medium uppercase",
+                              category.priority === "high" && "bg-red-500/20 text-red-400",
+                              category.priority === "medium" && "bg-yellow-500/20 text-yellow-400",
+                              category.priority === "low" && "bg-green-500/20 text-green-400"
+                            )}>
+                              {category.priority}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           {category.items.filter((i) => i.status === "pass").length} passed,{" "}
                           {category.items.filter((i) => i.status === "warning").length} warnings,{" "}
@@ -390,7 +675,17 @@ export function SeoAudit() {
                               <p className="font-medium text-foreground">{item.title}</p>
                               <p className="text-sm text-muted-foreground">{item.description}</p>
                               {item.recommendation && (
-                                <p className="mt-1 text-sm text-primary">Recommendation: {item.recommendation}</p>
+                                <p className="mt-1 text-sm text-primary">→ {item.recommendation}</p>
+                              )}
+                              {item.details && item.details.length > 0 && (
+                                <div className="mt-2 text-xs text-muted-foreground/70 pl-3 border-l-2 border-border">
+                                  {item.details.slice(0, 3).map((detail, i) => (
+                                    <div key={i} className="truncate">{detail}</div>
+                                  ))}
+                                  {item.details.length > 3 && (
+                                    <div className="text-muted-foreground/50">...and {item.details.length - 3} more</div>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -404,7 +699,7 @@ export function SeoAudit() {
 
             {/* Actions */}
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Button variant="outline" className="gap-2 bg-transparent">
+              <Button variant="outline" className="gap-2 bg-transparent" onClick={downloadReport}>
                 <Download className="h-4 w-4" />
                 Download Report
               </Button>
@@ -414,6 +709,7 @@ export function SeoAudit() {
                 onClick={() => {
                   setUrl("")
                   setResults(null)
+                  setAuditData(null)
                 }}
               >
                 <RefreshCw className="h-4 w-4" />

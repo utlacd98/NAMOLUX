@@ -26,7 +26,7 @@ export function HowItWorks() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section id="how-it-works" className="bg-muted/30 py-24" aria-labelledby="how-it-works-heading">
+    <section id="how-it-works" className="overflow-clip bg-muted/30 py-16 sm:py-24" aria-labelledby="how-it-works-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 id="how-it-works-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -40,7 +40,7 @@ export function HowItWorks() {
         <div ref={ref} className="relative mt-16">
           {/* Timeline line */}
           <div
-            className="absolute top-8 left-[28px] hidden h-[calc(100%-4rem)] w-px bg-gradient-to-b from-primary via-secondary to-accent lg:left-1/2 lg:block lg:-translate-x-1/2"
+            className="absolute top-8 left-[28px] hidden h-[calc(100%-4rem)] w-px bg-gradient-to-b from-primary/60 via-secondary/40 to-muted lg:left-1/2 lg:block lg:-translate-x-1/2"
             aria-hidden="true"
           />
 
@@ -61,7 +61,7 @@ export function HowItWorks() {
               >
                 {/* Number Circle */}
                 <div className="flex items-center gap-4 lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:gap-0">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary bg-card text-xl font-bold text-primary shadow-lg shadow-primary/20">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-card text-xl font-bold text-primary shadow-md shadow-black/10">
                     {step.number}
                   </div>
                 </div>

@@ -20,8 +20,17 @@ model User {
   transactions  Transaction[]
   usageHistory  Usage[]
 
+  // Stripe subscription fields
+  stripeCustomerId     String?   @unique
+  subscriptionId       String?   @unique
+  subscriptionStatus   String?   // "active" | "canceled" | "past_due" | "trialing" | null
+  subscriptionPriceId  String?   // The price ID they're subscribed to
+  subscriptionEndDate  DateTime? // When current period ends (for canceled subs)
+
   @@index([clerkId])
   @@index([email])
+  @@index([stripeCustomerId])
+  @@index([subscriptionId])
 }
 
 model Transaction {
@@ -50,5 +59,23 @@ model Usage {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+// Anonymous usage metrics (no auth required)
+model Metrics {
+  id        String   @id @default(cuid())
+  action    String   // "name_generation" | "bulk_check" | "seo_audit" | "affiliate_click" | "page_view"
+  metadata  Json?    // Store details like keyword count, TLDs checked, etc.
+  userAgent String?  // Browser info
+  country   String?  // Country from request headers
+  sessionId String?  // Anonymous session ID for tracking user journeys
+  device    String?  // "desktop" | "mobile" | "tablet"
+  referrer  String?  // Referrer URL
+  route     String?  // Current route/page
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([sessionId])
 }
 

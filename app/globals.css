@@ -76,50 +76,50 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* Dark Luxury Theme Override - applied when .dark class is present */
+/* Dark Luxury Theme Override - Gold + Neutral Palette */
 .dark {
-  --background: #0b0b10;
-  --foreground: #ededed;
-  --card: #1a1a24;
-  --card-foreground: #ededed;
-  --popover: #12121a;
-  --popover-foreground: #ededed;
-  --primary: #8b5cf6;
-  --primary-foreground: #ffffff;
-  --secondary: #6d28d9;
-  --secondary-foreground: #ffffff;
-  --muted: #12121a;
-  --muted-foreground: #9ca3af;
-  --accent: #e7d7b8;
-  --accent-foreground: #0b0b10;
+  --background: #0B0C10;
+  --foreground: #F4F4F4;
+  --card: #141720;
+  --card-foreground: #F4F4F4;
+  --popover: #11131A;
+  --popover-foreground: #F4F4F4;
+  --primary: #D6B27C;
+  --primary-foreground: #0B0C10;
+  --secondary: #8F7A55;
+  --secondary-foreground: #F4F4F4;
+  --muted: #11131A;
+  --muted-foreground: #A1A1AA;
+  --accent: #D6B27C;
+  --accent-foreground: #0B0C10;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: #8b5cf6;
+  --border: rgba(214, 178, 124, 0.08);
+  --input: rgba(255, 255, 255, 0.06);
+  --ring: #D6B27C;
 }
 
-/* Light Luxury Theme Override - elegant light mode */
+/* Light Luxury Theme Override - Gold + Neutral Palette */
 .light {
-  --background: #fafafa;
-  --foreground: #0b0b10;
-  --card: #ffffff;
-  --card-foreground: #0b0b10;
-  --popover: #ffffff;
-  --popover-foreground: #0b0b10;
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
-  --secondary: #8b5cf6;
-  --secondary-foreground: #ffffff;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #d4a574;
-  --accent-foreground: #0b0b10;
+  --background: #FAFAF9;
+  --foreground: #18181B;
+  --card: #FFFFFF;
+  --card-foreground: #18181B;
+  --popover: #FFFFFF;
+  --popover-foreground: #18181B;
+  --primary: #8F7A55;
+  --primary-foreground: #FFFFFF;
+  --secondary: #D6B27C;
+  --secondary-foreground: #18181B;
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+  --accent: #8F7A55;
+  --accent-foreground: #FFFFFF;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
+  --border: rgba(143, 122, 85, 0.12);
   --input: rgba(0, 0, 0, 0.05);
-  --ring: #7c3aed;
+  --ring: #8F7A55;
 }
 
 @theme inline {
@@ -165,29 +165,35 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply bg-background text-foreground;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
   body {
     @apply bg-background text-foreground;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+    min-width: 0;
+  }
+  /* Prevent all horizontal overflow at root */
+  #__next,
+  main {
+    overflow-x: clip;
+    max-width: 100%;
   }
 }
 
-/* Luxury Aura Animation */
+/* Luxury Aura Animation - Subtle and refined */
 @keyframes luxury-aura {
   0%,
   100% {
-    opacity: 0.4;
-    transform: scale(1) translate(0, 0);
-  }
-  25% {
-    opacity: 0.6;
-    transform: scale(1.05) translate(10px, -10px);
+    opacity: 0.15;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.5;
-    transform: scale(1.1) translate(-5px, 5px);
-  }
-  75% {
-    opacity: 0.55;
-    transform: scale(1.03) translate(-10px, -5px);
+    opacity: 0.25;
+    transform: scale(1.02);
   }
 }
 
@@ -201,28 +207,26 @@
   }
 }
 
-/* CTA Breathing Glow */
+/* CTA Subtle Shadow - No glow, premium feel */
 @keyframes breathing-glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }
 
-/* Fade Up Animation */
+/* Fade Up Animation - Subtle and refined */
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(30px);
-    filter: blur(4px);
+    transform: translateY(16px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -272,6 +276,80 @@
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Slow spin for gradient borders */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Gradient text shimmer */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* One-time gold shimmer pass for headlines */
+@keyframes shimmer-once {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.animate-shimmer-once {
+  background-size: 200% 100%;
+  animation: shimmer-once 1.5s ease-out forwards;
+}
+
+/* Soft blink for Live badge */
+@keyframes soft-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-soft-blink {
+  animation: soft-blink 3s ease-in-out infinite;
+}
+
+/* Subtle CTA pulse every 8 seconds */
+@keyframes cta-pulse {
+  0%, 100% {
+    box-shadow: 0 10px 25px -5px rgb(183 135 38 / 0.2), 0 8px 10px -6px rgb(183 135 38 / 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 15px 35px -5px rgb(183 135 38 / 0.35), 0 10px 15px -6px rgb(183 135 38 / 0.2);
+    transform: scale(1.02);
+  }
+}
+
+.animate-cta-pulse {
+  animation: cta-pulse 1s ease-in-out;
 }
 
 /* Stagger delays for cards */
@@ -327,7 +405,7 @@
   inset: 0;
   padding: 1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 50%, #e7d7b8 100%);
+  background: linear-gradient(135deg, #D6B27C 0%, #8F7A55 50%, #D6B27C 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -351,12 +429,58 @@ select option {
 }
 
 .dark select option {
-  background-color: #1a1a1a;
-  color: #ffffff;
+  background-color: #141720;
+  color: #F4F4F4;
 }
 
 /* Ensure dropdown menu matches dark theme */
 .dark select {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-first improvements */
+@media (max-width: 640px) {
+  /* Improve touch targets on mobile */
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+
+  /* Reduce animation intensity on mobile for performance */
+  .animate-fade-up {
+    animation-duration: 0.2s !important;
+  }
+
+  /* Lock horizontal overflow on mobile */
+  html, body {
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+    position: relative;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* Prevent page shift on swipe */
+  main, section, div {
+    max-width: 100%;
+  }
+
+  /* Full-width buttons on mobile */
+  .btn-mobile-full {
+    width: 100%;
+  }
+
+  /* Disable horizontal scroll bounce */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
 }
