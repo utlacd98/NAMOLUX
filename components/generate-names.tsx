@@ -36,18 +36,18 @@ function getSeoMicroSignal(name: string): { icon: string; text: string; type: "p
 
   // Check for strong niche pattern first (highest priority)
   if (NICHE_PATTERNS.some(p => p.test(lowerName))) {
-    return { icon: "ðŸ”¥", text: "Strong SEO", type: "positive" }
+    return { icon: "\u{1F525}", text: "Strong SEO", type: "positive" }
   }
 
   // Check for high competition keywords
   const matchedHigh = HIGH_COMPETITION.filter(kw => lowerName.includes(kw))
   if (matchedHigh.length >= 2) {
-    return { icon: "âš ï¸", text: "High competition", type: "warning" }
+    return { icon: "\u26A0\uFE0F", text: "High competition", type: "warning" }
   }
 
   // Check for niche-friendly (no common keywords)
   if (matchedHigh.length === 0 && lowerName.length >= 5 && lowerName.length <= 10) {
-    return { icon: "âœ…", text: "Niche-friendly", type: "positive" }
+    return { icon: "\u2705", text: "Niche-friendly", type: "positive" }
   }
 
   return null
@@ -122,11 +122,11 @@ const tldColors: Record<string, string> = {
 
 // Social platform icons (emoji fallback)
 const socialIcons: Record<string, string> = {
-  twitter: "ð•",
-  instagram: "ðŸ“·",
-  tiktok: "â™ª",
-  github: "âŒ¨",
-  youtube: "â–¶",
+  twitter: "\u{1D54F}",
+  instagram: "\u{1F4F7}",
+  tiktok: "\u266A",
+  github: "\u2328",
+  youtube: "\u25B6",
 }
 
 const generateMockResults = (keyword: string): DomainResult[] => {
@@ -755,7 +755,7 @@ export function GenerateNames() {
                     !isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                   )}
                 >
-                  âœ¨ AI Generate
+                  ✨ AI Generate
                 </button>
                 <button
                   onClick={() => setIsBulkMode(true)}
@@ -764,7 +764,7 @@ export function GenerateNames() {
                     isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                   )}
                 >
-                  ðŸ“‹ Bulk Check
+                  📋 Bulk Check
                 </button>
               </div>
 
@@ -1108,7 +1108,7 @@ export function GenerateNames() {
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
                     )}
                   >
-                    {showOnlyAvailable ? "âœ“ Avail." : "Avail. Only"}
+                    {showOnlyAvailable ? "✓ Avail." : "Avail. Only"}
                   </button>
                 </div>
 
@@ -1238,7 +1238,7 @@ export function GenerateNames() {
             {results.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm sm:mt-8 sm:p-6">
                 <h3 className="mb-3 text-base font-semibold text-foreground sm:mb-4 sm:text-lg">
-                  ðŸ” Check Social Handle
+                  🔍 Check Social Handle
                 </h3>
                 <p className="mb-3 text-xs text-muted-foreground sm:mb-4 sm:text-sm">
                   Check if your brand name is available as a username on social platforms.
@@ -1285,7 +1285,7 @@ export function GenerateNames() {
                             : "bg-muted/50 hover:bg-muted"
                         )}
                       >
-                        <span className="text-base sm:text-lg">{socialIcons[social.platformId] || "ðŸ”—"}</span>
+                        <span className="text-base sm:text-lg">{socialIcons[social.platformId] || "🔗"}</span>
                         <span className="text-[10px] font-medium text-foreground sm:text-xs">{social.platform}</span>
                         <span
                           className={cn(
