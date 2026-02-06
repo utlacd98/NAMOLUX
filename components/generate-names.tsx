@@ -22,6 +22,7 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
+  Shuffle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -189,6 +190,29 @@ const VIBE_MODIFIERS: Record<string, string[]> = {
   minimal: ["core", "base", "plain"],
 }
 
+const VIBE_SHUFFLE_TERMS: Record<string, string[]> = {
+  luxury: ["velvet", "gold", "elite", "luxe", "royal"],
+  futuristic: ["neo", "flux", "orbit", "quant", "nova"],
+  playful: ["pop", "bloom", "spark", "jolly", "zest"],
+  trustworthy: ["anchor", "steady", "proof", "clear", "shield"],
+  minimal: ["mono", "clean", "plain", "pure", "core"],
+}
+
+const INDUSTRY_SHUFFLE_TERMS: Record<string, string[]> = {
+  Technology: ["stack", "byte", "logic", "grid", "cloud"],
+  "Health & Wellness": ["vital", "well", "pulse", "care", "fit"],
+  Finance: ["ledger", "vault", "coin", "yield", "fund"],
+  "E-commerce": ["cart", "store", "shop", "basket", "trade"],
+  Education: ["learn", "tutor", "skill", "study", "class"],
+  Creative: ["craft", "pixel", "canvas", "story", "frame"],
+  "Real Estate": ["nest", "estate", "brick", "roof", "plot"],
+  "Food & Beverage": ["taste", "fresh", "plate", "sip", "chef"],
+  "SaaS & Software": ["app", "suite", "sync", "stack", "flow"],
+  "AI & Machine Learning": ["mind", "model", "neural", "agent", "vector"],
+}
+
+const GENERIC_SHUFFLE_TERMS = ["hub", "forge", "labs", "kit", "flow", "pilot", "base", "spark", "boost", "works"]
+
 function splitWords(value: string): string[] {
   return value
     .toLowerCase()
@@ -215,6 +239,17 @@ function getIndustryModifier(industry: string): string {
   return words[0] || ""
 }
 
+function getShufflePool(industry: string, vibe: string): string[] {
+  const pool = [
+    ...GENERIC_SHUFFLE_TERMS,
+    ...(VIBE_SHUFFLE_TERMS[vibe] || []),
+    ...(INDUSTRY_SHUFFLE_TERMS[industry] || []),
+    ...splitWords(industry),
+  ]
+
+  return Array.from(new Set(pool.map((word) => word.toLowerCase().replace(/[^a-z0-9]/g, "")).filter((word) => word.length >= 3)))
+}
+
 function createBlend(first: string, second: string): string {
   if (!first) return second
   if (!second) return first
@@ -234,9 +269,13 @@ function buildRemixSeed(baseKeyword: string, vibe: string, industry: string, att
   const vibeWords = VIBE_MODIFIERS[vibe] || []
   const vibeWord = vibeWords.length ? vibeWords[attempt % vibeWords.length] : ""
   const industryWord = getIndustryModifier(industry)
+  const shufflePool = getShufflePool(industry, vibe)
+  const shuffleWord = shufflePool.length ? shufflePool[attempt % shufflePool.length] : ""
+  const altShuffleWord = shufflePool.length ? shufflePool[(attempt + 3) % shufflePool.length] : ""
   const base = words.join(" ")
   const reversed = [...words].reverse().join(" ")
   const blendWithIndustry = createBlend(first, second || industryWord || vibeWord || "brand")
+  const blendWithShuffle = createBlend(first, shuffleWord || "brand")
   const shortBase = words.map((word) => shortenWord(lightlyRemoveInnerVowel(word))).join(" ")
 
   const candidates = [
@@ -250,6 +289,10 @@ function buildRemixSeed(baseKeyword: string, vibe: string, industry: string, att
     shortBase,
     vibeWord ? `${base} ${vibeWord}` : "",
     industryWord ? `${base} ${industryWord}` : "",
+    shuffleWord ? `${base} ${shuffleWord}` : "",
+    shuffleWord ? `${shuffleWord} ${base}` : "",
+    blendWithShuffle,
+    altShuffleWord ? `${blendWithShuffle} ${altShuffleWord}` : "",
   ]
     .map((item) => item.replace(/\s+/g, " ").trim())
     .filter(Boolean)
@@ -259,6 +302,25 @@ function buildRemixSeed(baseKeyword: string, vibe: string, industry: string, att
 
 function normaliseDomainName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function buildShuffledKeyword(baseKeyword: string, vibe: string, industry: string): string {
+  const baseWords = splitWords(baseKeyword)
+  const shufflePool = getShufflePool(industry, vibe)
+  const primary = baseWords[0] || shufflePool[0] || "brand"
+  const secondary = (shufflePool.find((word) => word !== primary) || "labs").toLowerCase()
+  const tertiary = (shufflePool.find((word) => word !== primary && word !== secondary) || "hub").toLowerCase()
+
+  const options = [
+    `${primary} ${secondary}`,
+    `${secondary} ${primary}`,
+    `${primary}${secondary}`,
+    `${primary}${tertiary}`,
+    `${createBlend(primary, secondary)} ${tertiary}`,
+  ]
+
+  const randomOption = options[Math.floor(Math.random() * options.length)] || `${primary} ${secondary}`
+  return randomOption.replace(/\s+/g, " ").trim()
 }
 
 function delay(ms: number, signal: AbortSignal): Promise<void> {
@@ -640,6 +702,12 @@ export function GenerateNames() {
     }
   }
 
+  const handleShuffleKeyword = () => {
+    const shuffled = buildShuffledKeyword(keyword, selectedVibe, selectedIndustry)
+    setKeyword(shuffled)
+    setError(null)
+  }
+
   const toggleShortlist = (fullDomain: string) => {
     setShortlist((prev) => (prev.includes(fullDomain) ? prev.filter((n) => n !== fullDomain) : [...prev, fullDomain]))
   }
@@ -796,15 +864,29 @@ export function GenerateNames() {
                   <label htmlFor="keyword" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
                     Keyword or concept
                   </label>
-                  <input
-                    id="keyword"
-                    type="text"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-                    placeholder="e.g., fitness, finance, creative..."
-                    className="h-10 w-full rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      id="keyword"
+                      type="text"
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
+                      placeholder="e.g., fitness, finance, creative..."
+                      className="h-10 w-full flex-1 rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleShuffleKeyword}
+                      className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border/50 bg-background/50 px-3 text-xs font-medium text-foreground transition-colors hover:bg-muted sm:h-12 sm:rounded-xl sm:px-4 sm:text-sm"
+                      title="Shuffle keyword ideas"
+                    >
+                      <Shuffle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span>Shuffle</span>
+                    </button>
+                  </div>
+                  <p className="mt-1 text-[10px] text-muted-foreground sm:text-xs">
+                    Need broader options? Shuffle the seed before generating.
+                  </p>
                   {/* Search History */}
                   {searchHistory.length > 0 && (
                     <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
