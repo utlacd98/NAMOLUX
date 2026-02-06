@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import {
@@ -36,18 +36,18 @@ function getSeoMicroSignal(name: string): { icon: string; text: string; type: "p
 
   // Check for strong niche pattern first (highest priority)
   if (NICHE_PATTERNS.some(p => p.test(lowerName))) {
-    return { icon: "🔥", text: "Strong SEO", type: "positive" }
+    return { icon: "ðŸ”¥", text: "Strong SEO", type: "positive" }
   }
 
   // Check for high competition keywords
   const matchedHigh = HIGH_COMPETITION.filter(kw => lowerName.includes(kw))
   if (matchedHigh.length >= 2) {
-    return { icon: "⚠️", text: "High competition", type: "warning" }
+    return { icon: "âš ï¸", text: "High competition", type: "warning" }
   }
 
   // Check for niche-friendly (no common keywords)
   if (matchedHigh.length === 0 && lowerName.length >= 5 && lowerName.length <= 10) {
-    return { icon: "✅", text: "Niche-friendly", type: "positive" }
+    return { icon: "âœ…", text: "Niche-friendly", type: "positive" }
   }
 
   return null
@@ -122,11 +122,11 @@ const tldColors: Record<string, string> = {
 
 // Social platform icons (emoji fallback)
 const socialIcons: Record<string, string> = {
-  twitter: "𝕏",
-  instagram: "📷",
-  tiktok: "♪",
-  github: "⌨",
-  youtube: "▶",
+  twitter: "ð•",
+  instagram: "ðŸ“·",
+  tiktok: "â™ª",
+  github: "âŒ¨",
+  youtube: "â–¶",
 }
 
 const generateMockResults = (keyword: string): DomainResult[] => {
@@ -172,6 +172,117 @@ const STORAGE_KEYS = {
   SEARCH_HISTORY: "namolux_search_history",
 }
 
+const AUTO_FIND_TARGET_COM_COUNT = 5
+const AUTO_FIND_MAX_ATTEMPTS = 8
+const AUTO_FIND_TIME_CAP_MS = 20_000
+const AUTO_FIND_BATCH_SIZE = 16
+const AUTO_FIND_ATTEMPT_DELAY_MS = 180
+
+const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
+const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
+
+const VIBE_MODIFIERS: Record<string, string[]> = {
+  luxury: ["studio", "atelier", "prime"],
+  futuristic: ["nova", "next", "quantum"],
+  playful: ["spark", "pop", "joy"],
+  trustworthy: ["secure", "solid", "trust"],
+  minimal: ["core", "base", "plain"],
+}
+
+function splitWords(value: string): string[] {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+}
+
+function lightlyRemoveInnerVowel(word: string): string {
+  if (word.length < 5) return word
+  const first = word[0]
+  const rest = word.slice(1).replace(/[aeiou]/, "")
+  return `${first}${rest}`
+}
+
+function shortenWord(word: string): string {
+  if (word.length <= 6) return word
+  return word.slice(0, 6)
+}
+
+function getIndustryModifier(industry: string): string {
+  if (!industry) return ""
+  const words = splitWords(industry).filter((word) => !["and", "the", "services"].includes(word))
+  return words[0] || ""
+}
+
+function createBlend(first: string, second: string): string {
+  if (!first) return second
+  if (!second) return first
+  const left = shortenWord(lightlyRemoveInnerVowel(first)).slice(0, 4)
+  const right = shortenWord(lightlyRemoveInnerVowel(second)).slice(-4)
+  return `${left}${right}`.replace(/[^a-z0-9]/g, "")
+}
+
+function buildRemixSeed(baseKeyword: string, vibe: string, industry: string, attempt: number): string {
+  const words = splitWords(baseKeyword)
+  if (words.length === 0) return baseKeyword
+
+  const first = words[0]
+  const second = words[1] || ""
+  const prefix = AUTO_FIND_PREFIXES[attempt % AUTO_FIND_PREFIXES.length]
+  const suffix = AUTO_FIND_SUFFIXES[attempt % AUTO_FIND_SUFFIXES.length]
+  const vibeWords = VIBE_MODIFIERS[vibe] || []
+  const vibeWord = vibeWords.length ? vibeWords[attempt % vibeWords.length] : ""
+  const industryWord = getIndustryModifier(industry)
+  const base = words.join(" ")
+  const reversed = [...words].reverse().join(" ")
+  const blendWithIndustry = createBlend(first, second || industryWord || vibeWord || "brand")
+  const shortBase = words.map((word) => shortenWord(lightlyRemoveInnerVowel(word))).join(" ")
+
+  const candidates = [
+    base,
+    reversed,
+    `${prefix} ${base}`,
+    `${base} ${suffix}`,
+    blendWithIndustry,
+    `${prefix} ${blendWithIndustry}`,
+    `${blendWithIndustry} ${suffix}`,
+    shortBase,
+    vibeWord ? `${base} ${vibeWord}` : "",
+    industryWord ? `${base} ${industryWord}` : "",
+  ]
+    .map((item) => item.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+
+  return candidates[attempt % candidates.length] || baseKeyword
+}
+
+function normaliseDomainName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function delay(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new DOMException("Aborted", "AbortError"))
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      signal.removeEventListener("abort", onAbort)
+      resolve()
+    }, ms)
+
+    const onAbort = () => {
+      window.clearTimeout(timeoutId)
+      signal.removeEventListener("abort", onAbort)
+      reject(new DOMException("Aborted", "AbortError"))
+    }
+
+    signal.addEventListener("abort", onAbort)
+  })
+}
+
 export function GenerateNames() {
   const searchParams = useSearchParams()
   const [keyword, setKeyword] = useState("")
@@ -183,6 +294,11 @@ export function GenerateNames() {
   const [shortlist, setShortlist] = useState<string[]>([])
   const [copiedName, setCopiedName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [autoFindComMode, setAutoFindComMode] = useState(false)
+  const [availableComPicks, setAvailableComPicks] = useState<DomainResult[]>([])
+  const [isAutoFindingComs, setIsAutoFindingComs] = useState(false)
+  const [autoFindAttempt, setAutoFindAttempt] = useState(0)
+  const [autoFindStatus, setAutoFindStatus] = useState<string | null>(null)
 
   // New state for filters and history
   const [selectedTldFilter, setSelectedTldFilter] = useState<string | null>(null)
@@ -203,6 +319,8 @@ export function GenerateNames() {
 
   // SEO Potential Check modal state
   const [seoCheckDomain, setSeoCheckDomain] = useState<{ name: string; tld: string } | null>(null)
+  const generationAbortRef = useRef<AbortController | null>(null)
+  const generationStoppedRef = useRef(false)
 
   // Initialise keyword from query string for schema.org SearchAction support.
   useEffect(() => {
@@ -211,6 +329,12 @@ export function GenerateNames() {
       setKeyword(query)
     }
   }, [searchParams, keyword])
+
+  useEffect(() => {
+    return () => {
+      generationAbortRef.current?.abort()
+    }
+  }, [])
 
   // Load shortlist and search history from localStorage on mount
   useEffect(() => {
@@ -254,6 +378,101 @@ export function GenerateNames() {
     if (showOnlyAvailable && !result.available) return false
     return true
   })
+
+  const stopAutoFindSearch = () => {
+    generationStoppedRef.current = true
+    generationAbortRef.current?.abort()
+  }
+
+  const extractDomainNames = (domains: any[]): string[] => {
+    const uniqueNames = new Set<string>()
+
+    for (const domain of domains || []) {
+      const rawName = typeof domain?.name === "string" ? domain.name : ""
+      const normalised = normaliseDomainName(rawName)
+      if (normalised.length >= 3 && normalised.length <= 63) {
+        uniqueNames.add(normalised)
+      }
+    }
+
+    return Array.from(uniqueNames)
+  }
+
+  const requestGeneratedNames = async (
+    seedKeyword: string,
+    count: number | null,
+    signal: AbortSignal,
+  ): Promise<string[]> => {
+    const payload: Record<string, unknown> = {
+      keyword: seedKeyword,
+      vibe: selectedVibe,
+      industry: selectedIndustry,
+      maxLength,
+    }
+
+    if (typeof count === "number") {
+      payload.count = count
+    }
+
+    const response = await fetch("/api/generate-domains", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal,
+      body: JSON.stringify(payload),
+    })
+
+    const responseData = await response.json()
+    if (!response.ok) {
+      throw new Error(responseData.error || "Failed to generate domain names")
+    }
+
+    return extractDomainNames(responseData.domains || [])
+  }
+
+  const requestAvailability = async (
+    domainNames: string[],
+    tlds: string[] | undefined,
+    signal: AbortSignal,
+  ): Promise<DomainResult[]> => {
+    const response = await fetch("/api/check-domain", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal,
+      body: JSON.stringify({
+        domains: domainNames,
+        tlds,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to check domain availability")
+    }
+
+    const responseData = await response.json()
+    return responseData.results || []
+  }
+
+  const mergeAvailableComResults = (
+    current: DomainResult[],
+    next: DomainResult[],
+  ): DomainResult[] => {
+    const picked = new Map<string, DomainResult>()
+
+    for (const result of [...current, ...next]) {
+      if (result.tld !== "com" || !result.available) continue
+      if (!picked.has(result.fullDomain)) {
+        picked.set(result.fullDomain, result)
+      }
+    }
+
+    return Array.from(picked.values())
+      .sort((a, b) => b.score - a.score || a.length - b.length)
+      .slice(0, AUTO_FIND_TARGET_COM_COUNT)
+  }
 
   // Check social handles
   const checkSocialHandles = async (handle: string) => {
@@ -323,56 +542,91 @@ export function GenerateNames() {
 
   const handleGenerate = async () => {
     if (!keyword.trim()) return
+    generationAbortRef.current?.abort()
+    const abortController = new AbortController()
+    generationAbortRef.current = abortController
+    generationStoppedRef.current = false
+
     setIsGenerating(true)
+    setIsAutoFindingComs(false)
+    setAutoFindAttempt(0)
+    setAutoFindStatus(null)
+    setAvailableComPicks([])
     setError(null)
     setSelectedTldFilter(null) // Reset filters on new search
     setShowOnlyAvailable(false)
 
     // Add to search history
-    addToSearchHistory(keyword.trim())
+    const baseKeyword = keyword.trim()
+    addToSearchHistory(baseKeyword)
 
     try {
-      // Step 1: Generate domain names using GPT
-      const generateResponse = await fetch("/api/generate-domains", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          keyword: keyword.trim(),
-          vibe: selectedVibe,
-          industry: selectedIndustry,
-          maxLength: maxLength,
-        }),
-      })
-
-      const generateData = await generateResponse.json()
-
-      if (!generateResponse.ok) {
-        throw new Error(generateData.error || "Failed to generate domain names")
+      const initialNames = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      if (initialNames.length === 0) {
+        throw new Error("No domain candidates were generated. Please try again.")
       }
 
-      const domainNames = generateData.domains.map((d: any) => d.name)
+      const initialResults = await requestAvailability(initialNames, undefined, abortController.signal)
+      setResults(initialResults)
 
-      // Step 2: Check domain availability
-      const checkResponse = await fetch("/api/check-domain", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          domains: domainNames,
-        }),
-      })
+      if (autoFindComMode) {
+        let comPicks = mergeAvailableComResults([], initialResults)
+        setAvailableComPicks(comPicks)
 
-      if (!checkResponse.ok) {
-        throw new Error("Failed to check domain availability")
+        if (comPicks.length < AUTO_FIND_TARGET_COM_COUNT) {
+          setIsAutoFindingComs(true)
+          const startedAt = Date.now()
+          let attempt = 1
+
+          while (
+            comPicks.length < AUTO_FIND_TARGET_COM_COUNT &&
+            attempt <= AUTO_FIND_MAX_ATTEMPTS &&
+            Date.now() - startedAt < AUTO_FIND_TIME_CAP_MS &&
+            !generationStoppedRef.current
+          ) {
+            setAutoFindAttempt(attempt)
+            setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
+
+            const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
+            const remixedNames = await requestGeneratedNames(
+              remixSeed,
+              AUTO_FIND_BATCH_SIZE,
+              abortController.signal,
+            )
+
+            if (remixedNames.length > 0) {
+              const comResults = await requestAvailability(remixedNames, ["com"], abortController.signal)
+              comPicks = mergeAvailableComResults(comPicks, comResults)
+              setAvailableComPicks(comPicks)
+            }
+
+            attempt += 1
+
+            if (
+              comPicks.length < AUTO_FIND_TARGET_COM_COUNT &&
+              attempt <= AUTO_FIND_MAX_ATTEMPTS &&
+              Date.now() - startedAt < AUTO_FIND_TIME_CAP_MS &&
+              !generationStoppedRef.current
+            ) {
+              await delay(AUTO_FIND_ATTEMPT_DELAY_MS, abortController.signal)
+            }
+          }
+        }
+
+        if (generationStoppedRef.current) {
+          setAutoFindStatus("Search stopped.")
+        } else if (comPicks.length >= AUTO_FIND_TARGET_COM_COUNT) {
+          setAutoFindStatus(`Found ${AUTO_FIND_TARGET_COM_COUNT} available .com domains.`)
+        } else {
+          setAutoFindStatus(`Found ${comPicks.length} available .com domains within the attempt/time cap.`)
+        }
       }
-
-      const checkData = await checkResponse.json()
-      setResults(checkData.results)
     } catch (error: any) {
       console.error("Error generating domains:", error)
+      if (error?.name === "AbortError" && generationStoppedRef.current) {
+        setAutoFindStatus("Search stopped.")
+        return
+      }
       // Handle network errors specifically
       if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
         setError("Network error. Please check your connection and try again.")
@@ -381,6 +635,8 @@ export function GenerateNames() {
       }
     } finally {
       setIsGenerating(false)
+      setIsAutoFindingComs(false)
+      generationAbortRef.current = null
     }
   }
 
@@ -499,7 +755,7 @@ export function GenerateNames() {
                     !isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                   )}
                 >
-                  ✨ AI Generate
+                  âœ¨ AI Generate
                 </button>
                 <button
                   onClick={() => setIsBulkMode(true)}
@@ -508,7 +764,7 @@ export function GenerateNames() {
                     isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                   )}
                 >
-                  📋 Bulk Check
+                  ðŸ“‹ Bulk Check
                 </button>
               </div>
 
@@ -628,6 +884,25 @@ export function GenerateNames() {
                   ))}
                 </div>
               </div>
+
+              <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3 sm:mt-5 sm:rounded-xl sm:p-4">
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={autoFindComMode}
+                    onChange={(e) => setAutoFindComMode(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border bg-background accent-primary"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-foreground">
+                      Auto-find 5 available .coms
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      Keeps remixing until it finds 5 available .com domains (max attempts/time).
+                    </span>
+                  </span>
+                </label>
+              </div>
               </>
               )}
 
@@ -663,6 +938,92 @@ export function GenerateNames() {
                 </div>
               )}
             </div>
+
+            {autoFindComMode && !isBulkMode && (isAutoFindingComs || availableComPicks.length > 0 || autoFindStatus) && (
+              <div className="mb-4 rounded-xl border border-border/40 bg-card/60 p-3 sm:mb-6 sm:rounded-2xl sm:p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground sm:text-base">Available .com picks</h2>
+                    <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+                      {isAutoFindingComs
+                        ? `Searching for available .coms... (Attempt ${Math.max(autoFindAttempt, 1)}/${AUTO_FIND_MAX_ATTEMPTS})`
+                        : autoFindStatus || "Ready"}
+                    </p>
+                  </div>
+                  {isAutoFindingComs && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={stopAutoFindSearch}
+                      className="h-9 w-full bg-transparent sm:w-auto"
+                    >
+                      Stop
+                    </Button>
+                  )}
+                </div>
+
+                {availableComPicks.length > 0 && (
+                  <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                    {availableComPicks.map((result) => (
+                      <div
+                        key={result.fullDomain}
+                        className="rounded-lg border border-green-500/20 bg-green-500/5 p-3"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-foreground">{result.fullDomain}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                            Available
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-1.5">
+                          <button
+                            onClick={() => copyToClipboard(result.fullDomain)}
+                            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            title="Copy domain"
+                          >
+                            {copiedName === result.fullDomain ? (
+                              <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => toggleShortlist(result.fullDomain)}
+                            className={cn(
+                              "rounded-md p-1.5 transition-colors hover:bg-muted",
+                              shortlist.includes(result.fullDomain)
+                                ? "text-primary"
+                                : "text-muted-foreground hover:text-foreground",
+                            )}
+                            title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                          >
+                            {shortlist.includes(result.fullDomain) ? (
+                              <BookmarkCheck className="h-3.5 w-3.5" />
+                            ) : (
+                              <Bookmark className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                          <a
+                            href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Buy
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Results */}
             {results.length > 0 && (
@@ -747,7 +1108,7 @@ export function GenerateNames() {
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
                     )}
                   >
-                    {showOnlyAvailable ? "✓ Avail." : "Avail. Only"}
+                    {showOnlyAvailable ? "âœ“ Avail." : "Avail. Only"}
                   </button>
                 </div>
 
@@ -877,7 +1238,7 @@ export function GenerateNames() {
             {results.length > 0 && (
               <div className="mt-6 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm sm:mt-8 sm:p-6">
                 <h3 className="mb-3 text-base font-semibold text-foreground sm:mb-4 sm:text-lg">
-                  🔍 Check Social Handle
+                  ðŸ” Check Social Handle
                 </h3>
                 <p className="mb-3 text-xs text-muted-foreground sm:mb-4 sm:text-sm">
                   Check if your brand name is available as a username on social platforms.
@@ -924,7 +1285,7 @@ export function GenerateNames() {
                             : "bg-muted/50 hover:bg-muted"
                         )}
                       >
-                        <span className="text-base sm:text-lg">{socialIcons[social.platformId] || "🔗"}</span>
+                        <span className="text-base sm:text-lg">{socialIcons[social.platformId] || "ðŸ”—"}</span>
                         <span className="text-[10px] font-medium text-foreground sm:text-xs">{social.platform}</span>
                         <span
                           className={cn(
@@ -1096,3 +1457,4 @@ export function GenerateNames() {
     </div>
   )
 }
+
