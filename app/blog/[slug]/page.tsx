@@ -25,14 +25,16 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   if (!post) return { title: "Post Not Found | NamoLux" }
 
   const url = `https://www.namolux.com/blog/${post.slug}`
+  const metaTitle = post.seoTitle || `${post.title} | NamoLux`
+  const metaDescription = post.metaDescription || post.description
 
   return {
-    title: `${post.title} | NamoLux`,
-    description: post.description,
+    title: metaTitle,
+    description: metaDescription,
     authors: [{ name: post.author }],
     openGraph: {
-      title: post.title,
-      description: post.description,
+      title: post.seoTitle || post.title,
+      description: metaDescription,
       type: "article",
       url,
       publishedTime: post.publishedAt,
@@ -42,8 +44,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.description,
+      title: post.seoTitle || post.title,
+      description: metaDescription,
     },
     alternates: {
       canonical: `/blog/${post.slug}`,
@@ -57,6 +59,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) notFound()
 
   const relatedPosts = getRelatedPosts(slug, 2)
+  const articleUrl = `https://www.namolux.com/blog/${post.slug}`
   const breadcrumbItems = [
     { label: "Blog", href: "/blog" },
     { label: post.title },
@@ -65,21 +68,51 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Generate schema markup
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
+    "@id": `${articleUrl}#article`,
+    url: articleUrl,
     headline: post.title,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": articleUrl,
+    },
     description: post.description,
-    author: { "@type": "Organization", name: post.author },
+    author: {
+      "@type": "Person",
+      name: post.author,
+    },
     publisher: {
       "@type": "Organization",
       name: "NamoLux",
       url: "https://www.namolux.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.namolux.com/logo.png",
+        width: 1200,
+        height: 337,
+      },
     },
+    image: ["https://www.namolux.com/og-image.png"],
     datePublished: post.publishedAt,
     dateModified: post.updatedAt || post.publishedAt,
-    mainEntityOfPage: `https://www.namolux.com/blog/${post.slug}`,
+    inLanguage: "en-US",
   }
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems)
+  const faqSchema = post.faqs?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      }
+    : null
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -97,6 +130,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       <main className="flex-1">
         <article className="px-4 pt-24 pb-16 sm:pt-28">
@@ -154,6 +193,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </a>
               </p>
             </footer>
+
+            {post.faqs?.length ? (
+              <section className="mt-16">
+                <h2 className="mb-6 text-xl font-bold text-foreground">Frequently Asked Questions</h2>
+                <div className="space-y-6">
+                  {post.faqs.map((faq) => (
+                    <div key={faq.question}>
+                      <h3 className="text-base font-semibold text-foreground">{faq.question}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
@@ -243,6 +296,51 @@ function BlogSection({ section }: { section: BlogSectionType }) {
             </li>
           ))}
         </ul>
+      )
+
+    case "table":
+      if (!section.headers?.length || !section.rows?.length) return null
+      return (
+        <div className="my-6 overflow-x-auto">
+          <table className="min-w-full border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-border/60">
+                {section.headers.map((header) => (
+                  <th key={header} className="px-3 py-2 font-semibold text-foreground">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {section.rows.map((row, rowIndex) => (
+                <tr key={`${row[0]}-${rowIndex}`} className="border-b border-border/30 align-top">
+                  {row.map((cell, cellIndex) => (
+                    <td key={`${row[0]}-${cellIndex}`} className="px-3 py-2 text-muted-foreground">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+
+    case "buttonCta":
+      if (!section.ctaLink || !section.ctaText) return null
+      return (
+        <div className="my-8">
+          {section.content ? (
+            <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{section.content}</p>
+          ) : null}
+          <Button asChild className="gap-2">
+            <Link href={section.ctaLink}>
+              {section.ctaText}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       )
 
     case "callout":

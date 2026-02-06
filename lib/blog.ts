@@ -6,6 +6,8 @@ export interface BlogPost {
   slug: string
   title: string
   description: string
+  seoTitle?: string
+  metaDescription?: string
   category: BlogCategory
   readTime: number // in minutes
   publishedAt: string // ISO date string
@@ -13,16 +15,24 @@ export interface BlogPost {
   author: string
   featured?: boolean
   content: BlogSection[]
+  faqs?: BlogFaq[]
 }
 
 export interface BlogSection {
-  type: "paragraph" | "heading" | "list" | "callout" | "code" | "quote"
+  type: "paragraph" | "heading" | "list" | "callout" | "code" | "quote" | "table" | "buttonCta"
   level?: 2 | 3 // for headings
   content: string
   items?: string[] // for lists
+  headers?: string[] // for tables
+  rows?: string[][] // for tables
   calloutType?: "tip" | "warning" | "cta" // for callouts
   ctaLink?: string // for CTA callouts
   ctaText?: string
+}
+
+export interface BlogFaq {
+  question: string
+  answer: string
 }
 
 // The 5 initial evergreen blog posts
@@ -1879,6 +1889,102 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Top 3 pain points become quarterly bets", "Small fixes get shipped weekly", "Track impact on support volume"] },
       { type: "callout", calloutType: "tip", content: "If a support issue shows up 5+ times, it is a product issue." },
       { type: "callout", calloutType: "cta", content: "Strengthen your product story with a strong brand.", ctaLink: "/generate", ctaText: "Find a Brand Name ->" }
+    ]
+  },
+  {
+    slug: "did-you-mean-namolux",
+    title: "Did you mean NamoLux?",
+    description: "If you searched for NamoLix, Namolix or Namelux, you probably meant NamoLux.",
+    seoTitle: "Did you mean NamoLux? Common misspellings (NamoLix, Namolix)",
+    metaDescription: "Found NamoLix, Namolix or Namelux in search? You probably meant NamoLux. See the official site, common misspellings and where to generate names free today.",
+    category: "Domain Strategy",
+    readTime: 4,
+    publishedAt: "2026-02-22",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "If you searched for NamoLix or a similar spelling, you are in the right place. The official NamoLux site is https://www.namolux.com." },
+      { type: "heading", level: 2, content: "Common misspellings we see" },
+      { type: "list", content: "", items: ["NamoLix", "Namolix", "Namelux", "Namo Lux", "NamoLux (correct)"] },
+      { type: "paragraph", content: "These spelling variations are normal. Brand names are often heard before they are typed, so search typos happen." },
+      { type: "buttonCta", content: "Start from the official generator and check live domain availability.", ctaLink: "/generate", ctaText: "Generate names free" },
+      { type: "heading", level: 2, content: "What NamoLux does" },
+      { type: "list", content: "", items: ["Availability-first domain suggestions so you do not waste time on taken names", "Founder Signal(TM) scoring to assess brand strength, risk and long-term fit", "Shortlist and export options for faster decisions with your team", "Vibe modes to explore naming styles such as luxury, playful, minimal and trustworthy"] },
+      { type: "callout", calloutType: "cta", content: "Need to verify you are on the right website?", ctaLink: "/", ctaText: "Visit the NamoLux homepage" },
+      { type: "callout", calloutType: "cta", content: "Want a fair tool comparison before choosing?", ctaLink: "/blog/best-ai-domain-name-generators", ctaText: "Read the 2026 comparison guide" }
+    ]
+  },
+  {
+    slug: "best-ai-domain-name-generators",
+    title: "Best AI domain name generators in 2026",
+    description: "A practical, neutral comparison of real domain naming tools and where each one fits.",
+    seoTitle: "Best AI Domain Name Generators (2026) \u2014 Compared",
+    metaDescription: "Compare the best AI domain name generators in 2026, including NamoLux, Namelix and Lean Domain Search, with availability checks, pros, cons and notes.",
+    category: "Domain Strategy",
+    readTime: 10,
+    publishedAt: "2026-02-23",
+    author: "NamoLux Team",
+    content: [
+      { type: "buttonCta", content: "If you want an availability-first workflow with scoring and export, start here.", ctaLink: "/generate", ctaText: "Try NamoLux free" },
+      { type: "paragraph", content: "Choosing a domain tool is less about flashy ideas and more about fit. You need names that are brandable, easy to say, and available to register without extra friction." },
+      { type: "paragraph", content: "Below is a practical comparison of widely used, real tools in 2026. The goal is to help you pick the right workflow for your stage, budget and naming style." },
+      { type: "heading", level: 2, content: "Comparison table" },
+      {
+        type: "table",
+        content: "",
+        headers: ["Tool", "Best for", "Availability checking", "Notes"],
+        rows: [
+          ["NamoLux", "Founders who want brandability plus scoring", "Yes, availability-first flow", "Includes Founder Signal(TM), shortlist/export and vibe modes"],
+          ["Namelix", "Quick AI name ideas", "Limited or indirect", "Strong ideation UI; registration depends on downstream provider"],
+          ["Lean Domain Search", "Fast keyword-based .com discovery", "Yes, .com-focused", "Great for simple combinations; less depth on brand scoring"],
+          ["NameSnack", "AI suggestions with broad style variety", "Yes", "Useful for brainstorming; quality varies by prompt/theme"],
+          ["BrandBucket", "Buying premium, curated brand domains", "Marketplace inventory", "Not a generator-first workflow; good if budget is available"],
+          ["Squadhelp", "Brand naming plus premium marketplace options", "Marketplace and assisted checks", "Includes naming contests/services alongside domains"],
+          ["GoDaddy domain search", "Direct registration and bulk lookup", "Yes", "Strong registrar tooling; less guidance on brand quality"]
+        ]
+      },
+      { type: "heading", level: 2, content: "Pros and cons at a glance" },
+      { type: "heading", level: 3, content: "NamoLux" },
+      { type: "list", content: "", items: ["Pro: Availability-first output reduces wasted shortlisting time", "Pro: Founder Signal(TM) scoring adds structured decision support", "Con: Smaller feature surface than broad registrar suites"] },
+      { type: "heading", level: 3, content: "Namelix" },
+      { type: "list", content: "", items: ["Pro: Fast AI ideation with many naming patterns", "Con: Availability workflow is not the main strength"] },
+      { type: "heading", level: 3, content: "Lean Domain Search" },
+      { type: "list", content: "", items: ["Pro: Useful for quick .com combinations", "Con: Limited to a narrower style of generated names"] },
+      { type: "heading", level: 3, content: "NameSnack" },
+      { type: "list", content: "", items: ["Pro: Flexible for early brainstorming", "Con: Output quality can be uneven across categories"] },
+      { type: "heading", level: 3, content: "BrandBucket" },
+      { type: "list", content: "", items: ["Pro: Curated premium names can save time", "Con: Marketplace pricing is often higher than hand registration"] },
+      { type: "heading", level: 3, content: "Squadhelp" },
+      { type: "list", content: "", items: ["Pro: Useful when you want naming support plus domain options", "Con: Can feel heavier than a simple DIY naming tool"] },
+      { type: "heading", level: 3, content: "GoDaddy domain search" },
+      { type: "list", content: "", items: ["Pro: Reliable registration path and bulk search", "Con: Discovery and brand scoring depth is limited"] },
+      { type: "heading", level: 2, content: "Where NamoLux is different" },
+      { type: "paragraph", content: "NamoLux is designed for founders who care about both naming quality and execution speed. Instead of generating big lists first and checking later, it keeps availability central throughout the process." },
+      { type: "list", content: "", items: ["Availability-first suggestions", "Founder Signal(TM) scoring", "Shortlist and export for team review", "Vibe modes for controlled creative direction"] },
+      { type: "heading", level: 2, content: "Choosing the right tool" },
+      { type: "list", content: "", items: ["If you already know your keywords and just need quick .com options, start with Lean Domain Search", "If you want premium inventory and budget is available, review BrandBucket or Squadhelp", "If you want AI ideation plus practical filters and scoring in one place, NamoLux is the better fit"] },
+      { type: "buttonCta", content: "Run your own shortlist and compare options in minutes.", ctaLink: "/generate", ctaText: "Try NamoLux free" }
+    ],
+    faqs: [
+      {
+        question: "What is the best AI domain name generator in 2026?",
+        answer: "It depends on your workflow. If you want availability-first suggestions with scoring and export, NamoLux is a strong choice. If you prefer premium marketplace buying, BrandBucket or Squadhelp may suit better."
+      },
+      {
+        question: "Is Namelix still worth using in 2026?",
+        answer: "Yes. Namelix remains useful for quick ideation and creative naming directions. Many teams still pair it with separate availability checks and shortlist validation."
+      },
+      {
+        question: "Do I need a .com domain for a new startup?",
+        answer: "Not always, but .com is usually the easiest extension for trust and recall. If your audience is technical, alternatives like .io can still work well."
+      },
+      {
+        question: "How should I evaluate domain name options quickly?",
+        answer: "Use a simple process: check availability first, shortlist the best candidates, run pronunciation and memorability checks, then score each option for brand fit and risk."
+      },
+      {
+        question: "What makes NamoLux different from a registrar search tool?",
+        answer: "Registrar search tools focus on registration. NamoLux focuses on decision quality before registration, using availability-first suggestions, Founder Signal(TM) scoring and shortlist export."
+      }
     ]
   }
 
