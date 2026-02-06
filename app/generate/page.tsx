@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import { GenerateNames } from "@/components/generate-names"
 
 export const metadata: Metadata = {
@@ -12,5 +13,9 @@ export const metadata: Metadata = {
 }
 
 export default function GeneratePage() {
-  return <GenerateNames />
+  return (
+    <Suspense fallback={null}>
+      <GenerateNames />
+    </Suspense>
+  )
 }
