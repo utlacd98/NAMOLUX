@@ -234,6 +234,8 @@ const AUTO_FIND_ATTEMPT_DELAY_MS = 180
 const AUTO_FIND_V2_MAX_ATTEMPTS = 8
 // Enabled by default. Set NEXT_PUBLIC_AUTO_FIND_V2=false to opt out.
 const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 !== "false"
+// Keep auto-find UI local-first: hidden in production unless explicitly enabled.
+const AUTO_FIND_UI_ENABLED = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_ENABLE_AUTO_FIND_UI === "true"
 
 const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
 const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
@@ -1107,6 +1109,7 @@ export function GenerateNames() {
                 </div>
               </div>
 
+              {AUTO_FIND_UI_ENABLED && (
               <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3 sm:mt-5 sm:rounded-xl sm:p-4">
                 <label className="flex cursor-pointer items-start gap-3">
                   <input
@@ -1284,6 +1287,7 @@ export function GenerateNames() {
                   </p>
                 )}
               </div>
+              )}
               </>
               )}
 
@@ -1320,7 +1324,7 @@ export function GenerateNames() {
               )}
             </div>
 
-            {autoFindComMode && !isBulkMode && (isAutoFindingComs || availableComPicks.length > 0 || autoFindStatus) && (
+            {AUTO_FIND_UI_ENABLED && autoFindComMode && !isBulkMode && (isAutoFindingComs || availableComPicks.length > 0 || autoFindStatus) && (
               <div className="mb-4 rounded-xl border border-border/40 bg-card/60 p-3 sm:mb-6 sm:rounded-2xl sm:p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
