@@ -1116,9 +1116,7 @@ export function GenerateNames() {
                     className="mt-0.5 h-4 w-4 rounded border-border bg-background accent-primary"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-foreground">
-                      Find 5 highest Founder Signal domains
-                    </span>
+                    <span className="block text-sm font-medium text-foreground">Auto-find premium domains across all TLDs</span>
                     <span className="mt-1 block text-xs text-muted-foreground">
                       We only show premium names (score &gt;= 80). If fewer are found, we won't show low-quality results.
                     </span>
