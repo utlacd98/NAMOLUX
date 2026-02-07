@@ -70,6 +70,7 @@ describe("runAutoFindV2 relaxation", () => {
           allowlist: [],
           allowHyphen: false,
           allowNumbers: false,
+          meaningFirst: true,
           preferTwoWordBrands: false,
           allowVibeSuffix: false,
           showAnyAvailable: false,
@@ -86,4 +87,5 @@ describe("runAutoFindV2 relaxation", () => {
     expect(result.summary.relaxationsApplied).toContain("Maximum length increased by 1 character")
   })
 })
+
 

@@ -39,6 +39,7 @@ describe("runAutoFindV2 integration-style flow", () => {
           allowlist: [],
           allowHyphen: false,
           allowNumbers: false,
+          meaningFirst: true,
           preferTwoWordBrands: true,
           allowVibeSuffix: true,
           showAnyAvailable: false,
@@ -57,4 +58,5 @@ describe("runAutoFindV2 integration-style flow", () => {
     expect(result.summary.checkedAvailability).toBeGreaterThanOrEqual(5)
   })
 })
+
 

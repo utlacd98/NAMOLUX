@@ -1,4 +1,5 @@
-﻿import { VIBE_MODIFIERS, getIndustryLexicon } from "@/lib/domainGen/synonyms"
+import { buildMeaningBreakdown, scorePronounceability, type MorphemeEntry } from "@/lib/domainGen/meaning"
+import { VIBE_MODIFIERS, getIndustryLexicon } from "@/lib/domainGen/synonyms"
 import type { AutoFindControls, Candidate, ScoredCandidate } from "@/lib/domainGen/types"
 
 const GENERIC_PENALTY_TERMS = ["lux", "pro", "hub", "labs", "group", "works", "co", "app", "get", "try"]
@@ -72,22 +73,6 @@ function getVibeLetterScore(name: string, vibe: string | undefined): number {
   return 0
 }
 
-function getPronounceabilityScore(name: string): number {
-  const onlyLetters = name.replace(/[^a-z]/g, "")
-  if (!onlyLetters) return -4
-
-  const vowelCount = (onlyLetters.match(/[aeiouy]/g) || []).length
-  const ratio = vowelCount / onlyLetters.length
-
-  if (ratio < 0.16 || ratio > 0.78) return -3.2
-  if (ratio < 0.21 || ratio > 0.72) return -1.4
-
-  const hasPenaltyPattern = VISUAL_PENALTY_PATTERNS.some((pattern) => pattern.test(name))
-  if (hasPenaltyPattern) return -2.4
-
-  return 3.2
-}
-
 export function satisfiesKeywordConstraint(
   name: string,
   keywordTokens: string[],
@@ -118,14 +103,25 @@ export function brandabilityScore(
     keywordTokens: string[]
     controls: AutoFindControls
     strategy?: string
+    roots?: string[]
+    concepts?: MorphemeEntry[]
   },
 ): {
   score: number
   scoreBreakdown: Record<string, number>
   qualityBand: "high" | "medium" | "low"
   whyTag: string
+  meaningScore: number
+  meaningBreakdown: string
+  whyItWorks: string
+  pronounceabilityScore: number
 } {
   const lexicon = getIndustryLexicon(options.industry)
+  const meaning = buildMeaningBreakdown({
+    name,
+    roots: options.roots || [],
+    concepts: options.concepts || [],
+  })
 
   const industryMatches = countMatches(name, lexicon.roots)
   const offTopicMatches = countMatches(name, lexicon.offTopicRoots)
@@ -137,7 +133,8 @@ export function brandabilityScore(
 
   const targetLength = options.controls.style === "real_words" ? 10 : 9
   const lengthScore = Math.max(0, 14 - Math.abs(targetLength - name.length))
-  const pronounceability = getPronounceabilityScore(name)
+  const pronounceabilityScore = scorePronounceability(name)
+  const pronounceability = (pronounceabilityScore - 60) / 12
 
   const memorabilityBase =
     syllables >= 2 && syllables <= 3 ? 3.2 : syllables === 1 || syllables === 4 ? 1.5 : -1.2
@@ -173,12 +170,15 @@ export function brandabilityScore(
         ? 0.55
         : 0
 
+  const meaningBoost = options.controls.meaningFirst ? meaning.meaningScore / 18 : 0
+
   const score = Number(
     (
       lengthScore +
       pronounceability +
       memorabilityScore +
       relevanceScore +
+      meaningBoost +
       offTopicPenalty +
       genericPenalty +
       visualPenalty +
@@ -204,10 +204,15 @@ export function brandabilityScore(
       penalties: Number((offTopicPenalty + genericPenalty + visualPenalty).toFixed(2)),
       keywordPosition: Number(positionScore.toFixed(2)),
       style: Number((styleScore + vibeLetterScore).toFixed(2)),
+      meaning: meaning.meaningScore,
       syllables,
     },
     qualityBand,
     whyTag,
+    meaningScore: meaning.meaningScore,
+    meaningBreakdown: meaning.breakdown,
+    whyItWorks: meaning.oneLiner,
+    pronounceabilityScore,
   }
 }
 
@@ -218,6 +223,7 @@ export function scoreCandidate(
     vibe?: string
     keywordTokens: string[]
     controls: AutoFindControls
+    concepts?: MorphemeEntry[]
   },
 ): ScoredCandidate {
   const scored = brandabilityScore(candidate.name, {
@@ -226,6 +232,8 @@ export function scoreCandidate(
     keywordTokens: options.keywordTokens,
     controls: options.controls,
     strategy: candidate.strategy,
+    roots: candidate.roots,
+    concepts: options.concepts,
   })
 
   return {
@@ -234,6 +242,11 @@ export function scoreCandidate(
     scoreBreakdown: scored.scoreBreakdown,
     whyTag: scored.whyTag,
     qualityBand: scored.qualityBand,
+    meaningScore: scored.meaningScore,
+    meaningBreakdown: scored.meaningBreakdown,
+    whyItWorks: scored.whyItWorks,
+    pronounceabilityScore: scored.pronounceabilityScore,
+    brandableScore: Number(Math.max(1, Math.min(10, scored.score / 2.6)).toFixed(1)),
   }
 }
 
@@ -244,6 +257,7 @@ export function rankCandidates(
     vibe?: string
     keywordTokens: string[]
     controls: AutoFindControls
+    concepts?: MorphemeEntry[]
   },
 ): ScoredCandidate[] {
   return candidates
@@ -251,4 +265,3 @@ export function rankCandidates(
     .map((candidate) => scoreCandidate(candidate, options))
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
 }
-

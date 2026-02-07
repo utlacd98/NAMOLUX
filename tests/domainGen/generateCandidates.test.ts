@@ -16,6 +16,7 @@ describe("generateDomainCandidates", () => {
         allowlist: [],
         allowHyphen: false,
         allowNumbers: false,
+        meaningFirst: true,
         preferTwoWordBrands: true,
         allowVibeSuffix: false,
         showAnyAvailable: false,
@@ -44,6 +45,7 @@ describe("generateDomainCandidates", () => {
         allowlist: [],
         allowHyphen: false,
         allowNumbers: false,
+        meaningFirst: true,
         preferTwoWordBrands: false,
         allowVibeSuffix: false,
         showAnyAvailable: false,
@@ -71,6 +73,7 @@ describe("generateDomainCandidates", () => {
         allowlist: [],
         allowHyphen: false,
         allowNumbers: false,
+        meaningFirst: true,
         preferTwoWordBrands: true,
         allowVibeSuffix: false,
         showAnyAvailable: false,
@@ -84,3 +87,4 @@ describe("generateDomainCandidates", () => {
     expect(generated.some((item) => /[aeiouy]/.test(item.name))).toBe(true)
   })
 })
+

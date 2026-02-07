@@ -1,0 +1,961 @@
+[
+  {
+    "fragment": "lux",
+    "meaning": "light; premium clarity",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "lux"
+  },
+  {
+    "fragment": "luc",
+    "meaning": "light; illumination",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "luc"
+  },
+  {
+    "fragment": "lumen",
+    "meaning": "unit of light",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "lumen"
+  },
+  {
+    "fragment": "nova",
+    "meaning": "new star; new beginning",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "nova"
+  },
+  {
+    "fragment": "neo",
+    "meaning": "new; modern",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "neo"
+  },
+  {
+    "fragment": "vera",
+    "meaning": "true; genuine",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "vera"
+  },
+  {
+    "fragment": "veri",
+    "meaning": "truth; verification",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "veri"
+  },
+  {
+    "fragment": "omni",
+    "meaning": "all; universal",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "omni"
+  },
+  {
+    "fragment": "aero",
+    "meaning": "air; flight",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "aero"
+  },
+  {
+    "fragment": "astro",
+    "meaning": "space; stars",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "astro"
+  },
+  {
+    "fragment": "terra",
+    "meaning": "earth; grounded",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "terra"
+  },
+  {
+    "fragment": "sol",
+    "meaning": "sun; energy",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "sol"
+  },
+  {
+    "fragment": "luna",
+    "meaning": "moon; calm glow",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "luna"
+  },
+  {
+    "fragment": "aqua",
+    "meaning": "water; fluid",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "aqua"
+  },
+  {
+    "fragment": "vita",
+    "meaning": "life; vitality",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "vita"
+  },
+  {
+    "fragment": "vivo",
+    "meaning": "alive; vivid",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "vivo"
+  },
+  {
+    "fragment": "bio",
+    "meaning": "life; biology",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "bio"
+  },
+  {
+    "fragment": "geo",
+    "meaning": "earth; location",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "geo"
+  },
+  {
+    "fragment": "chrono",
+    "meaning": "time; sequence",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "chrono"
+  },
+  {
+    "fragment": "tempo",
+    "meaning": "timing; pace",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "tempo"
+  },
+  {
+    "fragment": "celer",
+    "meaning": "swift; speed",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "celer"
+  },
+  {
+    "fragment": "forte",
+    "meaning": "strength; expertise",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "forte"
+  },
+  {
+    "fragment": "alta",
+    "meaning": "high; elevated",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "alta"
+  },
+  {
+    "fragment": "prime",
+    "meaning": "first; best",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "prime"
+  },
+  {
+    "fragment": "ultra",
+    "meaning": "beyond; advanced",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "ultra"
+  },
+  {
+    "fragment": "micro",
+    "meaning": "small; precise",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "micro"
+  },
+  {
+    "fragment": "macro",
+    "meaning": "large scale",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "macro"
+  },
+  {
+    "fragment": "nano",
+    "meaning": "tiny; precision",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "nano"
+  },
+  {
+    "fragment": "syn",
+    "meaning": "together; connected",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "syn"
+  },
+  {
+    "fragment": "sym",
+    "meaning": "harmony; balanced",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "sym"
+  },
+  {
+    "fragment": "meta",
+    "meaning": "beyond; abstract layer",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "meta"
+  },
+  {
+    "fragment": "para",
+    "meaning": "beside; support",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "para"
+  },
+  {
+    "fragment": "morph",
+    "meaning": "shape; transform",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "morph"
+  },
+  {
+    "fragment": "logi",
+    "meaning": "reason; logic",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "logi"
+  },
+  {
+    "fragment": "logos",
+    "meaning": "word; reason",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "logos"
+  },
+  {
+    "fragment": "cogni",
+    "meaning": "mind; thinking",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "cogni"
+  },
+  {
+    "fragment": "menta",
+    "meaning": "mind; intention",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "menta"
+  },
+  {
+    "fragment": "sapi",
+    "meaning": "wisdom; insight",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "sapi"
+  },
+  {
+    "fragment": "aud",
+    "meaning": "hear; audio",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "aud"
+  },
+  {
+    "fragment": "vis",
+    "meaning": "see; vision",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "vis"
+  },
+  {
+    "fragment": "vox",
+    "meaning": "voice",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "vox"
+  },
+  {
+    "fragment": "phon",
+    "meaning": "sound",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "phon"
+  },
+  {
+    "fragment": "graph",
+    "meaning": "write; map",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "graph"
+  },
+  {
+    "fragment": "script",
+    "meaning": "write; script",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "script"
+  },
+  {
+    "fragment": "scrib",
+    "meaning": "inscribe; note",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "scrib"
+  },
+  {
+    "fragment": "forma",
+    "meaning": "form; structure",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "forma"
+  },
+  {
+    "fragment": "struct",
+    "meaning": "build; structure",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "struct"
+  },
+  {
+    "fragment": "dyna",
+    "meaning": "power; dynamic",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "dyna"
+  },
+  {
+    "fragment": "ener",
+    "meaning": "energy; motion",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "ener"
+  },
+  {
+    "fragment": "flux",
+    "meaning": "flow; change",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "flux"
+  },
+  {
+    "fragment": "nex",
+    "meaning": "bind; connect",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "nex"
+  },
+  {
+    "fragment": "axis",
+    "meaning": "pivot; central line",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "axis"
+  },
+  {
+    "fragment": "porta",
+    "meaning": "gateway; access",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "porta"
+  },
+  {
+    "fragment": "navi",
+    "meaning": "navigate; guide",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "navi"
+  },
+  {
+    "fragment": "orb",
+    "meaning": "orbit; circle",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "orb"
+  },
+  {
+    "fragment": "aur",
+    "meaning": "golden glow",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "aur"
+  },
+  {
+    "fragment": "clar",
+    "meaning": "clear; transparent",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "clar"
+  },
+  {
+    "fragment": "fidel",
+    "meaning": "faithful; trust",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "fidel"
+  },
+  {
+    "fragment": "cred",
+    "meaning": "trust; belief",
+    "category": "latin_greek",
+    "weight": 1,
+    "pronunciation_hint": "cred"
+  },
+  {
+    "fragment": "sync",
+    "meaning": "synchronise; align",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "stack",
+    "meaning": "software stack",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "grid",
+    "meaning": "structured network",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "flow",
+    "meaning": "smooth process",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "mint",
+    "meaning": "create fresh value",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "spark",
+    "meaning": "ignite ideas",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "pulse",
+    "meaning": "live signal",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "lens",
+    "meaning": "focus and clarity",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "craft",
+    "meaning": "make with skill",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "forge",
+    "meaning": "build with intent",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "pilot",
+    "meaning": "lead early direction",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "orbit",
+    "meaning": "ecosystem motion",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "beam",
+    "meaning": "direct focus",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "cloud",
+    "meaning": "internet infrastructure",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "code",
+    "meaning": "software logic",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "data",
+    "meaning": "information asset",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "byte",
+    "meaning": "digital unit",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "node",
+    "meaning": "network point",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "edge",
+    "meaning": "fast edge processing",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "mesh",
+    "meaning": "interconnected fabric",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "loop",
+    "meaning": "iterative cycle",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "shift",
+    "meaning": "change state",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "drive",
+    "meaning": "momentum and force",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "boost",
+    "meaning": "accelerate growth",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "launch",
+    "meaning": "go live",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "build",
+    "meaning": "construct product",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "scale",
+    "meaning": "grow efficiently",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "stream",
+    "meaning": "continuous delivery",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "signal",
+    "meaning": "clear indicator",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "vector",
+    "meaning": "direction and magnitude",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "matrix",
+    "meaning": "multi-dimensional grid",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "quant",
+    "meaning": "quantitative intelligence",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "agent",
+    "meaning": "autonomous assistant",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "prompt",
+    "meaning": "instruction cue",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "logic",
+    "meaning": "reasoned system",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "frame",
+    "meaning": "structured context",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "dock",
+    "meaning": "stable base",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "link",
+    "meaning": "connect systems",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "nexus",
+    "meaning": "central connection",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "bridge",
+    "meaning": "connect two sides",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "core",
+    "meaning": "essential centre",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "base",
+    "meaning": "foundational layer",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "hub",
+    "meaning": "central node",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "lab",
+    "meaning": "experimentation space",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "studio",
+    "meaning": "creative workspace",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "works",
+    "meaning": "maker operation",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "foundry",
+    "meaning": "build engine",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "vault",
+    "meaning": "secure store",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "shield",
+    "meaning": "protective layer",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "trace",
+    "meaning": "track events",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "route",
+    "meaning": "path selection",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "quest",
+    "meaning": "mission path",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "vectora",
+    "meaning": "directed movement",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "pilotr",
+    "meaning": "guided starter",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "prism",
+    "meaning": "split insight",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "drift",
+    "meaning": "adaptive motion",
+    "category": "startup_tech",
+    "weight": 0.95
+  },
+  {
+    "fragment": "name",
+    "meaning": "identity label",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "nom",
+    "meaning": "name; naming root",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "namo",
+    "meaning": "name-focused sound",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "brand",
+    "meaning": "market identity",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "mark",
+    "meaning": "distinct sign",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "aura",
+    "meaning": "atmosphere; vibe",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "labs",
+    "meaning": "innovation workshop",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "collective",
+    "meaning": "group identity",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "house",
+    "meaning": "brand home",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "hq",
+    "meaning": "headquarters; main place",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "crest",
+    "meaning": "peak symbol",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "bloom",
+    "meaning": "growth and flourish",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "kind",
+    "meaning": "friendly tone",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "nest",
+    "meaning": "safe home",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "haven",
+    "meaning": "secure refuge",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "trail",
+    "meaning": "pathfinder",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "bold",
+    "meaning": "confident posture",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "bright",
+    "meaning": "clarity and optimism",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "clear",
+    "meaning": "transparent and simple",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "true",
+    "meaning": "authentic and honest",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "sure",
+    "meaning": "reliable certainty",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "trust",
+    "meaning": "dependable confidence",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "zen",
+    "meaning": "calm minimal feel",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "halo",
+    "meaning": "positive glow",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "ember",
+    "meaning": "warm spark",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "quill",
+    "meaning": "writing and craft",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "pixel",
+    "meaning": "digital detail",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "snap",
+    "meaning": "quick and sharp",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "hive",
+    "meaning": "community energy",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "vista",
+    "meaning": "broad view",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "vibe",
+    "meaning": "emotional tone",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "tone",
+    "meaning": "brand voice",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "story",
+    "meaning": "narrative identity",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "mode",
+    "meaning": "operating style",
+    "category": "brand_domain",
+    "weight": 0.9
+  },
+  {
+    "fragment": "motif",
+    "meaning": "signature pattern",
+    "category": "brand_domain",
+    "weight": 0.9
+  }
+]

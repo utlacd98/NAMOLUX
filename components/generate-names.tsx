@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { FounderSignalBadge } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
+import { buildResultCardView } from "@/lib/domainGen/resultCard"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -104,6 +105,11 @@ interface DomainResult {
   roots?: string[]
   whyTag?: string
   qualityBand?: "high" | "medium" | "low"
+  meaningScore?: number
+  meaningBreakdown?: string
+  whyItWorks?: string
+  brandableScore?: number
+  pronounceabilityScore?: number
 }
 
 type AutoFindMustIncludeKeyword = "exact" | "partial" | "none"
@@ -119,6 +125,7 @@ interface AutoFindControlsState {
   allowlist: string
   allowHyphen: boolean
   allowNumbers: boolean
+  meaningFirst: boolean
   preferTwoWordBrands: boolean
   allowVibeSuffix: boolean
   showAnyAvailable: boolean
@@ -359,6 +366,7 @@ export function GenerateNames() {
     allowlist: "",
     allowHyphen: false,
     allowNumbers: false,
+    meaningFirst: true,
     preferTwoWordBrands: true,
     allowVibeSuffix: false,
     showAnyAvailable: false,
@@ -616,6 +624,7 @@ export function GenerateNames() {
             .filter(Boolean),
           allowHyphen: autoFindControls.allowHyphen,
           allowNumbers: autoFindControls.allowNumbers,
+          meaningFirst: autoFindControls.meaningFirst,
           preferTwoWordBrands: autoFindControls.preferTwoWordBrands,
           allowVibeSuffix: autoFindControls.allowVibeSuffix,
           showAnyAvailable: autoFindControls.showAnyAvailable,
@@ -1106,10 +1115,10 @@ export function GenerateNames() {
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-foreground">
-                      Auto-find 5 available .coms
+                      Smart .com Finder (Beta)
                     </span>
                     <span className="mt-1 block text-xs text-muted-foreground">
-                      Keeps remixing until it finds 5 available .com domains (max attempts/time).
+                      Meaning-first search for up to 5 available .com domains (within attempts/time cap).
                     </span>
                   </span>
                 </label>
@@ -1229,6 +1238,15 @@ export function GenerateNames() {
                         <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                           <input
                             type="checkbox"
+                            checked={autoFindControls.meaningFirst}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, meaningFirst: e.target.checked }))}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Meaning-first mode
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <input
+                            type="checkbox"
                             checked={autoFindControls.preferTwoWordBrands}
                             onChange={(e) => {
                               setHasCustomTwoWordPreference(true)
@@ -1341,21 +1359,45 @@ export function GenerateNames() {
                 {availableComPicks.length > 0 && (
                   <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                     {availableComPicks.map((result) => (
+                      (() => {
+                        const resultCardView = buildResultCardView({
+                          fullDomain: result.fullDomain,
+                          whyItWorks: result.whyItWorks,
+                          meaningBreakdown: result.meaningBreakdown,
+                          meaningScore: result.meaningScore,
+                          brandableScore: result.brandableScore ?? result.score,
+                          pronounceable: result.pronounceable,
+                          available: result.available,
+                        })
+
+                        return (
                       <div
                         key={result.fullDomain}
                         className="rounded-lg border border-green-500/20 bg-green-500/5 p-3"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-foreground">{result.fullDomain}</p>
+                            <p className="truncate text-sm font-semibold text-foreground">{resultCardView.title}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
                               Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
                             </p>
+                            <p className="mt-1 text-[11px] text-muted-foreground">{resultCardView.whyItWorks}</p>
+                            <p className="mt-1 text-[11px] text-primary/90">{resultCardView.meaningBreakdown}</p>
                             {result.whyTag && (
                               <p className="mt-1 text-[11px] text-primary/90">
                                 {result.whyTag}
                               </p>
                             )}
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {resultCardView.badges.map((badge) => (
+                                <span
+                                  key={`${result.fullDomain}-${badge}`}
+                                  className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary"
+                                >
+                                  {badge}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                           <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400">
                             Available
@@ -1400,6 +1442,8 @@ export function GenerateNames() {
                           </a>
                         </div>
                       </div>
+                        )
+                      })()
                     ))}
                   </div>
                 )}

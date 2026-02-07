@@ -1,10 +1,17 @@
-﻿import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
+import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { evaluateCandidateFilters, topRejectedReasons } from "@/lib/domainGen/filters"
 import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
+import {
+  buildConcepts as buildConceptVectors,
+  buildMeaningBreakdown,
+  dedupeByMeaningDiversity,
+  type MorphemeEntry,
+} from "@/lib/domainGen/meaning"
 import { rankCandidates } from "@/lib/domainGen/scoreCandidates"
 import type {
   AutoFindRequestInput,
   AutoFindRunResult,
+  Candidate,
   NameStyleMode,
   NearMissOption,
   RelaxationStep,
@@ -22,50 +29,28 @@ interface RelaxationConfig {
     style?: NameStyleMode
     preferTwoWordBrands?: boolean
     allowVibeSuffix?: boolean
+    expandConcepts?: boolean
   }
 }
 
+interface ScoredStageResult {
+  ranked: ScoredCandidate[]
+  qualityFloor: number
+  meaningFloor: number
+}
+
 const RELAXATION_ORDER: RelaxationConfig[] = [
+  { id: "baseline", label: "Strict controls", apply: {} },
+  { id: "expand_concepts", label: "Expanded meaning concept set", apply: { expandConcepts: true } },
+  { id: "length_plus1", label: "Maximum length increased by 1 character", apply: { maxLengthDelta: 1 } },
   {
-    id: "baseline",
-    label: "Strict controls",
-    apply: {},
+    id: "length_plus2_two_word",
+    label: "Maximum length increased by 2 characters and 2-word mode enabled",
+    apply: { maxLengthDelta: 2, preferTwoWordBrands: true },
   },
-  {
-    id: "keyword_anywhere",
-    label: "Keyword position relaxed to anywhere",
-    apply: { keywordPosition: "anywhere" },
-  },
-  {
-    id: "length_plus1",
-    label: "Maximum length increased by 1 character",
-    apply: { maxLengthDelta: 1 },
-  },
-  {
-    id: "length_plus2",
-    label: "Maximum length increased by 2 characters",
-    apply: { maxLengthDelta: 2 },
-  },
-  {
-    id: "two_word_mode",
-    label: "2-word brand mode enabled",
-    apply: { preferTwoWordBrands: true },
-  },
-  {
-    id: "allow_suffix",
-    label: "Tasteful suffix mode enabled",
-    apply: { allowVibeSuffix: true },
-  },
-  {
-    id: "generic_affix",
-    label: "Generic affix fallback enabled",
-    apply: { allowGenericAffix: true },
-  },
-  {
-    id: "keyword_partial",
-    label: "Keyword inclusion relaxed to partial or synonym",
-    apply: { mustIncludeKeyword: "partial" },
-  },
+  { id: "allow_suffix", label: "Tasteful suffix mode enabled", apply: { allowVibeSuffix: true } },
+  { id: "generic_affix", label: "Generic affix fallback enabled", apply: { allowGenericAffix: true } },
+  { id: "keyword_partial", label: "Keyword inclusion relaxed to partial or synonym", apply: { mustIncludeKeyword: "partial" } },
 ]
 
 const MAX_TOTAL_AVAILABILITY_CHECKS = 1000
@@ -84,14 +69,8 @@ function toAllowlist(rawAllowlist: string[]): string[] {
     .filter(Boolean)
 }
 
-function toPick(domain: string, scoredCandidate: ScoredCandidate): ScoredCandidate {
-  return {
-    ...scoredCandidate,
-    name: domain.replace(/\.com$/i, ""),
-    roots: scoredCandidate.roots,
-    keywordHits: scoredCandidate.keywordHits,
-    strategy: scoredCandidate.strategy,
-  }
+function wasRelaxationApplied(relaxation: RelaxationConfig): boolean {
+  return Object.keys(relaxation.apply).length > 0
 }
 
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
@@ -116,10 +95,6 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   })
 }
 
-function wasRelaxationApplied(relaxation: RelaxationConfig): boolean {
-  return Object.keys(relaxation.apply).length > 0
-}
-
 function computeQualityFloor(
   ranked: ScoredCandidate[],
   stage: number,
@@ -127,10 +102,19 @@ function computeQualityFloor(
 ): number {
   if (showAnyAvailable || ranked.length === 0) return Number.NEGATIVE_INFINITY
 
-  const idx = Math.min(ranked.length - 1, Math.max(0, Math.floor(ranked.length * 0.22)))
+  const idx = Math.min(ranked.length - 1, Math.max(0, Math.floor(ranked.length * 0.25)))
   const percentileScore = ranked[idx]?.score ?? 12
-  const floor = Math.max(13.5, percentileScore - 1.2 - stage * 0.45)
+  const floor = Math.max(13, percentileScore - 1.2 - stage * 0.45)
   return Number(floor.toFixed(2))
+}
+
+function computeMeaningFloor(
+  stage: number,
+  meaningFirst: boolean,
+  showAnyAvailable: boolean,
+): number {
+  if (!meaningFirst || showAnyAvailable) return 0
+  return Math.max(58, 70 - stage * 4)
 }
 
 function buildQuickSuggestions(input: AutoFindRequestInput, picksFound: number, providerErrors: number): string[] {
@@ -169,7 +153,7 @@ async function buildNearMisses(
 ): Promise<NearMissOption[]> {
   if (candidates.length === 0) return []
 
-  const shortlist = candidates.slice(0, 14)
+  const shortlist = candidates.slice(0, 16)
   const altDomains = shortlist.flatMap((candidate) => ["io", "ai", "co"].map((tld) => `${candidate.name}.${tld}`))
   const altResults = await checkAvailabilityBatch(altDomains, {
     signal,
@@ -213,6 +197,229 @@ async function buildNearMisses(
   return nearMisses
 }
 
+function buildConcepts(
+  input: AutoFindRequestInput,
+  relaxation: RelaxationConfig,
+  stage: number,
+): MorphemeEntry[] {
+  const baseLimit = relaxation.apply.expandConcepts ? 10 : 7
+  const conceptLimit = Math.min(14, baseLimit + stage)
+
+  return buildConceptVectors({
+    keyword: input.keyword,
+    industry: input.industry,
+    vibe: input.vibe,
+    conceptLimit,
+    expanded: Boolean(relaxation.apply.expandConcepts),
+  })
+}
+
+function generateCandidates(
+  input: AutoFindRequestInput,
+  relaxation: RelaxationConfig,
+  stage: number,
+  concepts: MorphemeEntry[],
+  poolSize: number,
+  runSeedSalt: string,
+): {
+  candidates: Candidate[]
+  keywordTokens: string[]
+} {
+  const effectiveControls = {
+    ...input.controls,
+    keywordPosition: relaxation.apply.keywordPosition || input.controls.keywordPosition,
+    mustIncludeKeyword: relaxation.apply.mustIncludeKeyword || input.controls.mustIncludeKeyword,
+    style: relaxation.apply.style || input.controls.style,
+    preferTwoWordBrands: relaxation.apply.preferTwoWordBrands ?? input.controls.preferTwoWordBrands,
+    allowVibeSuffix: relaxation.apply.allowVibeSuffix ?? input.controls.allowVibeSuffix,
+  }
+
+  const maxLength = Math.max(5, (input.maxLength || 10) + (relaxation.apply.maxLengthDelta || 0))
+
+  const generated = generateCandidatePool(
+    {
+      ...input,
+      controls: effectiveControls,
+    },
+    {
+      poolSize,
+      relaxedKeywordPosition: effectiveControls.keywordPosition,
+      relaxedKeywordMode: effectiveControls.mustIncludeKeyword,
+      relaxedMaxLength: maxLength,
+      relaxedStyle: effectiveControls.style,
+      relaxedTwoWordMode: effectiveControls.preferTwoWordBrands,
+      relaxedAllowVibeSuffix: effectiveControls.allowVibeSuffix,
+      allowGenericAffix: relaxation.apply.allowGenericAffix,
+      conceptFragments: concepts.map((item) => item.fragment),
+      meaningFirst: input.controls.meaningFirst,
+      seedSalt: `${runSeedSalt}:${relaxation.id}:${stage}`,
+    },
+  )
+
+  const enriched = generated.candidates.map((candidate) => {
+    const meaning = buildMeaningBreakdown({
+      name: candidate.name,
+      roots: candidate.roots,
+      concepts,
+    })
+
+    return {
+      ...candidate,
+      meaningBreakdown: meaning.breakdown,
+      whyItWorks: meaning.oneLiner,
+      meaningScore: meaning.meaningScore,
+    }
+  })
+
+  return {
+    candidates: dedupeByMeaningDiversity(enriched),
+    keywordTokens: generated.keywordTokens,
+  }
+}
+
+function scoreCandidates(
+  input: AutoFindRequestInput,
+  stage: number,
+  concepts: MorphemeEntry[],
+  generatedCandidates: Candidate[],
+  keywordTokens: string[],
+): ScoredStageResult {
+  const rankedAll = rankCandidates(generatedCandidates, {
+    industry: input.industry,
+    vibe: input.vibe,
+    keywordTokens,
+    controls: input.controls,
+    concepts,
+  })
+
+  const qualityFloor = computeQualityFloor(rankedAll, stage, input.controls.showAnyAvailable)
+  const meaningFloor = computeMeaningFloor(stage, input.controls.meaningFirst, input.controls.showAnyAvailable)
+
+  const filtered = rankedAll.filter((candidate) => {
+    if (qualityFloor !== Number.NEGATIVE_INFINITY && candidate.score < qualityFloor) return false
+    if (input.controls.meaningFirst && (candidate.meaningScore || 0) < meaningFloor) return false
+    return true
+  })
+
+  return {
+    ranked: dedupeByMeaningDiversity(filtered.length > 0 ? filtered : rankedAll).slice(0, 280),
+    qualityFloor,
+    meaningFloor,
+  }
+}
+
+async function checkAvailability(
+  rankedCandidates: ScoredCandidate[],
+  pickedDomains: Map<string, ScoredCandidate>,
+  checkedDomains: Set<string>,
+  unavailableComCandidates: Map<string, ScoredCandidate>,
+  targetCount: number,
+  totals: {
+    checkedAvailability: number
+    providerErrors: number
+  },
+  options?: {
+    signal?: AbortSignal
+  },
+): Promise<void> {
+  const domainsToCheck = rankedCandidates
+    .map((candidate) => `${candidate.name}.com`)
+    .filter((domain) => !checkedDomains.has(domain) && !pickedDomains.has(domain))
+
+  if (domainsToCheck.length === 0) return
+
+  let cursor = 0
+
+  while (cursor < domainsToCheck.length && pickedDomains.size < targetCount) {
+    if (options?.signal?.aborted) {
+      throw new Error("aborted")
+    }
+
+    if (totals.checkedAvailability >= MAX_TOTAL_AVAILABILITY_CHECKS) {
+      break
+    }
+
+    const remainingBudget = MAX_TOTAL_AVAILABILITY_CHECKS - totals.checkedAvailability
+    const batchSize = Math.max(14, Math.min(AVAILABILITY_BATCH_SIZE, remainingBudget, domainsToCheck.length - cursor))
+    const chunk = domainsToCheck.slice(cursor, cursor + batchSize)
+    cursor += batchSize
+
+    for (const domain of chunk) {
+      checkedDomains.add(domain)
+    }
+
+    const availabilityResults = await checkAvailabilityBatch(chunk, {
+      signal: options?.signal,
+      concurrency: 8,
+      maxRetries: 2,
+      backoffMs: 160,
+      ttlMs: 24 * 60 * 60 * 1000,
+    })
+
+    totals.checkedAvailability += availabilityResults.length
+    totals.providerErrors += availabilityResults.filter((entry) => Boolean(entry.error)).length
+
+    const scoredByDomain = new Map(rankedCandidates.map((candidate) => [`${candidate.name}.com`, candidate]))
+
+    for (const availability of availabilityResults) {
+      const scored = scoredByDomain.get(availability.domain)
+      if (!scored) continue
+
+      if (availability.available) {
+        if (!pickedDomains.has(availability.domain)) {
+          pickedDomains.set(availability.domain, scored)
+        }
+      } else if (!unavailableComCandidates.has(scored.name)) {
+        unavailableComCandidates.set(scored.name, scored)
+      }
+    }
+
+    if (cursor < domainsToCheck.length) {
+      await sleep(INTER_BATCH_DELAY_MS, options?.signal)
+    }
+  }
+}
+
+function formatResults(input: {
+  targetCount: number
+  picks: ScoredCandidate[]
+  attempts: number
+  maxAttempts: number
+  generatedCandidates: number
+  passedFilters: number
+  checkedAvailability: number
+  providerErrors: number
+  qualityThreshold: number
+  relaxationsApplied: string[]
+  topRejectedReasons: Array<{ reason: string; count: number }>
+  explanation: string
+  suggestions: string[]
+  nearMisses: NearMissOption[]
+  availabilityHitRate: number
+}): AutoFindRunResult {
+  return {
+    picks: input.picks,
+    summary: {
+      found: input.picks.length,
+      target: input.targetCount,
+      attempts: input.attempts,
+      maxAttempts: input.maxAttempts,
+      generatedCandidates: input.generatedCandidates,
+      passedFilters: input.passedFilters,
+      checkedAvailability: input.checkedAvailability,
+      providerErrors: input.providerErrors,
+      availabilityHitRate: Number((input.availabilityHitRate * 100).toFixed(2)),
+      qualityThreshold: Number(input.qualityThreshold.toFixed(2)),
+      relaxationsApplied: input.relaxationsApplied,
+      topRejectedReasons: input.topRejectedReasons,
+      checkingProgress: `Checking ${input.checkedAvailability}/${Math.max(input.generatedCandidates, input.checkedAvailability)}... Found ${input.picks.length}/${input.targetCount}`,
+      suggestions: input.suggestions,
+      nearMisses: input.nearMisses,
+      explanation: input.explanation,
+    },
+  }
+}
+
 export async function runAutoFindV2(
   input: AutoFindRequestInput,
   options?: {
@@ -226,7 +433,6 @@ export async function runAutoFindV2(
   const targetCount = Math.max(1, Math.min(options?.targetCount ?? input.targetCount ?? 5, 10))
   const maxAttempts = Math.max(1, Math.min(options?.maxAttempts ?? RELAXATION_ORDER.length, RELAXATION_ORDER.length))
   let adaptivePoolSize = Math.max(340, Math.min(options?.poolSize ?? 720, 1600))
-  const shortlistSize = Math.max(90, Math.min(options?.shortlistSize ?? 180, 320))
 
   const blocklist = toBlocklist(input.controls.blocklist)
   const allowlist = toAllowlist(input.controls.allowlist)
@@ -241,18 +447,20 @@ export async function runAutoFindV2(
   let totalCheckedAvailability = 0
   let providerErrors = 0
   let attempts = 0
-  let availabilityBudgetReached = false
-  let qualityThresholdUsed = Number.NEGATIVE_INFINITY
+  let qualityThresholdUsed = 0
+  let meaningThresholdUsed = 0
 
   const relaxations: RelaxationStep[] = []
+  const availabilityTotals = {
+    checkedAvailability: 0,
+    providerErrors: 0,
+  }
   const runSeedSalt = input.controls.seed
     ? "seeded"
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
   for (let stage = 0; stage < maxAttempts; stage += 1) {
-    if (options?.signal?.aborted) {
-      throw new Error("aborted")
-    }
+    if (options?.signal?.aborted) throw new Error("aborted")
 
     const relaxation = RELAXATION_ORDER[stage]
     attempts += 1
@@ -262,34 +470,20 @@ export async function runAutoFindV2(
       applied: wasRelaxationApplied(relaxation),
     })
 
-    const maxLength = Math.max(5, (input.maxLength || 10) + (relaxation.apply.maxLengthDelta || 0))
-    const effectiveControls = {
-      ...input.controls,
-      keywordPosition: relaxation.apply.keywordPosition || input.controls.keywordPosition,
-      mustIncludeKeyword: relaxation.apply.mustIncludeKeyword || input.controls.mustIncludeKeyword,
-      style: relaxation.apply.style || input.controls.style,
-      preferTwoWordBrands: relaxation.apply.preferTwoWordBrands ?? input.controls.preferTwoWordBrands,
-      allowVibeSuffix: relaxation.apply.allowVibeSuffix ?? input.controls.allowVibeSuffix,
-    }
-
-    const generated = generateCandidatePool(input, {
-      poolSize: Math.min(1700, adaptivePoolSize + stage * 80),
-      relaxedKeywordPosition: effectiveControls.keywordPosition,
-      relaxedKeywordMode: effectiveControls.mustIncludeKeyword,
-      relaxedMaxLength: maxLength,
-      relaxedStyle: effectiveControls.style,
-      relaxedTwoWordMode: effectiveControls.preferTwoWordBrands,
-      relaxedAllowVibeSuffix: effectiveControls.allowVibeSuffix,
-      allowGenericAffix: relaxation.apply.allowGenericAffix,
-      seedSalt: `${runSeedSalt}:${relaxation.id}:${stage}`,
-    })
+    const concepts = buildConcepts(input, relaxation, stage)
+    const generated = generateCandidates(input, relaxation, stage, concepts, Math.min(1700, adaptivePoolSize + stage * 90), runSeedSalt)
 
     totalGenerated += generated.candidates.length
 
     const filtered = generated.candidates.filter((candidate) => {
       const decision = evaluateCandidateFilters(candidate.name, {
-        maxLength,
-        controls: effectiveControls,
+        maxLength: Math.max(5, (input.maxLength || 10) + (relaxation.apply.maxLengthDelta || 0)),
+        controls: {
+          ...input.controls,
+          keywordPosition: relaxation.apply.keywordPosition || input.controls.keywordPosition,
+          mustIncludeKeyword: relaxation.apply.mustIncludeKeyword || input.controls.mustIncludeKeyword,
+          style: relaxation.apply.style || input.controls.style,
+        },
         blocklist,
         allowlist,
       })
@@ -303,170 +497,81 @@ export async function runAutoFindV2(
 
     totalPassedFilters += filtered.length
 
-    const rankedAll = rankCandidates(filtered, {
-      industry: input.industry,
-      vibe: input.vibe,
-      keywordTokens: generated.keywordTokens,
-      controls: effectiveControls,
-    }).slice(0, Math.min(420, shortlistSize + stage * 18))
+    const scored = scoreCandidates(input, stage, concepts, filtered, generated.keywordTokens)
+    qualityThresholdUsed = Math.max(qualityThresholdUsed, Number.isFinite(scored.qualityFloor) ? scored.qualityFloor : 0)
+    meaningThresholdUsed = Math.max(meaningThresholdUsed, scored.meaningFloor)
 
-    if (rankedAll.length === 0) {
-      adaptivePoolSize = Math.min(1700, adaptivePoolSize + 160)
+    if (scored.ranked.length === 0) {
+      adaptivePoolSize = Math.min(1700, adaptivePoolSize + 170)
       continue
     }
 
-    const qualityFloor = computeQualityFloor(rankedAll, stage, input.controls.showAnyAvailable)
-    qualityThresholdUsed = Math.max(qualityThresholdUsed, qualityFloor)
-
-    const ranked =
-      qualityFloor === Number.NEGATIVE_INFINITY
-        ? rankedAll
-        : rankedAll.filter((candidate) => candidate.score >= qualityFloor)
-
-    const qualityRanked = ranked.length > 0 ? ranked : rankedAll.slice(0, Math.max(40, Math.floor(rankedAll.length * 0.4)))
-
-    const domainsToCheck = qualityRanked
-      .map((candidate) => `${candidate.name}.com`)
-      .filter((domain) => !checkedDomains.has(domain) && !pickedDomains.has(domain))
-
-    if (domainsToCheck.length === 0) {
-      continue
-    }
-
-    let cursor = 0
-    while (cursor < domainsToCheck.length && pickedDomains.size < targetCount) {
-      if (options?.signal?.aborted) {
-        throw new Error("aborted")
-      }
-
-      if (totalCheckedAvailability >= MAX_TOTAL_AVAILABILITY_CHECKS) {
-        availabilityBudgetReached = true
-        break
-      }
-
-      const remainingBudget = MAX_TOTAL_AVAILABILITY_CHECKS - totalCheckedAvailability
-      const adaptiveBatchSize = Math.min(AVAILABILITY_BATCH_SIZE + stage * 4, 72)
-      const batchSize = Math.max(16, Math.min(adaptiveBatchSize, remainingBudget, domainsToCheck.length - cursor))
-      const chunk = domainsToCheck.slice(cursor, cursor + batchSize)
-      cursor += batchSize
-
-      for (const domain of chunk) {
-        checkedDomains.add(domain)
-      }
-
-      const availabilityResults = await checkAvailabilityBatch(chunk, {
+    await checkAvailability(
+      scored.ranked,
+      pickedDomains,
+      checkedDomains,
+      unavailableComCandidates,
+      targetCount,
+      availabilityTotals,
+      {
         signal: options?.signal,
-        concurrency: 8,
-        maxRetries: 2,
-        backoffMs: 160,
-        ttlMs: 24 * 60 * 60 * 1000,
-      })
+      },
+    )
 
-      totalCheckedAvailability += availabilityResults.length
-      providerErrors += availabilityResults.filter((entry) => Boolean(entry.error)).length
+    totalCheckedAvailability = availabilityTotals.checkedAvailability
+    providerErrors = availabilityTotals.providerErrors
 
-      const scoredByDomain = new Map(qualityRanked.map((candidate) => [`${candidate.name}.com`, candidate]))
-
-      for (const availability of availabilityResults) {
-        const scored = scoredByDomain.get(availability.domain)
-        if (!scored) continue
-
-        if (availability.available) {
-          if (pickedDomains.size < targetCount && !pickedDomains.has(availability.domain)) {
-            pickedDomains.set(availability.domain, scored)
-          }
-          continue
-        }
-
-        if (!unavailableComCandidates.has(scored.name)) {
-          unavailableComCandidates.set(scored.name, scored)
-        }
-      }
-
-      if (pickedDomains.size >= targetCount) {
-        break
-      }
-
-      if (cursor < domainsToCheck.length) {
-        await sleep(INTER_BATCH_DELAY_MS + stage * 10, options?.signal)
-      }
-    }
-
-    const hitRate = totalCheckedAvailability > 0 ? pickedDomains.size / totalCheckedAvailability : 0
-    if (hitRate < 0.012 && stage >= 1) {
-      adaptivePoolSize = Math.min(1700, adaptivePoolSize + 180)
-    }
-
-    if (pickedDomains.size >= targetCount || availabilityBudgetReached) {
+    if (pickedDomains.size >= targetCount || availabilityTotals.checkedAvailability >= MAX_TOTAL_AVAILABILITY_CHECKS) {
       break
+    }
+
+    const hitRate = availabilityTotals.checkedAvailability > 0 ? pickedDomains.size / availabilityTotals.checkedAvailability : 0
+    if (hitRate < 0.013) {
+      adaptivePoolSize = Math.min(1700, adaptivePoolSize + 180)
     }
   }
 
   const picks = Array.from(pickedDomains.entries())
-    .map(([domain, candidate]) => toPick(domain, candidate))
+    .map(([domain, candidate]) => ({
+      ...candidate,
+      name: domain.replace(/\.com$/i, ""),
+    }))
     .sort((a, b) => b.score - a.score)
     .slice(0, targetCount)
 
-  const availabilityHitRate = totalCheckedAvailability > 0 ? picks.length / totalCheckedAvailability : 0
-  const relaxationsApplied = relaxations.filter((step) => step.applied).map((step) => step.label)
-  const topRejected = topRejectedReasons(allRejectedReasons, 6)
-
-  let nearMisses: NearMissOption[] = []
-  if (picks.length < targetCount) {
-    nearMisses = await buildNearMisses(
-      Array.from(unavailableComCandidates.values()).sort((a, b) => b.score - a.score),
-      options?.signal,
-    )
-  }
+  const nearMisses =
+    picks.length < targetCount
+      ? await buildNearMisses(Array.from(unavailableComCandidates.values()).sort((a, b) => b.score - a.score), options?.signal)
+      : []
 
   const suggestions = buildQuickSuggestions(input, picks.length, providerErrors)
 
-  const checkingProgress = `Checking ${totalCheckedAvailability}/${Math.max(totalGenerated, totalCheckedAvailability)}... Found ${picks.length}/${targetCount}`
   const explanationParts: string[] = []
-
   if (picks.length >= targetCount) {
-    explanationParts.push(`Found ${picks.length}/${targetCount} available .coms with quality filtering.`)
+    explanationParts.push(`Found ${picks.length}/${targetCount} available .coms with meaning-first quality filters.`)
   } else {
-    explanationParts.push(`Found ${picks.length}/${targetCount} available .coms after checking ${totalCheckedAvailability} unique domains.`)
-    explanationParts.push(`.com scarcity at this length is common. Try +2 chars, 2-word mode, or suffix mode.`)
-
-    if ((input.maxLength || 10) <= 8 || topRejected.some((reason) => reason.reason === "too_long")) {
-      explanationParts.push(`A strict name length cap reduced the pool.`)
-    }
-
-    if (input.controls.mustIncludeKeyword === "exact") {
-      explanationParts.push(`Exact keyword matching narrowed coverage.`)
-    }
-
-    if (availabilityBudgetReached) {
-      explanationParts.push(`Safety cap reached at ${MAX_TOTAL_AVAILABILITY_CHECKS} availability checks.`)
-    }
-
+    explanationParts.push(`Found ${picks.length}/${targetCount} available .coms after checking ${checkedDomains.size} unique domains.`)
+    explanationParts.push(`.com scarcity at this length is common. Try +2 chars, 2-word mode, or allow suffix.`)
     if (providerErrors > 0) {
       explanationParts.push(`Some provider responses were degraded.`)
     }
   }
 
-  return {
+  return formatResults({
+    targetCount,
     picks,
-    summary: {
-      found: picks.length,
-      target: targetCount,
-      attempts,
-      maxAttempts,
-      generatedCandidates: totalGenerated,
-      passedFilters: totalPassedFilters,
-      checkedAvailability: totalCheckedAvailability,
-      providerErrors,
-      availabilityHitRate: Number((availabilityHitRate * 100).toFixed(2)),
-      qualityThreshold: Number.isFinite(qualityThresholdUsed) ? Number(qualityThresholdUsed.toFixed(2)) : 0,
-      relaxationsApplied,
-      topRejectedReasons: topRejected,
-      checkingProgress,
-      suggestions,
-      nearMisses,
-      explanation: explanationParts.join(" "),
-    },
-  }
+    attempts,
+    maxAttempts,
+    generatedCandidates: totalGenerated,
+    passedFilters: totalPassedFilters,
+    checkedAvailability: availabilityTotals.checkedAvailability,
+    providerErrors,
+    qualityThreshold: Math.max(qualityThresholdUsed, meaningThresholdUsed),
+    relaxationsApplied: relaxations.filter((item) => item.applied).map((item) => item.label),
+    topRejectedReasons: topRejectedReasons(allRejectedReasons, 6),
+    explanation: explanationParts.join(" "),
+    suggestions,
+    nearMisses,
+    availabilityHitRate: availabilityTotals.checkedAvailability > 0 ? picks.length / availabilityTotals.checkedAvailability : 0,
+  })
 }
-

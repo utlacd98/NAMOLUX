@@ -15,6 +15,8 @@ interface GenerateCandidateOptions {
   relaxedStyle?: NameStyleMode
   relaxedTwoWordMode?: boolean
   relaxedAllowVibeSuffix?: boolean
+  conceptFragments?: string[]
+  meaningFirst?: boolean
   allowGenericAffix?: boolean
   seedSalt?: string
 }
@@ -126,6 +128,30 @@ function blendWords(first: string, second: string): string {
   const left = first.slice(0, Math.max(2, Math.ceil(first.length * 0.58)))
   const right = second.slice(Math.max(0, Math.floor(second.length * 0.42)))
   return mergeReadableParts(left, right)
+}
+
+function createWordplayBlend(first: string, second: string): string {
+  if (!first) return second
+  if (!second) return first
+
+  const left = first.length <= 4 ? first : first.slice(0, Math.max(3, first.length - 1))
+  const right = second.length <= 4 ? second : second.slice(1)
+  const joint = mergeReadableParts(left, right)
+
+  if (joint.length >= 5 && !/[aeiouy]/.test(joint.slice(-2))) {
+    return `${joint}o`
+  }
+
+  return joint
+}
+
+function createRealWordTwist(base: string): string {
+  const clean = toAsciiWord(base)
+  if (clean.length <= 3) return clean
+  if (clean.endsWith("t")) return `${clean}ry`
+  if (clean.endsWith("s")) return `${clean}io`
+  if (clean.endsWith("n")) return `${clean}ly`
+  return `${clean}ry`
 }
 
 function lightlySwapVowel(word: string): string {
@@ -264,6 +290,7 @@ function buildStrategyWeights(preferTwoWordBrands: boolean) {
   return [
     { value: "two_word_compound", weight: twoWordWeight },
     { value: "semantic_compound", weight: 1.6 },
+    { value: "wordplay_blend", weight: 1.3 },
     { value: "emotive_modifier", weight: 1.35 },
     { value: "action_noun", weight: 1.15 },
     { value: "root_suffix", weight: 1.25 },
@@ -271,6 +298,7 @@ function buildStrategyWeights(preferTwoWordBrands: boolean) {
     { value: "vibe_compound", weight: 1.8 },
     { value: "portmanteau", weight: preferTwoWordBrands ? 0.8 : 1.5 },
     { value: "soft_connector_blend", weight: 1.2 },
+    { value: "real_word_twist", weight: 1.15 },
     { value: "vowel_swap", weight: 0.65 },
     { value: "letter_omission", weight: 0.55 },
     { value: "mood_pairing", weight: 1.1 },
@@ -294,6 +322,7 @@ export function generateCandidatePool(
   const styleSuffixes = getStyleSuffixes(effectiveStyle)
   const preferTwoWordBrands = options?.relaxedTwoWordMode ?? input.controls.preferTwoWordBrands
   const allowVibeSuffix = options?.relaxedAllowVibeSuffix ?? input.controls.allowVibeSuffix
+  const conceptFragments = (options?.conceptFragments || []).map(toAsciiWord).filter(Boolean)
   const targetLength = Math.max(5, Math.min(options?.relaxedMaxLength || input.maxLength || 10, 24))
 
   const effectivePosition = options?.relaxedKeywordPosition || input.controls.keywordPosition
@@ -305,13 +334,15 @@ export function generateCandidatePool(
   )
 
   const tokensForBuild = [...keywordTokens, ...relatedTerms].map(toAsciiWord).filter(Boolean)
-  const baseRoots = Array.from(new Set([...tokensForBuild, ...lexicon.roots, ...FLAIR_MORPHEMES])).slice(0, 90)
+  const baseRoots = Array.from(new Set([...conceptFragments, ...tokensForBuild, ...lexicon.roots, ...FLAIR_MORPHEMES])).slice(0, 100)
   const shortRoots = baseRoots.filter((root) => root.length <= Math.max(4, targetLength - 2))
   const rootsForPrimary = shortRoots.length >= 10 ? shortRoots : baseRoots
   const modifiers = Array.from(new Set([...weightedModifiers, ...vibeFlavor.modifiers, ...vibeFlavor.modifiers]))
   const prefixes = Array.from(new Set([...lexicon.prefixes, ...vibeFlavor.prefixes]))
   const suffixes = Array.from(new Set([...lexicon.suffixes, ...vibeFlavor.suffixes, ...styleSuffixes]))
-  const emotionalNouns = Array.from(new Set([...vibeFlavor.nouns, ...FLAIR_MORPHEMES, ...relatedTerms.slice(0, 12)]))
+  const emotionalNouns = Array.from(
+    new Set([...vibeFlavor.nouns, ...FLAIR_MORPHEMES, ...relatedTerms.slice(0, 12), ...conceptFragments]),
+  )
   const strategyWeights = buildStrategyWeights(preferTwoWordBrands)
 
   const candidates = new Map<string, Candidate>()
@@ -350,6 +381,9 @@ export function generateCandidatePool(
     } else if (strategy === "semantic_compound") {
       built = styleIsBlend ? blendWords(rootA, rootB) : mergeReadableParts(rootA, rootB)
       roots = [rootA, rootB]
+    } else if (strategy === "wordplay_blend") {
+      built = createWordplayBlend(rootA, rootB)
+      roots = [rootA, rootB]
     } else if (strategy === "emotive_modifier") {
       built = mergeReadableParts(modifier, rootA)
       roots = [modifier, rootA]
@@ -372,6 +406,9 @@ export function generateCandidatePool(
       const connector = pickOne(["a", "e", "i", "o", "u"], rng)
       built = `${rootA}${connector}${rootB.slice(Math.min(2, Math.max(1, rootB.length - 3)))}`
       roots = [rootA, rootB]
+    } else if (strategy === "real_word_twist") {
+      built = createRealWordTwist(rootA)
+      roots = [rootA]
     } else if (strategy === "vowel_swap") {
       const source = styleIsBlend ? blendWords(rootA, rootB) : mergeReadableParts(rootA, rootB)
       built = lightlySwapVowel(source)

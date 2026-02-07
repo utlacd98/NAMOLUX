@@ -11,6 +11,7 @@ export interface AutoFindControls {
   allowlist: string[]
   allowHyphen: boolean
   allowNumbers: boolean
+  meaningFirst: boolean
   preferTwoWordBrands: boolean
   allowVibeSuffix: boolean
   showAnyAvailable: boolean
@@ -30,6 +31,9 @@ export interface Candidate {
   strategy: string
   roots: string[]
   keywordHits: string[]
+  meaningBreakdown?: string
+  whyItWorks?: string
+  meaningScore?: number
 }
 
 export interface FilterDecision {
@@ -42,6 +46,9 @@ export interface ScoredCandidate extends Candidate {
   scoreBreakdown: Record<string, number>
   whyTag?: string
   qualityBand?: "high" | "medium" | "low"
+  brandableScore?: number
+  meaningScore?: number
+  pronounceabilityScore?: number
 }
 
 export interface NearMissOption {

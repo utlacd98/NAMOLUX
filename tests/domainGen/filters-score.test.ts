@@ -14,6 +14,7 @@ describe("filters and scoring", () => {
         allowlist: [],
         allowHyphen: false,
         allowNumbers: false,
+        meaningFirst: true,
         preferTwoWordBrands: false,
         allowVibeSuffix: false,
         showAnyAvailable: false,
@@ -45,6 +46,7 @@ describe("filters and scoring", () => {
           allowlist: [],
           allowHyphen: false,
           allowNumbers: false,
+          meaningFirst: true,
           preferTwoWordBrands: false,
           allowVibeSuffix: false,
           showAnyAvailable: false,
@@ -68,6 +70,7 @@ describe("filters and scoring", () => {
         allowlist: [],
         allowHyphen: false,
         allowNumbers: false,
+        meaningFirst: true,
         preferTwoWordBrands: false,
         allowVibeSuffix: false,
         showAnyAvailable: false,
@@ -89,6 +92,7 @@ describe("filters and scoring", () => {
       allowlist: [],
       allowHyphen: false,
       allowNumbers: false,
+      meaningFirst: true,
       preferTwoWordBrands: true,
       allowVibeSuffix: true,
       showAnyAvailable: false,
@@ -113,3 +117,4 @@ describe("filters and scoring", () => {
     expect(novalux.score).toBeGreaterThan(gosnap.score)
   })
 })
+
