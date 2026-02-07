@@ -232,7 +232,8 @@ const AUTO_FIND_TIME_CAP_MS = 20_000
 const AUTO_FIND_BATCH_SIZE = 16
 const AUTO_FIND_ATTEMPT_DELAY_MS = 180
 const AUTO_FIND_V2_MAX_ATTEMPTS = 8
-const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 === "true"
+// Enabled by default. Set NEXT_PUBLIC_AUTO_FIND_V2=false to opt out.
+const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 !== "false"
 
 const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
 const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
@@ -608,6 +609,7 @@ export function GenerateNames() {
         vibe: selectedVibe,
         industry: selectedIndustry,
         maxLength,
+        tlds: ALL_TLDS,
         targetCount: AUTO_FIND_TARGET_COM_COUNT,
         controls: {
           seed: resolvedSeed,
@@ -635,7 +637,7 @@ export function GenerateNames() {
     const responseData = await response.json()
 
     if (!response.ok) {
-      throw new Error(responseData.error || "Failed to auto-find .com domains")
+      throw new Error(responseData.error || "Failed to auto-find top domains")
     }
 
     return {
@@ -779,7 +781,7 @@ export function GenerateNames() {
         if (AUTO_FIND_V2_ENABLED) {
           setIsAutoFindingComs(true)
           setAutoFindAttempt(1)
-          setAutoFindStatus(`Crafting expressive .com picks... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
+          setAutoFindStatus(`Scanning highest Founder Signal domains... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
 
           const autoFindV2Result = await requestAutoFindV2(baseKeyword, abortController.signal)
           setAvailableComPicks(autoFindV2Result.picks)
@@ -1115,10 +1117,10 @@ export function GenerateNames() {
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-foreground">
-                      Smart .com Finder (Beta)
+                      Find 5 highest Founder Signal domains
                     </span>
                     <span className="mt-1 block text-xs text-muted-foreground">
-                      Meaning-first search for up to 5 available .com domains (within attempts/time cap).
+                      We only show premium names (score &gt;= 80). If fewer are found, we won't show low-quality results.
                     </span>
                   </span>
                 </label>
@@ -1324,10 +1326,10 @@ export function GenerateNames() {
               <div className="mb-4 rounded-xl border border-border/40 bg-card/60 p-3 sm:mb-6 sm:rounded-2xl sm:p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-foreground sm:text-base">Available .com picks</h2>
+                    <h2 className="text-sm font-semibold text-foreground sm:text-base">Top Founder Signal picks</h2>
                     <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                       {isAutoFindingComs
-                        ? `Crafting expressive .com picks... (Attempt ${Math.max(autoFindAttempt, 1)}/${AUTO_FIND_V2_ENABLED ? AUTO_FIND_V2_MAX_ATTEMPTS : AUTO_FIND_MAX_ATTEMPTS})`
+                        ? `Scanning highest Founder Signal domains... (Attempt ${Math.max(autoFindAttempt, 1)}/${AUTO_FIND_V2_ENABLED ? AUTO_FIND_V2_MAX_ATTEMPTS : AUTO_FIND_MAX_ATTEMPTS})`
                         : autoFindStatus || "Ready"}
                     </p>
                     {autoFindSummary && (
@@ -1451,7 +1453,7 @@ export function GenerateNames() {
                 {autoFindSummary && autoFindSummary.found < autoFindSummary.target && (
                   <div className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 p-3">
                     <p className="text-xs text-amber-100/90">
-                      .com scarcity at this length. Try: +2 chars, 2-word mode, or allow suffix.
+                      Premium-domain scarcity at this length. Try: +2 chars, 2-word mode, or allow suffix.
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {autoFindSummary.suggestions.map((suggestion) => (
@@ -1480,11 +1482,11 @@ export function GenerateNames() {
 
                 {autoFindSummary && autoFindSummary.nearMisses.length > 0 && (
                   <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3">
-                    <p className="text-xs font-medium text-foreground">Near-misses (best .com taken)</p>
+                    <p className="text-xs font-medium text-foreground">Near-misses (top names available on alternate TLDs)</p>
                     <div className="mt-2 space-y-1.5">
                       {autoFindSummary.nearMisses.map((nearMiss) => (
                         <div key={nearMiss.name} className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-                          <span className="font-medium text-foreground">{nearMiss.name}.com</span>
+                          <span className="font-medium text-foreground">{nearMiss.name}</span>
                           {nearMiss.availableTlds.map((tld) => (
                             <button
                               key={`${nearMiss.name}-${tld}`}
@@ -1509,7 +1511,7 @@ export function GenerateNames() {
                     <summary className="cursor-pointer text-xs font-medium text-foreground sm:text-sm">Details</summary>
                     <div className="mt-2 space-y-2 text-[11px] text-muted-foreground sm:text-xs">
                       <p>
-                        Found {autoFindSummary.found}/{autoFindSummary.target} .coms. Generated{" "}
+                        Found {autoFindSummary.found}/{autoFindSummary.target} premium domains. Generated{" "}
                         {autoFindSummary.generatedCandidates} candidates, filtered to {autoFindSummary.passedFilters}, checked{" "}
                         {autoFindSummary.checkedAvailability} domains.
                       </p>
@@ -1984,4 +1986,5 @@ export function GenerateNames() {
     </div>
   )
 }
+
 

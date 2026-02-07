@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
-import { runAutoFindV2 } from "@/lib/domainGen/autofind"
-import type { AutoFindControls } from "@/lib/domainGen/types"
+import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
 import { trackMetric } from "@/lib/metrics"
 
 // Lazy initialization to avoid build-time errors
@@ -20,47 +19,23 @@ function getOpenAI(): OpenAI {
 }
 
 function isAutoFindV2Enabled(): boolean {
-  return process.env.AUTO_FIND_V2 === "true" || process.env.NEXT_PUBLIC_AUTO_FIND_V2 === "true"
+  const serverFlag = process.env.AUTO_FIND_V2
+  const publicFlag = process.env.NEXT_PUBLIC_AUTO_FIND_V2
+
+  if (serverFlag === "false" || publicFlag === "false") return false
+  if (serverFlag === "true" || publicFlag === "true") return true
+
+  // Default on so quality-first multi-TLD auto-find is active unless explicitly disabled.
+  return true
 }
 
-function parseCsvInput(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => String(item || "").toLowerCase().replace(/[^a-z0-9-]/g, "").trim())
-      .filter(Boolean)
-  }
-
-  if (typeof value !== "string") return []
-
-  return value
-    .split(/[,\n]/)
-    .map((item) => item.toLowerCase().replace(/[^a-z0-9-]/g, "").trim())
-    .filter(Boolean)
-}
-
-function parseControls(value: any): AutoFindControls {
-  const controls = value || {}
-
-  return {
-    seed: typeof controls.seed === "string" ? controls.seed.trim() || undefined : undefined,
-    mustIncludeKeyword:
-      controls.mustIncludeKeyword === "exact" || controls.mustIncludeKeyword === "partial" || controls.mustIncludeKeyword === "none"
-        ? controls.mustIncludeKeyword
-        : "partial",
-    keywordPosition:
-      controls.keywordPosition === "prefix" || controls.keywordPosition === "suffix" || controls.keywordPosition === "anywhere"
-        ? controls.keywordPosition
-        : "anywhere",
-    style: controls.style === "real_words" || controls.style === "brandable_blends" ? controls.style : "real_words",
-    blocklist: parseCsvInput(controls.blocklist),
-    allowlist: parseCsvInput(controls.allowlist),
-    allowHyphen: Boolean(controls.allowHyphen),
-    allowNumbers: Boolean(controls.allowNumbers),
-    meaningFirst: controls.meaningFirst !== false,
-    preferTwoWordBrands: controls.preferTwoWordBrands !== false,
-    allowVibeSuffix: Boolean(controls.allowVibeSuffix),
-    showAnyAvailable: Boolean(controls.showAnyAvailable),
-  }
+function toAutoFindVibe(value: unknown): AutoFindVibe {
+  const safe = String(value || "").toLowerCase()
+  if (safe === "luxury") return "Luxury"
+  if (safe === "futuristic") return "Futuristic"
+  if (safe === "playful") return "Playful"
+  if (safe === "trustworthy") return "Trustworthy"
+  return "Minimal"
 }
 
 export async function POST(request: NextRequest) {
@@ -79,25 +54,19 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Auto-find V2 is disabled." }, { status: 400 })
       }
 
-      const controls = parseControls(payload.controls)
-      const targetCountRaw = typeof payload.targetCount === "number" ? payload.targetCount : 5
-      const targetCount = Math.max(1, Math.min(Math.floor(targetCountRaw), 10))
-
       const started = Date.now()
-      const result = await runAutoFindV2(
-        {
-          keyword: keyword.trim(),
-          vibe,
-          industry,
-          maxLength: typeof maxLength === "number" ? maxLength : 10,
-          targetCount,
-          controls,
-        },
-        {
-          targetCount,
-          signal: request.signal,
-        },
-      )
+      const result = await autoFind5DotComByFounderScore({
+        keywords: keyword.trim(),
+        industry: typeof industry === "string" ? industry : undefined,
+        vibe: toAutoFindVibe(vibe),
+        maxLen: typeof maxLength === "number" ? maxLength : 9,
+        maxAttempts: typeof payload.maxAttempts === "number" ? payload.maxAttempts : undefined,
+        timeCapMs: typeof payload.timeCapMs === "number" ? payload.timeCapMs : undefined,
+        scoreFloor: typeof payload.scoreFloor === "number" ? payload.scoreFloor : undefined,
+        topNToCheck: typeof payload.topNToCheck === "number" ? payload.topNToCheck : undefined,
+        poolSize: typeof payload.poolSize === "number" ? payload.poolSize : undefined,
+        tlds: Array.isArray(payload.tlds) ? payload.tlds : undefined,
+      })
 
       const userAgent = request.headers.get("user-agent") || undefined
       const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
@@ -109,42 +78,63 @@ export async function POST(request: NextRequest) {
           vibe,
           industry,
           mode: "auto_find_v2",
-          found: result.summary.found,
-          target: result.summary.target,
-          attempts: result.summary.attempts,
-          generatedCandidates: result.summary.generatedCandidates,
-          checkedAvailability: result.summary.checkedAvailability,
-          providerErrors: result.summary.providerErrors,
+          found: result.found.length,
+          target: 5,
+          attempts: result.stats.attempts,
+          generatedCandidates: result.stats.generated,
+          checkedAvailability: result.stats.checkedAvailability,
+          filteredCandidates: Math.max(0, result.stats.generated - result.stats.passedQuality),
           elapsedMs: Date.now() - started,
         },
         userAgent,
         country,
       })
 
+      const checked = Math.max(result.stats.checkedAvailability, 1)
+      const availabilityHitRate = Number(((result.found.length / checked) * 100).toFixed(2))
+
       return NextResponse.json({
         success: true,
         autoFindV2: true,
-        picks: result.picks.map((pick) => ({
+        picks: result.found.map((pick) => ({
           name: pick.name,
-          tld: "com",
-          fullDomain: `${pick.name}.com`,
+          tld: pick.tld,
+          fullDomain: pick.domain,
           available: true,
-          score: Number(Math.min(10, Math.max(1, pick.score / 2.2)).toFixed(1)),
-          pronounceable: true,
-          memorability: Number(Math.min(10, Math.max(6, pick.score / 2.1)).toFixed(1)),
+          score: pick.founderScore,
+          founderScore: pick.founderScore,
+          pronounceable: pick.label === "Pronounceable",
+          memorability: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
           length: pick.name.length,
-          strategy: pick.strategy,
-          scoreBreakdown: pick.scoreBreakdown,
-          roots: pick.roots,
-          whyTag: pick.whyTag,
-          qualityBand: pick.qualityBand,
-          meaningScore: pick.meaningScore,
-          meaningBreakdown: pick.meaningBreakdown,
-          whyItWorks: pick.whyItWorks,
-          brandableScore: pick.brandableScore,
-          pronounceabilityScore: pick.pronounceabilityScore,
+          strategy: "founder_score_priority",
+          scoreBreakdown: { founderSignal: pick.founderScore },
+          roots: [],
+          whyTag: pick.reasons.slice(0, 2).join(" | "),
+          qualityBand: pick.founderScore >= 85 ? "high" : pick.founderScore >= 75 ? "medium" : "low",
+          meaningScore: Math.min(100, Math.max(10, pick.founderScore)),
+          meaningBreakdown: "Founder Signal quality-first selection.",
+          whyItWorks: `Founder Signal ${pick.founderScore}/100.`,
+          brandableScore: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
+          pronounceabilityScore: pick.label === "Pronounceable" ? 90 : 72,
         })),
-        summary: result.summary,
+        summary: {
+          found: result.found.length,
+          target: 5,
+          attempts: result.stats.attempts,
+          maxAttempts: typeof payload.maxAttempts === "number" ? payload.maxAttempts : 5,
+          generatedCandidates: result.stats.generated,
+          passedFilters: result.stats.passedQuality,
+          checkedAvailability: result.stats.checkedAvailability,
+          providerErrors: 0,
+          availabilityHitRate,
+          qualityThreshold: typeof payload.scoreFloor === "number" ? payload.scoreFloor : 80,
+          relaxationsApplied: [],
+          topRejectedReasons: [],
+          checkingProgress: `Checking ${result.stats.checkedAvailability}/${result.stats.generated}... Found ${result.found.length}/5`,
+          suggestions: result.found.length < 5 ? ["increase_length", "two_word_mode", "allow_suffix", "switch_tld_io_ai"] : [],
+          nearMisses: [],
+          explanation: result.message,
+        },
       })
     }
 
