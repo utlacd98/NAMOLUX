@@ -99,6 +99,53 @@ interface DomainResult {
   pronounceable: boolean
   memorability: number
   length: number
+  strategy?: string
+  scoreBreakdown?: Record<string, number>
+  roots?: string[]
+  whyTag?: string
+  qualityBand?: "high" | "medium" | "low"
+}
+
+type AutoFindMustIncludeKeyword = "exact" | "partial" | "none"
+type AutoFindKeywordPosition = "prefix" | "suffix" | "anywhere"
+type AutoFindStyle = "real_words" | "brandable_blends"
+
+interface AutoFindControlsState {
+  seed: string
+  mustIncludeKeyword: AutoFindMustIncludeKeyword
+  keywordPosition: AutoFindKeywordPosition
+  style: AutoFindStyle
+  blocklist: string
+  allowlist: string
+  allowHyphen: boolean
+  allowNumbers: boolean
+  preferTwoWordBrands: boolean
+  allowVibeSuffix: boolean
+  showAnyAvailable: boolean
+}
+
+interface AutoFindNearMiss {
+  name: string
+  availableTlds: string[]
+}
+
+interface AutoFindV2Summary {
+  found: number
+  target: number
+  attempts: number
+  maxAttempts: number
+  generatedCandidates: number
+  passedFilters: number
+  checkedAvailability: number
+  providerErrors: number
+  availabilityHitRate: number
+  qualityThreshold: number
+  relaxationsApplied: string[]
+  topRejectedReasons: Array<{ reason: string; count: number }>
+  checkingProgress: string
+  suggestions: string[]
+  nearMisses: AutoFindNearMiss[]
+  explanation: string
 }
 
 interface SocialResult {
@@ -177,6 +224,8 @@ const AUTO_FIND_MAX_ATTEMPTS = 8
 const AUTO_FIND_TIME_CAP_MS = 20_000
 const AUTO_FIND_BATCH_SIZE = 16
 const AUTO_FIND_ATTEMPT_DELAY_MS = 180
+const AUTO_FIND_V2_MAX_ATTEMPTS = 8
+const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 === "true"
 
 const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
 const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
@@ -299,6 +348,22 @@ export function GenerateNames() {
   const [isAutoFindingComs, setIsAutoFindingComs] = useState(false)
   const [autoFindAttempt, setAutoFindAttempt] = useState(0)
   const [autoFindStatus, setAutoFindStatus] = useState<string | null>(null)
+  const [autoFindSummary, setAutoFindSummary] = useState<AutoFindV2Summary | null>(null)
+  const [showAutoFindControls, setShowAutoFindControls] = useState(false)
+  const [autoFindControls, setAutoFindControls] = useState<AutoFindControlsState>({
+    seed: "",
+    mustIncludeKeyword: "partial",
+    keywordPosition: "anywhere",
+    style: "real_words",
+    blocklist: "",
+    allowlist: "",
+    allowHyphen: false,
+    allowNumbers: false,
+    preferTwoWordBrands: true,
+    allowVibeSuffix: false,
+    showAnyAvailable: false,
+  })
+  const [hasCustomTwoWordPreference, setHasCustomTwoWordPreference] = useState(false)
 
   // New state for filters and history
   const [selectedTldFilter, setSelectedTldFilter] = useState<string | null>(null)
@@ -335,6 +400,22 @@ export function GenerateNames() {
       generationAbortRef.current?.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (hasCustomTwoWordPreference) return
+
+    const shouldPreferTwoWord =
+      (selectedVibe === "luxury" || selectedVibe === "trustworthy") && maxLength >= 9
+
+    setAutoFindControls((prev) =>
+      prev.preferTwoWordBrands === shouldPreferTwoWord
+        ? prev
+        : {
+            ...prev,
+            preferTwoWordBrands: shouldPreferTwoWord,
+          },
+    )
+  }, [selectedVibe, maxLength, hasCustomTwoWordPreference])
 
   // Load shortlist and search history from localStorage on mount
   useEffect(() => {
@@ -382,6 +463,50 @@ export function GenerateNames() {
   const stopAutoFindSearch = () => {
     generationStoppedRef.current = true
     generationAbortRef.current?.abort()
+  }
+
+  const handleRerollFlair = () => {
+    if (isGenerating || !keyword.trim()) return
+    handleGenerate()
+  }
+
+  const applyAutoFindSuggestion = (suggestion: string) => {
+    if (suggestion === "increase_length") {
+      setMaxLength((prev) => Math.min(15, prev + 2))
+      return
+    }
+
+    if (suggestion === "two_word_mode") {
+      setHasCustomTwoWordPreference(true)
+      setAutoFindControls((prev) => ({ ...prev, preferTwoWordBrands: true }))
+      return
+    }
+
+    if (suggestion === "allow_suffix") {
+      setAutoFindControls((prev) => ({ ...prev, allowVibeSuffix: true }))
+      return
+    }
+
+    if (suggestion === "switch_tld_io_ai") {
+      setSelectedTldFilter("io")
+      setShowOnlyAvailable(true)
+      return
+    }
+
+    if (suggestion === "show_any_available") {
+      setAutoFindControls((prev) => ({ ...prev, showAnyAvailable: true }))
+      return
+    }
+  }
+
+  const getSuggestionLabel = (suggestion: string): string => {
+    if (suggestion === "increase_length") return "+2 length"
+    if (suggestion === "two_word_mode") return "2-word mode"
+    if (suggestion === "allow_suffix") return "Allow suffix"
+    if (suggestion === "switch_tld_io_ai") return "Switch TLD: .io/.ai"
+    if (suggestion === "show_any_available") return "Show any available"
+    if (suggestion === "retry") return "Retry"
+    return suggestion
   }
 
   const extractDomainNames = (domains: any[]): string[] => {
@@ -454,6 +579,77 @@ export function GenerateNames() {
 
     const responseData = await response.json()
     return responseData.results || []
+  }
+
+  const requestAutoFindV2 = async (
+    baseKeyword: string,
+    signal: AbortSignal,
+  ): Promise<{ picks: DomainResult[]; summary: AutoFindV2Summary }> => {
+    const resolvedSeed =
+      autoFindControls.seed.trim() || `auto-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+
+    const response = await fetch("/api/generate-domains", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal,
+      body: JSON.stringify({
+        autoFindV2: true,
+        keyword: baseKeyword,
+        vibe: selectedVibe,
+        industry: selectedIndustry,
+        maxLength,
+        targetCount: AUTO_FIND_TARGET_COM_COUNT,
+        controls: {
+          seed: resolvedSeed,
+          mustIncludeKeyword: autoFindControls.mustIncludeKeyword,
+          keywordPosition: autoFindControls.keywordPosition,
+          style: autoFindControls.style,
+          blocklist: autoFindControls.blocklist
+            .split(/[,\n]/)
+            .map((entry) => entry.trim())
+            .filter(Boolean),
+          allowlist: autoFindControls.allowlist
+            .split(/[,\n]/)
+            .map((entry) => entry.trim())
+            .filter(Boolean),
+          allowHyphen: autoFindControls.allowHyphen,
+          allowNumbers: autoFindControls.allowNumbers,
+          preferTwoWordBrands: autoFindControls.preferTwoWordBrands,
+          allowVibeSuffix: autoFindControls.allowVibeSuffix,
+          showAnyAvailable: autoFindControls.showAnyAvailable,
+        },
+      }),
+    })
+
+    const responseData = await response.json()
+
+    if (!response.ok) {
+      throw new Error(responseData.error || "Failed to auto-find .com domains")
+    }
+
+    return {
+      picks: responseData.picks || [],
+      summary: responseData.summary || {
+        found: 0,
+        target: AUTO_FIND_TARGET_COM_COUNT,
+        attempts: 0,
+        maxAttempts: AUTO_FIND_V2_MAX_ATTEMPTS,
+        generatedCandidates: 0,
+        passedFilters: 0,
+        checkedAvailability: 0,
+        providerErrors: 0,
+        availabilityHitRate: 0,
+        qualityThreshold: 0,
+        relaxationsApplied: [],
+        topRejectedReasons: [],
+        checkingProgress: "Checking 0/0... Found 0/5",
+        suggestions: [],
+        nearMisses: [],
+        explanation: "No summary available.",
+      },
+    }
   }
 
   const mergeAvailableComResults = (
@@ -551,6 +747,7 @@ export function GenerateNames() {
     setIsAutoFindingComs(false)
     setAutoFindAttempt(0)
     setAutoFindStatus(null)
+    setAutoFindSummary(null)
     setAvailableComPicks([])
     setError(null)
     setSelectedTldFilter(null) // Reset filters on new search
@@ -570,55 +767,69 @@ export function GenerateNames() {
       setResults(initialResults)
 
       if (autoFindComMode) {
-        let comPicks = mergeAvailableComResults([], initialResults)
-        setAvailableComPicks(comPicks)
-
-        if (comPicks.length < AUTO_FIND_TARGET_COM_COUNT) {
+        if (AUTO_FIND_V2_ENABLED) {
           setIsAutoFindingComs(true)
-          const startedAt = Date.now()
-          let attempt = 1
+          setAutoFindAttempt(1)
+          setAutoFindStatus(`Crafting expressive .com picks... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
 
-          while (
-            comPicks.length < AUTO_FIND_TARGET_COM_COUNT &&
-            attempt <= AUTO_FIND_MAX_ATTEMPTS &&
-            Date.now() - startedAt < AUTO_FIND_TIME_CAP_MS &&
-            !generationStoppedRef.current
-          ) {
-            setAutoFindAttempt(attempt)
-            setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
+          const autoFindV2Result = await requestAutoFindV2(baseKeyword, abortController.signal)
+          setAvailableComPicks(autoFindV2Result.picks)
+          setAutoFindSummary(autoFindV2Result.summary)
+          setAutoFindAttempt(Math.max(1, autoFindV2Result.summary.attempts))
+          setAutoFindStatus(
+            `${autoFindV2Result.summary.checkingProgress} (Attempt ${autoFindV2Result.summary.attempts}/${autoFindV2Result.summary.maxAttempts})`,
+          )
+        } else {
+          let comPicks = mergeAvailableComResults([], initialResults)
+          setAvailableComPicks(comPicks)
 
-            const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
-            const remixedNames = await requestGeneratedNames(
-              remixSeed,
-              AUTO_FIND_BATCH_SIZE,
-              abortController.signal,
-            )
+          if (comPicks.length < AUTO_FIND_TARGET_COM_COUNT) {
+            setIsAutoFindingComs(true)
+            const startedAt = Date.now()
+            let attempt = 1
 
-            if (remixedNames.length > 0) {
-              const comResults = await requestAvailability(remixedNames, ["com"], abortController.signal)
-              comPicks = mergeAvailableComResults(comPicks, comResults)
-              setAvailableComPicks(comPicks)
-            }
-
-            attempt += 1
-
-            if (
+            while (
               comPicks.length < AUTO_FIND_TARGET_COM_COUNT &&
               attempt <= AUTO_FIND_MAX_ATTEMPTS &&
               Date.now() - startedAt < AUTO_FIND_TIME_CAP_MS &&
               !generationStoppedRef.current
             ) {
-              await delay(AUTO_FIND_ATTEMPT_DELAY_MS, abortController.signal)
+              setAutoFindAttempt(attempt)
+              setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
+
+              const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
+              const remixedNames = await requestGeneratedNames(
+                remixSeed,
+                AUTO_FIND_BATCH_SIZE,
+                abortController.signal,
+              )
+
+              if (remixedNames.length > 0) {
+                const comResults = await requestAvailability(remixedNames, ["com"], abortController.signal)
+                comPicks = mergeAvailableComResults(comPicks, comResults)
+                setAvailableComPicks(comPicks)
+              }
+
+              attempt += 1
+
+              if (
+                comPicks.length < AUTO_FIND_TARGET_COM_COUNT &&
+                attempt <= AUTO_FIND_MAX_ATTEMPTS &&
+                Date.now() - startedAt < AUTO_FIND_TIME_CAP_MS &&
+                !generationStoppedRef.current
+              ) {
+                await delay(AUTO_FIND_ATTEMPT_DELAY_MS, abortController.signal)
+              }
             }
           }
-        }
 
-        if (generationStoppedRef.current) {
-          setAutoFindStatus("Search stopped.")
-        } else if (comPicks.length >= AUTO_FIND_TARGET_COM_COUNT) {
-          setAutoFindStatus(`Found ${AUTO_FIND_TARGET_COM_COUNT} available .com domains.`)
-        } else {
-          setAutoFindStatus(`Found ${comPicks.length} available .com domains within the attempt/time cap.`)
+          if (generationStoppedRef.current) {
+            setAutoFindStatus("Search stopped.")
+          } else if (comPicks.length >= AUTO_FIND_TARGET_COM_COUNT) {
+            setAutoFindStatus(`Found ${AUTO_FIND_TARGET_COM_COUNT} available .com domains.`)
+          } else {
+            setAutoFindStatus(`Found ${comPicks.length} available .com domains within the attempt/time cap.`)
+          }
         }
       }
     } catch (error: any) {
@@ -902,6 +1113,158 @@ export function GenerateNames() {
                     </span>
                   </span>
                 </label>
+                {autoFindComMode && AUTO_FIND_V2_ENABLED && (
+                  <div className="mt-3 border-t border-border/40 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowAutoFindControls((prev) => !prev)}
+                      className="text-xs font-medium text-primary hover:text-primary/80"
+                    >
+                      {showAutoFindControls ? "Hide advanced auto-find controls" : "Show advanced auto-find controls"}
+                    </button>
+                    {showAutoFindControls && (
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">Deterministic seed (optional)</label>
+                          <input
+                            type="text"
+                            value={autoFindControls.seed}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, seed: e.target.value }))}
+                            placeholder="e.g., jan-launch-01"
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">Must include keyword</label>
+                          <select
+                            value={autoFindControls.mustIncludeKeyword}
+                            onChange={(e) =>
+                              setAutoFindControls((prev) => ({
+                                ...prev,
+                                mustIncludeKeyword: e.target.value as AutoFindMustIncludeKeyword,
+                              }))
+                            }
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          >
+                            <option value="exact">Exact</option>
+                            <option value="partial">Partial</option>
+                            <option value="none">None</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">Keyword position</label>
+                          <select
+                            value={autoFindControls.keywordPosition}
+                            onChange={(e) =>
+                              setAutoFindControls((prev) => ({
+                                ...prev,
+                                keywordPosition: e.target.value as AutoFindKeywordPosition,
+                              }))
+                            }
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          >
+                            <option value="prefix">Prefix</option>
+                            <option value="suffix">Suffix</option>
+                            <option value="anywhere">Anywhere</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">Style</label>
+                          <select
+                            value={autoFindControls.style}
+                            onChange={(e) =>
+                              setAutoFindControls((prev) => ({
+                                ...prev,
+                                style: e.target.value as AutoFindStyle,
+                              }))
+                            }
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          >
+                            <option value="real_words">Real words</option>
+                            <option value="brandable_blends">Brandable blends</option>
+                          </select>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">
+                            Blocklist terms (comma separated)
+                          </label>
+                          <input
+                            type="text"
+                            value={autoFindControls.blocklist}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, blocklist: e.target.value }))}
+                            placeholder="lux, pro, hub"
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="mb-1 block text-[11px] font-medium text-foreground sm:text-xs">
+                            Allowlist roots (comma separated)
+                          </label>
+                          <input
+                            type="text"
+                            value={autoFindControls.allowlist}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, allowlist: e.target.value }))}
+                            placeholder="fit, motion"
+                            className="h-9 w-full rounded-md border border-border/50 bg-background/60 px-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <input
+                            type="checkbox"
+                            checked={autoFindControls.allowHyphen}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, allowHyphen: e.target.checked }))}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Allow hyphens
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <input
+                            type="checkbox"
+                            checked={autoFindControls.allowNumbers}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, allowNumbers: e.target.checked }))}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Allow numbers
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <input
+                            type="checkbox"
+                            checked={autoFindControls.preferTwoWordBrands}
+                            onChange={(e) => {
+                              setHasCustomTwoWordPreference(true)
+                              setAutoFindControls((prev) => ({ ...prev, preferTwoWordBrands: e.target.checked }))
+                            }}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Prefer 2-word brands
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <input
+                            type="checkbox"
+                            checked={autoFindControls.allowVibeSuffix}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, allowVibeSuffix: e.target.checked }))}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Allow tasteful suffixes
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-xs text-muted-foreground sm:col-span-2">
+                          <input
+                            type="checkbox"
+                            checked={autoFindControls.showAnyAvailable}
+                            onChange={(e) => setAutoFindControls((prev) => ({ ...prev, showAnyAvailable: e.target.checked }))}
+                            className="h-4 w-4 rounded border-border bg-background accent-primary"
+                          />
+                          Show any available (skip strict quality threshold)
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {autoFindComMode && !AUTO_FIND_V2_ENABLED && (
+                  <p className="mt-3 text-[11px] text-muted-foreground">
+                    Auto-find V2 is disabled. Set <code>NEXT_PUBLIC_AUTO_FIND_V2=true</code> to enable stronger relevance controls.
+                  </p>
+                )}
               </div>
               </>
               )}
@@ -946,9 +1309,12 @@ export function GenerateNames() {
                     <h2 className="text-sm font-semibold text-foreground sm:text-base">Available .com picks</h2>
                     <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                       {isAutoFindingComs
-                        ? `Searching for available .coms... (Attempt ${Math.max(autoFindAttempt, 1)}/${AUTO_FIND_MAX_ATTEMPTS})`
+                        ? `Crafting expressive .com picks... (Attempt ${Math.max(autoFindAttempt, 1)}/${AUTO_FIND_V2_ENABLED ? AUTO_FIND_V2_MAX_ATTEMPTS : AUTO_FIND_MAX_ATTEMPTS})`
                         : autoFindStatus || "Ready"}
                     </p>
+                    {autoFindSummary && (
+                      <p className="mt-1 text-[11px] text-muted-foreground sm:text-xs">{autoFindSummary.explanation}</p>
+                    )}
                   </div>
                   {isAutoFindingComs && (
                     <Button
@@ -958,6 +1324,16 @@ export function GenerateNames() {
                       className="h-9 w-full bg-transparent sm:w-auto"
                     >
                       Stop
+                    </Button>
+                  )}
+                  {!isAutoFindingComs && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRerollFlair}
+                      className="h-9 w-full bg-transparent sm:w-auto"
+                    >
+                      Reroll flair
                     </Button>
                   )}
                 </div>
@@ -975,6 +1351,11 @@ export function GenerateNames() {
                             <p className="mt-1 text-xs text-muted-foreground">
                               Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
                             </p>
+                            {result.whyTag && (
+                              <p className="mt-1 text-[11px] text-primary/90">
+                                {result.whyTag}
+                              </p>
+                            )}
                           </div>
                           <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400">
                             Available
@@ -1021,6 +1402,108 @@ export function GenerateNames() {
                       </div>
                     ))}
                   </div>
+                )}
+
+                {autoFindSummary && autoFindSummary.found < autoFindSummary.target && (
+                  <div className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 p-3">
+                    <p className="text-xs text-amber-100/90">
+                      .com scarcity at this length. Try: +2 chars, 2-word mode, or allow suffix.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {autoFindSummary.suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => applyAutoFindSuggestion(suggestion)}
+                          className="rounded-full border border-amber-400/40 px-2.5 py-1 text-[11px] font-medium text-amber-100 transition-colors hover:bg-amber-400/15"
+                        >
+                          {getSuggestionLabel(suggestion)}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTldFilter("ai")
+                          setShowOnlyAvailable(true)
+                        }}
+                        className="rounded-full border border-amber-400/40 px-2.5 py-1 text-[11px] font-medium text-amber-100 transition-colors hover:bg-amber-400/15"
+                      >
+                        Switch TLD: .ai
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {autoFindSummary && autoFindSummary.nearMisses.length > 0 && (
+                  <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3">
+                    <p className="text-xs font-medium text-foreground">Near-misses (best .com taken)</p>
+                    <div className="mt-2 space-y-1.5">
+                      {autoFindSummary.nearMisses.map((nearMiss) => (
+                        <div key={nearMiss.name} className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                          <span className="font-medium text-foreground">{nearMiss.name}.com</span>
+                          {nearMiss.availableTlds.map((tld) => (
+                            <button
+                              key={`${nearMiss.name}-${tld}`}
+                              type="button"
+                              onClick={() => {
+                                setSelectedTldFilter(tld)
+                                setShowOnlyAvailable(true)
+                              }}
+                              className="rounded-full bg-primary/15 px-2 py-0.5 font-medium text-primary transition-colors hover:bg-primary/25"
+                            >
+                              .{tld} available
+                            </button>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {AUTO_FIND_V2_ENABLED && autoFindSummary && (
+                  <details className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3 sm:mt-4">
+                    <summary className="cursor-pointer text-xs font-medium text-foreground sm:text-sm">Details</summary>
+                    <div className="mt-2 space-y-2 text-[11px] text-muted-foreground sm:text-xs">
+                      <p>
+                        Found {autoFindSummary.found}/{autoFindSummary.target} .coms. Generated{" "}
+                        {autoFindSummary.generatedCandidates} candidates, filtered to {autoFindSummary.passedFilters}, checked{" "}
+                        {autoFindSummary.checkedAvailability} domains.
+                      </p>
+                      <p>
+                        {autoFindSummary.checkingProgress} | Quality threshold: {autoFindSummary.qualityThreshold}
+                      </p>
+                      <p>
+                        Availability hit rate: {autoFindSummary.availabilityHitRate}% | Provider errors:{" "}
+                        {autoFindSummary.providerErrors}
+                      </p>
+                      <div>
+                        <p className="font-medium text-foreground">Applied relaxations</p>
+                        {autoFindSummary.relaxationsApplied.length > 0 ? (
+                          <ul className="mt-1 list-disc pl-4">
+                            {autoFindSummary.relaxationsApplied.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="mt-1">None</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">Top rejected reasons</p>
+                        {autoFindSummary.topRejectedReasons.length > 0 ? (
+                          <ul className="mt-1 list-disc pl-4">
+                            {autoFindSummary.topRejectedReasons.map((reason) => (
+                              <li key={reason.reason}>
+                                {reason.reason}: {reason.count}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="mt-1">No rejected reasons captured.</p>
+                        )}
+                      </div>
+                    </div>
+                  </details>
                 )}
               </div>
             )}

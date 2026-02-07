@@ -1,63 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
+import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { trackMetric } from "@/lib/metrics"
 
-// Supported TLDs
 const SUPPORTED_TLDS = ["com", "io", "co", "ai", "app", "dev"]
 
-// Function to check domain availability using DNS NS record check
-// NS records are the most reliable indicator - every registered domain MUST have NS records
-async function checkDomainAvailability(domain: string): Promise<boolean> {
-  try {
-    // Check NS records - every registered domain must have nameservers
-    const response = await fetch(
-      `https://dns.google/resolve?name=${domain}&type=NS`,
-      {
-        headers: { Accept: "application/dns-json" },
-        signal: AbortSignal.timeout(5000),
-      }
-    )
-
-    if (!response.ok) {
-      console.log(`DNS API error for ${domain}: ${response.status}`)
-      // On API error, be conservative and say unavailable
-      return false
-    }
-
-    const data = await response.json()
-    console.log(`DNS check for ${domain}: Status=${data.Status}, Answer=${data.Answer?.length || 0}`)
-
-    // Status codes: 0 = NOERROR, 3 = NXDOMAIN (domain doesn't exist)
-    if (data.Status === 3) {
-      // NXDOMAIN - domain definitely doesn't exist = available
-      return true
-    }
-
-    if (data.Status === 0) {
-      // NOERROR - check if there are actual NS records
-      if (data.Answer && data.Answer.length > 0) {
-        // Has NS records = registered = not available
-        return false
-      }
-      // No NS records but no error - might be available, but be conservative
-      // Check Authority section for SOA records
-      if (data.Authority && data.Authority.length > 0) {
-        // Has authority records, likely registered
-        return false
-      }
-      // No records at all, likely available
-      return true
-    }
-
-    // Other status codes (SERVFAIL, etc.) - be conservative
-    return false
-  } catch (error) {
-    console.error(`Error checking domain ${domain}:`, error)
-    // On error, be conservative and say not available
-    return false
-  }
-}
-
-// Function to score a domain name
 function scoreDomain(name: string): {
   score: number
   pronounceable: boolean
@@ -66,21 +12,16 @@ function scoreDomain(name: string): {
 } {
   const length = name.length
 
-  // Base score calculation
   let score = 10
-
-  // Length scoring (shorter is better, but not too short)
   if (length <= 6) score -= 1
   else if (length <= 8) score += 0
   else if (length <= 10) score -= 0.5
   else score -= 1.5
 
-  // Check for pronounceability (has vowels)
   const vowels = name.match(/[aeiou]/gi)
   const pronounceable = vowels ? vowels.length >= Math.floor(length / 3) : false
   if (pronounceable) score += 1
 
-  // Memorability (simple heuristic based on patterns)
   const hasRepeatingChars = /(.)\1/.test(name)
   const hasCommonPatterns = /ly$|io$|ify$|hub$|lab$/.test(name)
   let memorability = 7
@@ -99,6 +40,10 @@ function scoreDomain(name: string): {
   }
 }
 
+function sanitiseName(input: string): string {
+  return input.toLowerCase().replace(/[^a-z0-9-]/g, "")
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { domains, tlds } = await request.json()
@@ -107,49 +52,61 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Domains array is required" }, { status: 400 })
     }
 
-    // Use provided TLDs or default to all supported TLDs
     const tldsToCheck: string[] = tlds && Array.isArray(tlds) ? tlds : SUPPORTED_TLDS
+    const cleanDomains = domains.map((domainName: string) => sanitiseName(String(domainName || ""))).filter(Boolean)
 
-    // Check availability for each domain across all TLDs
-    const results = await Promise.all(
-      domains.flatMap((domainName: string) =>
-        tldsToCheck.map(async (tld: string) => {
-          const fullDomain = `${domainName}.${tld}`
-          const available = await checkDomainAvailability(fullDomain)
-          const metrics = scoreDomain(domainName)
+    if (cleanDomains.length === 0) {
+      return NextResponse.json({ error: "No valid domains supplied" }, { status: 400 })
+    }
 
-          return {
-            name: domainName,
-            tld,
-            fullDomain: fullDomain,
-            available,
-            ...metrics,
-          }
-        })
-      )
+    const fullDomains = cleanDomains.flatMap((domainName) => tldsToCheck.map((tld) => `${domainName}.${tld}`))
+
+    const availabilityResults = await checkAvailabilityBatch(fullDomains, {
+      signal: request.signal,
+      concurrency: 8,
+      maxRetries: 2,
+      backoffMs: 120,
+      ttlMs: 24 * 60 * 60 * 1000,
+    })
+
+    const availabilityMap = new Map(availabilityResults.map((result) => [result.domain, result]))
+
+    const results = cleanDomains.flatMap((domainName: string) =>
+      tldsToCheck.map((tld: string) => {
+        const fullDomain = `${domainName}.${tld}`
+        const availability = availabilityMap.get(fullDomain)
+        const metrics = scoreDomain(domainName)
+
+        return {
+          name: domainName,
+          tld,
+          fullDomain,
+          available: Boolean(availability?.available),
+          availabilityProvider: availability?.provider || "unknown",
+          availabilityLatencyMs: availability?.latencyMs || 0,
+          availabilityCached: Boolean(availability?.cached),
+          ...metrics,
+        }
+      }),
     )
 
-    // Sort by availability first, then by score, then by TLD priority
     const tldPriority: Record<string, number> = { com: 0, io: 1, co: 2, ai: 3, app: 4, dev: 5 }
     const sortedResults = results.sort((a, b) => {
-      // First sort by availability
-      if (a.available !== b.available) {
-        return a.available ? -1 : 1
-      }
-      // Then by score
-      if (a.score !== b.score) {
-        return b.score - a.score
-      }
-      // Then by TLD priority
+      if (a.available !== b.available) return a.available ? -1 : 1
+      if (a.score !== b.score) return b.score - a.score
       return (tldPriority[a.tld] || 99) - (tldPriority[b.tld] || 99)
     })
 
-    // Track bulk check metric (non-blocking)
     const userAgent = request.headers.get("user-agent") || undefined
     const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
     trackMetric({
       action: "bulk_check",
-      metadata: { domainCount: domains.length, tldCount: tldsToCheck.length },
+      metadata: {
+        domainCount: cleanDomains.length,
+        tldCount: tldsToCheck.length,
+        checkedCount: availabilityResults.length,
+        providerErrors: availabilityResults.filter((item) => item.error).length,
+      },
       userAgent,
       country,
     })
@@ -161,10 +118,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error("Error checking domains:", error)
-    return NextResponse.json(
-      { error: error.message || "Failed to check domain availability" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || "Failed to check domain availability" }, { status: 500 })
   }
 }
-

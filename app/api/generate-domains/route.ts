@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { runAutoFindV2 } from "@/lib/domainGen/autofind"
+import type { AutoFindControls } from "@/lib/domainGen/types"
 import { trackMetric } from "@/lib/metrics"
 
 // Lazy initialization to avoid build-time errors
@@ -17,14 +19,127 @@ function getOpenAI(): OpenAI {
   return openaiInstance
 }
 
+function isAutoFindV2Enabled(): boolean {
+  return process.env.AUTO_FIND_V2 === "true" || process.env.NEXT_PUBLIC_AUTO_FIND_V2 === "true"
+}
+
+function parseCsvInput(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item || "").toLowerCase().replace(/[^a-z0-9-]/g, "").trim())
+      .filter(Boolean)
+  }
+
+  if (typeof value !== "string") return []
+
+  return value
+    .split(/[,\n]/)
+    .map((item) => item.toLowerCase().replace(/[^a-z0-9-]/g, "").trim())
+    .filter(Boolean)
+}
+
+function parseControls(value: any): AutoFindControls {
+  const controls = value || {}
+
+  return {
+    seed: typeof controls.seed === "string" ? controls.seed.trim() || undefined : undefined,
+    mustIncludeKeyword:
+      controls.mustIncludeKeyword === "exact" || controls.mustIncludeKeyword === "partial" || controls.mustIncludeKeyword === "none"
+        ? controls.mustIncludeKeyword
+        : "partial",
+    keywordPosition:
+      controls.keywordPosition === "prefix" || controls.keywordPosition === "suffix" || controls.keywordPosition === "anywhere"
+        ? controls.keywordPosition
+        : "anywhere",
+    style: controls.style === "real_words" || controls.style === "brandable_blends" ? controls.style : "real_words",
+    blocklist: parseCsvInput(controls.blocklist),
+    allowlist: parseCsvInput(controls.allowlist),
+    allowHyphen: Boolean(controls.allowHyphen),
+    allowNumbers: Boolean(controls.allowNumbers),
+    preferTwoWordBrands: controls.preferTwoWordBrands !== false,
+    allowVibeSuffix: Boolean(controls.allowVibeSuffix),
+    showAnyAvailable: Boolean(controls.showAnyAvailable),
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { keyword, vibe, industry, maxLength, count } = await request.json()
+    const payload = await request.json()
+    const { keyword, vibe, industry, maxLength, count, autoFindV2 } = payload
     const hasCustomCount = typeof count === "number" && Number.isFinite(count)
     const safeCount = hasCustomCount ? Math.max(12, Math.min(Math.floor(count), 20)) : 10
 
     if (!keyword || !keyword.trim()) {
       return NextResponse.json({ error: "Keyword is required" }, { status: 400 })
+    }
+
+    if (autoFindV2) {
+      if (!isAutoFindV2Enabled()) {
+        return NextResponse.json({ error: "Auto-find V2 is disabled." }, { status: 400 })
+      }
+
+      const controls = parseControls(payload.controls)
+      const targetCountRaw = typeof payload.targetCount === "number" ? payload.targetCount : 5
+      const targetCount = Math.max(1, Math.min(Math.floor(targetCountRaw), 10))
+
+      const started = Date.now()
+      const result = await runAutoFindV2(
+        {
+          keyword: keyword.trim(),
+          vibe,
+          industry,
+          maxLength: typeof maxLength === "number" ? maxLength : 10,
+          targetCount,
+          controls,
+        },
+        {
+          targetCount,
+          signal: request.signal,
+        },
+      )
+
+      const userAgent = request.headers.get("user-agent") || undefined
+      const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
+
+      trackMetric({
+        action: "name_generation",
+        metadata: {
+          keyword,
+          vibe,
+          industry,
+          mode: "auto_find_v2",
+          found: result.summary.found,
+          target: result.summary.target,
+          attempts: result.summary.attempts,
+          generatedCandidates: result.summary.generatedCandidates,
+          checkedAvailability: result.summary.checkedAvailability,
+          providerErrors: result.summary.providerErrors,
+          elapsedMs: Date.now() - started,
+        },
+        userAgent,
+        country,
+      })
+
+      return NextResponse.json({
+        success: true,
+        autoFindV2: true,
+        picks: result.picks.map((pick) => ({
+          name: pick.name,
+          tld: "com",
+          fullDomain: `${pick.name}.com`,
+          available: true,
+          score: Number(Math.min(10, Math.max(1, pick.score / 2.2)).toFixed(1)),
+          pronounceable: true,
+          memorability: Number(Math.min(10, Math.max(6, pick.score / 2.1)).toFixed(1)),
+          length: pick.name.length,
+          strategy: pick.strategy,
+          scoreBreakdown: pick.scoreBreakdown,
+          roots: pick.roots,
+          whyTag: pick.whyTag,
+          qualityBand: pick.qualityBand,
+        })),
+        summary: result.summary,
+      })
     }
 
     // Create a prompt for GPT to generate domain names
