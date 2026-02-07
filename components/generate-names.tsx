@@ -110,6 +110,17 @@ interface DomainResult {
   whyItWorks?: string
   brandableScore?: number
   pronounceabilityScore?: number
+  styleLabel?: NameStyleLabel
+  meaningShort?: string | null
+}
+
+type NameStyleSelection = "mix" | "invented" | "blend" | "metaphor" | "literal"
+type NameStyleLabel = "Invented" | "Blend" | "Metaphor" | "Literal"
+
+interface GeneratedDomainSuggestion {
+  name: string
+  styleLabel?: NameStyleLabel
+  meaningShort?: string | null
 }
 
 type AutoFindMustIncludeKeyword = "exact" | "partial" | "none"
@@ -236,6 +247,16 @@ const AUTO_FIND_V2_MAX_ATTEMPTS = 8
 const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 !== "false"
 // Keep auto-find UI local-first: hidden in production unless explicitly enabled.
 const AUTO_FIND_UI_ENABLED = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_ENABLE_AUTO_FIND_UI === "true"
+// Enabled by default. Set NEXT_PUBLIC_NAME_STYLE_MODE_V2=false to hide.
+const NAME_STYLE_UI_ENABLED = process.env.NEXT_PUBLIC_NAME_STYLE_MODE_V2 !== "false"
+
+const NAME_STYLE_OPTIONS: Array<{ id: NameStyleSelection; label: string }> = [
+  { id: "mix", label: "Mix styles" },
+  { id: "invented", label: "Invented" },
+  { id: "blend", label: "Blend" },
+  { id: "metaphor", label: "Metaphor" },
+  { id: "literal", label: "Literal" },
+]
 
 const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
 const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
@@ -346,6 +367,8 @@ export function GenerateNames() {
   const searchParams = useSearchParams()
   const [keyword, setKeyword] = useState("")
   const [selectedVibe, setSelectedVibe] = useState("luxury")
+  const [selectedNameStyle, setSelectedNameStyle] = useState<NameStyleSelection>("mix")
+  const [meaningModeEnabled, setMeaningModeEnabled] = useState(false)
   const [selectedIndustry, setSelectedIndustry] = useState("")
   const [maxLength, setMaxLength] = useState(10)
   const [results, setResults] = useState<DomainResult[]>([])
@@ -520,25 +543,56 @@ export function GenerateNames() {
     return suggestion
   }
 
-  const extractDomainNames = (domains: any[]): string[] => {
-    const uniqueNames = new Set<string>()
+  const extractDomainSuggestions = (domains: any[]): GeneratedDomainSuggestion[] => {
+    const uniqueNames = new Map<string, GeneratedDomainSuggestion>()
+
+    const toStyleLabel = (value: unknown): NameStyleLabel | undefined => {
+      const safe = String(value || "").toLowerCase()
+      if (safe === "invented") return "Invented"
+      if (safe === "blend") return "Blend"
+      if (safe === "metaphor") return "Metaphor"
+      if (safe === "literal") return "Literal"
+      return undefined
+    }
 
     for (const domain of domains || []) {
       const rawName = typeof domain?.name === "string" ? domain.name : ""
       const normalised = normaliseDomainName(rawName)
-      if (normalised.length >= 3 && normalised.length <= 63) {
-        uniqueNames.add(normalised)
+      if (normalised.length < 3 || normalised.length > 63) continue
+
+      if (!uniqueNames.has(normalised)) {
+        uniqueNames.set(normalised, {
+          name: normalised,
+          styleLabel: toStyleLabel(domain?.style),
+          meaningShort: typeof domain?.meaningShort === "string" ? domain.meaningShort : null,
+        })
       }
     }
 
-    return Array.from(uniqueNames)
+    return Array.from(uniqueNames.values())
+  }
+
+  const applySuggestionMetadata = (
+    input: DomainResult[],
+    suggestions: GeneratedDomainSuggestion[],
+  ): DomainResult[] => {
+    const byName = new Map(suggestions.map((item) => [item.name, item]))
+    return input.map((result) => {
+      const meta = byName.get(result.name)
+      if (!meta) return result
+      return {
+        ...result,
+        styleLabel: meta.styleLabel,
+        meaningShort: meaningModeEnabled ? meta.meaningShort || null : null,
+      }
+    })
   }
 
   const requestGeneratedNames = async (
     seedKeyword: string,
     count: number | null,
     signal: AbortSignal,
-  ): Promise<string[]> => {
+  ): Promise<GeneratedDomainSuggestion[]> => {
     const payload: Record<string, unknown> = {
       keyword: seedKeyword,
       vibe: selectedVibe,
@@ -548,6 +602,12 @@ export function GenerateNames() {
 
     if (typeof count === "number") {
       payload.count = count
+    }
+
+    if (NAME_STYLE_UI_ENABLED) {
+      payload.generatorV2 = true
+      payload.nameStyle = selectedNameStyle
+      payload.meaningMode = meaningModeEnabled
     }
 
     const response = await fetch("/api/generate-domains", {
@@ -564,7 +624,7 @@ export function GenerateNames() {
       throw new Error(responseData.error || "Failed to generate domain names")
     }
 
-    return extractDomainNames(responseData.domains || [])
+    return extractDomainSuggestions(responseData.domains || [])
   }
 
   const requestAvailability = async (
@@ -771,13 +831,14 @@ export function GenerateNames() {
     addToSearchHistory(baseKeyword)
 
     try {
-      const initialNames = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      const initialSuggestions = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      const initialNames = initialSuggestions.map((item) => item.name)
       if (initialNames.length === 0) {
         throw new Error("No domain candidates were generated. Please try again.")
       }
 
       const initialResults = await requestAvailability(initialNames, undefined, abortController.signal)
-      setResults(initialResults)
+      setResults(applySuggestionMetadata(initialResults, initialSuggestions))
 
       if (autoFindComMode) {
         if (AUTO_FIND_V2_ENABLED) {
@@ -793,7 +854,7 @@ export function GenerateNames() {
             `${autoFindV2Result.summary.checkingProgress} (Attempt ${autoFindV2Result.summary.attempts}/${autoFindV2Result.summary.maxAttempts})`,
           )
         } else {
-          let comPicks = mergeAvailableComResults([], initialResults)
+          let comPicks = mergeAvailableComResults([], applySuggestionMetadata(initialResults, initialSuggestions))
           setAvailableComPicks(comPicks)
 
           if (comPicks.length < AUTO_FIND_TARGET_COM_COUNT) {
@@ -811,15 +872,16 @@ export function GenerateNames() {
               setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
 
               const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
-              const remixedNames = await requestGeneratedNames(
+              const remixedSuggestions = await requestGeneratedNames(
                 remixSeed,
                 AUTO_FIND_BATCH_SIZE,
                 abortController.signal,
               )
+              const remixedNames = remixedSuggestions.map((item) => item.name)
 
               if (remixedNames.length > 0) {
                 const comResults = await requestAvailability(remixedNames, ["com"], abortController.signal)
-                comPicks = mergeAvailableComResults(comPicks, comResults)
+                comPicks = mergeAvailableComResults(comPicks, applySuggestionMetadata(comResults, remixedSuggestions))
                 setAvailableComPicks(comPicks)
               }
 
@@ -892,7 +954,18 @@ export function GenerateNames() {
     if (results.length === 0) return
 
     // CSV headers
-    const headers = ["Domain Name", "TLD", "Full Domain", "Available", "Score", "Pronounceable", "Memorability", "Length"]
+    const headers = [
+      "Domain Name",
+      "TLD",
+      "Full Domain",
+      "Available",
+      "Score",
+      "Pronounceable",
+      "Memorability",
+      "Length",
+      "Style",
+      "Meaning",
+    ]
 
     // CSV rows
     const rows = results.map((r) => [
@@ -904,6 +977,8 @@ export function GenerateNames() {
       r.pronounceable ? "Yes" : "No",
       r.memorability.toString(),
       r.length.toString(),
+      r.styleLabel || "",
+      r.meaningShort || "",
     ])
 
     // Combine headers and rows
@@ -1108,6 +1183,45 @@ export function GenerateNames() {
                   ))}
                 </div>
               </div>
+
+              {NAME_STYLE_UI_ENABLED && (
+                <div className="mt-3 sm:mt-5">
+                  <label className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">Name Style</label>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {NAME_STYLE_OPTIONS.map((option) => (
+                      <button
+                        key={option.id}
+                        onClick={() => setSelectedNameStyle(option.id)}
+                        className={cn(
+                          "rounded-full px-2.5 py-1.5 text-[10px] font-medium transition-all sm:px-3.5 sm:py-2 sm:text-xs",
+                          selectedNameStyle === option.id
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3">
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={meaningModeEnabled}
+                        onChange={(e) => setMeaningModeEnabled(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-border bg-background accent-primary"
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-xs font-medium text-foreground sm:text-sm">Meaning Mode (show meaning)</span>
+                        <span className="mt-1 block text-[11px] text-muted-foreground sm:text-xs">
+                          Adds a short explanation for each name, for example "co + sun -&gt; warmth, travel, positivity".
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {AUTO_FIND_UI_ENABLED && (
               <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3 sm:mt-5 sm:rounded-xl sm:p-4">
@@ -1676,6 +1790,7 @@ export function GenerateNames() {
                             <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground sm:gap-3 sm:text-xs">
                               <span>Score: {result.score}</span>
                               <span className="hidden sm:inline">Memorability: {result.memorability}</span>
+                              {result.styleLabel && <span>Style: {result.styleLabel}</span>}
                               {result.pronounceable && (
                                 <span className="flex items-center gap-1 text-green-400">
                                   <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
@@ -1689,6 +1804,9 @@ export function GenerateNames() {
                               pronounceable={result.pronounceable}
                               memorability={result.memorability}
                             />
+                            {result.meaningShort && (
+                              <p className="mt-1 text-[11px] text-primary/90">Meaning: {result.meaningShort}</p>
+                            )}
 
                             {/* SEO Micro-Signal & Check Button */}
                             <div className="mt-1.5 flex flex-wrap items-center gap-2">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
+import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
 
 // Lazy initialization to avoid build-time errors
@@ -38,10 +39,24 @@ function toAutoFindVibe(value: unknown): AutoFindVibe {
   return "Minimal"
 }
 
+function isNameStyleV2Enabled(): boolean {
+  const serverFlag = process.env.NAME_STYLE_MODE_V2
+  const publicFlag = process.env.NEXT_PUBLIC_NAME_STYLE_MODE_V2
+  if (serverFlag === "false" || publicFlag === "false") return false
+  if (serverFlag === "true" || publicFlag === "true") return true
+  return true
+}
+
+function toNameStyle(value: unknown): NameStyleSelection {
+  const safe = String(value || "mix").toLowerCase()
+  if (safe === "invented" || safe === "blend" || safe === "metaphor" || safe === "literal") return safe
+  return "mix"
+}
+
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.json()
-    const { keyword, vibe, industry, maxLength, count, autoFindV2 } = payload
+    const { keyword, vibe, industry, maxLength, count, autoFindV2, generatorV2, nameStyle, meaningMode } = payload
     const hasCustomCount = typeof count === "number" && Number.isFinite(count)
     const safeCount = hasCustomCount ? Math.max(12, Math.min(Math.floor(count), 20)) : 10
 
@@ -135,6 +150,48 @@ export async function POST(request: NextRequest) {
           nearMisses: [],
           explanation: result.message,
         },
+      })
+    }
+
+    if (generatorV2 && isNameStyleV2Enabled()) {
+      const generated = generateNameStyleCandidates({
+        keywords: keyword.trim(),
+        industry: typeof industry === "string" ? industry : undefined,
+        vibe: typeof vibe === "string" ? vibe : "minimal",
+        maxLength: typeof maxLength === "number" ? maxLength : 10,
+        count: safeCount,
+        selectedStyle: toNameStyle(nameStyle),
+        meaningMode: Boolean(meaningMode),
+        seed: typeof payload.seed === "string" ? payload.seed : undefined,
+      })
+
+      const userAgent = request.headers.get("user-agent") || undefined
+      const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
+      trackMetric({
+        action: "name_generation",
+        metadata: {
+          keyword,
+          vibe,
+          industry,
+          mode: "style_v2",
+          style: toNameStyle(nameStyle),
+          meaningMode: Boolean(meaningMode),
+          requestedCount: safeCount,
+          resultCount: generated.length,
+        },
+        userAgent,
+        country,
+      })
+
+      return NextResponse.json({
+        success: true,
+        generatorV2: true,
+        domains: generated.map((item) => ({
+          name: item.name,
+          style: item.style,
+          meaningShort: item.meaningShort || null,
+          reasoning: item.meaningShort || `${item.style} style suggestion.`,
+        })),
       })
     }
 
