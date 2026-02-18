@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        url: "/namnewlogo.png",
+        width: 400,
+        height: 400,
         alt: "NamoLux - Domain Name Finder",
       },
     ],
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: "NamoLux - Domain Name Finder & SEO Audit",
     description:
       "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
-    images: ["/og-image.png"],
+    images: ["/namnewlogo.png"],
   },
   robots: {
     index: true,
@@ -64,9 +64,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/icon.png",
+    icon: [{ url: "/namnewlogo.png", type: "image/png" }],
+    apple: [{ url: "/namnewlogo.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/namnewlogo.png",
   },
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
