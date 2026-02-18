@@ -22,6 +22,8 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
+  Eye,
+  Lock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -399,6 +401,13 @@ export function GenerateNames() {
   const generationAbortRef = useRef<AbortController | null>(null)
   const generationStoppedRef = useRef(false)
 
+  // Freemium state: track if user is pro and which premium domain they've revealed
+  const [isPro, setIsPro] = useState(false)
+  const [revealedPremiumDomain, setRevealedPremiumDomain] = useState<string | null>(null)
+
+  // Score threshold for premium domains (75+)
+  const PREMIUM_SCORE_THRESHOLD = 75
+
   // Initialise keyword from query string for schema.org SearchAction support.
   useEffect(() => {
     const query = (searchParams.get("q") || searchParams.get("keyword") || "").trim()
@@ -604,7 +613,7 @@ export function GenerateNames() {
   const requestAutoFindV2 = async (
     baseKeyword: string,
     signal: AbortSignal,
-  ): Promise<{ picks: DomainResult[]; summary: AutoFindV2Summary }> => {
+  ): Promise<{ picks: DomainResult[]; summary: AutoFindV2Summary; isPro: boolean }> => {
     const resolvedSeed =
       autoFindControls.seed.trim() || `auto-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
@@ -671,6 +680,7 @@ export function GenerateNames() {
         nearMisses: [],
         explanation: "No summary available.",
       },
+      isPro: responseData.isPro || false,
     }
   }
 
@@ -800,6 +810,8 @@ export function GenerateNames() {
           setAutoFindStatus(`Scanning highest Founder Signal domains... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
 
           const autoFindV2Result = await requestAutoFindV2(baseKeyword, abortController.signal)
+          setIsPro(autoFindV2Result.isPro)
+          setRevealedPremiumDomain(null) // Reset reveal state on new generation
           setAvailableComPicks(autoFindV2Result.picks)
           setAutoFindSummary(autoFindV2Result.summary)
           setAutoFindAttempt(Math.max(1, autoFindV2Result.summary.attempts))
@@ -1376,93 +1388,157 @@ export function GenerateNames() {
 
                 {availableComPicks.length > 0 && (
                   <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                    {availableComPicks.map((result) => (
-                      (() => {
-                        const resultCardView = buildResultCardView({
-                          fullDomain: result.fullDomain,
-                          whyItWorks: result.whyItWorks,
-                          meaningBreakdown: result.meaningBreakdown,
-                          meaningScore: result.meaningScore,
-                          brandableScore: result.brandableScore ?? result.score,
-                          pronounceable: result.pronounceable,
-                          available: result.available,
-                        })
+                    {availableComPicks.map((result) => {
+                      const resultCardView = buildResultCardView({
+                        fullDomain: result.fullDomain,
+                        whyItWorks: result.whyItWorks,
+                        meaningBreakdown: result.meaningBreakdown,
+                        meaningScore: result.meaningScore,
+                        brandableScore: result.brandableScore ?? result.score,
+                        pronounceable: result.pronounceable,
+                        available: result.available,
+                      })
 
-                        return (
-                      <div
-                        key={result.fullDomain}
-                        className="rounded-lg border border-green-500/20 bg-green-500/5 p-3"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-foreground">{resultCardView.title}</p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
-                            </p>
-                            <p className="mt-1 text-[11px] text-muted-foreground">{resultCardView.whyItWorks}</p>
-                            <p className="mt-1 text-[11px] text-primary/90">{resultCardView.meaningBreakdown}</p>
-                            {result.whyTag && (
-                              <p className="mt-1 text-[11px] text-primary/90">
-                                {result.whyTag}
-                              </p>
-                            )}
-                            <div className="mt-1.5 flex flex-wrap gap-1.5">
-                              {resultCardView.badges.map((badge) => (
-                                <span
-                                  key={`${result.fullDomain}-${badge}`}
-                                  className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary"
-                                >
-                                  {badge}
-                                </span>
-                              ))}
+                      // Freemium blur logic: premium domains (score >= 75) are blurred for free users
+                      const isPremiumDomain = result.score >= PREMIUM_SCORE_THRESHOLD
+                      const isRevealed = result.fullDomain === revealedPremiumDomain
+                      const canReveal = isPremiumDomain && !isPro && revealedPremiumDomain === null
+                      const isBlurred = isPremiumDomain && !isPro && !isRevealed
+                      const showUpgradeCTA = isPremiumDomain && !isPro && revealedPremiumDomain !== null && !isRevealed
+
+                      // Handle click to reveal premium domain
+                      const handleRevealClick = () => {
+                        if (canReveal) {
+                          setRevealedPremiumDomain(result.fullDomain)
+                        }
+                      }
+
+                      return (
+                        <div
+                          key={result.fullDomain}
+                          className={cn(
+                            "relative rounded-lg border p-3 transition-all",
+                            isBlurred
+                              ? "border-amber-500/30 bg-amber-500/5 cursor-pointer hover:border-amber-400/50"
+                              : "border-green-500/20 bg-green-500/5"
+                          )}
+                          onClick={canReveal ? handleRevealClick : undefined}
+                        >
+                          {/* Premium badge for high-scoring domains */}
+                          {isPremiumDomain && (
+                            <div className="absolute -top-2 right-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-md">
+                              ⭐ PREMIUM
                             </div>
+                          )}
+
+                          {/* Blur overlay for locked premium domains */}
+                          {isBlurred && (
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
+                              {canReveal ? (
+                                <>
+                                  <div className="mb-2 rounded-full bg-amber-500/20 p-2">
+                                    <Eye className="h-5 w-5 text-amber-400" />
+                                  </div>
+                                  <p className="text-sm font-medium text-amber-400">Click to Reveal</p>
+                                  <p className="mt-1 text-[11px] text-muted-foreground">Score: {result.score}/100</p>
+                                  <p className="mt-0.5 text-[10px] text-amber-500/80">1 free reveal available</p>
+                                </>
+                              ) : showUpgradeCTA ? (
+                                <>
+                                  <div className="mb-2 rounded-full bg-primary/20 p-2">
+                                    <Lock className="h-5 w-5 text-primary" />
+                                  </div>
+                                  <p className="text-sm font-medium text-foreground">Premium Domain</p>
+                                  <p className="mt-1 text-[11px] text-muted-foreground">Score: {result.score}/100</p>
+                                  <a
+                                    href="/pricing"
+                                    className="mt-2 rounded-full bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    Unlock All Premium
+                                  </a>
+                                </>
+                              ) : null}
+                            </div>
+                          )}
+
+                          <div className={cn("flex items-start justify-between gap-2", isBlurred && "select-none")}>
+                            <div className="min-w-0">
+                              <p className={cn("truncate text-sm font-semibold text-foreground", isBlurred && "blur-sm")}>{resultCardView.title}</p>
+                              <p className={cn("mt-1 text-xs text-muted-foreground", isBlurred && "blur-sm")}>
+                                Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
+                              </p>
+                              <p className={cn("mt-1 text-[11px] text-muted-foreground", isBlurred && "blur-sm")}>{resultCardView.whyItWorks}</p>
+                              <p className={cn("mt-1 text-[11px] text-primary/90", isBlurred && "blur-sm")}>{resultCardView.meaningBreakdown}</p>
+                              {result.whyTag && (
+                                <p className={cn("mt-1 text-[11px] text-primary/90", isBlurred && "blur-sm")}>
+                                  {result.whyTag}
+                                </p>
+                              )}
+                              <div className={cn("mt-1.5 flex flex-wrap gap-1.5", isBlurred && "blur-sm")}>
+                                {resultCardView.badges.map((badge) => (
+                                  <span
+                                    key={`${result.fullDomain}-${badge}`}
+                                    className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary"
+                                  >
+                                    {badge}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <span className={cn(
+                              "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                              isPremiumDomain
+                                ? "bg-amber-500/15 text-amber-400"
+                                : "bg-green-500/15 text-green-400"
+                            )}>
+                              {isPremiumDomain ? "Premium" : "Available"}
+                            </span>
                           </div>
-                          <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400">
-                            Available
-                          </span>
+                          <div className={cn("mt-2 flex items-center gap-1.5", isBlurred && "blur-sm pointer-events-none")}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); copyToClipboard(result.fullDomain); }}
+                              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                              title="Copy domain"
+                              disabled={isBlurred}
+                            >
+                              {copiedName === result.fullDomain ? (
+                                <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                              ) : (
+                                <Copy className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleShortlist(result.fullDomain); }}
+                              className={cn(
+                                "rounded-md p-1.5 transition-colors hover:bg-muted",
+                                shortlist.includes(result.fullDomain)
+                                  ? "text-primary"
+                                  : "text-muted-foreground hover:text-foreground",
+                              )}
+                              title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                              disabled={isBlurred}
+                            >
+                              {shortlist.includes(result.fullDomain) ? (
+                                <BookmarkCheck className="h-3.5 w-3.5" />
+                              ) : (
+                                <Bookmark className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                            <a
+                              href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Buy
+                            </a>
+                          </div>
                         </div>
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <button
-                            onClick={() => copyToClipboard(result.fullDomain)}
-                            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            title="Copy domain"
-                          >
-                            {copiedName === result.fullDomain ? (
-                              <CheckCircle className="h-3.5 w-3.5 text-green-400" />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => toggleShortlist(result.fullDomain)}
-                            className={cn(
-                              "rounded-md p-1.5 transition-colors hover:bg-muted",
-                              shortlist.includes(result.fullDomain)
-                                ? "text-primary"
-                                : "text-muted-foreground hover:text-foreground",
-                            )}
-                            title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
-                          >
-                            {shortlist.includes(result.fullDomain) ? (
-                              <BookmarkCheck className="h-3.5 w-3.5" />
-                            ) : (
-                              <Bookmark className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                          <a
-                            href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Buy
-                          </a>
-                        </div>
-                      </div>
-                        )
-                      })()
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
 

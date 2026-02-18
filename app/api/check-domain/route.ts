@@ -53,8 +53,8 @@ function sanitiseName(input: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit first
-    const rateLimitResult = await checkRateLimit(request)
+    // Check rate limit first - bulk check feature
+    const rateLimitResult = await checkRateLimit(request, "bulk")
 
     if (!rateLimitResult.allowed) {
       return NextResponse.json(

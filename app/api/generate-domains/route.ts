@@ -56,8 +56,8 @@ function toNameStyle(value: unknown): NameStyleSelection {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit first
-    const rateLimitResult = await checkRateLimit(request)
+    // Check rate limit first - domain generation feature
+    const rateLimitResult = await checkRateLimit(request, "domain")
 
     if (!rateLimitResult.allowed) {
       const resetAt = rateLimitResult.resetAt
@@ -148,6 +148,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         autoFindV2: true,
+        isPro: rateLimitResult.isPro,
         picks: result.found.map((pick) => ({
           name: pick.name,
           tld: pick.tld,
@@ -228,6 +229,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         generatorV2: true,
+        isPro: rateLimitResult.isPro,
         domains: generated.map((item) => ({
           name: item.name,
           style: item.style,
@@ -332,6 +334,7 @@ Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...
 
     return NextResponse.json({
       success: true,
+      isPro: rateLimitResult.isPro,
       domains: finalSuggestions,
     })
   } catch (error: any) {

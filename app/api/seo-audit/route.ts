@@ -999,8 +999,8 @@ function auditStructuredData($: CheerioRoot): AuditCategory {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit first
-    const rateLimitResult = await checkRateLimit(request)
+    // Check rate limit first - SEO audit feature
+    const rateLimitResult = await checkRateLimit(request, "seo")
 
     if (!rateLimitResult.allowed) {
       return NextResponse.json(

@@ -4,6 +4,8 @@ import Stripe from "stripe"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+export type FeatureType = "domain" | "bulk" | "seo"
+
 export interface RateLimitResult {
   allowed: boolean
   isPro: boolean
@@ -12,6 +14,7 @@ export interface RateLimitResult {
   resetAt: Date | null
   plan: "free" | "pro"
   subscriptionStatus: "active" | "inactive" | "cancelled" | "past_due" | null
+  featureType?: FeatureType
 }
 
 /**
@@ -157,12 +160,18 @@ async function checkStripeSubscription(userId: string, email: string): Promise<{
  * 3. If authenticated, check Stripe for active subscription
  * 4. If has active subscription -> ALLOW unlimited
  * 5. If no subscription OR not authenticated:
- *    a. Query generation_logs for this IP in the last 24 hours
+ *    a. Query generation_logs for this IP in the last 24 hours, filtered by feature type
  *    b. Also query by user_id if authenticated
  *    c. If count >= 2 -> BLOCK
  *    d. If count < 2 -> ALLOW
+ *
+ * @param request - The incoming request
+ * @param featureType - The type of feature being used (domain, bulk, seo). Each feature has its own 2/day limit.
  */
-export async function checkRateLimit(request: NextRequest): Promise<RateLimitResult> {
+export async function checkRateLimit(
+  request: NextRequest,
+  featureType: FeatureType = "domain"
+): Promise<RateLimitResult> {
   const ip = getClientIP(request)
   const supabase = await createClient()
 
@@ -189,19 +198,21 @@ export async function checkRateLimit(request: NextRequest): Promise<RateLimitRes
       resetAt: null,
       plan: "pro",
       subscriptionStatus: subscriptionStatus as any,
+      featureType,
     }
   }
-  
-  // For free users or unauthenticated users, check rate limit
+
+  // For free users or unauthenticated users, check rate limit PER FEATURE
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  
-  // Check IP-based rate limit
+
+  // Check IP-based rate limit for this specific feature
   const { count: ipCount } = await supabase
     .from("generation_logs")
     .select("*", { count: "exact", head: true })
     .eq("ip_address", ip)
+    .eq("generation_type", featureType)
     .gte("created_at", twentyFourHoursAgo)
-  
+
   // Also check user-based rate limit if authenticated (prevents IP rotation abuse)
   let userCount = 0
   if (user) {
@@ -209,35 +220,37 @@ export async function checkRateLimit(request: NextRequest): Promise<RateLimitRes
       .from("generation_logs")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
+      .eq("generation_type", featureType)
       .gte("created_at", twentyFourHoursAgo)
     userCount = count || 0
   }
-  
+
   // Use the higher count (IP or user-based)
   const totalCount = Math.max(ipCount || 0, userCount)
-  
-  // Free users get 2 generations per 24 hours
+
+  // Free users get 2 uses per feature per 24 hours
   const FREE_LIMIT = 2
   const allowed = totalCount < FREE_LIMIT
   const remaining = Math.max(0, FREE_LIMIT - totalCount)
-  
+
   // Get the reset time (when the oldest generation in the window expires)
   let resetAt: Date | null = null
   if (!allowed) {
     const { data: oldestLog } = await supabase
       .from("generation_logs")
       .select("created_at")
+      .eq("generation_type", featureType)
       .or(`ip_address.eq.${ip}${user ? `,user_id.eq.${user.id}` : ""}`)
       .gte("created_at", twentyFourHoursAgo)
       .order("created_at", { ascending: true })
       .limit(1)
       .single()
-    
+
     if (oldestLog) {
       resetAt = new Date(new Date(oldestLog.created_at).getTime() + 24 * 60 * 60 * 1000)
     }
   }
-  
+
   return {
     allowed,
     isPro: false,
@@ -246,6 +259,7 @@ export async function checkRateLimit(request: NextRequest): Promise<RateLimitRes
     resetAt,
     plan: "free",
     subscriptionStatus: null,
+    featureType,
   }
 }
 
