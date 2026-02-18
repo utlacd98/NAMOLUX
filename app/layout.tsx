@@ -64,9 +64,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/namnewlogo.png", type: "image/png" }],
-    apple: [{ url: "/namnewlogo.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/namnewlogo.png",
+    icon: [{ url: "/namoluxfinalfav.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/namoluxfinalfav.svg", sizes: "180x180", type: "image/svg+xml" }],
+    shortcut: "/namoluxfinalfav.svg",
   },
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
