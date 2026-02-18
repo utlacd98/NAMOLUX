@@ -6,7 +6,7 @@ import {
   Activity, Zap, Search, FileSearch, Download, Copy,
   LayoutDashboard, Filter, Globe, ChevronLeft, ChevronRight, Menu, X,
   Megaphone, Linkedin, Facebook, Send, Calendar, FileText, MessageSquare, Sparkles, CheckCircle, AlertCircle,
-  PenTool, Plus, Trash2, Eye, Code,
+  PenTool, Plus, Trash2, Eye, Code, Mail, UserPlus, Tag, MailCheck, MailX,
   Target, LineChart as LineChartIcon, AlertTriangle, Trophy, ArrowUpRight, ArrowDownRight,
   Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock
 } from "lucide-react"
@@ -41,6 +41,7 @@ const NAV_ITEMS = [
   { id: "funnel", label: "Funnels", icon: Filter },
   { id: "geo", label: "Geo & Devices", icon: Globe },
   { id: "events", label: "Events", icon: Activity },
+  { id: "email-list", label: "Email List", icon: Mail },
   { id: "seo-intel", label: "SEO Intelligence", icon: Target },
   { id: "content-perf", label: "Content Performance", icon: LineChartIcon },
   { id: "competitor", label: "Competitor Monitor", icon: Crosshair },
@@ -359,6 +360,84 @@ export default function MetricsPage() {
   } | null>(null)
   const [blogAnalyticsLoading, setBlogAnalyticsLoading] = useState(false)
 
+  // Email List State
+  interface EmailSubscriber {
+    id: string
+    email: string
+    source: string
+    tags: string[]
+    status: "subscribed" | "unsubscribed" | "bounced"
+    created_at: string
+    updated_at?: string
+  }
+  const [emailList, setEmailList] = useState<EmailSubscriber[]>([])
+  const [emailStats, setEmailStats] = useState<{
+    total: number
+    subscribed: number
+    unsubscribed: number
+    bounced: number
+    recentSignups: number
+  } | null>(null)
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [newEmail, setNewEmail] = useState("")
+  const [newEmailSource, setNewEmailSource] = useState("manual")
+  const [emailSearchQuery, setEmailSearchQuery] = useState("")
+  const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | "subscribed" | "unsubscribed" | "bounced">("all")
+
+  const fetchEmailList = async () => {
+    setEmailLoading(true)
+    try {
+      const res = await fetch("/api/admin/email-list")
+      if (!res.ok) throw new Error("Failed to fetch email list")
+      const json = await res.json()
+      setEmailList(json.emails || [])
+      setEmailStats(json.stats || null)
+    } catch (e: any) {
+      console.error("Failed to fetch email list:", e)
+    } finally {
+      setEmailLoading(false)
+    }
+  }
+
+  const addEmail = async () => {
+    if (!newEmail.includes("@")) return
+    try {
+      const res = await fetch("/api/admin/email-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newEmail, source: newEmailSource })
+      })
+      if (res.ok) {
+        setNewEmail("")
+        fetchEmailList()
+      }
+    } catch (e) {
+      console.error("Failed to add email:", e)
+    }
+  }
+
+  const unsubscribeEmail = async (email: string, hardDelete: boolean = false) => {
+    try {
+      const url = `/api/admin/email-list?email=${encodeURIComponent(email)}${hardDelete ? "&hard=true" : ""}`
+      const res = await fetch(url, { method: "DELETE" })
+      if (res.ok) fetchEmailList()
+    } catch (e) {
+      console.error("Failed to unsubscribe:", e)
+    }
+  }
+
+  const exportEmailsCSV = () => {
+    const subscribedEmails = emailList.filter(e => e.status === "subscribed")
+    const csv = "Email,Source,Tags,Subscribed At\n" +
+      subscribedEmails.map(e => `${e.email},${e.source},"${e.tags?.join(", ") || ""}",${e.created_at}`).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `namolux-emails-${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+  }
+
   const fetchBlogAnalytics = async () => {
     setBlogAnalyticsLoading(true)
     try {
@@ -405,6 +484,7 @@ export default function MetricsPage() {
   useEffect(() => { fetchData(); fetchEvents() }, [])
   useEffect(() => { if (activeTab === "events") fetchEvents(1) }, [activeTab, eventFilter, searchQuery, days])
   useEffect(() => { if (activeTab === "blog-analytics") fetchBlogAnalytics() }, [activeTab, days])
+  useEffect(() => { if (activeTab === "email-list") fetchEmailList() }, [activeTab])
 
   const handleDaysChange = (d: 7 | 30 | 90) => { setDays(d); fetchData(d); if (activeTab === "events") fetchEvents(1) }
   const handleExport = () => { window.open(`/api/metrics/export?days=${days}`, "_blank") }
@@ -925,6 +1005,226 @@ export default function MetricsPage() {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* EMAIL LIST TAB */}
+          {activeTab === "email-list" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-primary" />
+                  Email Marketing List
+                </h2>
+                <div className="flex gap-2">
+                  <button onClick={fetchEmailList} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/40 text-sm text-muted-foreground hover:text-foreground">
+                    <RefreshCw className={`h-4 w-4 ${emailLoading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </button>
+                  <button onClick={exportEmailsCSV} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-sm text-primary hover:bg-primary/20">
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              {emailStats && (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                  <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                    <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                      <Users className="h-4 w-4" />
+                      <span className="text-xs">Total</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">{emailStats.total}</p>
+                  </div>
+                  <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+                    <div className="flex items-center gap-2 text-green-400 mb-1">
+                      <MailCheck className="h-4 w-4" />
+                      <span className="text-xs">Subscribed</span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-400">{emailStats.subscribed}</p>
+                  </div>
+                  <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+                    <div className="flex items-center gap-2 text-red-400 mb-1">
+                      <MailX className="h-4 w-4" />
+                      <span className="text-xs">Unsubscribed</span>
+                    </div>
+                    <p className="text-2xl font-bold text-red-400">{emailStats.unsubscribed}</p>
+                  </div>
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                    <div className="flex items-center gap-2 text-amber-400 mb-1">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span className="text-xs">Bounced</span>
+                    </div>
+                    <p className="text-2xl font-bold text-amber-400">{emailStats.bounced}</p>
+                  </div>
+                  <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+                    <div className="flex items-center gap-2 text-blue-400 mb-1">
+                      <UserPlus className="h-4 w-4" />
+                      <span className="text-xs">Last 7 Days</span>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-400">+{emailStats.recentSignups}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Add Email Form */}
+              <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" /> Add Subscriber
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="email@example.com"
+                    className="flex-1 min-w-[200px] rounded-lg border border-border/40 bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                  />
+                  <select
+                    value={newEmailSource}
+                    onChange={(e) => setNewEmailSource(e.target.value)}
+                    className="rounded-lg border border-border/40 bg-background px-3 py-2 text-sm text-foreground"
+                  >
+                    <option value="manual">Manual</option>
+                    <option value="landing_page">Landing Page</option>
+                    <option value="blog">Blog</option>
+                    <option value="product">Product</option>
+                    <option value="social">Social Media</option>
+                    <option value="referral">Referral</option>
+                  </select>
+                  <button
+                    onClick={addEmail}
+                    disabled={!newEmail.includes("@")}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap gap-3">
+                <div className="relative flex-1 max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={emailSearchQuery}
+                    onChange={(e) => setEmailSearchQuery(e.target.value)}
+                    placeholder="Search emails..."
+                    className="w-full rounded-lg border border-border/40 bg-card/30 pl-10 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+                <select
+                  value={emailStatusFilter}
+                  onChange={(e) => setEmailStatusFilter(e.target.value as any)}
+                  className="rounded-lg border border-border/40 bg-card/30 px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="all">All Status</option>
+                  <option value="subscribed">Subscribed</option>
+                  <option value="unsubscribed">Unsubscribed</option>
+                  <option value="bounced">Bounced</option>
+                </select>
+              </div>
+
+              {/* Email List Table */}
+              <div className="rounded-xl border border-border/40 bg-card/30 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/20">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Source</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Status</th>
+                        <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Subscribed</th>
+                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {emailList
+                        .filter(e => emailStatusFilter === "all" || e.status === emailStatusFilter)
+                        .filter(e => !emailSearchQuery || e.email.toLowerCase().includes(emailSearchQuery.toLowerCase()))
+                        .map((subscriber) => (
+                        <tr key={subscriber.id} className="border-b border-border/20 last:border-0 hover:bg-muted/10">
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-foreground">{subscriber.email}</div>
+                            <div className="text-xs text-muted-foreground sm:hidden">{subscriber.source}</div>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell capitalize">{subscriber.source}</td>
+                          <td className="px-4 py-3 hidden md:table-cell">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                              subscriber.status === "subscribed" ? "bg-green-500/20 text-green-400" :
+                              subscriber.status === "unsubscribed" ? "bg-red-500/20 text-red-400" :
+                              "bg-amber-500/20 text-amber-400"
+                            }`}>
+                              {subscriber.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground hidden lg:table-cell">
+                            {new Date(subscriber.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-1">
+                              {subscriber.status === "subscribed" && (
+                                <button
+                                  onClick={() => unsubscribeEmail(subscriber.email)}
+                                  className="p-1.5 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
+                                  title="Unsubscribe"
+                                >
+                                  <MailX className="h-4 w-4" />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => unsubscribeEmail(subscriber.email, true)}
+                                className="p-1.5 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
+                                title="Delete permanently"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {emailList.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                            {emailLoading ? "Loading..." : "No subscribers yet. Add your first one above!"}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* SQL Schema Info */}
+              <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                <h4 className="font-medium text-amber-400 mb-2 flex items-center gap-2">
+                  <Code className="h-4 w-4" /> Database Setup Required
+                </h4>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Run this SQL in your Supabase SQL Editor to create the email_subscribers table:
+                </p>
+                <pre className="text-[10px] bg-background/50 p-2 rounded overflow-x-auto text-muted-foreground">
+{`CREATE TABLE email_subscribers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  source TEXT DEFAULT 'manual',
+  tags TEXT[] DEFAULT '{}',
+  status TEXT DEFAULT 'subscribed' CHECK (status IN ('subscribed', 'unsubscribed', 'bounced')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+-- Enable Row Level Security
+ALTER TABLE email_subscribers ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for service role access
+CREATE POLICY "Service role can manage emails" ON email_subscribers
+  FOR ALL USING (true) WITH CHECK (true);`}
+                </pre>
+              </div>
             </div>
           )}
 
