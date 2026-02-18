@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Heart } from "lucide-react"
-import { KofiButton } from "@/components/kofi-button"
 
 // Social media icons as inline SVGs for better control
 function FacebookIcon({ className }: { className?: string }) {
@@ -103,10 +102,6 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* Right: Ko-fi Support Button */}
-          <div className="flex justify-center md:justify-end">
-            <KofiButton />
-          </div>
         </div>
 
         {/* Social Links Section */}
