@@ -4,7 +4,14 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Terms of Service | NamoLux",
-  description: "Terms of service for NamoLux domain name generator.",
+  description:
+    "Review the NamoLux terms of service covering credits, availability checks, acceptable use, and your responsibilities when generating domains with NamoLux.",
+  twitter: {
+    card: "summary",
+    title: "Terms of Service | NamoLux",
+    description:
+      "Review the NamoLux terms of service covering credits, availability checks, acceptable use, and your responsibilities when generating domains with NamoLux.",
+  },
 }
 
 export default function TermsPage() {
@@ -87,4 +94,3 @@ export default function TermsPage() {
     </div>
   )
 }
-

@@ -5,10 +5,17 @@ import { GenerateNames } from "@/components/generate-names"
 export const metadata: Metadata = {
   title: "Generate Domain Names | NamoLux",
   description:
-    "Generate short, memorable brand names with instant .com availability checks. Powered by AI to match your brand vibe.",
+    "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
   openGraph: {
     title: "Generate Domain Names | NamoLux",
-    description: "AI-powered domain name generator with instant availability checks.",
+    description:
+      "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Generate Domain Names | NamoLux",
+    description:
+      "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
   },
 }
 

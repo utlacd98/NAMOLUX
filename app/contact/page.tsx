@@ -5,7 +5,14 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Contact Us | NamoLux",
-  description: "Get in touch with the NamoLux team.",
+  description:
+    "Contact the NamoLux team for support, feedback, and product questions. We usually reply within 24-48 hours on business days to help with domain workflows.",
+  twitter: {
+    card: "summary",
+    title: "Contact Us | NamoLux",
+    description:
+      "Contact the NamoLux team for support, feedback, and product questions. We usually reply within 24-48 hours on business days to help with domain workflows.",
+  },
 }
 
 export default function ContactPage() {
@@ -100,4 +107,3 @@ export default function ContactPage() {
     </div>
   )
 }
-

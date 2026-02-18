@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   Search,
@@ -191,6 +192,7 @@ const generateMockAudit = (url: string): AuditCategory[] => {
 }
 
 export function SeoAudit() {
+  const router = useRouter()
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<AuditCategory[] | null>(null)
@@ -214,12 +216,17 @@ export function SeoAudit() {
         }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
+        if (response.status === 429 && data.error === "rate_limit_exceeded") {
+          router.push("/pricing?reason=limit_exceeded")
+          return
+        }
         throw new Error("Failed to analyze website")
       }
 
-      const data: AuditResult = await response.json()
-      setAuditData(data)
+      setAuditData(data as AuditResult)
 
       // Transform API response to match component structure
       const categories = data.categories.map((cat: any) => ({

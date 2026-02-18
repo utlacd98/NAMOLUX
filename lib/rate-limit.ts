@@ -1,0 +1,275 @@
+import { createClient } from "@/lib/supabase/server"
+import { NextRequest } from "next/server"
+import Stripe from "stripe"
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export interface RateLimitResult {
+  allowed: boolean
+  isPro: boolean
+  userId: string | null
+  remaining: number
+  resetAt: Date | null
+  plan: "free" | "pro"
+  subscriptionStatus: "active" | "inactive" | "cancelled" | "past_due" | null
+}
+
+/**
+ * Extract the client IP address from request headers.
+ * On Vercel, x-forwarded-for contains the client IP as the first entry.
+ */
+export function getClientIP(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-for")
+  if (forwarded) {
+    // Take the first IP in the chain (original client)
+    const firstIP = forwarded.split(",")[0].trim()
+    return firstIP
+  }
+  
+  // Fallback headers
+  const realIP = request.headers.get("x-real-ip")
+  if (realIP) return realIP.trim()
+  
+  // Final fallback
+  return "127.0.0.1"
+}
+
+/**
+ * Check if a user has an active Stripe subscription
+ * Uses multiple strategies: user ID metadata, customer metadata, and email matching
+ */
+async function checkStripeSubscription(userId: string, email: string): Promise<{ isPro: boolean; status: string | null }> {
+  try {
+    const userEmail = email.toLowerCase().trim()
+
+    // Strategy 1: Search subscriptions by supabase_user_id in metadata
+    const activeSubscriptions = await stripe.subscriptions.list({
+      status: "active",
+      limit: 100,
+    })
+
+    const matchingActiveSub = activeSubscriptions.data.find(sub =>
+      sub.metadata?.supabase_user_id === userId
+    )
+
+    if (matchingActiveSub) {
+      return { isPro: true, status: "active" }
+    }
+
+    // Check trialing subscriptions
+    const trialingSubscriptions = await stripe.subscriptions.list({
+      status: "trialing",
+      limit: 100,
+    })
+
+    const matchingTrialingSub = trialingSubscriptions.data.find(sub =>
+      sub.metadata?.supabase_user_id === userId
+    )
+
+    if (matchingTrialingSub) {
+      return { isPro: true, status: "trialing" }
+    }
+
+    // Strategy 2: Search customers by supabase_user_id in metadata
+    const allCustomers = await stripe.customers.list({
+      limit: 100,
+    })
+
+    const customerByUserId = allCustomers.data.find(c =>
+      c.metadata?.supabase_user_id === userId
+    )
+
+    if (customerByUserId) {
+      const customerSubs = await stripe.subscriptions.list({
+        customer: customerByUserId.id,
+        status: "active",
+        limit: 1,
+      })
+
+      if (customerSubs.data.length > 0) {
+        return { isPro: true, status: "active" }
+      }
+
+      const customerTrialSubs = await stripe.subscriptions.list({
+        customer: customerByUserId.id,
+        status: "trialing",
+        limit: 1,
+      })
+
+      if (customerTrialSubs.data.length > 0) {
+        return { isPro: true, status: "trialing" }
+      }
+    }
+
+    // Strategy 3: Fall back to email matching
+    if (userEmail) {
+      let customers = await stripe.customers.list({
+        email: email,
+        limit: 10,
+      })
+
+      // Case-insensitive search
+      if (customers.data.length === 0) {
+        const matchingCustomers = allCustomers.data.filter(c =>
+          c.email && c.email.toLowerCase().trim() === userEmail
+        )
+        if (matchingCustomers.length > 0) {
+          customers = { ...customers, data: matchingCustomers }
+        }
+      }
+
+      for (const customer of customers.data) {
+        const subs = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: "active",
+          limit: 1,
+        })
+
+        if (subs.data.length > 0) {
+          return { isPro: true, status: "active" }
+        }
+
+        const trialSubs = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: "trialing",
+          limit: 1,
+        })
+
+        if (trialSubs.data.length > 0) {
+          return { isPro: true, status: "trialing" }
+        }
+      }
+    }
+
+    return { isPro: false, status: null }
+  } catch (error) {
+    console.error("Error checking Stripe subscription:", error)
+    return { isPro: false, status: null }
+  }
+}
+
+/**
+ * Check rate limit for a generation request.
+ *
+ * Logic:
+ * 1. Get user's IP address
+ * 2. Check if user is authenticated
+ * 3. If authenticated, check Stripe for active subscription
+ * 4. If has active subscription -> ALLOW unlimited
+ * 5. If no subscription OR not authenticated:
+ *    a. Query generation_logs for this IP in the last 24 hours
+ *    b. Also query by user_id if authenticated
+ *    c. If count >= 2 -> BLOCK
+ *    d. If count < 2 -> ALLOW
+ */
+export async function checkRateLimit(request: NextRequest): Promise<RateLimitResult> {
+  const ip = getClientIP(request)
+  const supabase = await createClient()
+
+  // Check if user is authenticated
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let isPro = false
+  let subscriptionStatus: string | null = null
+
+  if (user) {
+    // Check Stripe directly for active subscription using user ID and email
+    const stripeStatus = await checkStripeSubscription(user.id, user.email || "")
+    isPro = stripeStatus.isPro
+    subscriptionStatus = stripeStatus.status
+  }
+
+  // Pro users with active subscription get unlimited access
+  if (isPro) {
+    return {
+      allowed: true,
+      isPro: true,
+      userId: user?.id || null,
+      remaining: -1, // Unlimited
+      resetAt: null,
+      plan: "pro",
+      subscriptionStatus: subscriptionStatus as any,
+    }
+  }
+  
+  // For free users or unauthenticated users, check rate limit
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  
+  // Check IP-based rate limit
+  const { count: ipCount } = await supabase
+    .from("generation_logs")
+    .select("*", { count: "exact", head: true })
+    .eq("ip_address", ip)
+    .gte("created_at", twentyFourHoursAgo)
+  
+  // Also check user-based rate limit if authenticated (prevents IP rotation abuse)
+  let userCount = 0
+  if (user) {
+    const { count } = await supabase
+      .from("generation_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", twentyFourHoursAgo)
+    userCount = count || 0
+  }
+  
+  // Use the higher count (IP or user-based)
+  const totalCount = Math.max(ipCount || 0, userCount)
+  
+  // Free users get 2 generations per 24 hours
+  const FREE_LIMIT = 2
+  const allowed = totalCount < FREE_LIMIT
+  const remaining = Math.max(0, FREE_LIMIT - totalCount)
+  
+  // Get the reset time (when the oldest generation in the window expires)
+  let resetAt: Date | null = null
+  if (!allowed) {
+    const { data: oldestLog } = await supabase
+      .from("generation_logs")
+      .select("created_at")
+      .or(`ip_address.eq.${ip}${user ? `,user_id.eq.${user.id}` : ""}`)
+      .gte("created_at", twentyFourHoursAgo)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .single()
+    
+    if (oldestLog) {
+      resetAt = new Date(new Date(oldestLog.created_at).getTime() + 24 * 60 * 60 * 1000)
+    }
+  }
+  
+  return {
+    allowed,
+    isPro: false,
+    userId: user?.id || null,
+    remaining,
+    resetAt,
+    plan: "free",
+    subscriptionStatus: null,
+  }
+}
+
+/**
+ * Log a generation request for rate limiting purposes.
+ */
+export async function logGeneration(
+  request: NextRequest,
+  userId: string | null,
+  generationType: "domain" | "bulk" | "seo" = "domain",
+  keyword?: string,
+  resultsCount: number = 0
+): Promise<void> {
+  const ip = getClientIP(request)
+  const userAgent = request.headers.get("user-agent") || null
+  const supabase = await createClient()
+  
+  await supabase.from("generation_logs").insert({
+    user_id: userId,
+    ip_address: ip,
+    user_agent: userAgent,
+    generation_type: generationType,
+    keyword_used: keyword,
+    results_count: resultsCount,
+  })
+}
+

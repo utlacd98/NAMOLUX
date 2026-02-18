@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Heart } from "lucide-react"
 import { KofiButton } from "@/components/kofi-button"
 
@@ -69,15 +68,12 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 sm:gap-6 md:grid md:grid-cols-3 md:items-center">
           {/* Left: Logo */}
           <div className="flex items-center justify-center md:justify-start">
-            <Link href="/" aria-label="NamoLux" className="inline-flex items-center">
-              <Image
-                src="/logo.png"
-                alt="NamoLux"
-                width={100}
-                height={28}
-                className="h-6 w-auto sm:h-7"
-              />
-              <span className="sr-only">NamoLux</span>
+            <Link
+              href="/"
+              aria-label="NamoLux"
+              className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-primary"
+            >
+              Namo<span className="text-[#D4A843]">Lux</span>
             </Link>
           </div>
 
@@ -125,7 +121,7 @@ export function Footer() {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground transition-colors hover:text-primary"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
                 aria-label={`Follow us on ${social.name}`}
               >
                 <social.icon className="h-5 w-5" />
@@ -135,21 +131,21 @@ export function Footer() {
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:gap-4">
-          <p className="max-w-2xl px-2 text-center text-[10px] text-muted-foreground sm:max-w-none sm:px-0 sm:text-xs">
+          <p className="max-w-2xl px-2 text-center text-xs text-muted-foreground sm:max-w-none sm:px-0">
             <Link href="/" className="transition-colors hover:text-foreground">
               NamoLux
             </Link>{" "}
             is the official site for the NamoLux domain name finder and Founder Signal scoring tool.
           </p>
 
-          <p className="text-xs text-muted-foreground sm:text-sm">© {currentYear} NamoLux</p>
+          <p className="text-sm text-muted-foreground">&copy; {currentYear} NamoLux</p>
 
-          <p className="max-w-md px-2 text-center text-[10px] text-muted-foreground sm:max-w-none sm:px-0 sm:text-xs">
+          <p className="max-w-md px-2 text-center text-xs text-muted-foreground sm:max-w-none sm:px-0">
             Availability checks are best-effort and may vary by registrar. Always verify with your preferred registrar
             before purchase.
           </p>
 
-          <p className="flex items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
+          <p className="flex items-center gap-1 text-xs text-muted-foreground">
             Made with <Heart className="h-2.5 w-2.5 text-red-400 sm:h-3 sm:w-3" /> for domain hunters
           </p>
         </div>

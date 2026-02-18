@@ -1,14 +1,16 @@
-"use client"
-
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { cn } from "@/lib/utils"
 
 const faqs = [
   {
-    question: "Is NamoLux really free?",
+    question: "What do I get with a free account?",
     answer:
-      "Yes! NamoLux is completely free to use. Generate unlimited AI-powered domain name suggestions and check availability without any cost or account required.",
+      "Free accounts get 2 domain generations per day, with full access to AI-powered name suggestions, real-time availability checking, and Founder Signal™ scoring. Perfect for exploring ideas before committing.",
+  },
+  {
+    question: "What's included in NamoLux Pro?",
+    answer:
+      "Pro members get unlimited domain generations, priority support, and full access to all features for just £9.99/month. No limits, no restrictions—generate as many names as you need.",
   },
   {
     question: "How does the AI generate names?",
@@ -16,30 +18,33 @@ const faqs = [
       "Enter a keyword or describe your brand, select a vibe (Luxury, Futuristic, Playful, etc.), and our AI generates creative, brandable domain names tailored to your vision.",
   },
   {
+    question: "What is Founder Signal™?",
+    answer:
+      "Founder Signal™ scores each domain from 0-100 based on brand strength, memorability, and scalability. It helps you quickly identify which names have the strongest potential for building a lasting brand.",
+  },
+  {
     question: "How do you check availability?",
     answer:
       "We use real-time DNS lookups to verify domain availability. Results are best-effort and may vary slightly by registrar—we recommend confirming with your preferred registrar before purchasing.",
+  },
+  {
+    question: "Which TLDs do you support?",
+    answer:
+      "We support .com, .io, .co, .ai, and .net domains. We prioritize .com as it's the most valuable for brand recognition, but you can filter results by any supported TLD.",
+  },
+  {
+    question: "Can I cancel my subscription anytime?",
+    answer:
+      "Yes, absolutely. You can cancel your Pro subscription at any time from your dashboard. You'll keep Pro access until the end of your billing period with no hidden fees.",
   },
   {
     question: "Can I export my shortlist?",
     answer:
       "Yes! Save your favorite domains to a shortlist and export them to CSV with a single click. Perfect for sharing with your team or tracking your options.",
   },
-  {
-    question: "Do you support other TLDs?",
-    answer:
-      "We currently support .com, .io, .co, .ai, and .net domains. We prioritize .com as it's the most valuable for brand recognition, but you can filter results by any supported TLD.",
-  },
-  {
-    question: "What is Bulk Check mode?",
-    answer:
-      "Bulk Check lets you paste a list of domain names and check their availability all at once—perfect if you already have ideas in mind and want to quickly verify which are available.",
-  },
 ]
 
 export function FAQ() {
-  const { ref, isVisible } = useScrollAnimation()
-
   return (
     <section id="faq" className="overflow-clip bg-muted/30 py-16 sm:py-24" aria-labelledby="faq-heading">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
@@ -51,8 +56,7 @@ export function FAQ() {
         </div>
 
         <div
-          ref={ref}
-          className={cn("mt-12 opacity-0", isVisible && "animate-fade-up")}
+          className={cn("mt-12 animate-fade-up")}
           style={{ animationFillMode: "forwards" }}
         >
           <Accordion type="single" collapsible className="w-full">

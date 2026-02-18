@@ -38,7 +38,7 @@ export function KofiButton({ className = "" }: { className?: string }) {
       href="https://ko-fi.com/C0C61SP3NU"
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 rounded-lg bg-[#72a4f2] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 ${className}`}
+      className={`inline-flex min-h-12 min-w-12 items-center gap-2 rounded-lg bg-[#72a4f2] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 ${className}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -52,4 +52,3 @@ export function KofiButton({ className = "" }: { className?: string }) {
     </a>
   )
 }
-

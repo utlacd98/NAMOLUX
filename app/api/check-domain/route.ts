@@ -1,42 +1,49 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { trackMetric } from "@/lib/metrics"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 
 const SUPPORTED_TLDS = ["com", "io", "co", "ai", "app", "dev"]
 
-function scoreDomain(name: string): {
+interface DomainScoreResult {
+  /** Founder Signal score (0-100) */
   score: number
+  /** Raw pronounceability score (0-100) */
   pronounceable: boolean
+  /** Raw memorability score (0-100), divided by 10 for display */
   memorability: number
   length: number
-} {
+  /** Full Founder Signal breakdown for UI */
+  founderSignal: {
+    score: number
+    rawScores: {
+      length: number
+      pronounceability: number
+      memorability: number
+      extension: number
+      characterQuality: number
+      brandRisk: number
+    }
+  }
+}
+
+function scoreDomain(name: string, tld: string, vibe?: BrandVibe): DomainScoreResult {
+  const result = scoreName({ name, tld, vibe })
   const length = name.length
 
-  let score = 10
-  if (length <= 6) score -= 1
-  else if (length <= 8) score += 0
-  else if (length <= 10) score -= 0.5
-  else score -= 1.5
-
-  const vowels = name.match(/[aeiou]/gi)
-  const pronounceable = vowels ? vowels.length >= Math.floor(length / 3) : false
-  if (pronounceable) score += 1
-
-  const hasRepeatingChars = /(.)\1/.test(name)
-  const hasCommonPatterns = /ly$|io$|ify$|hub$|lab$/.test(name)
-  let memorability = 7
-
-  if (hasCommonPatterns) memorability += 1
-  if (length <= 8) memorability += 1
-  if (hasRepeatingChars) memorability += 0.5
-
-  memorability = Math.min(10, memorability)
-
   return {
-    score: Math.max(1, Math.min(10, Number(score.toFixed(1)))),
-    pronounceable,
-    memorability: Number(memorability.toFixed(1)),
+    // Main score is now Founder Signal (0-100)
+    score: result.score,
+    // Pronounceable if raw score >= 60
+    pronounceable: result.rawScores.pronounceability >= 60,
+    // Memorability as 0-10 for backward compat (divide by 10)
+    memorability: Number((result.rawScores.memorability / 10).toFixed(1)),
     length,
+    founderSignal: {
+      score: result.score,
+      rawScores: result.rawScores,
+    },
   }
 }
 
@@ -46,6 +53,20 @@ function sanitiseName(input: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitResult = await checkRateLimit(request)
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: "rate_limit_exceeded",
+          message: "You've used your free bulk checks for today",
+          upgradeUrl: "/pricing",
+        },
+        { status: 429 }
+      )
+    }
+
     const { domains, tlds } = await request.json()
 
     if (!domains || !Array.isArray(domains)) {
@@ -75,7 +96,8 @@ export async function POST(request: NextRequest) {
       tldsToCheck.map((tld: string) => {
         const fullDomain = `${domainName}.${tld}`
         const availability = availabilityMap.get(fullDomain)
-        const metrics = scoreDomain(domainName)
+        // Pass TLD to scoring so extension strength is factored in
+        const metrics = scoreDomain(domainName, tld)
 
         return {
           name: domainName,
@@ -110,6 +132,11 @@ export async function POST(request: NextRequest) {
       userAgent,
       country,
     })
+
+    // Log generation for rate limiting (only for free users)
+    if (!rateLimitResult.isPro) {
+      logGeneration(request, rateLimitResult.userId, "bulk", undefined, cleanDomains.length).catch(() => {})
+    }
 
     return NextResponse.json({
       success: true,

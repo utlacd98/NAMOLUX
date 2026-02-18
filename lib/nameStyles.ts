@@ -25,6 +25,8 @@ interface GeneratorContext {
   maxLength: number
   keywordTokens: string[]
   industryKey: string
+  isFintech: boolean
+  fintechRoots: string[]
   conceptRoots: string[]
   metaphorRoots: string[]
   rng: () => number
@@ -33,6 +35,13 @@ interface GeneratorContext {
 const SCAM_PATTERN = /(free|cheap|crypto1000|earn\d{3,}|guaranteedprofit|doublemoney)/i
 const BAD_CLUSTER_PATTERN = /(xq|qz|ptk|qk|zxq|jj|vvv)/i
 const REPEATED_PATTERN = /(.)\1\1/i
+const HARSH_ENDINGS = ["dl", "vt", "cf", "zx", "rk", "cl"]
+const PREFERRED_ENDINGS = ["a", "o", "io", "ly", "fy", "e"]
+const FINTECH_METAPHOR_BOOST = ["anchor", "haven", "nest", "shield", "vault", "ledger", "beacon"]
+const FINTECH_SIGNAL_TOKENS = ["fintech", "payments", "payment", "lending", "wallet", "banking", "treasury", "fraud", "risk", "compliance", "invoice", "payroll", "card", "credit"]
+const FINTECH_LITERAL_PENALTY = ["bank", "loan", "credit", "money", "finance", "payment", "pay"]
+const FINTECH_BRAND_ROOTS = ["vera", "nexa", "cora", "luma", "vanta", "sora", "vault", "anchor", "haven", "shield", "ledger", "atlas", "beacon", "auri", "zena", "oryn"]
+const FINTECH_SOFT_ENDINGS = ["a", "o", "io", "ly", "fy", "ra", "va", "na"]
 
 const PROFANITY_BLOCKLIST = [
   "fuck",
@@ -204,6 +213,11 @@ function parseKeywordTokens(input: string): string[] {
   ).slice(0, 10)
 }
 
+function isFintechContext(industryKey: string, keywordTokens: string[]): boolean {
+  if (industryKey === "finance") return true
+  return keywordTokens.some((token) => FINTECH_SIGNAL_TOKENS.includes(token))
+}
+
 function hashSeed(value: string): number {
   let hash = 2166136261
   for (let i = 0; i < value.length; i += 1) {
@@ -242,15 +256,72 @@ function softBlend(left: string, right: string): string {
   return removeAwkwardJoin(l, r)
 }
 
-function shouldRejectBySafety(name: string, maxLength: number): boolean {
+function countSyllables(name: string): number {
+  return (name.match(/[aeiouy]+/g) || []).length
+}
+
+function hasConsonantRun(name: string, maxRun = 3): boolean {
+  return new RegExp(`[bcdfghjklmnpqrstvwxyz]{${maxRun + 1},}`, "i").test(name)
+}
+
+function hasHarshEnding(name: string): boolean {
+  return HARSH_ENDINGS.some((ending) => name.endsWith(ending))
+}
+
+function hasPreferredEnding(name: string): boolean {
+  return PREFERRED_ENDINGS.some((ending) => name.endsWith(ending))
+}
+
+function hasFintechPreferredEnding(name: string): boolean {
+  return FINTECH_SOFT_ENDINGS.some((ending) => name.endsWith(ending))
+}
+
+function hasHardStopEnding(name: string): boolean {
+  if (!/[bcdfghjklmnpqrstvwxyz]{2}$/.test(name)) return false
+  // keep a tiny set of acceptable soft clusters
+  if (/(nd|nt|st|rn|rd|ld)$/.test(name)) return false
+  return true
+}
+
+function looksChoppedWord(name: string): boolean {
+  if (/(saveca|guardl)/.test(name)) return true
+  if (name.length < 5) return false
+
+  // Treat abrupt trailing consonant clusters as chopped.
+  if (/[bcdfghjklmnpqrstvwxyz]{2}$/.test(name) && !/(nd|nt|st|rd|rn|rt|ld)$/.test(name)) return true
+
+  // Weak endings that often look like clipped fragments.
+  if (/(ca|ga|la)$/.test(name) && !/[aeiouy].*[aeiouy]/.test(name.slice(0, -2))) return true
+
+  return false
+}
+
+function isEasyToSay(name: string): boolean {
+  const vowels = (name.match(/[aeiouy]/g) || []).length
+  const ratio = vowels / Math.max(name.length, 1)
+  const syllables = countSyllables(name)
+
+  if (ratio < 0.24 || ratio > 0.68) return false
+  if (syllables < 2 || syllables > 4) return false
+  if (hasConsonantRun(name, 3)) return false
+  if (BAD_CLUSTER_PATTERN.test(name)) return false
+  return true
+}
+
+function shouldRejectBySafety(name: string, maxLength: number, isFintech: boolean): boolean {
   if (name.length < 4 || name.length > maxLength) return true
   if (/[-_\d]/.test(name)) return true
   if (SCAM_PATTERN.test(name)) return true
   if (BAD_CLUSTER_PATTERN.test(name)) return true
   if (REPEATED_PATTERN.test(name)) return true
-  if (/[bcdfghjklmnpqrstvwxyz]{5,}/i.test(name)) return true
+  if (hasConsonantRun(name, 3)) return true
+  if (hasHarshEnding(name)) return true
+  if (looksChoppedWord(name)) return true
+  if (hasHardStopEnding(name)) return true
   if (PROFANITY_BLOCKLIST.some((bad) => name.includes(bad))) return true
   if (GENERIC_SCAMMY_TOKENS.some((bad) => name.includes(bad) && name.length > 8 && bad.length >= 5)) return true
+  if (!isEasyToSay(name)) return true
+  if (isFintech && !hasFintechPreferredEnding(name)) return true
   return false
 }
 
@@ -275,13 +346,18 @@ function trigramSimilarity(a: string, b: string): number {
   return union === 0 ? 0 : intersect / union
 }
 
-export function filterCandidates(candidates: StyledNameCandidate[], maxLength: number): StyledNameCandidate[] {
+export function filterCandidates(
+  candidates: StyledNameCandidate[],
+  maxLength: number,
+  options?: { isFintech?: boolean },
+): StyledNameCandidate[] {
   const accepted: StyledNameCandidate[] = []
+  const isFintech = Boolean(options?.isFintech)
 
   for (const candidate of candidates) {
     const clean = normaliseWord(candidate.name)
     if (!clean) continue
-    if (shouldRejectBySafety(clean, maxLength)) continue
+    if (shouldRejectBySafety(clean, maxLength, isFintech)) continue
 
     const tooClose = accepted.some((existing) => {
       if (existing.name === clean) return true
@@ -299,14 +375,55 @@ export function filterCandidates(candidates: StyledNameCandidate[], maxLength: n
   return accepted
 }
 
-function buildConceptRoots(tokens: string[], industryKey: string, vibe: VibeMode): string[] {
-  const industry = INDUSTRY_SYNONYMS[industryKey] || INDUSTRY_SYNONYMS.other
-  const vibeRoots = [...VIBE_PHONEMES[vibe].prefixes, ...VIBE_PHONEMES[vibe].suffixes].map(normaliseWord)
-  return Array.from(new Set([...tokens, ...industry, ...vibeRoots])).filter((word) => word.length >= 2)
+function brandabilityScore(candidate: StyledNameCandidate, context: GeneratorContext): number {
+  const name = candidate.name
+  let score = 0
+
+  const syllables = countSyllables(name)
+  if (syllables >= 2 && syllables <= 3) score += 26
+  else if (syllables === 1 || syllables === 4) score += 10
+  else score -= 8
+
+  if (isEasyToSay(name)) score += 20
+  if (hasPreferredEnding(name)) score += 12
+  if (hasHarshEnding(name)) score -= 30
+  if (looksChoppedWord(name)) score -= 22
+  if (/(.)\1\1/.test(name)) score -= 15
+
+  if (candidate.style === "Invented") score += 12
+  if (candidate.style === "Metaphor") score += 11
+  if (candidate.style === "Blend") score += 8
+  if (candidate.style === "Literal") score -= 6
+
+  if (context.industryKey === "finance" && FINTECH_METAPHOR_BOOST.some((token) => name.includes(token))) {
+    score += 10
+  }
+
+  if (context.isFintech) {
+    if (context.fintechRoots.some((token) => token.length >= 4 && name.includes(token))) score += 9
+    if (hasFintechPreferredEnding(name)) score += 9
+    if (FINTECH_LITERAL_PENALTY.some((token) => name.includes(token))) score -= 16
+    if (candidate.style === "Literal") score -= 8
+  }
+
+  // Prefer names that look closer to modern startup brands (clean, no abrupt stop).
+  if (/[aeiouy]$/.test(name) || hasPreferredEnding(name)) score += 8
+  if (/[bcdfghjklmnpqrstvwxyz]{2}$/.test(name) && !/(nd|nt|st|rn|rd|ld)$/.test(name)) score -= 10
+
+  return score
 }
 
-function buildMetaphorRoots(industryKey: string): string[] {
-  return METAPHOR_LIBRARY[industryKey] || METAPHOR_LIBRARY.other
+function buildConceptRoots(tokens: string[], industryKey: string, vibe: VibeMode, isFintech: boolean): string[] {
+  const industry = INDUSTRY_SYNONYMS[industryKey] || INDUSTRY_SYNONYMS.other
+  const vibeRoots = [...VIBE_PHONEMES[vibe].prefixes, ...VIBE_PHONEMES[vibe].suffixes].map(normaliseWord)
+  const fintechRoots = isFintech ? FINTECH_BRAND_ROOTS : []
+  return Array.from(new Set([...tokens, ...industry, ...vibeRoots, ...fintechRoots])).filter((word) => word.length >= 2)
+}
+
+function buildMetaphorRoots(industryKey: string, isFintech: boolean): string[] {
+  const base = METAPHOR_LIBRARY[industryKey] || METAPHOR_LIBRARY.other
+  if (!isFintech) return base
+  return Array.from(new Set([...FINTECH_METAPHOR_BOOST, ...base]))
 }
 
 export function attachMeaning(input: {
@@ -340,20 +457,36 @@ export function attachMeaning(input: {
 
 export function generateInvented(context: GeneratorContext): StyledNameCandidate {
   const phoneme = VIBE_PHONEMES[context.vibe]
-  const syllableTarget = context.vibe === "minimal" ? (context.rng() > 0.6 ? 1 : 2) : context.rng() > 0.5 ? 2 : 3
-
   let name = ""
-  for (let i = 0; i < syllableTarget; i += 1) {
-    const onset = pickOne(phoneme.onsets, context.rng)
-    const vowel = pickOne(phoneme.vowels, context.rng)
-    const coda = pickOne(phoneme.codas, context.rng)
-    name += `${onset}${vowel}${coda}`
-    if (name.length > context.maxLength + 2) break
-  }
 
-  const rootHint = context.keywordTokens.length > 0 ? pickOne(context.keywordTokens, context.rng) : ""
-  if (rootHint && name.length < context.maxLength - 2 && context.rng() > 0.65) {
-    name = softBlend(rootHint.slice(0, 3), name)
+  if (context.isFintech) {
+    // Fintech invented names should feel like clean startup brands, not random syllables.
+    const baseRootPool = context.fintechRoots.length > 0 ? context.fintechRoots : FINTECH_BRAND_ROOTS.map(normaliseWord)
+    const base = pickOne(baseRootPool, context.rng)
+    const connector = pickOne(["a", "e", "i", "o", "io"], context.rng)
+    const tail = pickOne(["ra", "va", "na", "ly", "fy", "io", "ora"], context.rng)
+    const hint = context.keywordTokens.length > 0 ? pickOne(context.keywordTokens, context.rng).slice(0, 3) : ""
+
+    name = context.rng() > 0.55 ? softBlend(base, `${connector}${tail}`) : softBlend(base, hint || `${connector}${tail}`)
+
+    if (!hasFintechPreferredEnding(name)) {
+      const ending = pickOne(FINTECH_SOFT_ENDINGS, context.rng)
+      name = `${name.slice(0, Math.max(3, context.maxLength - ending.length))}${ending}`
+    }
+  } else {
+    const syllableTarget = context.vibe === "minimal" ? (context.rng() > 0.6 ? 1 : 2) : context.rng() > 0.5 ? 2 : 3
+    for (let i = 0; i < syllableTarget; i += 1) {
+      const onset = pickOne(phoneme.onsets, context.rng)
+      const vowel = pickOne(phoneme.vowels, context.rng)
+      const coda = pickOne(phoneme.codas, context.rng)
+      name += `${onset}${vowel}${coda}`
+      if (name.length > context.maxLength + 2) break
+    }
+
+    const rootHint = context.keywordTokens.length > 0 ? pickOne(context.keywordTokens, context.rng) : ""
+    if (rootHint && name.length < context.maxLength - 2 && context.rng() > 0.65) {
+      name = softBlend(rootHint.slice(0, 3), name)
+    }
   }
 
   name = normaliseWord(name).slice(0, context.maxLength)
@@ -371,8 +504,8 @@ export function generateInvented(context: GeneratorContext): StyledNameCandidate
 }
 
 export function generateBlend(context: GeneratorContext): StyledNameCandidate {
-  const rootA = pickOne(context.conceptRoots, context.rng)
-  const rootB = pickOne(context.conceptRoots, context.rng)
+  const rootA = context.isFintech && context.rng() > 0.45 ? pickOne(context.fintechRoots, context.rng) : pickOne(context.conceptRoots, context.rng)
+  const rootB = context.isFintech && context.rng() > 0.35 ? pickOne(context.fintechRoots, context.rng) : pickOne(context.conceptRoots, context.rng)
   const blended = softBlend(rootA, rootB).slice(0, context.maxLength)
   const concept = ROOT_MEANINGS[rootA] || ROOT_MEANINGS[rootB] || `${context.industryKey} brand direction`
 
@@ -393,8 +526,12 @@ export function generateBlend(context: GeneratorContext): StyledNameCandidate {
 
 export function generateLiteral(context: GeneratorContext): StyledNameCandidate {
   const industryWords = INDUSTRY_SYNONYMS[context.industryKey] || INDUSTRY_SYNONYMS.other
-  const wordA = context.keywordTokens.length > 0 ? pickOne(context.keywordTokens, context.rng) : pickOne(industryWords, context.rng)
-  const wordB = pickOne(industryWords, context.rng)
+  const literalPool = context.isFintech ? [...FINTECH_METAPHOR_BOOST, ...context.fintechRoots, ...industryWords] : industryWords
+  const wordA =
+    context.keywordTokens.length > 0 && !context.isFintech
+      ? pickOne(context.keywordTokens, context.rng)
+      : pickOne(literalPool, context.rng)
+  const wordB = pickOne(literalPool, context.rng)
   const literal = removeAwkwardJoin(wordA, wordB).slice(0, context.maxLength)
   const concept = `${context.industryKey} relevance`
 
@@ -415,7 +552,12 @@ export function generateLiteral(context: GeneratorContext): StyledNameCandidate 
 
 export function generateMetaphor(context: GeneratorContext): StyledNameCandidate {
   const metaphor = pickOne(context.metaphorRoots, context.rng)
-  const support = context.keywordTokens.length > 0 ? pickOne(context.keywordTokens, context.rng) : pickOne(context.conceptRoots, context.rng)
+  const support =
+    context.isFintech && context.rng() > 0.5
+      ? pickOne(context.fintechRoots, context.rng)
+      : context.keywordTokens.length > 0
+        ? pickOne(context.keywordTokens, context.rng)
+        : pickOne(context.conceptRoots, context.rng)
   const name = softBlend(metaphor, support).slice(0, context.maxLength)
   const concept = ROOT_MEANINGS[metaphor] || `a ${context.industryKey} brand with forward momentum`
 
@@ -433,13 +575,20 @@ export function generateMetaphor(context: GeneratorContext): StyledNameCandidate
   }
 }
 
-function mixPlan(total: number): Array<{ style: NameStyleLabel; count: number }> {
-  const base = [
-    { style: "Invented" as const, count: Math.floor(total * 0.4) },
-    { style: "Blend" as const, count: Math.floor(total * 0.3) },
-    { style: "Metaphor" as const, count: Math.floor(total * 0.2) },
-    { style: "Literal" as const, count: Math.floor(total * 0.1) },
-  ]
+function mixPlan(total: number, isFintech: boolean): Array<{ style: NameStyleLabel; count: number }> {
+  const base = isFintech
+    ? [
+        { style: "Invented" as const, count: Math.floor(total * 0.5) },
+        { style: "Blend" as const, count: Math.floor(total * 0.3) },
+        { style: "Metaphor" as const, count: Math.floor(total * 0.2) },
+        { style: "Literal" as const, count: 0 },
+      ]
+    : [
+        { style: "Invented" as const, count: Math.floor(total * 0.45) },
+        { style: "Blend" as const, count: Math.floor(total * 0.3) },
+        { style: "Metaphor" as const, count: Math.floor(total * 0.2) },
+        { style: "Literal" as const, count: Math.floor(total * 0.05) },
+      ]
 
   let allocated = base.reduce((sum, item) => sum + item.count, 0)
   let idx = 0
@@ -480,6 +629,8 @@ export function generateNameStyleCandidates(input: NameStyleInput): StyledNameCa
   const vibe = normaliseVibe(input.vibe)
   const industryKey = titleToIndustryKey(input.industry)
   const keywordTokens = parseKeywordTokens(input.keywords)
+  const isFintech = isFintechContext(industryKey, keywordTokens)
+  const fintechRoots = isFintech ? Array.from(new Set(FINTECH_BRAND_ROOTS.map(normaliseWord))) : []
   const style = input.selectedStyle || "mix"
   const meaningMode = Boolean(input.meaningMode)
   const seed = `${input.keywords}:${input.industry || "other"}:${vibe}:${maxLength}:${style}:${input.seed || "seed"}`
@@ -490,8 +641,10 @@ export function generateNameStyleCandidates(input: NameStyleInput): StyledNameCa
     maxLength,
     keywordTokens,
     industryKey,
-    conceptRoots: buildConceptRoots(keywordTokens, industryKey, vibe),
-    metaphorRoots: buildMetaphorRoots(industryKey),
+    isFintech,
+    fintechRoots,
+    conceptRoots: buildConceptRoots(keywordTokens, industryKey, vibe, isFintech),
+    metaphorRoots: buildMetaphorRoots(industryKey, isFintech),
     rng,
   }
 
@@ -521,7 +674,7 @@ export function generateNameStyleCandidates(input: NameStyleInput): StyledNameCa
   }
 
   if (style === "mix") {
-    for (const part of mixPlan(count)) {
+    for (const part of mixPlan(count, context.isFintech)) {
       pushStyle(part.style, Math.max(1, part.count))
     }
   } else if (style === "invented") {
@@ -534,7 +687,16 @@ export function generateNameStyleCandidates(input: NameStyleInput): StyledNameCa
     pushStyle("Literal", count)
   }
 
-  const filtered = filterCandidates(raw, maxLength).slice(0, count * 2)
-  const diverse = enforceStyleDiversity(filtered)
+  const ranked = filterCandidates(raw, maxLength, { isFintech: context.isFintech }).sort((a, b) => {
+      const scoreDiff = brandabilityScore(b, context) - brandabilityScore(a, context)
+      if (scoreDiff !== 0) return scoreDiff
+      return a.name.localeCompare(b.name)
+    })
+
+  const threshold = context.isFintech ? 48 : 40
+  const filtered = ranked.filter((candidate) => brandabilityScore(candidate, context) >= threshold)
+  const shortlisted = (filtered.length > 0 ? filtered : ranked).slice(0, count * 3)
+
+  const diverse = enforceStyleDiversity(shortlisted)
   return diverse.slice(0, count)
 }

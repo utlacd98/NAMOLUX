@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import * as cheerio from "cheerio"
 import { trackMetric } from "@/lib/metrics"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 type CheerioRoot = ReturnType<typeof cheerio.load>
 
@@ -998,6 +999,20 @@ function auditStructuredData($: CheerioRoot): AuditCategory {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitResult = await checkRateLimit(request)
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: "rate_limit_exceeded",
+          message: "You've used your free SEO audits for today",
+          upgradeUrl: "/pricing",
+        },
+        { status: 429 }
+      )
+    }
+
     const { url } = await request.json()
 
     if (!url || !url.trim()) {
@@ -1072,6 +1087,11 @@ export async function POST(request: NextRequest) {
       userAgent,
       country,
     })
+
+    // Log generation for rate limiting (only for free users)
+    if (!rateLimitResult.isPro) {
+      logGeneration(request, rateLimitResult.userId, "seo", validUrl, 1).catch(() => {})
+    }
 
     const result: AuditResult = {
       success: true,

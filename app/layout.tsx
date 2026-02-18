@@ -1,17 +1,16 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
+import { LazyAnalytics } from "@/components/lazy-analytics"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" })
 
 export const metadata: Metadata = {
   title: "NamoLux - Domain Name Finder & SEO Audit",
   description:
-    "Check domain availability instantly and evaluate every name with Founder Signal scoring. NamoLux helps founders find domains worth building on.",
+    "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
   keywords: [
     "domain name finder",
     "domain availability checker",
@@ -32,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "NamoLux - Domain Name Finder & SEO Audit",
     description:
-      "Check domain availability instantly and evaluate every name with Founder Signal scoring.",
+      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
@@ -49,7 +48,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NamoLux - Domain Name Finder & SEO Audit",
-    description: "Check domain availability instantly and evaluate every name with Founder Signal scoring.",
+    description:
+      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -92,27 +92,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <head>
-        {/* Force dark mode always */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-                (function() {
-                  try {
-                    localStorage.removeItem('theme');
-                    document.documentElement.classList.remove('light');
-                    document.documentElement.classList.add('dark');
-                  } catch (e) {}
-                })();
-              `,
-          }}
-        />
-      </head>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          {children}
-          <Analytics />
-        </ThemeProvider>
+        {children}
+        <LazyAnalytics />
       </body>
     </html>
   )

@@ -83,4 +83,58 @@ describe("nameStyles generator", () => {
     expect(results.every((item) => (item.meaningShort || "").toLowerCase().includes("sound"))).toBe(true)
     expect(results.every((item) => !(item.meaningShort || "").includes("+"))).toBe(true)
   })
+
+  it("filters out harsh endings and hard consonant clusters", () => {
+    const results = generateNameStyleCandidates({
+      keywords: "finance payments",
+      industry: "Finance",
+      vibe: "Trustworthy",
+      maxLength: 10,
+      count: 20,
+      selectedStyle: "mix",
+      meaningMode: true,
+      seed: "phonetic-filter",
+    })
+
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.every((item) => !/(dl|vt|cf|zx|rk|cl)$/.test(item.name))).toBe(true)
+    expect(results.every((item) => !/[bcdfghjklmnpqrstvwxyz]{4,}/.test(item.name))).toBe(true)
+  })
+
+  it("prioritises brandable endings and avoids obvious chopped output", () => {
+    const results = generateNameStyleCandidates({
+      keywords: "fintech lending",
+      industry: "Finance",
+      vibe: "Luxury",
+      maxLength: 10,
+      count: 18,
+      selectedStyle: "mix",
+      meaningMode: true,
+      seed: "brandability-priority",
+    })
+
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.every((item) => !/(saveca|guardl)/.test(item.name))).toBe(true)
+    expect(results.filter((item) => /(a|o|io|ly|fy|e)$/.test(item.name)).length).toBeGreaterThanOrEqual(
+      Math.floor(results.length * 0.4),
+    )
+  })
+
+  it("uses fintech brand profile for finance context instead of literal keyword mashups", () => {
+    const results = generateNameStyleCandidates({
+      keywords: "fintech payments lending",
+      industry: "Finance",
+      vibe: "Trustworthy",
+      maxLength: 10,
+      count: 20,
+      selectedStyle: "mix",
+      meaningMode: true,
+      seed: "fintech-profile",
+    })
+
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.some((item) => item.style === "Invented")).toBe(true)
+    expect(results.every((item) => !/(bank|loan|credit|money|finance)/.test(item.name))).toBe(true)
+    expect(results.filter((item) => item.style === "Literal").length).toBeLessThanOrEqual(1)
+  })
 })

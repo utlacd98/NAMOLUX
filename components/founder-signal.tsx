@@ -3,37 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-// Common dictionary words (exact match penalty)
-const DICTIONARY_WORDS = [
-  "cloud", "tech", "data", "code", "sync", "flow", "link", "node", "core", "wave",
-  "spark", "pulse", "shift", "stack", "swift", "smart", "prime", "pixel", "logic"
-]
-
-// Very common industry keywords
-const INDUSTRY_KEYWORDS = [
-  "app", "hub", "lab", "base", "zone", "spot", "nest", "dock", "port", "desk",
-  "box", "kit", "pad", "tap", "bot", "api", "crm", "saas", "ai", "ml"
-]
-
-// Known brand patterns to avoid similarity
-const KNOWN_BRANDS = [
-  "stripe", "slack", "notion", "figma", "linear", "vercel", "supabase", "prisma",
-  "twilio", "sendgrid", "mailchimp", "hubspot", "zendesk", "asana", "trello"
-]
-
-// TLD strength weights (0-20 scale)
-const TLD_STRENGTH: Record<string, number> = {
-  com: 20,
-  io: 16,
-  ai: 15,
-  app: 13,
-  dev: 12,
-  co: 11,
-}
-
-// Hard consonant clusters that hurt pronunciation
-const HARD_CLUSTERS = ["xtr", "qz", "zx", "xz", "kx", "qk", "bz", "zb", "pz", "zp", "ckx", "xck"]
+import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 
 interface FounderSignalResult {
   score: number
@@ -43,7 +13,16 @@ interface FounderSignalResult {
     memorabilityScore: number
     extensionScore: number
     characterScore: number
-    brandRiskPenalty: number
+    brandRiskScore: number
+    vibeModifier: number
+  }
+  rawScores: {
+    length: number
+    pronounceability: number
+    memorability: number
+    extension: number
+    characterQuality: number
+    brandRisk: number
   }
   insights: {
     type: "positive" | "warning" | "negative"
@@ -52,156 +31,100 @@ interface FounderSignalResult {
   brutalVerdict: string
 }
 
-// Calculate Founder Signal score with new formula
+// Calculate Founder Signal score using the centralized scoring function
 export function calculateFounderSignal(
   name: string,
   tld: string,
-  pronounceable: boolean,
-  memorability: number
+  vibe?: BrandVibe
 ): FounderSignalResult {
+  const result = scoreName({ name, tld, vibe })
   const insights: FounderSignalResult["insights"] = []
-  const lowerName = name.toLowerCase()
-  const len = name.length
 
-  // 1️⃣ Name Length Score (0-20)
-  let lengthScore = 2
-  if (len <= 5) lengthScore = 20
-  else if (len <= 7) lengthScore = 18
-  else if (len <= 9) lengthScore = 15
-  else if (len <= 11) lengthScore = 10
-  else if (len <= 13) lengthScore = 6
+  // Generate insights based on raw scores
+  const { rawScores } = result
 
-  if (lengthScore >= 18) {
-    insights.push({ type: "positive", text: "Short & brandable" })
-  } else if (lengthScore >= 15) {
+  // Length insights
+  if (rawScores.length >= 90) {
+    insights.push({ type: "positive", text: "Short & brandable (≤6 chars)" })
+  } else if (rawScores.length >= 60) {
     insights.push({ type: "positive", text: "Good brand length" })
-  } else if (lengthScore <= 10) {
+  } else if (rawScores.length < 45) {
     insights.push({ type: "warning", text: "Name is getting long" })
   }
 
-  // 2️⃣ Pronounceability Score (0-15)
-  // Convert boolean to 0-10 scale, then multiply by 1.5
-  const pronounceRaw = pronounceable ? 10 : 4
-  const pronounceScore = Math.min(15, pronounceRaw * 1.5)
-
-  if (pronounceable) {
+  // Pronounceability insights
+  if (rawScores.pronounceability >= 80) {
     insights.push({ type: "positive", text: "Easy to pronounce" })
-  } else {
+  } else if (rawScores.pronounceability < 50) {
+    insights.push({ type: "negative", text: "Hard to pronounce" })
+  } else if (rawScores.pronounceability < 70) {
     insights.push({ type: "warning", text: "May be hard to say aloud" })
   }
 
-  // 3️⃣ Memorability Score (0-15)
-  const memorabilityScore = Math.min(15, memorability * 1.5)
-
-  if (memorability >= 8) {
+  // Memorability insights
+  if (rawScores.memorability >= 80) {
     insights.push({ type: "positive", text: "Highly memorable" })
+  } else if (rawScores.memorability < 50) {
+    insights.push({ type: "negative", text: "Low memorability — generic patterns" })
   }
 
-  // 4️⃣ Extension Strength Score (0-20)
-  const extensionScore = TLD_STRENGTH[tld] || 8
-
-  if (tld === "com") {
+  // Extension insights
+  if (rawScores.extension >= 100) {
     insights.push({ type: "positive", text: "Premium extension (.com)" })
-  } else if (extensionScore >= 15) {
+  } else if (rawScores.extension >= 75) {
     insights.push({ type: "positive", text: `Strong tech extension (.${tld})` })
-  } else if (extensionScore <= 11) {
+  } else if (rawScores.extension < 55) {
     insights.push({ type: "warning", text: `Weaker extension (.${tld})` })
   }
 
-  // 5️⃣ Character Quality Score (0-15)
-  let characterScore = 15
-
-  if (name.includes("-")) {
-    characterScore -= 5
-    insights.push({ type: "warning", text: "Hyphens hurt word-of-mouth" })
-  }
-  if (/\d/.test(name)) {
-    characterScore -= 5
-    insights.push({ type: "warning", text: "Numbers cause confusion" })
-  }
-  if (/(.)\1/.test(lowerName)) {
-    characterScore -= 3
-    insights.push({ type: "warning", text: "Double letters can trip people up" })
-  }
-  if (HARD_CLUSTERS.some(cluster => lowerName.includes(cluster))) {
-    characterScore -= 3
-    insights.push({ type: "warning", text: "Hard consonant cluster" })
-  }
-  characterScore = Math.max(0, characterScore)
-
-  if (characterScore === 15) {
+  // Character quality insights
+  if (rawScores.characterQuality < 70) {
+    if (name.includes("-")) {
+      insights.push({ type: "warning", text: "Hyphens hurt word-of-mouth" })
+    }
+    if (/\d/.test(name)) {
+      insights.push({ type: "warning", text: "Numbers cause confusion" })
+    }
+  } else if (rawScores.characterQuality >= 95) {
     insights.push({ type: "positive", text: "Clean characters" })
   }
 
-  // 6️⃣ Brand Risk Penalty (-15 to 0)
-  let brandRiskPenalty = 0
-
-  // Exact dictionary word: -8
-  if (DICTIONARY_WORDS.includes(lowerName)) {
-    brandRiskPenalty -= 8
-    insights.push({ type: "negative", text: "Exact dictionary word — hard to own" })
+  // Brand risk insights
+  if (rawScores.brandRisk < 50) {
+    insights.push({ type: "negative", text: "High brand risk — generic/conflict patterns" })
+  } else if (rawScores.brandRisk < 70) {
+    insights.push({ type: "warning", text: "Some brand risk concerns" })
+  } else if (rawScores.brandRisk >= 90) {
+    insights.push({ type: "positive", text: "Low brand risk — unique positioning" })
   }
 
-  // Very common industry keyword: -5
-  if (INDUSTRY_KEYWORDS.some(kw => lowerName === kw || lowerName.startsWith(kw) || lowerName.endsWith(kw))) {
-    brandRiskPenalty -= 5
-    insights.push({ type: "negative", text: "Generic industry keyword" })
+  // Vibe modifier insight
+  if (result.breakdown.vibeModifier > 0) {
+    insights.push({ type: "positive", text: `Matches ${vibe} vibe (+${result.breakdown.vibeModifier})` })
+  } else if (result.breakdown.vibeModifier < 0) {
+    insights.push({ type: "warning", text: `Clashes with ${vibe} vibe (${result.breakdown.vibeModifier})` })
   }
-
-  // Looks like plural/generic (ends in 's', 'ly', 'ify', 'er'): -4
-  if (/s$|ly$|ify$|er$|tion$/.test(lowerName) && len > 5) {
-    brandRiskPenalty -= 4
-    insights.push({ type: "warning", text: "Looks like a generic/plural" })
-  }
-
-  // High similarity to known brand: -6
-  const similarBrand = KNOWN_BRANDS.find(brand => {
-    const similarity = lowerName.includes(brand.slice(0, 4)) || brand.includes(lowerName.slice(0, 4))
-    return similarity && lowerName !== brand
-  })
-  if (similarBrand) {
-    brandRiskPenalty -= 6
-    insights.push({ type: "negative", text: `Similar to existing brand (${similarBrand})` })
-  }
-
-  // Looks like verb/tool only (ends in 'ify', 'ly', 'er'): -3
-  if (/ify$|ize$/.test(lowerName)) {
-    brandRiskPenalty -= 3
-    insights.push({ type: "warning", text: "Sounds like a tool, not a brand" })
-  }
-
-  // Cap penalty at -15
-  brandRiskPenalty = Math.max(-15, brandRiskPenalty)
-
-  // 🧠 Final Formula
-  const totalScore = Math.max(0, Math.min(100,
-    lengthScore + pronounceScore + memorabilityScore + extensionScore + characterScore + brandRiskPenalty
-  ))
 
   // Generate brutal verdict based on score
   let brutalVerdict = ""
-  if (totalScore >= 80) {
-    brutalVerdict = "Strong foundation for a lasting brand. Move fast."
-  } else if (totalScore >= 65) {
-    brutalVerdict = "Solid choice with minor trade-offs. Could work well."
-  } else if (totalScore >= 50) {
-    brutalVerdict = "This name works technically, but it's forgettable and competes with dozens of similar brands."
-  } else if (totalScore >= 35) {
+  if (result.score >= 90) {
+    brutalVerdict = "Elite brand potential. This name can scale globally. Move fast."
+  } else if (result.score >= 80) {
+    brutalVerdict = "Strong foundation for a lasting brand. Minor optimizations possible."
+  } else if (result.score >= 65) {
+    brutalVerdict = "Solid choice with trade-offs. Could work well in the right niche."
+  } else if (result.score >= 50) {
+    brutalVerdict = "Forgettable and competes with dozens of similar brands. Consider alternatives."
+  } else if (result.score >= 35) {
     brutalVerdict = "Weak long-term brandability. You'll fight for recognition."
   } else {
-    brutalVerdict = "This name will hold you back. Consider alternatives."
+    brutalVerdict = "This name will hold you back. Generic patterns, brand conflicts, or unpronounceable. Start over."
   }
 
   return {
-    score: Math.round(totalScore),
-    breakdown: {
-      lengthScore,
-      pronounceScore,
-      memorabilityScore,
-      extensionScore,
-      characterScore,
-      brandRiskPenalty,
-    },
+    score: result.score,
+    breakdown: result.breakdown,
+    rawScores: result.rawScores,
     insights: insights.slice(0, 6),
     brutalVerdict,
   }
@@ -210,13 +133,16 @@ export function calculateFounderSignal(
 interface FounderSignalBadgeProps {
   name: string
   tld: string
-  pronounceable: boolean
-  memorability: number
+  vibe?: BrandVibe
+  /** @deprecated - no longer used, scoring calculates internally */
+  pronounceable?: boolean
+  /** @deprecated - no longer used, scoring calculates internally */
+  memorability?: number
 }
 
-export function FounderSignalBadge({ name, tld, pronounceable, memorability }: FounderSignalBadgeProps) {
+export function FounderSignalBadge({ name, tld, vibe }: FounderSignalBadgeProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const signal = calculateFounderSignal(name, tld, pronounceable, memorability)
+  const signal = calculateFounderSignal(name, tld, vibe)
 
   // Color based on score
   const getScoreColor = (score: number) => {

@@ -1,14 +1,9 @@
-"use client"
-
 import Link from "next/link"
 import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { cn } from "@/lib/utils"
 
 export function FinalCTA() {
-  const { ref, isVisible } = useScrollAnimation()
-
   return (
     <section className="relative overflow-clip py-16 sm:py-24" aria-labelledby="final-cta-heading">
       {/* Background Aura - contained within viewport */}
@@ -20,11 +15,7 @@ export function FinalCTA() {
       </div>
 
       <div
-        ref={ref}
-        className={cn(
-          "relative mx-auto max-w-3xl px-4 text-center opacity-0 sm:px-6 lg:px-8",
-          isVisible && "animate-fade-up",
-        )}
+        className={cn("relative mx-auto max-w-3xl px-4 text-center animate-fade-up sm:px-6 lg:px-8")}
         style={{ animationFillMode: "forwards" }}
       >
         <h2

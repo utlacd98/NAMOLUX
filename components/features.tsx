@@ -1,8 +1,4 @@
-"use client"
-
 import { Globe, Palette, Download, MessageSquare, Zap, Lightbulb, Star } from "lucide-react"
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
-import { cn } from "@/lib/utils"
 
 const features = [
   {
@@ -44,8 +40,6 @@ const features = [
 ]
 
 export function Features() {
-  const { ref, isVisible } = useScrollAnimation()
-
   return (
     <section id="features" className="overflow-clip py-16 sm:py-24" aria-labelledby="features-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -60,17 +54,13 @@ export function Features() {
           </p>
         </div>
 
-        <div ref={ref} className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <div
                 key={feature.title}
-                className={cn(
-                  "group relative rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/20 hover:shadow-md hover:shadow-black/10",
-                  "opacity-0",
-                  isVisible && "animate-fade-up",
-                )}
+                className="group relative rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/20 hover:shadow-md hover:shadow-black/10 animate-fade-up"
                 style={{
                   animationDelay: `${index * 0.08}s`,
                   animationFillMode: "forwards",

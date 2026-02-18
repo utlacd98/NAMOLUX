@@ -1,6 +1,3 @@
-"use client"
-
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { cn } from "@/lib/utils"
 
 const stats = [
@@ -21,14 +18,11 @@ const fictionalLogos = [
 ]
 
 export function SocialProof() {
-  const { ref, isVisible } = useScrollAnimation()
-
   return (
     <section className="overflow-clip border-y border-border/30 bg-muted/20 py-12 sm:py-20" aria-label="Social proof">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div
-          ref={ref}
-          className={cn("text-center opacity-0", isVisible && "animate-fade-up")}
+          className={cn("text-center animate-fade-up")}
           style={{ animationFillMode: "forwards" }}
         >
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/70">Loved by builders</p>
@@ -37,7 +31,7 @@ export function SocialProof() {
             {stats.map((stat, index) => (
               <div key={stat.label} className="flex items-center">
                 <div
-                  className={cn("px-4 py-2 text-center opacity-0 sm:px-6 md:px-8 lg:px-12", isVisible && "animate-fade-up")}
+                  className={cn("px-4 py-2 text-center animate-fade-up sm:px-6 md:px-8 lg:px-12")}
                   style={{
                     animationDelay: `${0.1 + index * 0.1}s`,
                     animationFillMode: "forwards",

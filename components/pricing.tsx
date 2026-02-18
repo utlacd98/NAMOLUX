@@ -1,14 +1,9 @@
-"use client"
-
 import Link from "next/link"
 import { Check, Sparkles, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { cn } from "@/lib/utils"
 
 export function Pricing() {
-  const { ref, isVisible } = useScrollAnimation()
-
   const features = [
     "Unlimited domain generation",
     "All brand vibes & industries",
@@ -24,11 +19,7 @@ export function Pricing() {
     <section id="pricing" className="py-24" aria-labelledby="pricing-heading">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div
-          ref={ref}
-          className={cn(
-            "text-center opacity-0",
-            isVisible && "animate-fade-up"
-          )}
+          className={cn("text-center animate-fade-up")}
           style={{ animationFillMode: "forwards" }}
         >
           <h2
@@ -44,10 +35,7 @@ export function Pricing() {
 
         {/* Single Pricing Card */}
         <div
-          className={cn(
-            "mt-12 opacity-0",
-            isVisible && "animate-fade-up"
-          )}
+          className={cn("mt-12 animate-fade-up")}
           style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
         >
           <div className="relative overflow-hidden rounded-2xl border-2 border-primary bg-card p-8 shadow-xl sm:p-10">
@@ -63,12 +51,12 @@ export function Pricing() {
               </p>
 
               <div className="mt-6 flex items-baseline justify-center gap-2">
-                <span className="text-5xl font-bold text-foreground">£5</span>
+                <span className="text-5xl font-bold text-foreground">£9.99</span>
                 <span className="text-lg text-muted-foreground">/month</span>
               </div>
 
               <Button asChild size="lg" className="mt-8 w-full max-w-sm px-8 py-6 text-lg font-semibold">
-                <Link href="/api/checkout">
+                <Link href="/api/stripe/checkout">
                   <Sparkles className="mr-2 h-5 w-5" />
                   Get Started
                 </Link>
@@ -98,15 +86,12 @@ export function Pricing() {
 
         {/* Free tier note */}
         <div
-          className={cn(
-            "mt-8 text-center opacity-0",
-            isVisible && "animate-fade-up"
-          )}
+          className={cn("mt-8 text-center animate-fade-up")}
           style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}
         >
           <p className="text-sm text-muted-foreground">
             <Zap className="inline h-4 w-4 mr-1 text-primary" />
-            Try 5 free generations before subscribing •{" "}
+            Try 1 free generation per day before subscribing •{" "}
             <Link href="/generate" className="text-primary hover:underline">
               Start free →
             </Link>
@@ -116,4 +101,3 @@ export function Pricing() {
     </section>
   )
 }
-

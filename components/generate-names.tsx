@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import {
   ArrowLeft,
   Check,
@@ -344,6 +344,7 @@ function delay(ms: number, signal: AbortSignal): Promise<void> {
 
 export function GenerateNames() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [keyword, setKeyword] = useState("")
   const [selectedVibe, setSelectedVibe] = useState("luxury")
   const [selectedIndustry, setSelectedIndustry] = useState("")
@@ -561,6 +562,10 @@ export function GenerateNames() {
 
     const responseData = await response.json()
     if (!response.ok) {
+      if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
+        router.push("/pricing?reason=limit_exceeded")
+        throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+      }
       throw new Error(responseData.error || "Failed to generate domain names")
     }
 
@@ -584,11 +589,15 @@ export function GenerateNames() {
       }),
     })
 
+    const responseData = await response.json()
     if (!response.ok) {
+      if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
+        router.push("/pricing?reason=limit_exceeded")
+        throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+      }
       throw new Error("Failed to check domain availability")
     }
 
-    const responseData = await response.json()
     return responseData.results || []
   }
 
@@ -735,11 +744,16 @@ export function GenerateNames() {
         body: JSON.stringify({ domains }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
+        if (response.status === 429 && data.error === "rate_limit_exceeded") {
+          router.push("/pricing?reason=limit_exceeded")
+          return
+        }
         throw new Error("Failed to check domains")
       }
 
-      const data = await response.json()
       setResults(data.results)
     } catch (error: any) {
       console.error("Error checking domains:", error)
@@ -1686,8 +1700,7 @@ export function GenerateNames() {
                             <FounderSignalBadge
                               name={result.name}
                               tld={result.tld}
-                              pronounceable={result.pronounceable}
-                              memorability={result.memorability}
+                              vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
                             />
 
                             {/* SEO Micro-Signal & Check Button */}

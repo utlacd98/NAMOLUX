@@ -1,6 +1,3 @@
-"use client"
-
-import { useScrollAnimation } from "@/hooks/use-scroll-animation"
 import { cn } from "@/lib/utils"
 
 const steps = [
@@ -23,8 +20,6 @@ const steps = [
 ]
 
 export function HowItWorks() {
-  const { ref, isVisible } = useScrollAnimation()
-
   return (
     <section id="how-it-works" className="overflow-clip bg-muted/30 py-16 sm:py-24" aria-labelledby="how-it-works-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -37,7 +32,7 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div ref={ref} className="relative mt-16">
+        <div className="relative mt-16">
           {/* Timeline line */}
           <div
             className="absolute top-8 left-[28px] hidden h-[calc(100%-4rem)] w-px bg-gradient-to-b from-primary/60 via-secondary/40 to-muted lg:left-1/2 lg:block lg:-translate-x-1/2"
@@ -49,10 +44,8 @@ export function HowItWorks() {
               <div
                 key={step.number}
                 className={cn(
-                  "relative flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-12",
+                  "relative flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-12 animate-fade-up",
                   index % 2 === 1 && "lg:flex-row-reverse",
-                  "opacity-0",
-                  isVisible && "animate-fade-up",
                 )}
                 style={{
                   animationDelay: `${index * 0.2}s`,

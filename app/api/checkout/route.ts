@@ -29,27 +29,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get the origin for redirect URLs
-    const requestOrigin = request.headers.get("origin")
-    const referer = request.headers.get("referer")
-
-    // Try to get origin from various sources
-    let origin = requestOrigin
-    if (!origin && referer) {
-      try {
-        origin = new URL(referer).origin
-      } catch {
-        // Invalid referer URL
-      }
-    }
-    if (!origin) {
-      origin = process.env.NEXT_PUBLIC_APP_URL || "https://www.namolux.com"
-    }
-
-    // Ensure origin is a valid URL
-    if (!origin.startsWith("http://") && !origin.startsWith("https://")) {
-      origin = "https://www.namolux.com"
-    }
+    // Hardcode the production URL - must use www to match cookie domain
+    const origin = "https://www.namolux.com"
 
     // Create a checkout session for the monthly subscription
     const session = await stripeClient.checkout.sessions.create({

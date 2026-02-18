@@ -352,6 +352,66 @@
   animation: cta-pulse 1s ease-in-out;
 }
 
+/* Hero fade-up animation with stagger support */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-fade-up {
+  opacity: 0;
+  animation: hero-fade-up 0.5s ease-out forwards;
+}
+
+/* Badge pop animation */
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-badge-pop {
+  opacity: 0;
+  animation: badge-pop 0.3s ease-out forwards;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-fade-up,
+  .animate-badge-pop {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero stagger delays */
+.hero-delay-0 { animation-delay: 0s; }
+.hero-delay-1 { animation-delay: 0.15s; }
+.hero-delay-2 { animation-delay: 0.3s; }
+.hero-delay-3 { animation-delay: 0.4s; }
+.hero-delay-4 { animation-delay: 0.5s; }
+.hero-delay-card { animation-delay: 0.3s; }
+.hero-delay-row-1 { animation-delay: 0.6s; }
+.hero-delay-row-2 { animation-delay: 0.75s; }
+.hero-delay-row-3 { animation-delay: 0.9s; }
+.hero-delay-row-4 { animation-delay: 1.05s; }
+.hero-delay-row-5 { animation-delay: 1.2s; }
+
 /* Stagger delays for cards */
 .stagger-1 {
   animation-delay: 0.1s;
@@ -451,8 +511,21 @@ select option {
 /* Mobile-first improvements */
 @media (max-width: 640px) {
   /* Improve touch targets on mobile */
-  button, a, input, select, textarea {
-    min-height: 44px;
+  button,
+  [role="button"],
+  a[aria-label],
+  a.inline-flex,
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+  }
+
+  button,
+  [role="button"],
+  a[aria-label],
+  a.inline-flex {
+    min-width: 48px;
   }
 
   /* Reduce animation intensity on mobile for performance */

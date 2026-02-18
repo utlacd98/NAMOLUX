@@ -4,7 +4,14 @@ import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Privacy Policy | NamoLux",
-  description: "Privacy policy for NamoLux domain name generator.",
+  description:
+    "Read the NamoLux privacy policy to see what data we collect, how domain searches and account details are handled, and how your information is protected.",
+  twitter: {
+    card: "summary",
+    title: "Privacy Policy | NamoLux",
+    description:
+      "Read the NamoLux privacy policy to see what data we collect, how domain searches and account details are handled, and how your information is protected.",
+  },
 }
 
 export default function PrivacyPage() {
@@ -78,4 +85,3 @@ export default function PrivacyPage() {
     </div>
   )
 }
-

@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
-import { db } from "@/lib/db"
+import { createServiceClient } from "@/lib/supabase/server"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia",
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -71,77 +69,129 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  const supabase = createServiceClient()
 
-  // Find or create user by email
-  let user = await db.user.findUnique({ where: { email: customerEmail } })
+  // Find user by email or by supabase_user_id in metadata
+  const supabaseUserId = subscription.metadata?.supabase_user_id
 
-  if (!user) {
-    // Create user without clerkId (they can link later)
-    user = await db.user.create({
-      data: {
-        email: customerEmail,
-        clerkId: `stripe_${customerId}`, // Temporary ID
-        stripeCustomerId: customerId,
-        subscriptionId: subscriptionId,
-        subscriptionStatus: subscription.status,
-        subscriptionPriceId: subscription.items.data[0]?.price.id,
-        subscriptionEndDate: new Date(subscription.current_period_end * 1000),
-      },
-    })
+  if (supabaseUserId) {
+    // Update user profile by Supabase user ID
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscriptionId,
+        plan: "pro",
+        subscription_status: "active",
+        subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      })
+      .eq("id", supabaseUserId)
+
+    if (error) {
+      console.error("Error updating profile by user ID:", error)
+    } else {
+      console.log(`Subscription activated for user ${supabaseUserId}`)
+    }
   } else {
-    // Update existing user
-    await db.user.update({
-      where: { email: customerEmail },
-      data: {
-        stripeCustomerId: customerId,
-        subscriptionId: subscriptionId,
-        subscriptionStatus: subscription.status,
-        subscriptionPriceId: subscription.items.data[0]?.price.id,
-        subscriptionEndDate: new Date(subscription.current_period_end * 1000),
-      },
-    })
-  }
+    // Fallback: find user by email
+    const { data: profile, error: findError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", customerEmail)
+      .single()
 
-  console.log(`Subscription activated for ${customerEmail}`)
+    if (findError || !profile) {
+      console.error("No profile found for email:", customerEmail)
+      return
+    }
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscriptionId,
+        plan: "pro",
+        subscription_status: "active",
+        subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      })
+      .eq("id", profile.id)
+
+    if (error) {
+      console.error("Error updating profile by email:", error)
+    } else {
+      console.log(`Subscription activated for ${customerEmail}`)
+    }
+  }
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
-  const user = await db.user.findUnique({
-    where: { subscriptionId: subscription.id },
-  })
+  const supabase = createServiceClient()
 
-  if (!user) {
+  // Find user by subscription ID
+  const { data: profile, error: findError } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("stripe_subscription_id", subscription.id)
+    .single()
+
+  if (findError || !profile) {
     console.error(`No user found for subscription ${subscription.id}`)
     return
   }
 
-  await db.user.update({
-    where: { id: user.id },
-    data: {
-      subscriptionStatus: subscription.status,
-      subscriptionEndDate: new Date(subscription.current_period_end * 1000),
-    },
-  })
+  // Map Stripe status to our subscription_status
+  const statusMap: Record<string, string> = {
+    active: "active",
+    past_due: "past_due",
+    canceled: "cancelled",
+    unpaid: "inactive",
+    trialing: "active",
+    incomplete: "inactive",
+    incomplete_expired: "inactive",
+    paused: "inactive",
+  }
 
-  console.log(`Subscription updated for user ${user.email}: ${subscription.status}`)
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      subscription_status: statusMap[subscription.status] || "inactive",
+      subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    })
+    .eq("id", profile.id)
+
+  if (error) {
+    console.error("Error updating subscription:", error)
+  } else {
+    console.log(`Subscription updated for user ${profile.email}: ${subscription.status}`)
+  }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const user = await db.user.findUnique({
-    where: { subscriptionId: subscription.id },
-  })
+  const supabase = createServiceClient()
 
-  if (!user) return
+  // Find user by subscription ID
+  const { data: profile, error: findError } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("stripe_subscription_id", subscription.id)
+    .single()
 
-  await db.user.update({
-    where: { id: user.id },
-    data: {
-      subscriptionStatus: "canceled",
-      subscriptionEndDate: new Date(subscription.current_period_end * 1000),
-    },
-  })
+  if (findError || !profile) return
 
-  console.log(`Subscription canceled for user ${user.email}`)
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      plan: "free",
+      subscription_status: "cancelled",
+      subscription_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    })
+    .eq("id", profile.id)
+
+  if (error) {
+    console.error("Error cancelling subscription:", error)
+  } else {
+    console.log(`Subscription cancelled for user ${profile.email}`)
+  }
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
@@ -149,12 +199,22 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
   const subscriptionId = invoice.subscription as string
   if (!subscriptionId) return
 
-  const user = await db.user.findUnique({
-    where: { subscriptionId },
-  })
+  const supabase = createServiceClient()
 
-  if (user) {
-    console.log(`Invoice paid for user ${user.email}`)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("stripe_subscription_id", subscriptionId)
+    .single()
+
+  if (profile) {
+    // Ensure subscription is marked as active on successful payment
+    await supabase
+      .from("profiles")
+      .update({ subscription_status: "active" })
+      .eq("id", profile.id)
+
+    console.log(`Invoice paid for user ${profile.email}`)
   }
 }
 
@@ -162,16 +222,20 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   const subscriptionId = invoice.subscription as string
   if (!subscriptionId) return
 
-  const user = await db.user.findUnique({
-    where: { subscriptionId },
-  })
+  const supabase = createServiceClient()
 
-  if (user) {
-    await db.user.update({
-      where: { id: user.id },
-      data: { subscriptionStatus: "past_due" },
-    })
-    console.log(`Payment failed for user ${user.email}`)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .eq("stripe_subscription_id", subscriptionId)
+    .single()
+
+  if (profile) {
+    await supabase
+      .from("profiles")
+      .update({ subscription_status: "past_due" })
+      .eq("id", profile.id)
+
+    console.log(`Payment failed for user ${profile.email}`)
   }
 }
-

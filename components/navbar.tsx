@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
+import { User } from "@supabase/supabase-js"
 
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -28,43 +29,52 @@ const resourceLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
   const [isResourcesOpen, setIsResourcesOpen] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const supabase = createClient()
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isOpen])
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
     }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    checkUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
 
   return (
     <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "glass border-b border-border" : "bg-transparent",
-      )}
+      className="glass fixed top-0 left-0 right-0 z-50 w-full border-b border-border transition-all duration-300"
       role="navigation"
       aria-label="Main navigation"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4 sm:h-16">
-          {/* Logo - wrapped in Link */}
+          {/* Logo - Text */}
           <Link
             href="/"
-            className="flex shrink-0 items-center text-foreground transition-colors hover:text-primary"
+            className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-primary sm:text-2xl"
             aria-label="NamoLux"
           >
-            <Image
-              src="/logo.png"
-              alt="NamoLux"
-              width={120}
-              height={32}
-              className="h-8 w-auto sm:h-10"
-              priority
-            />
-            <span className="sr-only">NamoLux</span>
+            Namo<span className="text-[#D4A843]">Lux</span>
           </Link>
 
           {/* Desktop Nav - Centered */}
@@ -97,6 +107,8 @@ export function Navbar() {
               <button
                 className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:text-foreground"
                 onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+                aria-expanded={isResourcesOpen}
+                aria-haspopup="menu"
               >
                 Resources
                 <ChevronDown className={cn("h-4 w-4 transition-transform", isResourcesOpen && "rotate-180")} />
@@ -122,15 +134,49 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* CTA Button */}
-            <Button asChild className="hidden sm:inline-flex">
-              <Link href="/generate">Generate Names</Link>
-            </Button>
+            {user ? (
+              <>
+                {/* Dashboard Button - More prominent */}
+                <Button asChild variant="outline" className="hidden sm:inline-flex">
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="h-4 w-4 mr-1.5" />
+                    Dashboard
+                  </Link>
+                </Button>
+                {/* Generate Names Button */}
+                <Button asChild className="hidden sm:inline-flex">
+                  <Link href="/generate">Generate Names</Link>
+                </Button>
+                {/* Sign Out Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:inline-flex text-muted-foreground hover:text-foreground"
+                  onClick={async () => {
+                    await supabase.auth.signOut()
+                    window.location.href = "/"
+                  }}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Sign In Button */}
+                <Button asChild variant="ghost" className="hidden sm:inline-flex">
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                {/* CTA Button */}
+                <Button asChild className="hidden sm:inline-flex">
+                  <Link href="/generate">Generate Names</Link>
+                </Button>
+              </>
+            )}
 
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+              className="rounded-lg p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
               aria-expanded={isOpen}
               aria-label="Toggle menu"
             >
@@ -139,52 +185,94 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Nav - Updated for Link support */}
+        {/* Mobile Nav Overlay */}
         {isOpen && (
-          <div className="mt-2 rounded-lg border border-border bg-background p-4 md:hidden">
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) =>
-                link.href.startsWith("/") ? (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </a>
-                ),
-              )}
-              {/* Mobile Resources Section */}
-              <div className="border-t border-border pt-3">
-                <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-                  Resources
-                </span>
-                {resourceLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="block py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-              {/* Mobile CTA */}
-              <div className="border-t border-border pt-3">
-                <Button asChild className="w-full">
-                  <Link href="/generate" onClick={() => setIsOpen(false)}>Generate Names</Link>
-                </Button>
+          <div
+            className="fixed inset-0 top-16 z-40 bg-background md:hidden"
+            style={{ height: "calc(100vh - 4rem)" }}
+          >
+            <div className="h-full overflow-y-auto overscroll-contain p-4 pb-8">
+              <div className="flex flex-col gap-3">
+                {navLinks.map((link) =>
+                  link.href.startsWith("/") ? (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="block py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="block py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  ),
+                )}
+                {/* Mobile Resources Section */}
+                <div className="border-t border-border pt-3">
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    Resources
+                  </span>
+                  {resourceLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className="block py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+                {/* Mobile Auth Section */}
+                <div className="border-t border-border pt-3 pb-6">
+                  {user ? (
+                    <>
+                      {/* Dashboard Link */}
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 py-2 text-sm font-medium text-primary mb-3"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      {/* Sign Out Button */}
+                      <Button
+                        variant="outline"
+                        className="w-full mb-3"
+                        onClick={async () => {
+                          await supabase.auth.signOut()
+                          setIsOpen(false)
+                          window.location.href = "/"
+                        }}
+                      >
+                        Sign Out
+                      </Button>
+                      {/* Generate Names Button */}
+                      <Button asChild className="w-full">
+                        <Link href="/generate" onClick={() => setIsOpen(false)}>Generate Names</Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Sign In Button */}
+                      <Button asChild variant="outline" className="w-full mb-3">
+                        <Link href="/sign-in" onClick={() => setIsOpen(false)}>Sign In</Link>
+                      </Button>
+                      {/* Generate Names Button */}
+                      <Button asChild className="w-full">
+                        <Link href="/generate" onClick={() => setIsOpen(false)}>Generate Names</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
 import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 // Lazy initialization to avoid build-time errors
 let openaiInstance: OpenAI | null = null
@@ -55,6 +56,37 @@ function toNameStyle(value: unknown): NameStyleSelection {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit first
+    const rateLimitResult = await checkRateLimit(request)
+
+    if (!rateLimitResult.allowed) {
+      const resetAt = rateLimitResult.resetAt
+      const now = new Date()
+      const diffMs = resetAt ? resetAt.getTime() - now.getTime() : 0
+      const hoursRemaining = Math.floor(diffMs / (1000 * 60 * 60))
+      const minutesRemaining = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+      return NextResponse.json(
+        {
+          error: "rate_limit_exceeded",
+          message: "You've used your free generation for today",
+          resetAt: resetAt?.toISOString(),
+          hoursRemaining,
+          minutesRemaining,
+          upgradeUrl: "/pricing",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil(diffMs / 1000)),
+            "X-RateLimit-Limit": "1",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": resetAt?.toISOString() || "",
+          },
+        }
+      )
+    }
+
     const payload = await request.json()
     const { keyword, vibe, industry, maxLength, count, autoFindV2, generatorV2, nameStyle, meaningMode } = payload
     const hasCustomCount = typeof count === "number" && Number.isFinite(count)
@@ -107,6 +139,11 @@ export async function POST(request: NextRequest) {
 
       const checked = Math.max(result.stats.checkedAvailability, 1)
       const availabilityHitRate = Number(((result.found.length / checked) * 100).toFixed(2))
+
+      // Log generation for rate limiting (only for free users - pro users don't need logging for limits)
+      if (!rateLimitResult.isPro) {
+        logGeneration(request, rateLimitResult.userId, "domain", keyword, result.found.length).catch(() => {})
+      }
 
       return NextResponse.json({
         success: true,
@@ -182,6 +219,11 @@ export async function POST(request: NextRequest) {
         userAgent,
         country,
       })
+
+      // Log generation for rate limiting (only for free users)
+      if (!rateLimitResult.isPro) {
+        logGeneration(request, rateLimitResult.userId, "domain", keyword, generated.length).catch(() => {})
+      }
 
       return NextResponse.json({
         success: true,
@@ -282,6 +324,11 @@ Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...
       userAgent,
       country,
     })
+
+    // Log generation for rate limiting (only for free users)
+    if (!rateLimitResult.isPro) {
+      logGeneration(request, rateLimitResult.userId, "domain", keyword, finalSuggestions.length).catch(() => {})
+    }
 
     return NextResponse.json({
       success: true,

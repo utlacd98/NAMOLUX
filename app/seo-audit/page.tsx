@@ -4,10 +4,17 @@ import { SeoAudit } from "@/components/seo-audit"
 export const metadata: Metadata = {
   title: "SEO Audit Tool | NamoLux",
   description:
-    "Analyze any website's SEO performance instantly. Get actionable insights on meta tags, performance, accessibility, and more.",
+    "Analyse any website's SEO performance instantly with actionable checks for meta tags, Core Web Vitals, accessibility, and technical issues that impact rankings.",
   openGraph: {
     title: "SEO Audit Tool | NamoLux",
-    description: "Free SEO audit tool with instant website analysis.",
+    description:
+      "Analyse any website's SEO performance instantly with actionable checks for meta tags, Core Web Vitals, accessibility, and technical issues that impact rankings.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SEO Audit Tool | NamoLux",
+    description:
+      "Analyse any website's SEO performance instantly with actionable checks for meta tags, Core Web Vitals, accessibility, and technical issues that impact rankings.",
   },
 }
 
