@@ -8,8 +8,9 @@ import {
   Megaphone, Linkedin, Facebook, Send, Calendar, FileText, MessageSquare, Sparkles, CheckCircle, AlertCircle,
   PenTool, Plus, Trash2, Eye, Code, Mail, UserPlus, Tag, MailCheck, MailX,
   Target, LineChart as LineChartIcon, AlertTriangle, Trophy, ArrowUpRight, ArrowDownRight,
-  Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock
+  Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock, Clapperboard, Play
 } from "lucide-react"
+import { adCampaigns, generateAdScript, type AdCampaign } from "@/lib/ads-data"
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar
@@ -49,6 +50,7 @@ const NAV_ITEMS = [
   { id: "blog-analytics", label: "Blog Analytics", icon: FileText },
   { id: "marketing", label: "Marketing Agent", icon: Megaphone },
   { id: "blog", label: "Blog Editor", icon: PenTool },
+  { id: "ads", label: "Ads Library", icon: Clapperboard },
 ]
 
 type BlogCategory = "Domain Strategy" | "SEO Foundations" | "Builder Insights"
@@ -348,6 +350,10 @@ export default function MetricsPage() {
   const [blogTopic, setBlogTopic] = useState("")
   const [blogGenerating, setBlogGenerating] = useState(false)
   const [blogError, setBlogError] = useState<string | null>(null)
+
+  // Ads Library State
+  const [selectedAd, setSelectedAd] = useState<AdCampaign | null>(null)
+  const [adCopied, setAdCopied] = useState(false)
 
   // Blog Analytics State
   const [blogAnalytics, setBlogAnalytics] = useState<{
@@ -2315,6 +2321,180 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ADS LIBRARY TAB */}
+          {activeTab === "ads" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Clapperboard className="h-5 w-5 text-primary" />
+                  Ads Library
+                </h2>
+                <span className="text-sm text-muted-foreground">{adCampaigns.length} ad(s)</span>
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-3">
+                {/* Ad List */}
+                <div className="lg:col-span-1 space-y-3">
+                  <h3 className="text-sm font-medium text-muted-foreground">Campaigns</h3>
+                  {adCampaigns.map((ad) => (
+                    <button
+                      key={ad.id}
+                      onClick={() => setSelectedAd(ad)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all ${
+                        selectedAd?.id === ad.id
+                          ? "border-primary bg-primary/10"
+                          : "border-border/40 bg-card/30 hover:border-border"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-foreground truncate">{ad.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{ad.duration} • {ad.format}</div>
+                        </div>
+                        <span className={`shrink-0 text-xs px-2 py-0.5 rounded ${
+                          ad.status === "ready" ? "bg-green-500/20 text-green-400" :
+                          ad.status === "active" ? "bg-blue-500/20 text-blue-400" :
+                          ad.status === "draft" ? "bg-amber-500/20 text-amber-400" :
+                          "bg-gray-500/20 text-gray-400"
+                        }`}>
+                          {ad.status}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {ad.tone.map((t) => (
+                          <span key={t} className="text-xs bg-muted/30 text-muted-foreground px-1.5 py-0.5 rounded">{t}</span>
+                        ))}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Ad Details */}
+                <div className="lg:col-span-2">
+                  {selectedAd ? (
+                    <div className="space-y-6">
+                      {/* Header */}
+                      <div className="rounded-xl border border-border/40 bg-card/30 p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className="text-xl font-semibold text-foreground">{selectedAd.name}</h3>
+                            <p className="text-sm text-muted-foreground mt-1">{selectedAd.description}</p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const script = generateAdScript(selectedAd)
+                              const blob = new Blob([script], { type: "text/markdown" })
+                              const url = URL.createObjectURL(blob)
+                              const a = document.createElement("a")
+                              a.href = url
+                              a.download = `${selectedAd.id}-script.md`
+                              a.click()
+                              URL.revokeObjectURL(url)
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download Script
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                          <div className="p-3 rounded-lg bg-muted/20 border border-border/20">
+                            <div className="text-xs text-muted-foreground">Format</div>
+                            <div className="text-sm font-medium text-foreground">{selectedAd.format}</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/20 border border-border/20">
+                            <div className="text-xs text-muted-foreground">Duration</div>
+                            <div className="text-sm font-medium text-foreground">{selectedAd.duration}</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/20 border border-border/20">
+                            <div className="text-xs text-muted-foreground">Goal</div>
+                            <div className="text-sm font-medium text-foreground">{selectedAd.goal}</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/20 border border-border/20">
+                            <div className="text-xs text-muted-foreground">Scenes</div>
+                            <div className="text-sm font-medium text-foreground">{selectedAd.scenes.length}</div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {selectedAd.platforms.map((p) => (
+                            <span key={p} className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">{p}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Scene Breakdown */}
+                      <div className="rounded-xl border border-border/40 bg-card/30 p-6">
+                        <h4 className="font-medium text-foreground flex items-center gap-2 mb-4">
+                          <Play className="h-4 w-4 text-primary" />
+                          Scene-by-Scene Script
+                        </h4>
+                        <div className="space-y-4 max-h-[500px] overflow-y-auto">
+                          {selectedAd.scenes.map((scene, idx) => (
+                            <div key={idx} className="p-4 rounded-lg bg-muted/20 border border-border/20">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-primary">{scene.timestamp}</span>
+                                <span className="text-sm font-medium text-foreground">{scene.title}</span>
+                              </div>
+                              <div className="space-y-2 text-sm">
+                                <div>
+                                  <span className="text-muted-foreground">🎥 Visual: </span>
+                                  <span className="text-foreground">{scene.visual}</span>
+                                </div>
+                                {scene.text && (
+                                  <div>
+                                    <span className="text-muted-foreground">📝 Text: </span>
+                                    <span className="text-foreground italic">"{scene.text}"</span>
+                                  </div>
+                                )}
+                                {scene.audio && (
+                                  <div>
+                                    <span className="text-muted-foreground">🔊 Audio: </span>
+                                    <span className="text-foreground">{scene.audio}</span>
+                                  </div>
+                                )}
+                                {scene.notes && (
+                                  <div>
+                                    <span className="text-muted-foreground">📌 Notes: </span>
+                                    <span className="text-foreground">{scene.notes}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Copy Script Button */}
+                      <div className="flex gap-3">
+                        <button
+                          onClick={async () => {
+                            const script = generateAdScript(selectedAd)
+                            await navigator.clipboard.writeText(script)
+                            setAdCopied(true)
+                            setTimeout(() => setAdCopied(false), 2000)
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border/40 bg-card/30 text-foreground hover:bg-muted/30 transition-colors"
+                        >
+                          {adCopied ? <CheckCircle className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                          {adCopied ? "Copied!" : "Copy Script"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/40 bg-card/20">
+                      <div className="text-center">
+                        <Clapperboard className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                        <p className="text-muted-foreground">Select an ad campaign to view details</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </main>
