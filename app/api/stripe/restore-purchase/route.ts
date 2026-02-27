@@ -4,6 +4,46 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+async function grantPro(userId: string, customerId: string | null) {
+  const serviceClient = createServiceClient()
+  const payload: Record<string, string> = { id: userId, plan: "pro" }
+  if (customerId) payload.stripe_customer_id = customerId
+
+  const { error } = await serviceClient
+    .from("profiles")
+    .upsert(payload, { onConflict: "id" })
+
+  if (error) {
+    console.error("Upsert error:", error)
+    // fallback: plain update
+    const { error: e2 } = await serviceClient
+      .from("profiles")
+      .update({ plan: "pro" })
+      .eq("id", userId)
+    if (e2) throw new Error("DB update failed: " + e2.message)
+  }
+}
+
+async function findPaidCustomerByEmail(email: string): Promise<string | null> {
+  const customers = await stripe.customers.list({ email, limit: 10 })
+  console.log(`Stripe customers for ${email}:`, customers.data.length)
+
+  for (const customer of customers.data) {
+    const [piList, sessionList] = await Promise.all([
+      stripe.paymentIntents.list({ customer: customer.id, limit: 20 }),
+      stripe.checkout.sessions.list({ customer: customer.id, limit: 20 }),
+    ])
+
+    const hasSucceededPI = piList.data.some((pi) => pi.status === "succeeded")
+    const hasPaidSession = sessionList.data.some((s) => s.payment_status === "paid")
+
+    console.log(`  Customer ${customer.id}: PI succeeded=${hasSucceededPI}, paid sessions=${hasPaidSession}`)
+
+    if (hasSucceededPI || hasPaidSession) return customer.id
+  }
+  return null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()
@@ -12,7 +52,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
-    // User must be logged in — we update their profile
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -20,73 +59,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "You must be signed in to restore a purchase" }, { status: 401 })
     }
 
-    const cleanEmail = email.toLowerCase().trim()
-    console.log(`Restore purchase attempt: user=${user.id}, email=${cleanEmail}`)
+    console.log(`Restore purchase: user=${user.id} (${user.email}), entered email=${email}`)
 
-    // Look up Stripe customers matching the provided email
-    const customers = await stripe.customers.list({ email: cleanEmail, limit: 10 })
-    console.log(`Stripe customers found for ${cleanEmail}:`, customers.data.length)
-
-    if (customers.data.length === 0) {
-      return NextResponse.json({ error: "No purchase found for that email address" }, { status: 404 })
+    // 1. Search payment intents by supabase_user_id metadata (most reliable)
+    try {
+      const piSearch = await stripe.paymentIntents.search({
+        query: `metadata['supabase_user_id']:'${user.id}' AND status:'succeeded'`,
+        limit: 5,
+      })
+      console.log(`PI search by user ID found:`, piSearch.data.length)
+      if (piSearch.data.length > 0) {
+        const customerId = piSearch.data[0].customer as string | null
+        await grantPro(user.id, customerId)
+        console.log(`Pro granted via metadata search for user ${user.id}`)
+        return NextResponse.json({ success: true })
+      }
+    } catch (e) {
+      console.log("PI metadata search not available, skipping:", e)
     }
 
-    let foundCustomerId: string | null = null
-
-    for (const customer of customers.data) {
-      console.log(`Checking customer ${customer.id}`)
-
-      // Check payment intents — any succeeded payment qualifies
-      const paymentIntents = await stripe.paymentIntents.list({
-        customer: customer.id,
-        limit: 20,
+    // 2. Search checkout sessions by supabase_user_id metadata
+    try {
+      const csSearch = await stripe.checkout.sessions.search({
+        query: `metadata['supabase_user_id']:'${user.id}' AND payment_status:'paid'`,
+        limit: 5,
       })
-      const succeeded = paymentIntents.data.filter((pi) => pi.status === "succeeded")
-      console.log(`  Payment intents succeeded: ${succeeded.length}`)
-
-      // Check checkout sessions
-      const sessions = await stripe.checkout.sessions.list({
-        customer: customer.id,
-        limit: 20,
-      })
-      const paidSessions = sessions.data.filter((s) => s.payment_status === "paid")
-      console.log(`  Paid checkout sessions: ${paidSessions.length}`)
-
-      if (succeeded.length > 0 || paidSessions.length > 0) {
-        foundCustomerId = customer.id
-        break
+      console.log(`Session search by user ID found:`, csSearch.data.length)
+      if (csSearch.data.length > 0) {
+        const customerId = csSearch.data[0].customer as string | null
+        await grantPro(user.id, customerId)
+        console.log(`Pro granted via session metadata search for user ${user.id}`)
+        return NextResponse.json({ success: true })
       }
+    } catch (e) {
+      console.log("Session metadata search not available, skipping:", e)
+    }
+
+    // 3. Try entered email
+    const enteredEmail = email.toLowerCase().trim()
+    let foundCustomerId = await findPaidCustomerByEmail(enteredEmail)
+
+    // 4. Also try the user's own account email if different
+    if (!foundCustomerId && user.email && user.email.toLowerCase() !== enteredEmail) {
+      console.log(`Trying user's own login email: ${user.email}`)
+      foundCustomerId = await findPaidCustomerByEmail(user.email.toLowerCase())
     }
 
     if (!foundCustomerId) {
-      return NextResponse.json({ error: "No completed purchase found for that email address" }, { status: 404 })
+      return NextResponse.json({
+        error: "No completed purchase found. Make sure you're using the email address you paid with. Contact support if the issue persists.",
+      }, { status: 404 })
     }
 
-    console.log(`Found valid purchase. Granting Pro to user ${user.id}`)
-
-    // Use upsert so it works even if no profiles row exists yet
-    const serviceClient = createServiceClient()
-    const { error: upsertError } = await serviceClient
-      .from("profiles")
-      .upsert(
-        { id: user.id, plan: "pro", stripe_customer_id: foundCustomerId },
-        { onConflict: "id" }
-      )
-
-    if (upsertError) {
-      console.error("Upsert error:", upsertError)
-      // Fallback: try update only
-      const { error: updateError } = await serviceClient
-        .from("profiles")
-        .update({ plan: "pro" })
-        .eq("id", user.id)
-      if (updateError) {
-        console.error("Update fallback error:", updateError)
-        return NextResponse.json({ error: "Failed to restore access. Please contact support." }, { status: 500 })
-      }
-    }
-
-    console.log(`Pro restored for user ${user.id} via Stripe customer ${foundCustomerId}`)
+    await grantPro(user.id, foundCustomerId)
+    console.log(`Pro restored for user ${user.id} via customer ${foundCustomerId}`)
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error("Restore purchase error:", error)
