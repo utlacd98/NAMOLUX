@@ -58,7 +58,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         stripe_customer_id: customerId,
         plan: "pro",
         subscription_status: "active",
-        subscription_end: null,
       })
       .eq("id", supabaseUserId)
 
@@ -86,7 +85,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         stripe_customer_id: customerId,
         plan: "pro",
         subscription_status: "active",
-        subscription_end: null,
       })
       .eq("id", profile.id)
 
