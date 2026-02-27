@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { RestorePurchase } from "@/components/restore-purchase"
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
 import {
@@ -208,6 +209,7 @@ function DashboardContent() {
                 <p className="text-[#D4A843] text-lg font-semibold">£15 one-time</p>
                 <p className="text-xs text-[#555]">Pay once, use forever</p>
               </div>
+              <RestorePurchase />
             </div>
           )}
 
