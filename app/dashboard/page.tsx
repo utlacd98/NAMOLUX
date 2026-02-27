@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -13,7 +13,8 @@ import {
   Zap,
   Settings,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  CheckCircle
 } from "lucide-react"
 
 interface SubscriptionInfo {
@@ -24,11 +25,14 @@ interface SubscriptionInfo {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const [user, setUser] = useState<User | null>(null)
   const [subscription, setSubscription] = useState<SubscriptionInfo>({ isPro: false, subscriptionEnd: null, customerId: null })
   const [loading, setLoading] = useState(true)
+  const [verifying, setVerifying] = useState(false)
+  const [justUpgraded, setJustUpgraded] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +44,30 @@ export default function DashboardPage() {
       }
       setUser(user)
 
-      // Check subscription status via API (checks Stripe directly)
+      // If returning from Stripe checkout, verify the payment and grant Pro
+      const sessionId = searchParams.get("session_id")
+      if (sessionId) {
+        setVerifying(true)
+        try {
+          const res = await fetch("/api/stripe/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId }),
+          })
+          if (res.ok) {
+            setSubscription({ isPro: true, subscriptionEnd: null, customerId: null })
+            setJustUpgraded(true)
+            setVerifying(false)
+            setLoading(false)
+            return
+          }
+        } catch (err) {
+          console.error("Error verifying payment:", err)
+        }
+        setVerifying(false)
+      }
+
+      // Check subscription status
       try {
         const response = await fetch("/api/subscription")
         if (response.ok) {
@@ -59,12 +86,13 @@ export default function DashboardPage() {
     }
 
     fetchData()
-  }, [supabase, router])
+  }, [supabase, router, searchParams])
 
-  if (loading) {
+  if (loading || verifying) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center flex-col gap-3">
         <Loader2 className="h-8 w-8 animate-spin text-[#D4A843]" />
+        {verifying && <p className="text-[#888] text-sm">Activating your Pro access...</p>}
       </div>
     )
   }
@@ -81,6 +109,14 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
             <p className="text-[#888]">Welcome back, {user?.email}</p>
           </div>
+
+          {/* Success banner */}
+          {justUpgraded && (
+            <div className="mb-6 flex items-center gap-3 bg-[#D4A843]/10 border border-[#D4A843]/30 rounded-xl px-5 py-4">
+              <CheckCircle className="h-5 w-5 text-[#D4A843] shrink-0" />
+              <p className="text-[#D4A843] font-medium">Payment confirmed — you now have Pro access!</p>
+            </div>
+          )}
 
           {/* Profile Card */}
           <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-6 mb-6">
@@ -190,4 +226,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

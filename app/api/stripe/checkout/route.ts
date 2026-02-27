@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${baseUrl}/dashboard?success=true`,
+      success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pricing?cancelled=true`,
       payment_intent_data: {
         metadata: {
