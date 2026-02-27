@@ -144,7 +144,7 @@ export function Navbar() {
                   </Link>
                 </Button>
                 {/* Generate Names Button */}
-                <Button asChild className="hidden sm:inline-flex">
+                <Button asChild className="hidden sm:inline-flex bg-[#D4A843] hover:bg-[#c49a3d] text-black">
                   <Link href="/generate">Generate Names</Link>
                 </Button>
                 {/* Sign Out Button */}
@@ -167,7 +167,7 @@ export function Navbar() {
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
                 {/* CTA Button */}
-                <Button asChild className="hidden sm:inline-flex">
+                <Button asChild className="hidden sm:inline-flex bg-[#D4A843] hover:bg-[#c49a3d] text-black">
                   <Link href="/generate">Generate Names</Link>
                 </Button>
               </>
@@ -256,7 +256,7 @@ export function Navbar() {
                         Sign Out
                       </Button>
                       {/* Generate Names Button */}
-                      <Button asChild className="w-full">
+                      <Button asChild className="w-full bg-[#D4A843] hover:bg-[#c49a3d] text-black">
                         <Link href="/generate" onClick={() => setIsOpen(false)}>Generate Names</Link>
                       </Button>
                     </>
@@ -267,7 +267,7 @@ export function Navbar() {
                         <Link href="/sign-in" onClick={() => setIsOpen(false)}>Sign In</Link>
                       </Button>
                       {/* Generate Names Button */}
-                      <Button asChild className="w-full">
+                      <Button asChild className="w-full bg-[#D4A843] hover:bg-[#c49a3d] text-black">
                         <Link href="/generate" onClick={() => setIsOpen(false)}>Generate Names</Link>
                       </Button>
                     </>
