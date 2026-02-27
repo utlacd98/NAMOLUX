@@ -35,14 +35,21 @@ export async function POST(request: NextRequest) {
       .from("profiles")
       .update({
         plan: "pro",
-        subscription_status: "active",
         stripe_customer_id: session.customer as string,
       })
       .eq("id", user.id)
 
     if (error) {
       console.error("Error granting pro access:", error)
-      return NextResponse.json({ error: "Failed to update profile" }, { status: 500 })
+      // Try with just plan in case stripe_customer_id column has an issue
+      const { error: error2 } = await serviceClient
+        .from("profiles")
+        .update({ plan: "pro" })
+        .eq("id", user.id)
+      if (error2) {
+        console.error("Fallback update also failed:", error2)
+        return NextResponse.json({ error: "Failed to update profile", detail: error2.message }, { status: 500 })
+      }
     }
 
     console.log(`Pro access granted via verify-payment for user ${user.id}`)

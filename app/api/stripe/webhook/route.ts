@@ -57,7 +57,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       .update({
         stripe_customer_id: customerId,
         plan: "pro",
-        subscription_status: "active",
       })
       .eq("id", supabaseUserId)
 
@@ -84,7 +83,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       .update({
         stripe_customer_id: customerId,
         plan: "pro",
-        subscription_status: "active",
       })
       .eq("id", profile.id)
 
