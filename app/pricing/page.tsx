@@ -6,7 +6,7 @@ import { Check, Sparkles, Crown, Zap, Shield, Clock } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Pricing | NamoLux Pro",
-  description: "Upgrade to NamoLux Pro for unlimited domain generation, Founder Signal™ scoring, and more. £9.99/month, cancel anytime.",
+  description: "Upgrade to NamoLux Pro for unlimited domain generation, Founder Signal™ scoring, and more. One-time payment of £15.",
 }
 
 export default function PricingPage() {
@@ -20,7 +20,7 @@ export default function PricingPage() {
     { text: "Bulk domain checking", icon: Check },
     { text: "Export to CSV", icon: Check },
     { text: "Priority support", icon: Check },
-    { text: "Cancel anytime", icon: Clock },
+    { text: "Lifetime access — pay once", icon: Clock },
   ]
 
   const freeFeatures = [
@@ -43,7 +43,7 @@ export default function PricingPage() {
               Simple, transparent pricing
             </h1>
             <p className="text-lg text-[#888] max-w-2xl mx-auto">
-              One plan, everything included. No hidden fees, no surprises. Cancel anytime.
+              One plan, everything included. Pay once, use forever. No subscriptions.
             </p>
           </div>
 
@@ -90,8 +90,8 @@ export default function PricingPage() {
               <p className="text-[#888] mb-6">Unlimited access to everything</p>
               
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-[#D4A843]">£9.99</span>
-                <span className="text-[#888]">/month</span>
+                <span className="text-4xl font-bold text-[#D4A843]">£15</span>
+                <span className="text-[#888]">one-time</span>
               </div>
 
               <Link
@@ -120,10 +120,10 @@ export default function PricingPage() {
             </h2>
             <div className="space-y-4">
               {[
-                { q: "Can I cancel anytime?", a: "Yes! Cancel with one click from your dashboard. No cancellation fees." },
+                { q: "Is this really a one-time payment?", a: "Yes! Pay £15 once and you have Pro access forever. No recurring charges, no surprises." },
                 { q: "What payment methods do you accept?", a: "We accept all major credit cards, debit cards, and Apple Pay via Stripe." },
-                { q: "Is there a free trial?", a: "Yes! All users get 1 free generation per day to try NamoLux before subscribing." },
-                { q: "What happens if I cancel?", a: "You'll keep Pro access until the end of your billing period. After that, you'll revert to the free plan." },
+                { q: "Is there a free trial?", a: "Yes! All users get 2 free uses per day per feature to try NamoLux before upgrading." },
+                { q: "Do I get future updates?", a: "Yes — your £15 covers all future features and improvements. Pay once, benefit forever." },
               ].map(({ q, a }) => (
                 <div key={q} className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-5">
                   <h3 className="text-white font-medium mb-2">{q}</h3>

@@ -1,8 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest } from "next/server"
-import Stripe from "stripe"
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export type FeatureType = "domain" | "bulk" | "seo"
 
@@ -38,116 +35,20 @@ export function getClientIP(request: NextRequest): string {
 }
 
 /**
- * Check if a user has an active Stripe subscription
- * Uses multiple strategies: user ID metadata, customer metadata, and email matching
+ * Check if a user has Pro access by querying Supabase profile directly.
  */
-async function checkStripeSubscription(userId: string, email: string): Promise<{ isPro: boolean; status: string | null }> {
+async function checkProAccess(userId: string): Promise<boolean> {
   try {
-    const userEmail = email.toLowerCase().trim()
-
-    // Strategy 1: Search subscriptions by supabase_user_id in metadata
-    const activeSubscriptions = await stripe.subscriptions.list({
-      status: "active",
-      limit: 100,
-    })
-
-    const matchingActiveSub = activeSubscriptions.data.find(sub =>
-      sub.metadata?.supabase_user_id === userId
-    )
-
-    if (matchingActiveSub) {
-      return { isPro: true, status: "active" }
-    }
-
-    // Check trialing subscriptions
-    const trialingSubscriptions = await stripe.subscriptions.list({
-      status: "trialing",
-      limit: 100,
-    })
-
-    const matchingTrialingSub = trialingSubscriptions.data.find(sub =>
-      sub.metadata?.supabase_user_id === userId
-    )
-
-    if (matchingTrialingSub) {
-      return { isPro: true, status: "trialing" }
-    }
-
-    // Strategy 2: Search customers by supabase_user_id in metadata
-    const allCustomers = await stripe.customers.list({
-      limit: 100,
-    })
-
-    const customerByUserId = allCustomers.data.find(c =>
-      c.metadata?.supabase_user_id === userId
-    )
-
-    if (customerByUserId) {
-      const customerSubs = await stripe.subscriptions.list({
-        customer: customerByUserId.id,
-        status: "active",
-        limit: 1,
-      })
-
-      if (customerSubs.data.length > 0) {
-        return { isPro: true, status: "active" }
-      }
-
-      const customerTrialSubs = await stripe.subscriptions.list({
-        customer: customerByUserId.id,
-        status: "trialing",
-        limit: 1,
-      })
-
-      if (customerTrialSubs.data.length > 0) {
-        return { isPro: true, status: "trialing" }
-      }
-    }
-
-    // Strategy 3: Fall back to email matching
-    if (userEmail) {
-      let customers = await stripe.customers.list({
-        email: email,
-        limit: 10,
-      })
-
-      // Case-insensitive search
-      if (customers.data.length === 0) {
-        const matchingCustomers = allCustomers.data.filter(c =>
-          c.email && c.email.toLowerCase().trim() === userEmail
-        )
-        if (matchingCustomers.length > 0) {
-          customers = { ...customers, data: matchingCustomers }
-        }
-      }
-
-      for (const customer of customers.data) {
-        const subs = await stripe.subscriptions.list({
-          customer: customer.id,
-          status: "active",
-          limit: 1,
-        })
-
-        if (subs.data.length > 0) {
-          return { isPro: true, status: "active" }
-        }
-
-        const trialSubs = await stripe.subscriptions.list({
-          customer: customer.id,
-          status: "trialing",
-          limit: 1,
-        })
-
-        if (trialSubs.data.length > 0) {
-          return { isPro: true, status: "trialing" }
-        }
-      }
-    }
-
-    return { isPro: false, status: null }
+    const supabase = await createClient()
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", userId)
+      .single()
+    return profile?.plan === "pro"
   } catch (error) {
-    console.error("Error checking Stripe subscription:", error)
-    return { isPro: false, status: null }
+    console.error("Error checking pro access:", error)
+    return false
   }
 }
 
@@ -179,13 +80,9 @@ export async function checkRateLimit(
   const { data: { user } } = await supabase.auth.getUser()
 
   let isPro = false
-  let subscriptionStatus: string | null = null
 
   if (user) {
-    // Check Stripe directly for active subscription using user ID and email
-    const stripeStatus = await checkStripeSubscription(user.id, user.email || "")
-    isPro = stripeStatus.isPro
-    subscriptionStatus = stripeStatus.status
+    isPro = await checkProAccess(user.id)
   }
 
   // Pro users with active subscription get unlimited access
@@ -197,7 +94,7 @@ export async function checkRateLimit(
       remaining: -1, // Unlimited
       resetAt: null,
       plan: "pro",
-      subscriptionStatus: subscriptionStatus as any,
+      subscriptionStatus: "active",
       featureType,
     }
   }

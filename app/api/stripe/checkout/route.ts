@@ -21,64 +21,64 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(signInUrl)
     }
 
-    // Check if user is already a customer with an active subscription
-    // Search Stripe directly instead of querying local DB
-    const existingCustomers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    })
+    // Check if user already has Pro access in Supabase
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan, stripe_customer_id")
+      .eq("id", user.id)
+      .single()
 
+    if (profile?.plan === "pro") {
+      return NextResponse.redirect(new URL("/dashboard?already_pro=true", request.url))
+    }
+
+    // Create or reuse Stripe customer
     let customerId: string
 
-    if (existingCustomers.data.length > 0) {
-      customerId = existingCustomers.data[0].id
-
-      // Check if they already have an active subscription
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "active",
+    if (profile?.stripe_customer_id) {
+      customerId = profile.stripe_customer_id
+    } else {
+      const existingCustomers = await stripe.customers.list({
+        email: user.email,
         limit: 1,
       })
 
-      if (subscriptions.data.length > 0) {
-        // Already subscribed - redirect to dashboard
-        return NextResponse.redirect(new URL("/dashboard?already_subscribed=true", request.url))
+      if (existingCustomers.data.length > 0) {
+        customerId = existingCustomers.data[0].id
+      } else {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            supabase_user_id: user.id,
+          },
+        })
+        customerId = customer.id
       }
-    } else {
-      // Create new Stripe customer
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: {
-          supabase_user_id: user.id,
-        },
-      })
-      customerId = customer.id
     }
 
-    // Create checkout session
+    // Create one-time payment checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      mode: "subscription",
+      mode: "payment",
       payment_method_types: ["card"],
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID!, // £9.99/month price ID from Stripe
+          price: process.env.STRIPE_PRICE_ID!, // £15 one-time price ID
           quantity: 1,
         },
       ],
       success_url: `${baseUrl}/dashboard?success=true`,
       cancel_url: `${baseUrl}/pricing?cancelled=true`,
-      subscription_data: {
+      payment_intent_data: {
         metadata: {
           supabase_user_id: user.id,
         },
       },
+      metadata: {
+        supabase_user_id: user.id,
+      },
       allow_promotion_codes: true,
       billing_address_collection: "auto",
-      customer_update: {
-        address: "auto",
-        name: "auto",
-      },
     })
 
     if (!session.url) {

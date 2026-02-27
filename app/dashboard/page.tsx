@@ -11,9 +11,7 @@ import {
   Loader2,
   Crown,
   Zap,
-  Calendar,
   Settings,
-  CreditCard,
   Sparkles,
   ArrowRight
 } from "lucide-react"
@@ -141,20 +139,8 @@ export default function DashboardPage() {
                     <Crown className="h-5 w-5 text-[#D4A843]" />
                     <h3 className="text-lg font-semibold text-white">NamoLux Pro</h3>
                   </div>
-                  <p className="text-[#888] text-sm">
-                    {subscription.subscriptionEnd
-                      ? `Renews on ${new Date(subscription.subscriptionEnd).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`
-                      : "Active subscription"
-                    }
-                  </p>
+                  <p className="text-[#888] text-sm">Lifetime access — one-time payment</p>
                 </div>
-                <Link
-                  href="/api/stripe/portal"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#2a2a2a] text-white font-medium rounded-lg transition"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  Manage Subscription
-                </Link>
               </div>
             </div>
           ) : (
@@ -175,8 +161,8 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
-                <p className="text-[#D4A843] text-lg font-semibold">£9.99/month</p>
-                <p className="text-xs text-[#555]">Cancel anytime</p>
+                <p className="text-[#D4A843] text-lg font-semibold">£15 one-time</p>
+                <p className="text-xs text-[#555]">Pay once, use forever</p>
               </div>
             </div>
           )}

@@ -29,7 +29,7 @@ export function Pricing() {
             Simple pricing
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            One plan, everything included. Cancel anytime.
+            One plan, everything included. Pay once, use forever.
           </p>
         </div>
 
@@ -51,8 +51,8 @@ export function Pricing() {
               </p>
 
               <div className="mt-6 flex items-baseline justify-center gap-2">
-                <span className="text-5xl font-bold text-foreground">£9.99</span>
-                <span className="text-lg text-muted-foreground">/month</span>
+                <span className="text-5xl font-bold text-foreground">£15</span>
+                <span className="text-lg text-muted-foreground">one-time</span>
               </div>
 
               <Button asChild size="lg" className="mt-8 w-full max-w-sm px-8 py-6 text-lg font-semibold">
@@ -63,7 +63,7 @@ export function Pricing() {
               </Button>
 
               <p className="mt-4 text-sm text-muted-foreground">
-                Cancel anytime • No hidden fees
+                One-time payment • Lifetime access
               </p>
             </div>
 
@@ -91,7 +91,7 @@ export function Pricing() {
         >
           <p className="text-sm text-muted-foreground">
             <Zap className="inline h-4 w-4 mr-1 text-primary" />
-            Try 1 free generation per day before subscribing •{" "}
+            Try 2 free uses per day before upgrading •{" "}
             <Link href="/generate" className="text-primary hover:underline">
               Start free →
             </Link>
