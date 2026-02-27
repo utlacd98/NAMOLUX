@@ -68,7 +68,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-8">
             <Link href="/">
-              <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={220} height={56} className="h-14 w-auto" priority />
+              <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={320} height={80} className="w-64 h-auto" priority />
             </Link>
           </div>
           <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-8 text-center">
@@ -96,7 +96,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={220} height={56} className="h-14 w-auto" priority />
+            <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={320} height={80} className="w-64 h-auto" priority />
           </Link>
         </div>
 
