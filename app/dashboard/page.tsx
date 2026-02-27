@@ -196,14 +196,13 @@ function DashboardContent() {
                     Get unlimited domain generation, Founder Signal™ scoring, and more.
                   </p>
                 </div>
-                <Link
+                <a
                   href="/api/stripe/checkout"
-                  prefetch={false}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-medium rounded-lg transition"
                 >
                   Upgrade to Pro
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
               </div>
               <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
                 <p className="text-[#D4A843] text-lg font-semibold">£15 one-time</p>

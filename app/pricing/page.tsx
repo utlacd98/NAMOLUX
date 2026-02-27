@@ -94,13 +94,13 @@ export default function PricingPage() {
                 <span className="text-[#888]">one-time</span>
               </div>
 
-              <Link
+              <a
                 href="/api/stripe/checkout"
                 className="block w-full py-3 px-6 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold rounded-lg text-center transition mb-8 flex items-center justify-center gap-2"
               >
                 <Sparkles className="h-4 w-4" />
                 Upgrade to Pro
-              </Link>
+              </a>
 
               <ul className="space-y-3">
                 {proFeatures.map(({ text, icon: Icon }) => (
