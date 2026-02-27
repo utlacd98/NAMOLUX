@@ -46,7 +46,7 @@ function SignInForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 pb-24">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8">
