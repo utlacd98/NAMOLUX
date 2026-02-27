@@ -54,42 +54,12 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   if (supabaseUserId) {
     const { error } = await supabase
       .from("profiles")
-      .update({
-        stripe_customer_id: customerId,
-        plan: "pro",
-      })
-      .eq("id", supabaseUserId)
+      .upsert({ id: supabaseUserId, plan: "pro" }, { onConflict: "id" })
 
     if (error) {
       console.error("Error updating profile by user ID:", error)
     } else {
       console.log(`Pro access granted for user ${supabaseUserId}`)
-    }
-  } else {
-    // Fallback: find user by email
-    const { data: profile, error: findError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", customerEmail)
-      .single()
-
-    if (findError || !profile) {
-      console.error("No profile found for email:", customerEmail)
-      return
-    }
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        stripe_customer_id: customerId,
-        plan: "pro",
-      })
-      .eq("id", profile.id)
-
-    if (error) {
-      console.error("Error updating profile by email:", error)
-    } else {
-      console.log(`Pro access granted for ${customerEmail}`)
     }
   }
 }

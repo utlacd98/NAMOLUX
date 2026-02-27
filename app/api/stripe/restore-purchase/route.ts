@@ -4,14 +4,12 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-async function grantPro(userId: string, customerId: string | null) {
+async function grantPro(userId: string, _customerId: string | null) {
   const serviceClient = createServiceClient()
-  const payload: Record<string, string> = { id: userId, plan: "pro" }
-  if (customerId) payload.stripe_customer_id = customerId
 
   const { error } = await serviceClient
     .from("profiles")
-    .upsert(payload, { onConflict: "id" })
+    .upsert({ id: userId, plan: "pro" }, { onConflict: "id" })
 
   if (error) {
     console.error("Upsert error:", error)
