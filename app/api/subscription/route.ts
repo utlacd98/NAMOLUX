@@ -22,8 +22,7 @@ export async function GET() {
       .single()
 
     return NextResponse.json({
-      isPro: true, // TEMP: locked to pro while RLS issue is resolved
-      // isPro: profile?.plan === "pro",
+      isPro: profile?.plan === "pro",
       subscriptionEnd: null,
       customerId: profile?.stripe_customer_id || null,
     })
