@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { RestorePurchase } from "@/components/restore-purchase"
 import { Check, Sparkles, Crown, Zap, Shield, Clock } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -140,6 +141,9 @@ export default function PricingPage() {
               Secure payments powered by Stripe
             </p>
           </div>
+
+          {/* Restore purchase */}
+          <RestorePurchase />
         </div>
       </main>
       <Footer />
