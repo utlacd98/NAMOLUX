@@ -198,6 +198,7 @@ function DashboardContent() {
                 </div>
                 <Link
                   href="/api/stripe/checkout"
+                  prefetch={false}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-medium rounded-lg transition"
                 >
                   Upgrade to Pro

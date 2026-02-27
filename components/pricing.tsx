@@ -56,7 +56,7 @@ export function Pricing() {
               </div>
 
               <Button asChild size="lg" className="mt-8 w-full max-w-sm px-8 py-6 text-lg font-semibold">
-                <Link href="/api/stripe/checkout">
+                <Link href="/api/stripe/checkout" prefetch={false}>
                   <Sparkles className="mr-2 h-5 w-5" />
                   Get Started
                 </Link>
