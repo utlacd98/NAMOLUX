@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
-import { Check, X, Search, TrendingUp, Star, ArrowRight, Zap, Users } from "lucide-react"
+import { Check, X, Search, TrendingUp, Star, ArrowRight, Zap, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const domainResults = [
@@ -11,6 +11,22 @@ const domainResults = [
   { name: "darkforge.com", available: false, score: 52, label: "Risky" },
   { name: "eclipsebrand.co", available: true, score: 71, label: "Viable" },
   { name: "obsidianlab.com", available: true, score: 78, label: "Strong" },
+]
+
+const searchPhrases = [
+  "luxury web agency",
+  "fintech startup",
+  "fitness app",
+  "AI SaaS tool",
+  "creative studio",
+]
+
+const avatarSeeds = [
+  { initials: "AK", bg: "#1a1a1a" },
+  { initials: "MJ", bg: "#1e1a14" },
+  { initials: "SR", bg: "#141a1a" },
+  { initials: "TW", bg: "#1a141e" },
+  { initials: "OP", bg: "#1a1e14" },
 ]
 
 function getSignalColor(label: string): string {
@@ -27,56 +43,80 @@ function getSignalColor(label: string): string {
   }
 }
 
-// Hook for counting animation
 function useCountUp(target: number, duration: number = 1000, delay: number = 0, start: boolean = true) {
   const [count, setCount] = useState(0)
   const frameRef = useRef<number>()
 
   useEffect(() => {
     if (!start) return
-
     const startTime = performance.now() + delay
-
     const animate = (currentTime: number) => {
       if (currentTime < startTime) {
         frameRef.current = requestAnimationFrame(animate)
         return
       }
-
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
-      // Ease out: fast start, slow finish
       const easeOut = 1 - Math.pow(1 - progress, 3)
-      const currentCount = Math.round(easeOut * target)
-
-      setCount(currentCount)
-
-      if (progress < 1) {
-        frameRef.current = requestAnimationFrame(animate)
-      }
+      setCount(Math.round(easeOut * target))
+      if (progress < 1) frameRef.current = requestAnimationFrame(animate)
     }
-
     frameRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current)
-      }
-    }
+    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current) }
   }, [target, duration, delay, start])
 
   return count
 }
 
-// Component for animated score
 function AnimatedScore({ score, label, delay }: { score: number; label: string; delay: number }) {
   const count = useCountUp(score, 1000, delay, true)
-
   return (
     <span className={`flex items-center gap-1 text-xs font-bold tabular-nums ${getSignalColor(label)}`}>
       <TrendingUp className="h-3 w-3" />
       {count}
     </span>
+  )
+}
+
+function TypewriterSearch() {
+  const [displayText, setDisplayText] = useState("")
+  const [phraseIndex, setPhraseIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const phrase = searchPhrases[phraseIndex]
+    const typingSpeed = isDeleting ? 40 : 80
+    const pauseAtEnd = 2000
+    const pauseAtStart = 400
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting && displayText === phrase) {
+        setTimeout(() => setIsDeleting(true), pauseAtEnd)
+        return
+      }
+      if (isDeleting && displayText === "") {
+        setIsDeleting(false)
+        setPhraseIndex((i) => (i + 1) % searchPhrases.length)
+        setTimeout(() => {}, pauseAtStart)
+        return
+      }
+      setDisplayText(isDeleting
+        ? phrase.slice(0, displayText.length - 1)
+        : phrase.slice(0, displayText.length + 1)
+      )
+    }, typingSpeed)
+
+    return () => clearTimeout(timeout)
+  }, [displayText, isDeleting, phraseIndex])
+
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-background/40 px-4 py-2.5">
+      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <span className="text-sm text-foreground/80 min-w-0">
+        {displayText}
+        <span className="animate-cursor-blink ml-0.5 inline-block w-px h-3.5 bg-[#D4A843] align-middle" />
+      </span>
+    </div>
   )
 }
 
@@ -86,15 +126,30 @@ export function Hero() {
       className="relative min-h-[100svh] overflow-clip pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
       aria-labelledby="hero-heading"
     >
+      {/* Base gradient background */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background:
-            "linear-gradient(to bottom, hsl(0 0% 4%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 6%) 100%)",
+          background: "linear-gradient(to bottom, hsl(0 0% 4%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 6%) 100%)",
         }}
         aria-hidden="true"
       />
+
+      {/* Dot grid pattern */}
+      <div
+        className="pointer-events-none absolute inset-0 hidden sm:block"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(212,168,67,0.07) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 70%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 70%, transparent 100%)",
+        }}
+        aria-hidden="true"
+      />
+
       <div className="pointer-events-none absolute inset-0 bg-black/30 sm:bg-transparent" aria-hidden="true" />
+
+      {/* Aura glows */}
       <div className="pointer-events-none absolute inset-0 hidden overflow-clip sm:block" aria-hidden="true">
         <div className="animate-luxury-aura absolute left-[15%] top-[20%] h-[50vh] w-[50vh] max-h-[500px] max-w-[500px] rounded-full bg-gradient-to-br from-primary/20 via-secondary/10 to-transparent blur-[150px]" />
         <div
@@ -106,41 +161,55 @@ export function Hero() {
       {/* Subtle gold radial glow behind headline */}
       <div
         className="pointer-events-none absolute left-[10%] top-[25%] hidden h-[600px] w-[600px] rounded-full lg:block"
-        style={{
-          background: "radial-gradient(circle, rgba(212, 168, 67, 0.03) 0%, transparent 70%)",
-        }}
+        style={{ background: "radial-gradient(circle, rgba(212, 168, 67, 0.03) 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
       <div className="relative mx-auto max-w-[1280px] px-6 md:px-12 lg:px-20">
         <div className="grid min-h-[calc(100vh-10rem)] items-center gap-8 sm:gap-12 lg:grid-cols-[55%_45%] lg:gap-16">
+
           {/* Left Column */}
           <div className="flex flex-col items-start text-left">
-            <h1 className="sr-only">NamoLux</h1>
 
-            {/* Headline - animated */}
-            <h2
+            {/* Announcement pill */}
+            <div className="animate-hero-fade-up hero-delay-0 mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4A843]/25 bg-[#D4A843]/8 px-4 py-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-[#D4A843]" aria-hidden="true" />
+              <span className="text-xs font-medium text-[#D4A843] tracking-wide">
+                AI-powered · Real-time availability · Founder Signal™
+              </span>
+            </div>
+
+            {/* Headline — h1 for SEO */}
+            <h1
               id="hero-heading"
-              className="animate-hero-fade-up hero-delay-0 font-bold tracking-tight text-foreground text-[1.9rem] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
+              className="animate-hero-fade-up hero-delay-1 font-bold tracking-tight text-foreground text-[1.9rem] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
             >
               <span className="block">
                 Find an{" "}
-                <span className="text-[#D4A843]">
+                <span
+                  className="text-[#D4A843] animate-shimmer-once"
+                  style={{
+                    backgroundImage: "linear-gradient(90deg, #D4A843 0%, #f0ca6e 40%, #D4A843 60%, #b8902a 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundSize: "200% 100%",
+                  }}
+                >
                   available domain
                 </span>
               </span>
               <span className="mt-1 block sm:mt-2">worth building a company on.</span>
-            </h2>
+            </h1>
 
-            {/* Subtext - animated */}
-            <p className="animate-hero-fade-up hero-delay-1 mt-6 max-w-xl text-lg leading-relaxed text-[#a0a0a0] md:text-xl">
+            {/* Subtext */}
+            <p className="animate-hero-fade-up hero-delay-2 mt-6 max-w-xl text-lg leading-relaxed text-[#a0a0a0] md:text-xl">
               Generate brandable domain names with AI, check availability in real time, and score every name with{" "}
               <span className="font-semibold text-white">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex w-full flex-col sm:w-auto">
-              {/* Primary CTA - animated */}
               <Button
                 asChild
                 size="lg"
@@ -154,16 +223,15 @@ export function Hero() {
                 </Link>
               </Button>
 
-              {/* Secondary CTA - animated */}
               <Link
                 href="#pricing"
                 className="animate-hero-fade-up hero-delay-3 mt-3 text-center text-sm font-medium text-[#a0a0a0] underline-offset-4 transition-colors hover:text-white hover:underline sm:text-left"
               >
-                See what Pro includes
+                See what Pro includes →
               </Link>
             </div>
 
-            {/* Social Proof Strip - animated */}
+            {/* Social Proof — avatar stack + stats */}
             <div className="animate-hero-fade-up hero-delay-4 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
@@ -171,8 +239,20 @@ export function Hero() {
                   <span className="font-semibold text-white">10,000+</span> names generated
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
+              <div className="flex items-center gap-2.5">
+                {/* Stacked avatar circles */}
+                <div className="flex -space-x-2">
+                  {avatarSeeds.map((a) => (
+                    <div
+                      key={a.initials}
+                      className="h-6 w-6 rounded-full border border-[#D4A843]/30 flex items-center justify-center text-[8px] font-bold text-[#D4A843]"
+                      style={{ background: a.bg }}
+                      aria-hidden="true"
+                    >
+                      {a.initials}
+                    </div>
+                  ))}
+                </div>
                 <span className="text-sm text-[#666666]">
                   Trusted by <span className="font-semibold text-white">founders & agencies</span>
                 </span>
@@ -187,7 +267,6 @@ export function Hero() {
               aria-hidden="true"
             />
 
-            {/* Card with entrance animation */}
             <div
               className="animate-hero-fade-up hero-delay-card group relative overflow-hidden rounded-2xl border border-border/30 bg-card/80 shadow-2xl shadow-black/40 backdrop-blur-lg transition-transform duration-500 hover:scale-[1.01]"
               style={{ animationDuration: "0.6s" }}
@@ -212,28 +291,23 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Search Input */}
+              {/* Typewriter Search Input */}
               <div className="relative border-b border-border/20 px-6 py-4">
-                <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-background/40 px-4 py-2.5">
-                  <Search className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground/80">luxury web agency</span>
-                </div>
+                <TypewriterSearch />
               </div>
 
-              {/* Domain Results - Staggered animations */}
+              {/* Domain Results */}
               <div className="relative space-y-1.5 p-4">
                 {domainResults.map((result, index) => {
-                  const rowDelay = 600 + (index * 150) // 0.6s base + 0.15s per row
-                  const scoreDelay = rowDelay + 300 // Score starts counting after row appears
-                  const badgeDelay = scoreDelay + 1000 // Badge pops after score finishes
+                  const rowDelay = 600 + (index * 150)
+                  const scoreDelay = rowDelay + 300
+                  const badgeDelay = scoreDelay + 1000
 
                   return (
                     <div
                       key={result.name}
                       className={`animate-hero-fade-up flex items-center justify-between gap-3 rounded-xl px-4 py-3 ${
-                        result.available
-                          ? "bg-muted/20"
-                          : "bg-muted/10 opacity-50"
+                        result.available ? "bg-muted/20" : "bg-muted/10 opacity-50"
                       }`}
                       style={{ animationDelay: `${rowDelay}ms` }}
                     >
@@ -247,20 +321,14 @@ export function Hero() {
                       </div>
                       <span
                         className={`animate-badge-pop flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          result.available
-                            ? "bg-emerald-500/15 text-emerald-400"
-                            : "bg-red-500/10 text-red-400/80"
+                          result.available ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/10 text-red-400/80"
                         }`}
                         style={{ animationDelay: `${badgeDelay}ms` }}
                       >
                         {result.available ? (
-                          <>
-                            <Check className="h-3 w-3" /> Available
-                          </>
+                          <><Check className="h-3 w-3" /> Available</>
                         ) : (
-                          <>
-                            <X className="h-3 w-3" /> Taken
-                          </>
+                          <><X className="h-3 w-3" /> Taken</>
                         )}
                       </span>
                     </div>
@@ -287,6 +355,7 @@ export function Hero() {
           </div>
         </div>
 
+        {/* Mobile card */}
         <div className="relative mt-10 lg:hidden">
           <div className="absolute -top-5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
           <div className="overflow-hidden rounded-xl border border-border/20 bg-card/60 shadow-lg backdrop-blur-sm">

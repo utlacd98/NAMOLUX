@@ -12,16 +12,16 @@ import { Footer } from "@/components/footer"
 const siteUrl = "https://www.namolux.com"
 
 export const metadata: Metadata = {
-  title: "NamoLux - Domain Name Finder & SEO Audit",
+  title: "NamoLux — AI Domain Name Generator | Find Brandable Available Domains",
   description:
-    "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+    "Generate AI-powered brandable domain names, check live availability across .com .io .ai .co, and score every option with Founder Signal™. Find a domain worth building on.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "NamoLux - Domain Name Finder & SEO Audit",
+    title: "NamoLux — AI Domain Name Generator | Find Brandable Available Domains",
     description:
-      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+      "Generate AI-powered brandable domain names, check live availability across .com .io .ai .co, and score every option with Founder Signal™. Find a domain worth building on.",
     url: siteUrl,
     siteName: "NamoLux",
     type: "website",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux - Domain Name Finder & SEO Audit",
+    title: "NamoLux — AI Domain Name Generator | Find Brandable Available Domains",
     description:
-      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+      "Generate AI-powered brandable domain names, check live availability across .com .io .ai .co, and score every option with Founder Signal™. Find a domain worth building on.",
     images: ["/og-image.png"],
   },
 }
