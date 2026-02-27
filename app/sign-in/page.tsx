@@ -54,9 +54,9 @@ function SignInForm() {
             <Image
               src="/namoluxloginpagelogo.svg"
               alt="NamoLux"
-              width={56}
+              width={220}
               height={56}
-              className="h-12 w-12 sm:h-14 sm:w-14"
+              className="h-14 w-auto"
               priority
             />
           </Link>

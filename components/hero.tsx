@@ -171,14 +171,6 @@ export function Hero() {
           {/* Left Column */}
           <div className="flex flex-col items-start text-left">
 
-            {/* Announcement pill */}
-            <div className="animate-hero-fade-up hero-delay-0 mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4A843]/25 bg-[#D4A843]/8 px-4 py-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-[#D4A843]" aria-hidden="true" />
-              <span className="text-xs font-medium text-[#D4A843] tracking-wide">
-                AI-powered · Real-time availability · Founder Signal™
-              </span>
-            </div>
-
             {/* Headline — h1 for SEO */}
             <h1
               id="hero-heading"
