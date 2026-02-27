@@ -17,14 +17,14 @@ export async function GET() {
     const serviceClient = createServiceClient()
     const { data: profile } = await serviceClient
       .from("profiles")
-      .select("plan, stripe_customer_id")
+      .select("plan")
       .eq("id", user.id)
       .single()
 
     return NextResponse.json({
       isPro: profile?.plan === "pro",
       subscriptionEnd: null,
-      customerId: profile?.stripe_customer_id || null,
+      customerId: null,
     })
   } catch (error: any) {
     console.error("Error checking subscription:", error)
