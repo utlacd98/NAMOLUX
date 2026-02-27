@@ -52,11 +52,11 @@ function SignInForm() {
         <div className="flex justify-center mb-8">
           <Link href="/">
             <Image
-              src="/logo.svg"
+              src="/namoluxloginpagelogo.svg"
               alt="NamoLux"
-              width={140}
-              height={36}
-              className="h-9 w-auto"
+              width={56}
+              height={56}
+              className="h-12 w-12 sm:h-14 sm:w-14"
               priority
             />
           </Link>
