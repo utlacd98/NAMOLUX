@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextRequest } from "next/server"
 
 export type FeatureType = "domain" | "bulk" | "seo"
@@ -39,8 +39,8 @@ export function getClientIP(request: NextRequest): string {
  */
 async function checkProAccess(userId: string): Promise<boolean> {
   try {
-    const supabase = await createClient()
-    const { data: profile } = await supabase
+    const serviceClient = createServiceClient()
+    const { data: profile } = await serviceClient
       .from("profiles")
       .select("plan")
       .eq("id", userId)

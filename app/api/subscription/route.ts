@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createServiceClient } from "@/lib/supabase/server"
 
 export async function GET() {
   try {
@@ -13,7 +13,9 @@ export async function GET() {
       )
     }
 
-    const { data: profile } = await supabase
+    // Use service client to bypass RLS when reading profile
+    const serviceClient = createServiceClient()
+    const { data: profile } = await serviceClient
       .from("profiles")
       .select("plan, stripe_customer_id")
       .eq("id", user.id)
