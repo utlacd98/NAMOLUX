@@ -2554,6 +2554,670 @@ export const blogPosts: BlogPost[] = [
     ]
   },
 
+  // ── DOMAIN STRATEGY ─────────────────────────────────────────────────────────
+
+  {
+    slug: "how-to-choose-a-domain-name",
+    title: "How to Choose a Domain Name for Your Business in 2026",
+    description: "A practical, no-fluff guide to picking the perfect domain name for your startup or business — covering length, TLDs, branding, and availability.",
+    seoTitle: "How to Choose a Domain Name for a Business in 2026 | NamoLux",
+    metaDescription: "Learn how to choose the perfect domain name for your business in 2026. Covers length, TLD choice, brandability, trademark checks, and common mistakes to avoid.",
+    category: "Domain Strategy",
+    readTime: 10,
+    publishedAt: "2026-03-01",
+    author: "NamoLux Team",
+    featured: false,
+    content: [
+      { type: "paragraph", content: "Your domain name will be on every business card, email signature, ad campaign, and product invoice you ever send. Get it wrong and you're doing invisible damage to your brand every single day. Get it right and it becomes one of your most valuable assets. Here's a complete, honest guide to choosing a domain name that works." },
+      { type: "callout", calloutType: "cta", content: "Skip the guesswork — generate brandable domain names with instant availability checks.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
+      { type: "heading", level: 2, content: "Why Your Domain Name Matters More Than You Think" },
+      { type: "paragraph", content: "Most founders treat the domain as an afterthought — something you pick once you've decided on a business name. That's backwards. Your domain affects your SEO, your brand perception, your email deliverability, and how easily customers find and remember you. It's not just a URL. It's the foundation of your online identity." },
+      { type: "heading", level: 2, content: "The 6 Rules of a Great Domain Name" },
+      { type: "heading", level: 3, content: "1. Keep It Short" },
+      { type: "paragraph", content: "Aim for 6 to 14 characters. The shorter, the better. Short domains are easier to type, easier to remember, and look cleaner on marketing materials. Anything over 20 characters is almost always a mistake. The world's biggest brands — Google, Apple, Stripe, Slack — all have short names." },
+      { type: "heading", level: 3, content: "2. Make It Easy to Spell" },
+      { type: "paragraph", content: "Apply the radio test: if someone heard your domain name on the radio without seeing it written down, could they spell it correctly? If your name relies on unusual spelling, double letters, or silent letters, you're losing traffic every day to typos. Words like 'Fiverr', 'Tumblr', and 'Flickr' are famous examples — but they built massive marketing budgets to correct for that confusion." },
+      { type: "heading", level: 3, content: "3. Avoid Hyphens and Numbers" },
+      { type: "paragraph", content: "Hyphens are a red flag — they make domains look spammy and are almost impossible to communicate verbally. Numbers create the same problem: does 'for' mean the number 4 or the word four? Both hurt clarity and trust." },
+      { type: "heading", level: 3, content: "4. Choose the Right TLD" },
+      { type: "paragraph", content: "If you can get a .com, get it. .com still carries the most authority and trust, especially with older demographics. If .com isn't available, .io is widely accepted in tech, .co has mainstream recognition, and .ai is gaining credibility for AI-focused products. Avoid obscure TLDs like .biz, .info, or country-codes unless your business is geographically focused." },
+      { type: "heading", level: 3, content: "5. Make It Brandable, Not Generic" },
+      { type: "paragraph", content: "Generic domains like 'bestdomains.com' or 'cheapaccounting.com' might seem good for SEO, but they're forgettable and impossible to build a brand around. The best domain names are invented words or unexpected combinations that feel natural once you hear them a few times — think Canva, Notion, Figma, Loom." },
+      { type: "heading", level: 3, content: "6. Check It Across Everything" },
+      { type: "list", content: "", items: ["Is the exact-match .com available?", "Are matching social media handles free on X, Instagram, LinkedIn?", "Does it conflict with any registered trademarks?", "Is there anything negative that shows up when you Google it?", "Has the domain been penalised or used for spam in the past?"] },
+      { type: "callout", calloutType: "tip", content: "NamoLux checks domain availability, social handle availability, and Founder Signal™ score all in one search — saving you hours of manual checking." },
+      { type: "heading", level: 2, content: "Common Mistakes Founders Make When Choosing a Domain" },
+      { type: "list", content: "", items: [
+        "Buying a domain before validating the business idea",
+        "Choosing a name that limits future growth (e.g., 'cheappizzauk.com' then expanding internationally)",
+        "Ignoring domain history — old domains can carry Google penalties",
+        "Using the same name as a well-known brand with slight variation (trademark risk)",
+        "Settling for a bad domain just because it was cheap or available",
+        "Picking something clever that's impossible to spell without seeing it written"
+      ] },
+      { type: "heading", level: 2, content: "The Best Process for Picking Your Domain" },
+      { type: "paragraph", content: "Start with your brand concept — what feeling do you want to evoke? What does your product do at its core? Generate 20-30 name ideas using an AI domain generator, then filter down based on the six rules above. Run a trademark search on your shortlist. Check social handles. Then buy the winner — and ideally the .com, .co, and .io versions for brand protection." },
+      { type: "callout", calloutType: "cta", content: "Generate dozens of brandable, available domain ideas in seconds with NamoLux.", ctaLink: "/generate", ctaText: "Find Your Domain Now →" },
+      { type: "heading", level: 2, content: "What to Do If Your First Choice Isn't Available" },
+      { type: "paragraph", content: "Don't panic. First, try variations: add a prefix like 'get', 'try', 'use', or 'go' to your name (e.g., getnotion.com, tryloom.com). Or use a different TLD if the .com alternative is credible for your industry. You can also try dropping vowels (carefully), combining two short words, or exploring related concept words using a thesaurus." },
+      { type: "quote", content: "The perfect domain name doesn't exist. The right domain name does — it's the one that's memorable, available, and you can build a brand around." },
+      { type: "heading", level: 2, content: "How NamoLux Helps You Choose" },
+      { type: "paragraph", content: "NamoLux's AI generates domain name ideas based on your niche, brand vibe, and industry — then instantly checks availability across .com, .io, .ai, and .co. Every result comes with a Founder Signal™ score from 0-100 rating brandability, risk, and scalability. It's the fastest way to go from concept to confident domain choice." },
+      { type: "callout", calloutType: "cta", content: "Try it free — no account needed to start generating names.", ctaLink: "/generate", ctaText: "Generate Domain Ideas →" }
+    ],
+    faqs: [
+      { question: "How long should a domain name be?", answer: "Ideally between 6 and 14 characters. Shorter is almost always better — it's easier to type, spell, and remember. Avoid anything over 20 characters." },
+      { question: "Should I buy a .com or is .io fine?", answer: ".com is still the gold standard and should be your first choice. .io is widely accepted in tech and SaaS. .co is gaining recognition. .ai is good for AI-focused products. Avoid .biz, .info, and most obscure TLDs." },
+      { question: "Can I use hyphens in a domain name?", answer: "You can, but you shouldn't. Hyphens make domains harder to communicate verbally, look spammy, and create confusion. There are very few cases where a hyphen adds value." },
+      { question: "How do I check if a domain name is trademarked?", answer: "Search the USPTO database (for US trademarks) or your national IP office. Also do a Google search for the name plus 'trademark'. NamoLux flags potential conflicts as part of the Founder Signal™ score." },
+      { question: "What if the domain I want is taken but not in use?", answer: "You have options: try a variation (add 'get', 'try', 'use' as prefix), use a different TLD, or contact the owner to buy it. Domain brokers can negotiate on your behalf for high-value acquisitions." }
+    ]
+  },
+
+  {
+    slug: "best-domain-extensions-2026",
+    title: "Best Domain Extensions in 2026: .com vs .io vs .ai vs .co Compared",
+    description: "Which TLD is right for your business? We compare .com, .io, .ai, .co, and other popular domain extensions so you can make the right call.",
+    seoTitle: "Best Domain Extensions in 2026: .com vs .io vs .ai vs .co | NamoLux",
+    metaDescription: "Compare the best domain extensions in 2026 — .com, .io, .ai, .co, and more. Find out which TLD is right for your startup, SaaS, or online business.",
+    category: "Domain Strategy",
+    readTime: 9,
+    publishedAt: "2026-03-02",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "When the domain you want isn't available as a .com, the question becomes: which alternative TLD (top-level domain) is the best choice? In 2026, the landscape has shifted. Some extensions that were once seen as second-best are now legitimate — while others remain risky. Here's the honest breakdown." },
+      { type: "heading", level: 2, content: "Why TLD Choice Still Matters" },
+      { type: "paragraph", content: "Your TLD signals credibility, industry, and geographic focus. It affects click-through rates in search results, whether users trust your email, and how easy your domain is to remember. Choosing the wrong TLD can make your brand look cheap or niche even when it isn't." },
+      { type: "callout", calloutType: "cta", content: "Check availability across .com, .io, .ai, and .co for your domain idea instantly.", ctaLink: "/generate", ctaText: "Search Domains with NamoLux →" },
+      { type: "heading", level: 2, content: ".com — Still the Default Standard" },
+      { type: "paragraph", content: ".com is the most recognised, most trusted, and most typed TLD in the world. When someone hears a domain name, they instinctively type .com first. If you can get a strong .com, do it. It still commands the most authority for SEO, email deliverability, and brand trust across every demographic." },
+      { type: "list", content: "", items: [
+        "Best for: every type of business, especially consumer-facing",
+        "Trust level: highest — universally recognised",
+        "SEO impact: neutral advantage from familiarity",
+        "Availability: increasingly scarce for good names"
+      ] },
+      { type: "heading", level: 2, content: ".io — The Tech & Startup Standard" },
+      { type: "paragraph", content: ".io is the most widely accepted alternative to .com in the tech world. Originally the ccTLD for the British Indian Ocean Territory, it's been adopted so thoroughly by the startup and developer community that most tech users don't think twice about it. Major tools like Linear, Notion (originally notion.so), and countless SaaS products use .io." },
+      { type: "list", content: "", items: [
+        "Best for: SaaS, developer tools, B2B tech products",
+        "Trust level: high within tech circles, medium with general public",
+        "SEO impact: treated the same as .com by Google",
+        "Availability: better than .com but good names going fast"
+      ] },
+      { type: "callout", calloutType: "tip", content: "If your target audience is developers or tech-savvy users, .io is a completely legitimate choice and often has better name availability than .com." },
+      { type: "heading", level: 2, content: ".ai — The Domain of the Moment" },
+      { type: "paragraph", content: ".ai (originally Anguilla's ccTLD) has become the default for AI-focused products and companies. OpenAI, Anthropic's Claude, and hundreds of AI startups use .ai domains. If you're building in the AI space, .ai signals that immediately — and commands premium attention. Be aware it commands premium pricing to register and renew." },
+      { type: "list", content: "", items: [
+        "Best for: AI products, machine learning tools, automation companies",
+        "Trust level: high and rising — widely associated with AI credibility",
+        "SEO impact: treated neutrally by Google (ccTLD exception)",
+        "Cost: higher than average — often £50-£80/year to renew"
+      ] },
+      { type: "heading", level: 2, content: ".co — The Clean Alternative" },
+      { type: "paragraph", content: ".co was aggressively marketed as a premium alternative to .com and gained real traction. Companies like AngelList (angel.co) and Stripe's CLI (stripe.com/docs but co.stripe.com) have used it. It reads as naturally short and modern. The risk is occasional confusion with .com, particularly with older users who may auto-complete to .com." },
+      { type: "list", content: "", items: [
+        "Best for: startups, global brands, clean modern feel",
+        "Trust level: medium-high, growing recognition",
+        "SEO impact: treated as generic TLD (same as .com) by Google",
+        "Risk: users may accidentally type .com"
+      ] },
+      { type: "heading", level: 2, content: ".app and .dev — Modern Niche Options" },
+      { type: "paragraph", content: ".app and .dev are Google-operated TLDs with enforced HTTPS. They're gaining traction in specific communities — .app for mobile products, .dev for developer tools. They're clean, modern, and communicate product type instantly. Not mainstream yet, but respected within their communities." },
+      { type: "heading", level: 2, content: "TLDs to Avoid" },
+      { type: "list", content: "", items: [
+        ".biz — strongly associated with spam and low-quality sites",
+        ".info — overused by content farms, low trust signal",
+        ".net — once relevant, now confusing and dated",
+        ".online, .site, .website — look temporary and uncommitted",
+        "Obscure ccTLDs used out of context (e.g., .tk, .ml, .ga) — free and associated with malicious sites"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Avoid free domain extensions (.tk, .ml, .ga, .cf). They are heavily used for phishing and spam, and email providers often block or flag them. Even if your intentions are good, your reputation will suffer." },
+      { type: "heading", level: 2, content: "The Smart TLD Strategy" },
+      { type: "paragraph", content: "Register your primary domain in your chosen TLD. Then buy the .com version too if possible — even if you don't use it as your main domain, redirect it to your site to capture traffic from users who instinctively type .com. Brand protection is worth the £10/year registration fee." },
+      { type: "table", headers: ["TLD", "Best For", "Trust Level", "SEO Treatment"], rows: [
+        [".com", "Any business", "Highest", "Standard"],
+        [".io", "SaaS, dev tools", "High (tech)", "Same as .com"],
+        [".ai", "AI products", "High (growing)", "Same as .com"],
+        [".co", "Global startups", "Medium-high", "Same as .com"],
+        [".app", "Mobile apps", "Medium", "Same as .com"],
+        [".dev", "Developer tools", "Medium", "Same as .com"],
+        [".biz / .info", "Avoid", "Low", "Neutral but distrusted"]
+      ] },
+      { type: "callout", calloutType: "cta", content: "Find a name that's available as a .com, .io, or .ai — NamoLux checks all TLDs in one search.", ctaLink: "/generate", ctaText: "Check Domain Availability →" }
+    ],
+    faqs: [
+      { question: "Does my TLD affect my Google ranking?", answer: "Google officially treats most TLDs equally in terms of ranking. The main SEO factors are content quality, backlinks, and user experience — not whether you use .com or .io. The exception is ccTLDs like .uk or .de, which Google may associate with specific countries." },
+      { question: "Is .io still a good choice in 2026?", answer: "Yes, absolutely. .io is widely accepted in the tech and startup community and has no trust deficit among tech-savvy users. If your target audience is developers, product managers, or startup founders, .io is a solid choice." },
+      { question: "Should I buy multiple TLDs?", answer: "For brand protection, it's wise to buy your top 2-3 TLD variations and redirect them all to your primary domain. At minimum, own both .com and your primary TLD." },
+      { question: "Why is .ai so expensive?", answer: ".ai is the ccTLD for Anguilla and the government controls pricing. Demand has increased dramatically with the AI boom, pushing prices up. Typical renewal costs are £50-£80/year, compared to £10-£15 for .com." }
+    ]
+  },
+
+  {
+    slug: "how-to-come-up-with-a-business-name",
+    title: "How to Come Up with a Business Name: 10 Frameworks That Actually Work",
+    description: "Stuck on naming your business? These 10 proven naming frameworks used by top brands will help you find a name that's memorable, available, and built to last.",
+    seoTitle: "How to Come Up with a Business Name: 10 Proven Frameworks | NamoLux",
+    metaDescription: "Struggling to name your business? Discover 10 proven naming frameworks used by top brands — from invented words to compound names — with examples and availability tips.",
+    category: "Domain Strategy",
+    readTime: 11,
+    publishedAt: "2026-03-03",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Coming up with a business name is one of the most creatively paralysing tasks a founder faces. It needs to be memorable, available, trademarkable, and work in a domain. It has to represent your brand today and scale with you tomorrow. And everyone has an opinion on it. Here are 10 frameworks that top brands have used — and that you can apply today." },
+      { type: "callout", calloutType: "cta", content: "Generate hundreds of business name ideas using AI — filtered by your niche, brand vibe, and domain availability.", ctaLink: "/generate", ctaText: "Generate Business Names →" },
+      { type: "heading", level: 2, content: "Framework 1: The Invented Word" },
+      { type: "paragraph", content: "Make up a word that doesn't exist but sounds natural and evokes the right feeling. This approach gives you the cleanest trademark and domain situation — and produces the most memorable names. Examples: Google (googol + whimsy), Kodak (strong 'k' sounds), Slack (chosen for feeling), Xerox (invented to be unique)." },
+      { type: "callout", calloutType: "tip", content: "Invented words work best when they're pronounceable on first sight and sound positive or energetic. Avoid anything that sounds harsh, clinical, or confusing." },
+      { type: "heading", level: 2, content: "Framework 2: The Compound Word" },
+      { type: "paragraph", content: "Combine two real words into one to create something new. The combination creates unexpected meaning and is usually still intuitive. Examples: Facebook (face + book), Snapchat (snap + chat), Mailchimp (mail + chimp), Salesforce (sales + force), Dropbox (drop + box)." },
+      { type: "heading", level: 2, content: "Framework 3: The Metaphor" },
+      { type: "paragraph", content: "Choose a word that represents a concept or feeling associated with what you do, rather than describing it literally. This creates emotional resonance. Examples: Amazon (vast, powerful), Apple (simple, human), Stripe (clean, linear payment flow), Loom (weaving information together), Notion (ideas taking shape)." },
+      { type: "heading", level: 2, content: "Framework 4: The Founder's Name" },
+      { type: "paragraph", content: "Using your own name or surname creates authenticity and accountability. It's a classic approach for professional services and luxury brands. Examples: Ford, Tesla, Dell, Dyson, Johnson & Johnson. Risk: it can limit exit value (brands tied to individuals are harder to sell) and feel less scalable for B2B SaaS." },
+      { type: "heading", level: 2, content: "Framework 5: The Descriptive Name" },
+      { type: "paragraph", content: "Describe exactly what you do. Risky in a crowded market (hard to trademark, poor differentiation), but powerful when executed well in a new category where clarity matters most. Examples: General Motors, YouTube, WhatsApp, SoundCloud. Warning: descriptive names are the hardest to protect legally." },
+      { type: "callout", calloutType: "warning", content: "Purely descriptive names (e.g., 'BestDomainFinder.com') are almost impossible to trademark and create serious brand differentiation problems. Use this framework carefully." },
+      { type: "heading", level: 2, content: "Framework 6: The Acronym" },
+      { type: "paragraph", content: "Take the initials of a longer name. Best used when the full name is already well-established and the acronym has become the shorthand. Examples: IBM (International Business Machines), BMW, HSBC, HBO. Warning: acronyms are notoriously hard to build brand recognition around from scratch." },
+      { type: "heading", level: 2, content: "Framework 7: The Misspelled Word" },
+      { type: "paragraph", content: "Take a common word and change the spelling slightly to create uniqueness and improve domain availability. Examples: Fiverr (fiver), Tumblr (tumble), Flickr (flicker), Reddit (read it). This worked in the 2000s when these brands built massive budgets to correct the confusion — harder to pull off today." },
+      { type: "heading", level: 2, content: "Framework 8: The Foreign Word" },
+      { type: "paragraph", content: "Use a word from another language that means something relevant but sounds fresh in English. Allows you to convey meaning without using overused English words. Examples: Audi (Latin: 'listen'), Volvo (Latin: 'I roll'), Ikea (Swedish founder's initials + birthplace), Lego (Danish: 'play well')." },
+      { type: "heading", level: 2, content: "Framework 9: The Geographic Reference" },
+      { type: "paragraph", content: "Reference a place that carries the right connotations — authenticity, origin, or aspiration. Works well for premium, heritage, or locally-rooted brands. Examples: Patagonia, Adobe (river), Amazon (river), Sonos (sound + Latin suffix). Can feel limiting if you go global, so use cautiously." },
+      { type: "heading", level: 2, content: "Framework 10: The Truncated Word" },
+      { type: "paragraph", content: "Shorten a longer word or phrase to its most memorable core. Creates names that feel both familiar and novel. Examples: Pinterest (pin + interest), Instagram (instant + telegram), Canva (canvas), Figma (figure), Asana (yoga pose, shortened and focused)." },
+      { type: "heading", level: 2, content: "How to Shortlist Your Name" },
+      { type: "paragraph", content: "Once you have 20+ candidates using these frameworks, filter with these questions:" },
+      { type: "list", content: "", items: [
+        "Can you spell it after hearing it once? (Radio test)",
+        "Is the domain available as .com, .io, or .ai?",
+        "Are there any conflicting trademarks?",
+        "Does it still work in 5 years when you expand?",
+        "Do the social handles match or are close enough?",
+        "Does it pass the 'embarrassment test' — would you be proud to say it in a meeting?"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Let AI generate names across all 10 frameworks based on your niche — then check domain and social availability instantly.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" },
+      { type: "heading", level: 2, content: "The Founder Signal™ Score" },
+      { type: "paragraph", content: "NamoLux's Founder Signal™ scores every generated name from 0-100 based on brandability, domain strength, risk factors, and scalability. It's the fastest way to separate the names worth pursuing from those that look good on paper but have hidden problems." }
+    ],
+    faqs: [
+      { question: "How many business name ideas should I generate before deciding?", answer: "Aim for at least 50-100 candidates before shortlisting. The first ideas that come to mind are usually the most obvious — and therefore the most taken. AI tools like NamoLux can generate hundreds in seconds." },
+      { question: "Should my business name describe what I do?", answer: "Not necessarily. The most successful brands are often metaphorical or invented (Apple, Slack, Stripe) rather than descriptive. Descriptive names are hard to trademark and limit your ability to pivot or expand." },
+      { question: "How important is the domain when choosing a business name?", answer: "Very important. A great name with a bad domain creates real problems — from email confusion to lost traffic. Always check domain availability as part of the naming process, not as an afterthought." },
+      { question: "Can I use a business name that's similar to a competitor?", answer: "This is legally risky. Even if the names aren't identical, if they're in the same industry and cause confusion, you could face a trademark dispute. Always do a thorough trademark search before committing." }
+    ]
+  },
+
+  // ── SEO FOUNDATIONS ─────────────────────────────────────────────────────────
+
+  {
+    slug: "how-to-rank-on-google-first-page",
+    title: "How to Rank on Google's First Page in 2026: The Complete Guide",
+    description: "Learn the exact strategies that get pages onto Google's first page in 2026 — from keyword research and on-page SEO to backlinks and technical foundations.",
+    seoTitle: "How to Rank on Google First Page in 2026: Complete Guide | NamoLux",
+    metaDescription: "The complete guide to ranking on Google's first page in 2026. Covers keyword research, on-page SEO, technical foundations, backlinks, and content strategy for new sites.",
+    category: "SEO Foundations",
+    readTime: 13,
+    publishedAt: "2026-03-04",
+    author: "NamoLux Team",
+    featured: false,
+    content: [
+      { type: "paragraph", content: "Getting onto Google's first page is the goal of almost every website owner — and it's more achievable than most people think, provided you understand how it actually works in 2026. Google's algorithm has evolved dramatically, but the core principles remain: create genuinely useful content for real people, build authority, and make sure your site is technically sound. Here's exactly how to do it." },
+      { type: "heading", level: 2, content: "Why First Page Matters (And Why Page 2 Doesn't)" },
+      { type: "paragraph", content: "Over 90% of search clicks go to results on the first page. The top three results alone capture over 50% of all clicks. Being on page two is effectively invisible. This isn't to intimidate — it's to illustrate why every effort you make toward ranking should be focused on that first page, not just 'being somewhere in Google'." },
+      { type: "heading", level: 2, content: "Step 1: Find Keywords You Can Actually Win" },
+      { type: "paragraph", content: "The biggest mistake new sites make is targeting keywords with massive search volume that established sites have been optimising for years. Instead, start with what SEOs call 'low-hanging fruit' — keywords with real search intent, moderate traffic, and manageable competition." },
+      { type: "list", content: "", items: [
+        "Use tools like Ahrefs, Semrush, or free alternatives like Ubersuggest",
+        "Target long-tail keywords (3-5 words) before broad terms",
+        "Look for keywords where the top results are weak — thin content, low domain authority",
+        "Prioritise informational and commercial investigation intent for content",
+        "Check 'People Also Ask' and 'Related Searches' for content gaps"
+      ] },
+      { type: "callout", calloutType: "tip", content: "New sites should target keywords with under 1,000 monthly searches first. Win those, build authority, then go after higher-volume terms. Trying to rank for 'domain name generator' before you rank for 'AI domain name generator for SaaS' is a recipe for wasted effort." },
+      { type: "heading", level: 2, content: "Step 2: Understand Search Intent" },
+      { type: "paragraph", content: "Google's primary goal is to match search results to user intent. Every keyword has an intent: informational (how does X work?), navigational (find a specific site), commercial investigation (comparing options), or transactional (ready to buy). Your content must match the intent, not just include the keyword." },
+      { type: "heading", level: 2, content: "Step 3: Create Content That Deserves to Rank" },
+      { type: "paragraph", content: "Google has repeatedly said it rewards content that demonstrates Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T). That means content written by people who know what they're talking about, based on real experience, with proper sourcing and clear takeaways." },
+      { type: "list", content: "", items: [
+        "Cover the topic more completely than the current top results",
+        "Include original insights, data, or examples — not just rephrased information",
+        "Structure with clear headings (H2, H3) that answer sub-questions",
+        "Add tables, lists, and visuals where they aid comprehension",
+        "Write for the reader first, keyword optimisation second"
+      ] },
+      { type: "heading", level: 2, content: "Step 4: On-Page SEO Fundamentals" },
+      { type: "paragraph", content: "Once you have great content, make sure Google can understand what it's about:" },
+      { type: "list", content: "", items: [
+        "Include your target keyword in the title tag and H1",
+        "Write a compelling meta description (155 chars) that earns clicks",
+        "Use the keyword naturally in the first 100 words",
+        "Optimise image alt text with descriptive, relevant text",
+        "Add internal links to related content on your site",
+        "Use schema markup (Article, FAQ, HowTo) for rich results"
+      ] },
+      { type: "heading", level: 2, content: "Step 5: Build Your Technical Foundation" },
+      { type: "paragraph", content: "Technical issues can prevent Google from properly crawling, indexing, and ranking your content — even if it's excellent. The Core Web Vitals — Largest Contentful Paint (LCP), Interaction to Next Paint (INP), and Cumulative Layout Shift (CLS) — are now ranking factors." },
+      { type: "list", content: "", items: [
+        "Ensure your site loads in under 2 seconds on mobile",
+        "Submit your sitemap to Google Search Console",
+        "Fix crawl errors and broken links",
+        "Ensure all important pages are indexed",
+        "Use HTTPS (essential — HTTP sites are marked as insecure)",
+        "Implement proper canonical tags to avoid duplicate content"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Check your site's technical SEO health with a free audit — find what's blocking your rankings.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
+      { type: "heading", level: 2, content: "Step 6: Earn Backlinks That Matter" },
+      { type: "paragraph", content: "Backlinks remain one of Google's most powerful ranking signals. A link from a trusted, relevant site tells Google that your content is worth citing. The key word is 'earn' — buying links or participating in link schemes can get your site penalised." },
+      { type: "list", content: "", items: [
+        "Create link-worthy assets: data studies, original research, comprehensive guides",
+        "Reach out to journalists and bloggers who cover your topic (HARO, ResponseSource)",
+        "Guest post on industry publications with genuine value content",
+        "List your business in relevant, authoritative directories",
+        "Earn mentions by being genuinely notable in your space"
+      ] },
+      { type: "heading", level: 2, content: "Step 7: Be Patient and Consistent" },
+      { type: "paragraph", content: "New sites typically take 3-6 months before Google starts to trust them enough to rank consistently. This is often called the 'Google Sandbox' effect. It's not a bug — it's Google being cautious about new sites. The solution is consistent, high-quality output during this period. Sites that publish regularly and earn organic links during the sandbox phase break out much faster." },
+      { type: "heading", level: 2, content: "What Not to Do" },
+      { type: "list", content: "", items: [
+        "Keyword stuffing — repeating keywords unnaturally kills readability and triggers penalties",
+        "Buying low-quality backlinks — one manual penalty can wipe out years of work",
+        "Publishing thin content and hoping for the best",
+        "Ignoring mobile — over 60% of searches happen on mobile devices",
+        "Targeting keywords that are too competitive too early",
+        "Changing your strategy every month — SEO requires patience"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Start with a domain and brand that give your SEO the best possible foundation.", ctaLink: "/generate", ctaText: "Find a Brandable Domain →" }
+    ],
+    faqs: [
+      { question: "How long does it take to rank on Google's first page?", answer: "For new sites, expect 3-12 months for meaningful rankings on competitive keywords. Low-competition, long-tail keywords can rank in weeks. Established sites with authority can rank new content in days. Consistency matters more than speed." },
+      { question: "How many backlinks do I need to rank on page one?", answer: "It varies enormously by keyword competition. For low-competition terms, you might rank with zero backlinks if your content is excellent. For competitive terms, you might need hundreds of high-quality links. Focus on earning relevant, authoritative links rather than hitting a number." },
+      { question: "Does social media help with Google rankings?", answer: "Social media doesn't directly improve rankings, but it increases visibility, drives traffic, and can lead to natural backlinks — all of which do help. Think of social as an amplification tool for your content, not a direct ranking signal." },
+      { question: "Is SEO still worth it in 2026 with AI search?", answer: "Absolutely. Even with AI Overviews in Google Search, the cited sources are getting massive traffic. Being one of the authoritative sources that AI cites is the new SEO goal. High-quality, trustworthy content matters more than ever." }
+    ]
+  },
+
+  {
+    slug: "on-page-seo-complete-guide",
+    title: "On-Page SEO: The Complete Optimisation Guide for 2026",
+    description: "Everything you need to know about on-page SEO — from title tags and meta descriptions to internal linking, schema markup, and content structure.",
+    seoTitle: "On-Page SEO Guide 2026: Complete Optimisation Checklist | NamoLux",
+    metaDescription: "Master on-page SEO in 2026 with this complete guide. Covers title tags, meta descriptions, H1/H2 structure, internal links, schema markup, and content optimisation best practices.",
+    category: "SEO Foundations",
+    readTime: 11,
+    publishedAt: "2026-03-05",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "On-page SEO is everything you can control directly on your website to help it rank better in search engines. Unlike backlinks (which depend on others) or domain authority (which takes time), on-page SEO is entirely in your hands — and the improvements can show results within days of being crawled. Here's the complete guide for 2026." },
+      { type: "callout", calloutType: "cta", content: "See how your pages score on key SEO factors with a free site audit.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
+      { type: "heading", level: 2, content: "1. Title Tags — Your Most Important On-Page Element" },
+      { type: "paragraph", content: "The title tag is the blue clickable link in search results. It's the single most important on-page SEO element you control. Every page needs a unique, compelling title tag that includes your primary keyword near the beginning." },
+      { type: "list", content: "", items: [
+        "Keep it under 60 characters to avoid truncation in search results",
+        "Include your primary keyword as close to the start as possible",
+        "Make it compelling enough to earn the click — it's ad copy, not just a label",
+        "Each page must have a unique title tag — duplicates confuse Google",
+        "Don't keyword stuff — one or two natural inclusions is enough"
+      ] },
+      { type: "callout", calloutType: "tip", content: "Good title tag formula: [Primary Keyword]: [Benefit or Context] | [Brand Name]. Example: 'AI Domain Name Generator: Find Brandable Names Instantly | NamoLux'" },
+      { type: "heading", level: 2, content: "2. Meta Descriptions — Earn the Click" },
+      { type: "paragraph", content: "Meta descriptions don't directly affect rankings, but they massively affect click-through rate (CTR) — which does. A compelling meta description tells the searcher exactly what they'll get and why they should choose your result over the others." },
+      { type: "list", content: "", items: [
+        "Keep to 150-160 characters (anything longer gets cut)",
+        "Include your primary keyword (Google bolds it in results)",
+        "Write it as an ad — include a benefit and a mild call to action",
+        "Make it unique for every important page",
+        "Don't repeat the title — add new information"
+      ] },
+      { type: "heading", level: 2, content: "3. H1, H2, and H3 Heading Structure" },
+      { type: "paragraph", content: "Headings create structure for both users and search engines. Google uses heading hierarchy to understand what a page is about and which parts of your content address which sub-topics." },
+      { type: "list", content: "", items: [
+        "Every page should have exactly one H1 — your main page title, including the primary keyword",
+        "Use H2s for major sections and include secondary keywords naturally",
+        "H3s are for subsections within an H2 section",
+        "Don't skip heading levels (H1 → H3 with no H2 in between)",
+        "Write headings for humans, not just for SEO — they guide the reading experience"
+      ] },
+      { type: "heading", level: 2, content: "4. Keyword Optimisation — Natural, Not Robotic" },
+      { type: "paragraph", content: "Include your primary keyword in: the title tag, the H1, the first paragraph, and naturally throughout the content. Also include related terms and synonyms — Google understands semantic relevance and rewards comprehensive topic coverage." },
+      { type: "callout", calloutType: "warning", content: "Keyword density as a metric is outdated. Don't aim for a specific percentage. Write naturally, cover the topic fully, and your keyword will appear at the right frequency automatically." },
+      { type: "heading", level: 2, content: "5. URL Structure" },
+      { type: "paragraph", content: "Clean, readable URLs help both users and search engines understand page hierarchy. Keep them short, include the primary keyword, and use hyphens to separate words. Avoid parameter-heavy URLs, uppercase letters, and unnecessary words." },
+      { type: "list", content: "", items: [
+        "Good: yoursite.com/blog/on-page-seo-guide",
+        "Bad: yoursite.com/blog?id=1234&category=seo&post=on-page-seo",
+        "Keep URLs static — changing them requires 301 redirects",
+        "Lowercase only — uppercase letters can create duplicate content issues"
+      ] },
+      { type: "heading", level: 2, content: "6. Internal Linking" },
+      { type: "paragraph", content: "Internal links connect your pages, distribute PageRank across your site, and help Google discover all your content. They also keep users on your site longer by guiding them to relevant next steps." },
+      { type: "list", content: "", items: [
+        "Link from high-authority pages (popular posts) to pages you want to rank",
+        "Use descriptive anchor text — not 'click here' but the actual topic",
+        "Link to related content naturally within the body text",
+        "Ensure your most important pages have the most internal links pointing at them",
+        "Fix broken internal links — they waste crawl budget and frustrate users"
+      ] },
+      { type: "heading", level: 2, content: "7. Image Optimisation" },
+      { type: "list", content: "", items: [
+        "Use descriptive file names: 'on-page-seo-checklist.jpg' not 'IMG_1234.jpg'",
+        "Always write alt text — describe the image accurately, include keywords where natural",
+        "Compress images before uploading — large images slow down page load",
+        "Use next-gen formats (WebP, AVIF) where your CMS supports them",
+        "Add width and height attributes to prevent layout shift (CLS)"
+      ] },
+      { type: "heading", level: 2, content: "8. Content Length and Depth" },
+      { type: "paragraph", content: "Longer content doesn't automatically rank better — but comprehensive content does. The goal is to be the most thorough, authoritative, and useful resource for your target keyword. Check what the current top-ranking pages cover, and make sure you cover it all — plus something they don't." },
+      { type: "heading", level: 2, content: "9. Schema Markup" },
+      { type: "paragraph", content: "Schema markup (structured data) tells Google exactly what your content is — an article, a product, a recipe, an FAQ. It enables rich results in search: star ratings, FAQs, How-to steps, and event dates that make your result stand out and earn more clicks." },
+      { type: "list", content: "", items: [
+        "Article schema for blog posts",
+        "FAQ schema for pages with frequently asked questions",
+        "Product schema for e-commerce listings",
+        "LocalBusiness schema for local businesses",
+        "Use Google's Rich Results Test to validate your markup"
+      ] },
+      { type: "heading", level: 2, content: "10. Page Speed and Core Web Vitals" },
+      { type: "paragraph", content: "Core Web Vitals are official Google ranking factors. Pages that load fast, respond quickly to interaction, and don't shift layout as they load provide a better user experience — and Google rewards that." },
+      { type: "table", headers: ["Metric", "What It Measures", "Good Score"], rows: [
+        ["LCP (Largest Contentful Paint)", "How fast main content loads", "Under 2.5 seconds"],
+        ["INP (Interaction to Next Paint)", "How fast page responds to clicks", "Under 200ms"],
+        ["CLS (Cumulative Layout Shift)", "How much layout shifts during load", "Under 0.1"]
+      ] },
+      { type: "callout", calloutType: "cta", content: "Audit your site's on-page SEO health — see exactly what needs fixing.", ctaLink: "/seo-audit", ctaText: "Get Your Free SEO Audit →" }
+    ],
+    faqs: [
+      { question: "How long should a meta description be?", answer: "Between 150-160 characters. Anything longer gets truncated in search results with an ellipsis, which can cut off your call to action. Keep it concise, include the keyword, and make it compelling." },
+      { question: "How many H1 tags should a page have?", answer: "One. Every page should have exactly one H1 — your main headline that includes your primary keyword. Multiple H1s confuse Google about the main topic of your page." },
+      { question: "Do I need to update old content for SEO?", answer: "Yes. Refreshing outdated content is one of the highest-ROI SEO activities. Update statistics, add new sections, improve structure, and republish with the current date. Google often rewards freshness for informational queries." },
+      { question: "What's more important: content quality or technical SEO?", answer: "Content quality. Technical SEO creates the foundation for your content to be crawled and indexed properly — but no amount of technical perfection will rank thin or irrelevant content. Get the content right first, then make sure the technical foundation supports it." }
+    ]
+  },
+
+  {
+    slug: "how-to-increase-website-traffic",
+    title: "How to Increase Website Traffic in 2026: 15 Strategies That Work",
+    description: "Struggling to get visitors to your website? These 15 proven strategies will drive more of the right traffic — from SEO and content to social and partnerships.",
+    seoTitle: "How to Increase Website Traffic in 2026: 15 Proven Strategies | NamoLux",
+    metaDescription: "Learn 15 proven strategies to increase website traffic in 2026 — covering SEO, content marketing, social media, email, partnerships, and paid acquisition for new and growing sites.",
+    category: "SEO Foundations",
+    readTime: 12,
+    publishedAt: "2026-03-06",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Building a website is just the beginning. Getting people to visit it is an entirely different challenge — one that most new site owners underestimate. The good news: there are clear, proven strategies for increasing website traffic, and they don't all require a big budget. Here are 15 that work in 2026." },
+      { type: "heading", level: 2, content: "Organic Traffic Strategies (Long-Term Foundation)" },
+      { type: "heading", level: 3, content: "1. Target Keywords Your Competition Has Missed" },
+      { type: "paragraph", content: "The fastest path to organic traffic isn't competing head-on with established sites for high-volume terms. It's finding the keywords they're ignoring — longer phrases, question-based queries, and niche topics where you can be the definitive resource. Use keyword research tools to find queries with search volume and low competition." },
+      { type: "heading", level: 3, content: "2. Publish Long-Form, Comprehensive Content" },
+      { type: "paragraph", content: "The average first-page Google result is over 1,400 words. But length alone doesn't rank — comprehensiveness does. Cover your topic more thoroughly than anyone else. Answer follow-up questions before they're asked. Include examples, data, visuals, and FAQs. Give searchers no reason to return to Google for more." },
+      { type: "callout", calloutType: "tip", content: "One comprehensive 3,000-word guide will typically outperform ten 300-word posts on related topics. Depth beats breadth in content strategy." },
+      { type: "heading", level: 3, content: "3. Optimise Existing Content First" },
+      { type: "paragraph", content: "Before creating new content, audit what you already have. Pages ranking on positions 4-15 are the best candidates for quick wins — they're already indexed and trusted, they just need on-page improvements, better internal links, or refreshed information to climb to the top 3." },
+      { type: "callout", calloutType: "cta", content: "See which pages are underperforming and exactly how to improve them.", ctaLink: "/seo-audit", ctaText: "Audit Your Site for Free →" },
+      { type: "heading", level: 3, content: "4. Build Backlinks Through Link-Worthy Content" },
+      { type: "paragraph", content: "The most scalable backlink strategy is creating content that people naturally want to link to: original research, data studies, comprehensive guides, free tools, and unique insights. Pair this with strategic outreach to journalists, bloggers, and resource curators in your niche." },
+      { type: "heading", level: 3, content: "5. Optimise for Featured Snippets" },
+      { type: "paragraph", content: "Featured snippets are the answer boxes that appear at position zero in Google results. They receive a disproportionate share of clicks and build instant authority. To target them: identify questions your audience asks, structure your answer clearly, and use formatting (lists, tables, short paragraphs) that Google can extract easily." },
+      { type: "heading", level: 2, content: "Content and Social Strategies (Medium-Term Growth)" },
+      { type: "heading", level: 3, content: "6. Repurpose Content Across Channels" },
+      { type: "paragraph", content: "Each long-form piece of content should fuel multiple formats. A comprehensive guide becomes a LinkedIn carousel, a Twitter/X thread, a YouTube video, a podcast episode, and a newsletter issue. You do the research once; the content works across every channel." },
+      { type: "heading", level: 3, content: "7. Build an Email Newsletter" },
+      { type: "paragraph", content: "Email is the only channel you own completely — no algorithm changes can take it from you. Build a newsletter from day one, even before you have a large audience. Offer a free resource (template, guide, checklist) in exchange for an email address. A list of 500 engaged subscribers can generate consistent, reliable traffic." },
+      { type: "heading", level: 3, content: "8. Leverage Social Proof Through Community" },
+      { type: "paragraph", content: "Participate genuinely in online communities where your target audience hangs out — Reddit, LinkedIn, Slack groups, Discord servers, Facebook groups. Provide value, answer questions, share insights, and occasionally (without spamming) link to your content when it's genuinely the best answer." },
+      { type: "heading", level: 3, content: "9. Collaborate with Complementary Sites" },
+      { type: "paragraph", content: "Guest posting, podcast appearances, newsletter swaps, and co-created content can all expose your site to established, targeted audiences. Focus on sites serving the same audience as you but in a different category — no direct competition, maximum relevance." },
+      { type: "heading", level: 3, content: "10. Use YouTube and Video SEO" },
+      { type: "paragraph", content: "YouTube is the world's second-largest search engine. Video content ranks in both YouTube search and Google's video carousels. Creating companion videos for your best content, or answering common questions in your niche, can drive substantial traffic to your site through link placement in video descriptions and cards." },
+      { type: "heading", level: 2, content: "Technical and Structural Strategies" },
+      { type: "heading", level: 3, content: "11. Fix Your Technical SEO Issues" },
+      { type: "paragraph", content: "Site speed, crawlability, mobile usability, and correct indexation are foundational. A fast, clean site that Google can crawl easily amplifies every other strategy you implement. Technical issues act as a ceiling on your organic growth potential." },
+      { type: "heading", level: 3, content: "12. Improve Internal Linking" },
+      { type: "paragraph", content: "Internal links distribute authority across your site and help Google discover all your content. Your most-linked internal pages signal to Google that they're your most important. Audit your internal link structure and ensure your key landing pages are getting links from your most-visited content." },
+      { type: "heading", level: 3, content: "13. Optimise for Local Search" },
+      { type: "paragraph", content: "If you have a local business or serve a specific geographic market, local SEO is one of the highest-ROI traffic strategies. Claim and optimise your Google Business Profile, earn local reviews, get listed in local directories, and create location-specific content. Local searches often convert far higher than generic queries." },
+      { type: "heading", level: 2, content: "Paid and Partnership Strategies (Immediate Traffic)" },
+      { type: "heading", level: 3, content: "14. Use Paid Ads Strategically" },
+      { type: "paragraph", content: "Google Ads and Meta Ads can drive immediate, targeted traffic — but only once you know your unit economics. Before scaling paid, understand your customer acquisition cost (CAC) and the lifetime value (LTV) of a customer. Paid traffic that doesn't convert is just money leaving your account." },
+      { type: "heading", level: 3, content: "15. Product Hunt and Launch Platforms" },
+      { type: "paragraph", content: "For product launches, Product Hunt, AppSumo, Hacker News (Show HN), and Reddit r/entrepreneur can drive spikes of highly targeted, influential traffic. These aren't sustainable long-term channels, but a successful launch can provide the initial traction and backlinks that fuel organic growth for months." },
+      { type: "heading", level: 2, content: "Building a Sustainable Traffic System" },
+      { type: "paragraph", content: "The best traffic strategy combines at least three channels: a long-term organic engine (SEO + content), a community or social presence, and an owned channel (email). That combination creates resilience — if one channel dips, the others maintain your baseline. Build all three from the start, even at a small scale." },
+      { type: "callout", calloutType: "cta", content: "A strong domain and brand makes every traffic strategy more effective. Find yours with NamoLux.", ctaLink: "/generate", ctaText: "Find Your Domain Name →" }
+    ],
+    faqs: [
+      { question: "How long before SEO brings consistent traffic?", answer: "Typically 3-6 months for new sites to see meaningful organic traffic from SEO. Low-competition long-tail keywords can rank in weeks; competitive terms take 6-12+ months. The key is consistency — sites that publish and build links regularly see compounding growth." },
+      { question: "What's the fastest way to get website traffic?", answer: "Paid advertising (Google Ads, Meta Ads) is the fastest way to get immediate traffic. Community participation (Reddit, LinkedIn, Twitter) is the fastest free method. SEO is the most sustainable but takes the longest to show results." },
+      { question: "Is social media traffic worth pursuing?", answer: "Yes, but it should be a supplement, not your primary strategy. Social media traffic is volatile — algorithm changes can cut your reach overnight. Use social to amplify content and grow an email list, which you own completely regardless of platform changes." },
+      { question: "How many blog posts do I need to publish per month?", answer: "Quality always beats quantity. One exceptional, comprehensive post per week is better than five thin posts. That said, consistency matters — publishing regularly signals to Google that your site is active and maintained." }
+    ]
+  },
+
+  // ── BUILDER INSIGHTS ─────────────────────────────────────────────────────────
+
+  {
+    slug: "how-to-validate-a-business-idea",
+    title: "How to Validate a Business Idea Before You Build: The No-Fluff Guide",
+    description: "Most founders build before they validate. Learn the fast, practical frameworks used by successful solo founders to test business ideas with real customers — before writing a single line of code.",
+    seoTitle: "How to Validate a Business Idea Before Building: No-Fluff Guide | NamoLux",
+    metaDescription: "Learn how to validate a business idea quickly with real customers before building. Covers problem validation, landing page tests, pre-sales, and the frameworks used by successful solo founders.",
+    category: "Builder Insights",
+    readTime: 11,
+    publishedAt: "2026-03-07",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "The most common reason startups fail isn't bad execution — it's building something nobody wanted. Validation is the process of finding out whether your idea solves a real problem for real people who will pay for the solution, before you invest months of development. It sounds obvious. Most founders still skip it." },
+      { type: "heading", level: 2, content: "Why Validation Saves You Months (or Years)" },
+      { type: "paragraph", content: "Every week you spend building an unvalidated product is a week you might be wasting. The earlier you discover that your assumptions are wrong, the less it costs to pivot or stop. Validation isn't about killing ideas — it's about refining them with evidence rather than hope." },
+      { type: "callout", calloutType: "tip", content: "The goal of validation is not to prove you're right. It's to find out fast whether you're wrong — and what you're wrong about specifically." },
+      { type: "heading", level: 2, content: "Step 1: Clearly Define the Problem You're Solving" },
+      { type: "paragraph", content: "Before validating your solution, validate the problem. Can you articulate who exactly has this problem, how frequently they experience it, and what it costs them (in time, money, or frustration) when they can't solve it? If you can't answer those questions specifically, you're not ready to validate yet." },
+      { type: "list", content: "", items: [
+        "Who specifically has this problem? (Job title, situation, demographic)",
+        "How often do they experience it? (Daily, weekly, monthly?)",
+        "What do they do about it now? (The current solution reveals willingness to pay)",
+        "What does it cost them not to solve it? (Time, money, lost revenue)",
+        "Are they actively looking for a better solution?"
+      ] },
+      { type: "heading", level: 2, content: "Step 2: Talk to Real People — Before You Build Anything" },
+      { type: "paragraph", content: "Customer discovery interviews are the most valuable validation tool available, and they're free. Find 10-15 people who match your target customer profile and have an honest conversation about the problem. Not about your solution — about their experience with the problem." },
+      { type: "list", content: "", items: [
+        "Ask about the last time they experienced the problem",
+        "Ask what they did about it — actual behaviour, not hypothetical",
+        "Ask what they wish existed",
+        "Never pitch your idea — listen and ask follow-up questions",
+        "Treat negative feedback as gold — it's cheaper now than after you've built"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Do not ask 'Would you use this?' or 'Would you pay for this?' People say yes to avoid being rude. Ask about their current behaviour instead — it's much more predictive." },
+      { type: "heading", level: 2, content: "Step 3: Build a Landing Page (Not the Product)" },
+      { type: "paragraph", content: "A landing page with a waitlist signup or pre-sale is often the fastest way to validate demand without building the product. Describe the problem and your solution clearly, show the value proposition, and ask for an email address (or a payment). The number of signups relative to your ad spend or outreach effort tells you a lot about real demand." },
+      { type: "list", content: "", items: [
+        "Use a clear, specific headline that addresses the problem directly",
+        "List three to five concrete benefits (not features)",
+        "Add a single CTA: 'Join the waitlist' or 'Get early access'",
+        "Drive 200-500 targeted visitors to the page",
+        "Measure: signups, email conversion rate, and bounce rate"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Your landing page needs a great domain. Generate brandable, available names for your idea in seconds.", ctaLink: "/generate", ctaText: "Find a Domain for Your Idea →" },
+      { type: "heading", level: 2, content: "Step 4: Pre-Sell Before You Build" },
+      { type: "paragraph", content: "The ultimate validation is someone giving you money for something that doesn't exist yet. Pre-sales turn hypothetical interest into real commitment. If you can sell 10 lifetime deals or early-bird subscriptions before you've written a line of code, you have genuine validation that people value your solution enough to pay for it." },
+      { type: "heading", level: 2, content: "Step 5: Build the Minimum Version and Ship It" },
+      { type: "paragraph", content: "If you've validated the problem, found early believers, and maybe even pre-sold — now you build. But build the minimum version that delivers the core value, not the full vision. Your first version should solve the core problem simply. Everything else is a distraction until you have paying customers." },
+      { type: "heading", level: 2, content: "Common Validation Mistakes" },
+      { type: "list", content: "", items: [
+        "Asking friends and family (they'll support you out of kindness, not genuine interest)",
+        "Pitching instead of listening in customer interviews",
+        "Treating email signups as validation (they're interest — money is validation)",
+        "Building a full MVP when a landing page or spreadsheet would validate the same thing",
+        "Validating with the wrong audience — users who can't or won't pay don't count"
+      ] },
+      { type: "heading", level: 2, content: "Signals That Mean Your Idea is Worth Building" },
+      { type: "list", content: "", items: [
+        "People paid you for the pre-sale without heavy persuasion",
+        "Multiple customer interviews expressed the same problem unprompted",
+        "Your waitlist page converted at over 20% of traffic",
+        "People are using hacked-together workarounds that show genuine effort to solve the problem",
+        "An existing solution with the same core value proposition already exists and is profitable"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Once your idea is validated, your brand starts with the right domain. Find yours before you build.", ctaLink: "/generate", ctaText: "Generate Brand Names →" }
+    ],
+    faqs: [
+      { question: "How long should business idea validation take?", answer: "Effective validation can happen in 2-4 weeks. Spending months 'validating' is often procrastination in disguise. Set a deadline: 15 customer interviews and a landing page in 2 weeks. The data you need to make a decision will be clear by then." },
+      { question: "What counts as true validation?", answer: "Someone paying you money — or at minimum, providing their email address plus a detailed articulation of their problem that matches your hypothesis. A general 'sounds cool' is not validation." },
+      { question: "Do I need a prototype or MVP to validate?", answer: "Usually not. A landing page, a manual demo, or a Figma mockup is often enough to validate the core concept. The more you build before validating, the more expensive a pivot becomes." },
+      { question: "What if my idea has already been validated by an existing competitor?", answer: "That's actually good news — it confirms the market exists. The question then becomes: what's your differentiated angle? What do existing customers complain about with the current solutions? That's your entry point." }
+    ]
+  },
+
+  {
+    slug: "how-to-launch-on-product-hunt",
+    title: "How to Launch on Product Hunt: A Founder's Step-by-Step Playbook",
+    description: "A practical, no-fluff playbook for launching on Product Hunt — from preparation and hunter selection to launch day execution and post-launch momentum.",
+    seoTitle: "How to Launch on Product Hunt Successfully in 2026 | NamoLux",
+    metaDescription: "Learn exactly how to launch on Product Hunt and make the most of it — covering preparation, hunter selection, launch day strategy, and how to convert attention into real customers.",
+    category: "Builder Insights",
+    readTime: 10,
+    publishedAt: "2026-03-08",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Product Hunt can drive thousands of visitors, hundreds of signups, and meaningful press coverage — all in a single day. But only if you launch correctly. A poorly prepared launch wastes your single best shot at a Product Hunt spike. Here's how to do it right." },
+      { type: "heading", level: 2, content: "What Product Hunt Can (and Can't) Do for You" },
+      { type: "paragraph", content: "Product Hunt is best for: getting your first wave of users, gathering early feedback, building credibility ('as seen on Product Hunt'), and earning backlinks from tech publications that cover PH launches. It's not a substitute for long-term marketing. The traffic spike is real but short-lived — the real value is in converting that attention into lasting customers and communities." },
+      { type: "callout", calloutType: "tip", content: "Product Hunt is most valuable for B2B SaaS, developer tools, and productivity products. Consumer apps and physical products see less consistent results." },
+      { type: "heading", level: 2, content: "Phase 1: Preparation (2 Weeks Before Launch)" },
+      { type: "heading", level: 3, content: "Choose Your Launch Day Wisely" },
+      { type: "paragraph", content: "Tuesday, Wednesday, and Thursday are the best days to launch — they have the highest active user numbers. Avoid Mondays (people catching up) and Fridays/weekends (activity drops). New PH days start at 00:01 PST — launching right at midnight maximises the time your product has to accumulate votes." },
+      { type: "heading", level: 3, content: "Prepare All Your Assets" },
+      { type: "list", content: "", items: [
+        "Product tagline: under 60 characters, specific benefit, no fluff",
+        "Product description: 260 characters max, clear value proposition",
+        "Gallery images: 5-8 screenshots showing the product in action",
+        "Product video: 60-90 seconds, demo-focused, no corporate fluff",
+        "First comment: your personal founder story for the discussion section",
+        "Full landing page ready with clear CTA for PH visitors"
+      ] },
+      { type: "heading", level: 3, content: "Build Your Support Network" },
+      { type: "paragraph", content: "Product Hunt's algorithm rewards early momentum. In the first few hours, upvotes and comments from engaged users matter most. Before launch, contact your existing users, newsletter subscribers, LinkedIn connections, and any communities you're part of. Don't ask for blind upvotes — ask people who genuinely might benefit from your product to check it out." },
+      { type: "callout", calloutType: "warning", content: "Don't use upvote-for-upvote groups or incentivised voting services. Product Hunt's algorithm detects inauthentic engagement and can suppress or remove your listing." },
+      { type: "heading", level: 2, content: "Phase 2: Launch Day Execution" },
+      { type: "heading", level: 3, content: "Post at 00:01 PST" },
+      { type: "paragraph", content: "Set an alarm. Launch the moment the new Product Hunt day begins. The earlier you post, the more time you have to accumulate votes. Late-day launches rarely make the top 10 because they're playing catch-up." },
+      { type: "heading", level: 3, content: "Your Maker Comment" },
+      { type: "paragraph", content: "The first comment from the maker (you) sets the tone for discussion. Tell your founder story honestly — why you built this, what problem you personally experienced, what surprised you during development. Be human. Product Hunt users respond to authenticity over marketing." },
+      { type: "heading", level: 3, content: "Respond to Every Comment" },
+      { type: "paragraph", content: "Every comment is an opportunity. Thank people who upvote. Answer every question thoroughly. Engage with critical feedback publicly and gracefully — the way you handle criticism on launch day tells potential customers more about you than your product does." },
+      { type: "heading", level: 3, content: "Activate Your Network in Waves" },
+      { type: "paragraph", content: "Don't send all your support requests at once. Send in waves throughout the day — early morning, lunchtime, and evening in key time zones. Steady, distributed engagement looks more natural to the algorithm than a single spike." },
+      { type: "heading", level: 2, content: "Phase 3: Post-Launch Momentum" },
+      { type: "paragraph", content: "The launch day is just the beginning. Here's how to extend the value:" },
+      { type: "list", content: "", items: [
+        "Email every signup from launch day within 24 hours — personally, not automated",
+        "Write a 'launch reflections' post for your blog or Medium",
+        "Reach out to tech journalists who cover Product Hunt launches",
+        "Join the PH Makers Slack community to connect with other founders",
+        "Add 'Featured on Product Hunt' badge to your site (free credibility)",
+        "Set up email automation to onboard PH signups properly"
+      ] },
+      { type: "heading", level: 2, content: "What to Do If Your Launch Underperforms" },
+      { type: "paragraph", content: "Not every launch wins. If you don't make the top 5, that's okay — you still got real users, real feedback, and a backlink from PH. Analyse what worked and what didn't: was the tagline clear? Did the visuals demonstrate the value? Was the product actually ready? Use the data to improve and consider a relaunch in 6 months." },
+      { type: "callout", calloutType: "cta", content: "Before you launch, make sure your brand and domain are ready for the attention. Generate brandable name ideas with NamoLux.", ctaLink: "/generate", ctaText: "Find Your Brand Name →" }
+    ],
+    faqs: [
+      { question: "Do I need a 'hunter' to launch on Product Hunt?", answer: "No — you can self-post as a maker. However, being 'hunted' by a well-known member of the PH community (with a large following) can give you additional visibility. Reach out to potential hunters 2-3 weeks before your planned launch date." },
+      { question: "How many upvotes do you need to be #1 on Product Hunt?", answer: "It varies significantly day by day. On a slow day, 300-400 upvotes might win. On a competitive day, you might need 800-1,000+. Focus on quality engagement and early momentum rather than chasing a specific number." },
+      { question: "Can I launch on Product Hunt more than once?", answer: "Yes. You can relaunch a product if you have significant new features or a new version. Many successful products have launched multiple times. Wait at least 6 months between launches for maximum impact." },
+      { question: "Should I offer a discount for Product Hunt visitors?", answer: "A PH-exclusive offer (extended trial, special price) can significantly improve conversion from visit to signup. The PH audience is deal-aware and responds well to launch-specific offers." }
+    ]
+  },
+
+  {
+    slug: "how-to-build-a-saas-product",
+    title: "How to Build a SaaS Product in 2026: From Idea to First Paying Customer",
+    description: "The complete beginner's guide to building a SaaS product as a solo founder or small team — covering tech stack, pricing, acquiring first customers, and avoiding the traps that kill most early-stage products.",
+    seoTitle: "How to Build a SaaS Product in 2026: Solo Founder's Guide | NamoLux",
+    metaDescription: "Learn how to build a SaaS product in 2026 from idea to first paying customer. Covers tech stack choices, pricing strategy, customer acquisition, and the mistakes that kill most early-stage SaaS products.",
+    category: "Builder Insights",
+    readTime: 13,
+    publishedAt: "2026-03-09",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "SaaS has never been more accessible. The tools available to solo founders in 2026 mean you can go from idea to live product in weeks, not years. But accessibility doesn't mean easy — most SaaS products still fail, usually for the same predictable reasons. Here's the complete guide to doing it right." },
+      { type: "heading", level: 2, content: "What Makes SaaS Different from Other Businesses" },
+      { type: "paragraph", content: "SaaS (Software as a Service) businesses have some unique advantages: recurring revenue that compounds, low marginal cost per additional customer, and the ability to serve global markets from day one. But they also have unique challenges: users expect continuous improvement, churn is a constant battle, and the upfront development cost can be significant." },
+      { type: "heading", level: 2, content: "Step 1: Pick the Right Problem to Solve" },
+      { type: "paragraph", content: "The best SaaS ideas come from your own experience — problems you've lived with that existing tools don't solve well. The second-best source is industries you understand deeply. Avoid building generic tools trying to compete with established players on their own turf. The narrower and more specific your initial focus, the easier it is to acquire your first customers." },
+      { type: "list", content: "", items: [
+        "Target a specific industry or workflow, not 'everyone'",
+        "Find problems where people currently use spreadsheets, email, or manual processes",
+        "Look for pain that people pay to solve already (existing paid alternatives = existing market)",
+        "Avoid building another project management or CRM tool without a very specific angle"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Start with a strong brand. Generate available, brandable domain names for your SaaS idea.", ctaLink: "/generate", ctaText: "Generate SaaS Names →" },
+      { type: "heading", level: 2, content: "Step 2: Choose Your Tech Stack" },
+      { type: "paragraph", content: "Your tech stack should optimise for speed to market, not perfection. As a solo founder or small team, the best stack is the one you can build and ship fastest. That said, some choices are easier to scale than others." },
+      { type: "list", content: "", items: [
+        "Frontend: Next.js (React) is the dominant choice for SaaS in 2026 — great ecosystem, server-side rendering, and deploys easily on Vercel",
+        "Backend/DB: Supabase (Postgres + auth + storage) is the go-to for small teams — eliminates massive backend complexity",
+        "Payments: Stripe — the industry standard, with excellent documentation and a generous free tier",
+        "Auth: Supabase Auth or Clerk — both handle the complexity of auth so you don't have to",
+        "AI features: OpenAI API or Anthropic Claude API — commodity capability now, differentiator in how you apply it"
+      ] },
+      { type: "heading", level: 2, content: "Step 3: Build Only What You Need to Sell" },
+      { type: "paragraph", content: "The biggest trap for technical founders is building too much before getting a single paying customer. Your first version should do one thing excellently — not twenty things adequately. Ship the core value, and let your first customers tell you what to build next." },
+      { type: "callout", calloutType: "warning", content: "If you've been building for more than 3 months without a paying customer, stop adding features. Start selling what you have, imperfect as it is." },
+      { type: "heading", level: 2, content: "Step 4: Pricing Your SaaS" },
+      { type: "paragraph", content: "Most first-time founders underprice. The logic feels backwards, but charging more can make it easier to acquire customers — higher prices signal quality, attract customers who value the product (and don't churn immediately), and give you margin to actually support them." },
+      { type: "heading", level: 3, content: "Common SaaS Pricing Models" },
+      { type: "table", headers: ["Model", "How It Works", "Best For"], rows: [
+        ["Flat-rate", "One price for all features", "Simple products, early stage"],
+        ["Per-seat", "Price per user/month", "Team collaboration tools"],
+        ["Usage-based", "Pay for what you use", "APIs, infrastructure, data tools"],
+        ["Tiered", "Feature-gated plans (Free/Pro/Business)", "Broad user bases with different needs"],
+        ["One-time", "Pay once, own forever", "Tools, utilities, niche products"]
+      ] },
+      { type: "heading", level: 2, content: "Step 5: Get Your First 10 Paying Customers" },
+      { type: "paragraph", content: "Your first 10 customers will not come from SEO, Product Hunt, or paid ads. They will come from you — directly asking people you know or reaching out manually to people who have the problem you solve. This is not scalable, and that's fine. At this stage, manual effort is how you learn what resonates." },
+      { type: "list", content: "", items: [
+        "Post in communities where your target customer hangs out (Reddit, Slack, Discord)",
+        "Reach out personally on LinkedIn to people with the exact job title you're targeting",
+        "Offer a pilot deal: discounted or free for 30 days in exchange for honest feedback",
+        "Contact people who use competing products and share what you do differently",
+        "Post on Twitter/X about the problem you're solving — not the product — and see who resonates"
+      ] },
+      { type: "heading", level: 2, content: "Step 6: Reduce Churn From Day One" },
+      { type: "paragraph", content: "Churn — customers cancelling — is the silent killer of SaaS businesses. A product with 5% monthly churn loses over 46% of customers every year. The solution is making sure customers actually use the product and see value quickly. This is called time-to-value, and it's the most important metric in your first year." },
+      { type: "list", content: "", items: [
+        "Build an onboarding flow that gets users to the 'aha moment' in under 5 minutes",
+        "Reach out personally to every customer in the first week",
+        "Track product usage — customers who don't use the product will cancel",
+        "Set up check-in emails for inactive users",
+        "Ask every churned customer why they left — it's painful but invaluable"
+      ] },
+      { type: "heading", level: 2, content: "Step 7: Build Your Growth Engine" },
+      { type: "paragraph", content: "Once you have 10-20 paying customers and low churn, it's time to build a repeatable growth channel. The best channels for early-stage SaaS are content marketing (SEO takes 6-12 months but compounds), community presence, and referral/word of mouth." },
+      { type: "heading", level: 2, content: "The Most Common SaaS Mistakes" },
+      { type: "list", content: "", items: [
+        "Building without validating — spending months on a product before talking to customers",
+        "Pricing too low — it attracts the wrong customers and kills your margins",
+        "Competing on features alone — differentiate on positioning and ICP focus",
+        "Ignoring onboarding — most churn happens in the first week",
+        "Trying to serve everyone — the more specific your initial audience, the faster you can dominate it",
+        "Not building in public — transparency builds trust and attracts early adopters"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Ready to start? Every great SaaS starts with a great brand. Find your domain name today.", ctaLink: "/generate", ctaText: "Generate Your SaaS Name →" }
+    ],
+    faqs: [
+      { question: "Do I need to be a developer to build a SaaS product?", answer: "No, but it helps. No-code tools (Bubble, Webflow, Glide) and AI code generation have made it possible for non-developers to build real SaaS products. However, for complex products, some technical capability — or a technical co-founder — will significantly reduce your build time and costs." },
+      { question: "How long does it take to build a SaaS MVP?", answer: "With modern tools and stacks (Next.js, Supabase, Stripe), a focused MVP can be built in 4-8 weeks. The key is ruthlessly scoping to the core value only. Features beyond the core should wait until you have paying customers." },
+      { question: "What's a realistic first-year revenue goal for a solo SaaS founder?", answer: "Every product is different, but a realistic goal for a focused solo founder is £1,000-£5,000 MRR (monthly recurring revenue) by month 12. That requires approximately 50-250 customers at £20/month. Sounds modest — but at £5,000 MRR, you have a real business." },
+      { question: "Should I build a free tier?", answer: "A free tier drives signups but can also attract users who never convert and create support burden. In early stage, it's often better to offer a free trial (14-30 days) rather than a permanent free tier. Free trials convert better and filter for serious users." }
+    ]
+  },
+
 ]
 
 // Utility functions
