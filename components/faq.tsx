@@ -10,7 +10,7 @@ const faqs = [
   {
     question: "What's included in NamoLux Pro?",
     answer:
-      "Pro members get unlimited domain generations, priority support, and full access to all features for just £9.99/month. No limits, no restrictions—generate as many names as you need.",
+      "Pro is a one-time payment of £15 — no subscription, no monthly fees. You get unlimited domain generations, priority support, and full access to all features, forever.",
   },
   {
     question: "How does the AI generate names?",
@@ -33,9 +33,9 @@ const faqs = [
       "We support .com, .io, .co, .ai, and .net domains. We prioritize .com as it's the most valuable for brand recognition, but you can filter results by any supported TLD.",
   },
   {
-    question: "Can I cancel my subscription anytime?",
+    question: "Is this really a one-time payment?",
     answer:
-      "Yes, absolutely. You can cancel your Pro subscription at any time from your dashboard. You'll keep Pro access until the end of your billing period with no hidden fees.",
+      "Yes — £15 once, Pro access forever. There's no subscription, no auto-renewal, and no hidden fees. Once you pay, your account is upgraded permanently.",
   },
   {
     question: "Can I export my shortlist?",
