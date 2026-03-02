@@ -3218,6 +3218,456 @@ export const blogPosts: BlogPost[] = [
     ]
   },
 
+  // ── Domain Strategy ──────────────────────────────────────────────────────────
+
+  {
+    slug: "expired-domains-complete-guide",
+    title: "How to Find Expired Domains: A Complete Guide to Valuable Drops",
+    description: "Expired domains can come with existing backlinks, authority, and brand history — but only if you know how to find and evaluate them properly. Here's the complete guide.",
+    seoTitle: "How to Find Expired Domains: Complete Guide to Domain Drops | NamoLux",
+    metaDescription: "Learn how to find, evaluate, and buy expired domains in 2026. Covers the expiry lifecycle, the best tools for finding drops, how to check for penalties, and when an expired domain is actually worth buying.",
+    category: "Domain Strategy",
+    readTime: 11,
+    publishedAt: "2026-03-10",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Every day, thousands of domain names expire and re-enter the market. Some are worthless — abandoned projects with no history. Others are quietly valuable: they carry years of backlinks, existing search engine authority, or recognisable brand equity that a new registrant can inherit. Knowing how to find, evaluate, and acquire the right expired domains is a skill that can give your brand a significant head start." },
+      { type: "heading", level: 2, content: "What Is an Expired Domain?" },
+      { type: "paragraph", content: "A domain expires when its owner fails to renew it by the renewal deadline. This doesn't make it immediately available — domains go through a structured lifecycle before re-entering the open market. Understanding this process is essential for knowing when and how to acquire them." },
+      { type: "heading", level: 3, content: "The Domain Expiry Lifecycle" },
+      { type: "list", content: "", items: [
+        "Active period: Domain is registered and in use",
+        "Expiry date: Owner fails to renew — domain enters grace period (typically 0-45 days)",
+        "Grace period: Owner can still renew at standard price — domain may still resolve",
+        "Redemption period: Domain is deactivated but can be recovered by original owner for a redemption fee (typically £100-200) — lasts 30 days",
+        "Pending delete: Domain queued for deletion — no recovery possible (5 days)",
+        "Drop: Domain becomes available for general registration"
+      ] },
+      { type: "heading", level: 2, content: "Why Expired Domains Have Value" },
+      { type: "paragraph", content: "The value in an expired domain comes from what it accumulated while it was live. Backlinks from other websites pointing at the domain don't disappear when the domain expires — they're still recorded by Google and other search engines. If the domain had genuine authority, relevant content, and clean link history, a new owner can potentially benefit from that legacy." },
+      { type: "list", content: "", items: [
+        "Existing backlink profile: Hundreds or thousands of referring domains pointing to the URL",
+        "Domain age: Older domains sometimes have an inherent trust signal in search algorithms",
+        "Existing traffic: Some expired domains still receive direct type-in traffic from old bookmarks or links",
+        "Brand recognition: If the domain was a known brand, people may still search for it",
+        "Topical authority: If the domain was in your niche, it may carry relevant subject-matter signals"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Expired domain value is NOT guaranteed. Many expired domains have low-quality or spammy link profiles that can actively harm your new site. Never buy an expired domain without thoroughly auditing its history." },
+      { type: "heading", level: 2, content: "Where to Find Expired Domains" },
+      { type: "paragraph", content: "Several platforms aggregate expiring and recently expired domains, making it much easier to find options without monitoring every registrar manually." },
+      { type: "heading", level: 3, content: "Best Tools for Finding Expired Domains" },
+      { type: "list", content: "", items: [
+        "GoDaddy Auctions (auctions.godaddy.com): The largest marketplace for expiring domain auctions — searchable by keyword, TLD, and estimated value",
+        "Namecheap Marketplace: Auction and buy-now options for expiring domains with basic metrics",
+        "Expireddomains.net: Free database of hundreds of thousands of expiring domains with basic backlink and Majestic data",
+        "SpamZilla: Paid tool that filters expired domains for spam and shows cleaned backlink data — saves significant manual time",
+        "DomCop: Premium tool with comprehensive metrics, filters, and auction tracking across multiple platforms",
+        "FreshDrop: Curated lists of recently dropped domains with SEO metrics"
+      ] },
+      { type: "heading", level: 2, content: "How to Evaluate an Expired Domain" },
+      { type: "paragraph", content: "Finding an expired domain is easy. Finding a good one requires careful due diligence. These are the checks you must run before spending money." },
+      { type: "heading", level: 3, content: "Backlink Quality Audit" },
+      { type: "paragraph", content: "Use Ahrefs, Majestic, or Semrush to analyse the domain's backlink profile. You're looking for: referring domains from genuinely authoritative sites, backlinks that are topically relevant to your intended use, a natural link growth pattern over time, and no sudden spikes that indicate link schemes." },
+      { type: "heading", level: 3, content: "Google Penalty Check" },
+      { type: "paragraph", content: "Search Google for 'site:domain.com' — if the domain has indexed pages but shows zero results, it may have been manually penalised and deindexed. Also search the Wayback Machine (web.archive.org) to see what the original site contained. Domains previously used for spam, adult content, or gambling can carry reputational damage." },
+      { type: "heading", level: 3, content: "Spam Score" },
+      { type: "paragraph", content: "Moz's Spam Score and Majestic's Trust Flow vs Citation Flow ratio both indicate link quality. A domain with high Citation Flow but very low Trust Flow has many links but low-quality ones — a red flag. SpamZilla automates much of this filtering and is worth the subscription if you're buying domains regularly." },
+      { type: "list", content: "", items: [
+        "Check Wayback Machine: what was the previous site's content?",
+        "Run Ahrefs or Majestic: what is the referring domain quality and relevance?",
+        "Check Moz Spam Score: anything above 30% warrants caution",
+        "Search Google: 'site:domain.com' — zero results on a live domain suggests deindexing",
+        "Check DMCA history: dmca.com/r/[domain] — past copyright strikes indicate risk",
+        "Verify the brand: Google the domain name — is there any existing community, news coverage, or recognition?"
+      ] },
+      { type: "heading", level: 2, content: "How to Buy an Expired Domain" },
+      { type: "paragraph", content: "Depending on where the domain is in its lifecycle, your buying method differs." },
+      { type: "list", content: "", items: [
+        "Auction: Domains in active auction on GoDaddy or Namecheap — bid like eBay, highest wins",
+        "Buy now: Some expired domains have fixed prices on marketplaces — immediate purchase",
+        "Backorder: If a domain is in grace/redemption period, a backorder service (SnapNames, Pool, GoDaddy Backorder) will attempt to catch it the moment it drops",
+        "Direct registration: If the domain fully drops and no one has caught it, it becomes available for standard registration at normal prices — first come, first served"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Want a clean start instead? Generate brandable, available domain names for your project — no history to worry about.", ctaLink: "/generate", ctaText: "Generate New Domain Names →" },
+      { type: "heading", level: 2, content: "Should You Use an Expired Domain for Your Brand?" },
+      { type: "paragraph", content: "An expired domain can be used in two ways: as a redirect 301'd to your main site (to pass link equity) or as the primary domain for your new project. The first use is relatively safe if the link profile is clean. The second is riskier — you're inheriting the domain's full history, including any negative signals you may have missed in your audit. For most founders building a new brand, a clean new domain with a strong name will serve you better long-term than the uncertain benefits of an expired domain." },
+    ],
+    faqs: [
+      { question: "What happens to a domain when it expires?", answer: "After expiry, a domain goes through several phases: a grace period (0-45 days, owner can still renew), a redemption period (30 days, owner can recover for a fee), and a pending delete phase (5 days). Then it drops and becomes available for general registration. The exact timeline varies by registrar." },
+      { question: "Are expired domains worth buying for SEO?", answer: "Sometimes. An expired domain with a clean, high-quality backlink profile from relevant sites can give a new site a meaningful SEO head start. But the majority of expired domains have poor link quality, potential spam history, or previous Google penalties that make them risky. Thorough due diligence (Ahrefs backlink audit, Wayback Machine content check, Google deindex check) is essential before every purchase." },
+      { question: "How do you check if an expired domain has Google penalties?", answer: "Search Google for 'site:domain.com' — if the domain has content in the Wayback Machine but zero results on Google, it may be deindexed due to a manual penalty. Also look for any history of low-quality content, link schemes, or spammy anchor text in the backlink profile using Ahrefs or Majestic. SpamZilla automates many of these checks." },
+      { question: "How much do expired domains typically cost?", answer: "Prices range enormously. Low-quality drops can be registered for the standard registration price (£10-15). Domains with genuine backlink authority typically sell for £100-£1,000+ at auction. Premium aged domains or strong brand names can fetch thousands. The right price depends entirely on the backlink quality, brand recognition, and competitive interest at auction time." }
+    ]
+  },
+
+  {
+    slug: "domain-hacks-guide",
+    title: "Domain Hacks: How to Create Clever, Memorable URLs with Alternative TLDs",
+    description: "Domain hacks use country code TLDs to create clever, compact URLs — del.icio.us, bit.ly, last.fm. Here's how they work, when to use them, and the pitfalls to avoid.",
+    seoTitle: "Domain Hacks Guide: Creative Domain Name Ideas with Alternative TLDs | NamoLux",
+    metaDescription: "Learn what domain hacks are, how to create them using country code TLDs, and see famous examples. Covers SEO implications, best TLDs to use, and when a domain hack is (and isn't) a good idea for your brand.",
+    category: "Domain Strategy",
+    readTime: 9,
+    publishedAt: "2026-03-11",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "A domain hack is a domain name where the TLD (top-level domain) forms part of the word or phrase — creating a compact, clever URL. The classic example: del.icio.us uses the .us TLD to complete the word 'delicious'. bit.ly completes 'bitly'. last.fm uses .fm (Micronesia's TLD) to evoke 'FM radio'. Done well, domain hacks are unforgettable. Done poorly, they're confusing, untrustworthy, or impossible to say aloud." },
+      { type: "heading", level: 2, content: "Why Domain Hacks Became Popular" },
+      { type: "paragraph", content: "Domain hacks went mainstream in the early 2010s when short .com domains were largely unavailable and founders needed creative alternatives. The startup community embraced them for their brevity and memorability — a 6-character hack could replace a 20-character .com. Today, domain hacks remain popular for URL shorteners, early-stage startups, and products where brand personality and brevity matter more than conventional credibility." },
+      { type: "heading", level: 2, content: "How to Create a Domain Hack" },
+      { type: "paragraph", content: "Creating a domain hack involves finding a word or phrase that naturally ends in (or contains) a country code or generic TLD. The best hacks feel inevitable — the TLD is a seamless extension of the word, not a visible workaround." },
+      { type: "list", content: "", items: [
+        "List your brand name candidates and note how they end",
+        "Match the ending against available TLDs (see list below)",
+        "Check if the hack reads as a complete word or phrase without visible seams",
+        "Test it verbally: can someone say it aloud and immediately understand how to type it?",
+        "Verify the TLD is commercially available for registration and renewable long-term"
+      ] },
+      { type: "heading", level: 2, content: "Best TLDs for Domain Hacks" },
+      { type: "list", content: "", items: [
+        ".ly (Libya): For words ending in -ly — used by bit.ly, buff.ly, ow.ly. Relatively affordable and widely available",
+        ".io (British Indian Ocean Territory): Not a classic hack TLD but widely accepted in tech — works for words ending in -io",
+        ".me (Montenegro): Words ending in -me — useful for personal brands and phrases ('read.me', 'about.me')",
+        ".is (Iceland): For words or phrases ending in -is ('this.is', 'definit.is')",
+        ".it (Italy): English words ending in -it ('start.it', 'do.it') — note: Italy restricts registration to EU residents",
+        ".fm (Micronesia): Audio, radio, and media brands — 'last.fm', 'anchor.fm', a natural fit for podcast brands",
+        ".am (Armenia): Time-related brands and phrases — '7.am', 'wake.am'",
+        ".st (São Tomé): Words ending in -st — 'brea.st', 'interst.com' etc.",
+        ".co (Colombia): Shortening of 'company' — not a true hack but widely accepted as a brand TLD"
+      ] },
+      { type: "heading", level: 2, content: "Famous Domain Hack Examples" },
+      { type: "list", content: "", items: [
+        "del.icio.us — the social bookmarking pioneer that made domain hacks famous (now delicious.com)",
+        "bit.ly — URL shortener, one of the most successful domain hack brands ever built",
+        "last.fm — music streaming and scrobbling platform; .fm perfectly mirrors 'FM radio'",
+        "instagr.am — Instagram's original domain before acquiring instagram.com",
+        "rel.ax — a wellness brand using .ax (Åland Islands) to complete 'relax'",
+        "fin.land — could be used as a domain hack for fintech or Scandinavia-related brands",
+        "yo.ur — a classic instructional hack format"
+      ] },
+      { type: "heading", level: 2, content: "SEO Implications of Domain Hacks" },
+      { type: "paragraph", content: "Google treats country code TLDs (ccTLDs) primarily as geographic signals. A .fr domain is associated with France, a .de with Germany. However, Google has confirmed it treats several ccTLDs as generic — including .io, .co, .me, and .ly — because they are used so predominantly for non-geographic purposes. If you register a .ly or .io domain hack, Google will not automatically restrict your rankings to that country." },
+      { type: "callout", calloutType: "warning", content: "Some ccTLDs (like .it, .de, .fr) are treated geographically by Google by default. Using them as domain hacks may suppress your rankings in other countries unless you configure your international targeting settings in Google Search Console." },
+      { type: "heading", level: 2, content: "Pros and Cons of Domain Hacks" },
+      { type: "list", content: "", items: [
+        "Pro: Short and memorable — a well-chosen hack can be easier to remember than a long .com",
+        "Pro: Available — most hack combinations haven't been registered yet",
+        "Pro: Distinctive personality — signals creativity and unconventional thinking",
+        "Con: Hard to say aloud — 'go to app dot ly' is confusing in conversation",
+        "Con: Trust gap — many users are conditioned to distrust non-.com domains",
+        "Con: Dependent on a small country's registry — if the TLD changes policy, your domain could be affected",
+        "Con: Can be penalised geographically — some ccTLDs restrict your international SEO reach"
+      ] },
+      { type: "heading", level: 2, content: "When NOT to Use a Domain Hack" },
+      { type: "paragraph", content: "Domain hacks work best for digital-native products targeting tech-savvy audiences. They are a poor choice when trust is paramount (financial services, healthcare, legal), when your audience is non-technical, when you have a large marketing budget that includes offline channels, or when you expect significant word-of-mouth referral through speech rather than typed URLs." },
+      { type: "callout", calloutType: "cta", content: "Looking for creative, available domain names without the TLD complexity? NamoLux generates brandable names across .com, .io, .ai, and .co instantly.", ctaLink: "/generate", ctaText: "Generate Domain Names →" },
+    ],
+    faqs: [
+      { question: "Are domain hacks bad for SEO?", answer: "Not inherently — but it depends on the TLD. Google treats .ly, .io, .me, and .co as generic TLDs, so there's no automatic geographic restriction. However, truly country-coded TLDs (.it, .fr, .de) are treated as geographic signals and can suppress your rankings internationally. Always check how Google categorises your chosen TLD before committing to a hack." },
+      { question: "What are the best TLDs for domain hacks?", answer: ".ly (words ending in -ly), .me (words ending in -me), .fm (audio/media brands), .is (words ending in -is), and .io (tech brands ending in -io) are the most popular and widely trusted options for domain hacks. Avoid highly geographic TLDs (.fr, .de, .it) unless you have a strong reason and understand the SEO implications." },
+      { question: "What are some famous examples of successful domain hacks?", answer: "bit.ly (URL shortener), last.fm (music platform), instagr.am (Instagram's original domain), del.icio.us (social bookmarking), and about.me (personal profiles) are among the most well-known. Most successful domain hacks are short (under 10 characters total) and the TLD is phonetically seamless with the word." },
+      { question: "Is it risky to build a brand on a country code TLD?", answer: "There is a small but real risk. Country code TLD registries are governed by individual nations and can change their policies — including restricting registrations to residents, changing pricing dramatically, or in rare cases, suspending registrations. The risk is low for established TLDs like .ly and .io but worth understanding before making it your primary brand domain. Securing the .com equivalent as a defensive registration is always wise." }
+    ]
+  },
+
+  // ── SEO Foundations ──────────────────────────────────────────────────────────
+
+  {
+    slug: "google-search-console-tutorial",
+    title: "Google Search Console Tutorial: How to Use It to Grow Your Traffic",
+    description: "Google Search Console is the most valuable free SEO tool available — but most site owners barely scratch the surface. Here's how to use every key report to grow your organic traffic.",
+    seoTitle: "Google Search Console Tutorial 2026: Complete Guide to Growing Traffic | NamoLux",
+    metaDescription: "Complete Google Search Console tutorial for 2026. Learn how to set up GSC, read every key report (Performance, Coverage, Core Web Vitals, Links), and use the data to improve your Google rankings.",
+    category: "SEO Foundations",
+    readTime: 12,
+    publishedAt: "2026-03-12",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Google Search Console (GSC) is the most powerful free SEO tool available — and the most underused. While everyone chases Ahrefs and Semrush data, GSC gives you something those tools can't: direct data from Google itself, about exactly how your site is performing in search. If you're not using it seriously, you're making SEO decisions with one eye closed." },
+      { type: "heading", level: 2, content: "What Is Google Search Console?" },
+      { type: "paragraph", content: "Google Search Console is a free tool from Google that shows you how your website performs in Google Search. It tells you which pages are indexed, which keywords you rank for, how many clicks you receive, what errors Google encounters when crawling your site, and whether you have any manual penalties. Unlike Google Analytics (which tracks what happens on your site), GSC tracks what happens before users arrive — in the search results themselves." },
+      { type: "heading", level: 2, content: "How to Set Up Google Search Console" },
+      { type: "paragraph", content: "Go to search.google.com/search-console, click 'Add Property', and choose between Domain property (recommended — covers all subdomains and protocols) or URL prefix (just one specific URL variant). Verify ownership using one of Google's methods." },
+      { type: "list", content: "", items: [
+        "DNS record verification (recommended for Domain properties): Add a TXT record to your domain's DNS settings",
+        "HTML file upload: Download a verification file and upload it to your site's root directory",
+        "HTML meta tag: Add a meta tag to your homepage's <head> section",
+        "Google Analytics: If you already have GA4 installed, GSC can verify via the same Google account",
+        "Google Tag Manager: Verify through an existing GTM container"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Data appears in GSC after 2-3 days minimum. For a new site, full data accumulation can take 4-6 weeks. Don't make decisions based on less than 30 days of data." },
+      { type: "heading", level: 2, content: "The Performance Report: Your Most Important Dashboard" },
+      { type: "paragraph", content: "The Performance report shows data about your site's appearance and clicks in Google Search. It's the closest thing to a real-time view of your SEO performance. The four key metrics are: Total clicks (how many times users clicked your site from search results), Total impressions (how many times your site appeared in results, even without a click), Average CTR (click-through rate — clicks ÷ impressions), and Average position (your average ranking position across all queries)." },
+      { type: "heading", level: 3, content: "How to Use the Performance Report to Grow Traffic" },
+      { type: "list", content: "", items: [
+        "Filter by 'Queries': Find keywords where you rank positions 5-15 with high impressions but low CTR — these are your best optimisation opportunities. Improving a page from position 8 to position 3 can 5x your clicks",
+        "Filter by 'Pages': Find your highest-impression pages — if impressions are high but CTR is low, rewrite the title tag and meta description to be more compelling",
+        "Date comparison: Compare this 28 days vs previous 28 days to identify trends — which pages are gaining, which are declining?",
+        "Filter by 'Devices': If mobile CTR is dramatically lower than desktop, your mobile snippet may be truncated or your structured data only showing on desktop",
+        "Filter by 'Country': If you're getting significant impressions from countries you don't serve, consider international SEO or hreflang tags"
+      ] },
+      { type: "heading", level: 2, content: "The Coverage Report: Understanding What Google Has Indexed" },
+      { type: "paragraph", content: "The Coverage report shows which pages Google has crawled and indexed, and which have issues. It categorises pages into: Valid (indexed), Valid with warnings (indexed but with minor issues), Error (not indexed due to a problem), and Excluded (not indexed, but intentionally so)." },
+      { type: "list", content: "", items: [
+        "Error — Server error (5xx): Your server returned an error when Googlebot visited — hosting or code issue",
+        "Error — Redirect error: A redirect chain is broken or looping",
+        "Error — Not found (404): The page doesn't exist — check for broken internal links or missing pages",
+        "Excluded — Crawled, currently not indexed: Google crawled the page but chose not to index it — usually indicates thin or low-quality content",
+        "Excluded — Discovered, currently not indexed: Googlebot knows about the page but hasn't crawled it yet — may indicate crawl budget issues on large sites",
+        "Excluded — Duplicate without canonical tag: Multiple URLs serving the same content with no canonical specified"
+      ] },
+      { type: "heading", level: 2, content: "The URL Inspection Tool" },
+      { type: "paragraph", content: "Enter any URL from your site to see exactly how Google has indexed it. You can see the last crawl date, whether it's indexed, what canonicalised URL Google selected, and whether there are any mobile usability or structured data issues. After making changes to a page, use Request Indexing to ask Google to re-crawl it faster — usually picks up changes within 24-48 hours." },
+      { type: "heading", level: 2, content: "Core Web Vitals Report" },
+      { type: "paragraph", content: "Core Web Vitals are a set of performance metrics Google uses as ranking factors. The three metrics are: Largest Contentful Paint (LCP — how quickly the main content loads, target under 2.5 seconds), Interaction to Next Paint (INP — how responsive the page feels to interactions, target under 200ms), and Cumulative Layout Shift (CLS — how much the page layout shifts unexpectedly, target under 0.1). Pages in the 'Poor' category should be prioritised for optimisation." },
+      { type: "heading", level: 2, content: "The Links Report: Understanding Your Backlink Profile" },
+      { type: "paragraph", content: "The Links report shows your top linked pages (which pages receive the most internal and external links), top linking sites, and top anchor texts. While less detailed than Ahrefs or Majestic, this is Google's own view of your link profile — the most authoritative source available. Use it to identify your most link-worthy content and your strongest pages for internal linking concentration." },
+      { type: "heading", level: 2, content: "Manual Actions: The Penalty Report" },
+      { type: "paragraph", content: "If Google has issued a manual penalty against your site, it appears here. Manual actions are applied by Google employees when a site violates their webmaster guidelines — typically for spammy links, hidden text, or structured data manipulation. If you receive a manual action, fix the underlying issue, then submit a reconsideration request through GSC. Most manual actions are resolved within 2-4 weeks of a successful reconsideration." },
+      { type: "callout", calloutType: "cta", content: "Strong SEO starts with a strong domain name. Generate brandable, available names for your site or project.", ctaLink: "/generate", ctaText: "Generate Domain Names →" },
+    ],
+    faqs: [
+      { question: "Is Google Search Console free?", answer: "Yes, completely free. Google Search Console is a free tool available to any website owner with a Google account. There's no paid tier or premium version — all features are included at no cost. It's arguably the most valuable free marketing tool available to website owners." },
+      { question: "How long does it take for data to appear in Google Search Console?", answer: "Initial data typically appears within 2-3 days of verification. However, the Performance report only shows data from when your property was added — there's no historical data before that date. Core Web Vitals data requires 28 days of field data collection before the report populates. For brand new sites, meaningful data accumulation takes 4-6 weeks." },
+      { question: "What's the difference between Google Search Console and Google Analytics?", answer: "Google Search Console shows data about how your site performs in Google Search — impressions, clicks, rankings, indexing, and crawling. Google Analytics shows data about what happens once users arrive on your site — sessions, pageviews, conversions, bounce rate. GSC is a pre-arrival view; GA is an on-site view. Both are essential — they answer completely different questions." },
+      { question: "How do I fix indexing errors in Google Search Console?", answer: "Start by clicking the specific error in the Coverage report to see which pages are affected and get more context. For 404 errors: fix the broken links or create 301 redirects from the old URL to the correct one. For server errors: investigate your hosting logs for the cause. For 'Crawled, not indexed': improve the content quality or consolidate thin pages. After fixing, use the 'Validate Fix' button to prompt Google to re-check." }
+    ]
+  },
+
+  {
+    slug: "how-to-build-backlinks-beginners-guide",
+    title: "How to Build Backlinks in 2026: A Beginner's Guide to Getting Links That Count",
+    description: "Backlinks remain one of Google's strongest ranking signals. Here's a practical, beginner-friendly guide to building your first 50 high-quality links without buying them or gaming the system.",
+    seoTitle: "How to Build Backlinks in 2026: Beginner's Link Building Guide | NamoLux",
+    metaDescription: "Learn how to build high-quality backlinks in 2026. Covers guest posting, digital PR, broken link building, linkable asset creation, and exactly what to avoid. A practical guide for site owners who are new to link building.",
+    category: "SEO Foundations",
+    readTime: 13,
+    publishedAt: "2026-03-13",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Backlinks — links from other websites pointing to yours — remain one of Google's most significant ranking factors in 2026. While the algorithm has grown more sophisticated, links from credible, relevant websites are still one of the clearest signals of a page's quality and authority. The challenge: building genuine backlinks takes time, skill, and persistence. Here's how to do it properly." },
+      { type: "heading", level: 2, content: "What Makes a Backlink Valuable?" },
+      { type: "paragraph", content: "Not all backlinks are equal. A single link from a genuinely authoritative, relevant site can be worth more than a thousand links from low-quality directories. When evaluating link opportunities, look for these characteristics." },
+      { type: "list", content: "", items: [
+        "Relevance: The linking site covers the same or related topics as your site — a tech blog linking to a tech company is worth more than a gardening blog linking to the same company",
+        "Authority: The linking domain has genuine trust — real traffic, real content, real reputation",
+        "Placement: A contextual link within the body of an article ('editorial link') is worth more than a link in a sidebar or footer",
+        "Anchor text: A link with relevant descriptive anchor text ('domain name generator') is more useful than a generic 'click here'",
+        "Dofollow vs nofollow: Dofollow links pass ranking signals; nofollow links don't — but nofollow links from high-traffic sites still drive real visitors"
+      ] },
+      { type: "heading", level: 2, content: "1. Guest Posting" },
+      { type: "paragraph", content: "Writing articles for other websites in your niche in exchange for a contextual backlink remains one of the most reliable link-building methods. The key is finding genuine publications with real audiences — not ghost sites built solely to sell links." },
+      { type: "list", content: "", items: [
+        "Search Google: '[your niche] + write for us', '[your niche] + guest post', '[your niche] + contribute'",
+        "Aim for sites with real organic traffic (check Semrush or Ahrefs estimated traffic) rather than just high DR/DA",
+        "Pitch specific article ideas that genuinely add value to their readers — not generic 'I'd like to write for you' emails",
+        "Include your portfolio and demonstrate expertise upfront — editors receive hundreds of pitches",
+        "Avoid sites that accept any content from anyone for a fee — these are link farms and can harm your site"
+      ] },
+      { type: "heading", level: 2, content: "2. Digital PR and HARO" },
+      { type: "paragraph", content: "Digital PR involves getting your brand or expertise mentioned in news articles, industry publications, and authoritative resources. HARO (Help a Reporter Out — now Connectively) connects journalists looking for expert quotes with sources who can provide them. A single HARO response that gets published in a major outlet can result in a high-DA link you couldn't acquire any other way." },
+      { type: "list", content: "", items: [
+        "Sign up to Connectively (formerly HARO) and respond to relevant queries in your industry",
+        "Be specific, concise, and genuinely expert in your responses — generic answers don't get used",
+        "Monitor Google Alerts for your brand name and industry keywords — unlinked mentions are link opportunities",
+        "Create genuinely newsworthy content: original research, data studies, or strong contrarian opinions attract press coverage",
+        "Build relationships with journalists covering your space before you need coverage"
+      ] },
+      { type: "heading", level: 2, content: "3. Broken Link Building" },
+      { type: "paragraph", content: "Broken link building involves finding pages on authoritative sites that link to content that no longer exists (404 errors), then offering your own relevant content as a replacement. It works because webmasters genuinely want to fix broken links — you're solving a problem for them, not just asking for a favour." },
+      { type: "list", content: "", items: [
+        "Use Ahrefs' Broken Backlinks report or Chrome extension 'Check My Links' to find broken outbound links on relevant sites",
+        "Identify which of your existing pages could serve as a replacement for the broken content",
+        "If you don't have relevant content, create it specifically for this opportunity — then reach out",
+        "Email the webmaster: be brief, mention the broken link specifically, and explain what your page covers",
+        "Don't mass-email — manual, personalised outreach consistently outperforms bulk templates"
+      ] },
+      { type: "heading", level: 2, content: "4. Building Linkable Assets" },
+      { type: "paragraph", content: "Some content types attract links naturally because they serve as reference material that other writers and sites link to. Creating 'linkable assets' is one of the highest-leverage long-term link building investments." },
+      { type: "list", content: "", items: [
+        "Original research and surveys: 'We surveyed 500 founders...' — data no one else has is inherently linkable",
+        "Comprehensive statistics pages: 'X Statistics About [Topic]' — writers constantly link to stat aggregations",
+        "Free tools and calculators: Useful tools get embedded and linked to repeatedly",
+        "Definitive guides: Long-form, comprehensive resources on a topic that become the go-to reference",
+        "Infographics and visual data: Still shared and embedded by relevant sites in your niche"
+      ] },
+      { type: "callout", calloutType: "cta", content: "Strong domains attract stronger links. Make sure your brand name and domain are working hard for you.", ctaLink: "/generate", ctaText: "Check Your Domain Name →" },
+      { type: "heading", level: 2, content: "5. Unlinked Brand Mentions" },
+      { type: "paragraph", content: "Every time someone mentions your brand name without linking to you, that's a link opportunity. Set up Google Alerts or use Brand24 to monitor your brand name. When you find an unlinked mention on a relevant site, reach out politely and ask if they'd be willing to add a link. This works particularly well because the author has already signalled they know and respect your brand." },
+      { type: "heading", level: 2, content: "6. Strategic Internal Linking" },
+      { type: "paragraph", content: "Internal linking — linking from one page on your site to another — doesn't build external authority, but it distributes the authority you have more effectively. Every high-authority page on your site should link to pages you want to rank. Review your most-linked pages and ensure they're distributing link equity to your conversion-critical pages." },
+      { type: "heading", level: 2, content: "What NOT to Do" },
+      { type: "list", content: "", items: [
+        "Never buy links from link farms or private blog networks (PBNs) — Google's link spam algorithm catches these and manual penalties are career-ending for your domain",
+        "Don't use automated link building software — the links it creates are low quality at best and penalisable at worst",
+        "Avoid reciprocal link schemes ('I'll link to you if you link to me') — Google specifically calls these out in its guidelines",
+        "Don't stuff keyword-rich anchor text — a natural link profile has varied anchor texts; exact-match anchor text manipulation is a clear spam signal",
+        "Don't create thin 'resource pages' solely to acquire links — these rarely earn links and waste your content investment"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Google's SpamBrain algorithm has become significantly better at identifying and discounting unnatural links. A penalty from a manual action can take months to recover from. Always prioritise quality over quantity." },
+    ],
+    faqs: [
+      { question: "How many backlinks do I need to rank on the first page?", answer: "There's no fixed number — it depends entirely on your competition. Some niche keywords can be ranked with 5-10 quality links; competitive commercial keywords may require hundreds from authoritative domains. The best approach is to check the backlink profiles of the current first-page results for your target keyword using Ahrefs or Semrush. That tells you the real benchmark for your specific situation." },
+      { question: "Are backlinks from social media worth anything for SEO?", answer: "Social media links (Twitter/X, LinkedIn, Facebook) are all nofollow — they don't pass direct ranking signals. However, social shares can drive real traffic and increase the chances that other site owners discover and link to your content. Social media is a distribution and discovery channel for your linkable content, not a direct link-building tactic." },
+      { question: "How do I check my current backlinks?", answer: "The free options: Google Search Console's Links report shows your top linked pages and linking sites (direct from Google, but limited detail). The paid options: Ahrefs, Semrush, and Majestic all offer comprehensive backlink analysis. Ahrefs is widely considered the most accurate and complete backlink database. For a free spot-check, Moz's Link Explorer offers limited free lookups." },
+      { question: "What is a toxic backlink and should I disavow them?", answer: "Toxic backlinks are links from spammy, low-quality, or manipulative sites that could trigger a Google penalty. Google's John Mueller has stated that most sites don't need to disavow links — Google's algorithm is good at ignoring low-quality links without manual intervention. The disavow tool should only be used if: (1) you have a manual action for unnatural links, or (2) you knowingly acquired spammy links through past link-buying. Don't disavow out of fear alone." }
+    ]
+  },
+
+  // ── Builder Insights ─────────────────────────────────────────────────────────
+
+  {
+    slug: "how-to-build-an-email-list",
+    title: "How to Build an Email List from Zero: The Founder's Growth Playbook",
+    description: "Email delivers higher ROI than any other digital channel — but only if you build your list with the right strategy. Here's the founder's playbook for growing from zero to a list that actually converts.",
+    seoTitle: "How to Build an Email List from Zero: Complete Founder's Guide 2026 | NamoLux",
+    metaDescription: "Learn how to build an email list from scratch in 2026. Covers choosing a platform, creating lead magnets, opt-in form placement, content strategy, and how to grow your list without paid ads.",
+    category: "Builder Insights",
+    readTime: 12,
+    publishedAt: "2026-03-14",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Social media algorithms change. Platforms rise and fall. Ad costs increase. But your email list is yours — no algorithm between you and your audience, no rent to pay, no reach throttling. Founders who build email lists early consistently outperform those who don't, because email remains the highest-converting, lowest-cost channel available. Here's how to build yours from zero." },
+      { type: "heading", level: 2, content: "Why Email Outperforms Every Other Channel" },
+      { type: "list", content: "", items: [
+        "Average email open rates: 20-40% depending on industry. Average organic social reach: 2-5% of followers",
+        "Email ROI: £36 for every £1 spent (DMA, 2025) — higher than any other marketing channel",
+        "You own the list: Instagram, Twitter/X, or TikTok can suspend your account, change the algorithm, or disappear. Your email list is portable and permanent",
+        "Direct purchase intent: Email subscribers have explicitly opted in to hear from you — fundamentally different from passive social followers",
+        "Compounding asset: A well-maintained email list grows in value over time as you segment it and understand your audience better"
+      ] },
+      { type: "heading", level: 2, content: "Choosing Your Email Platform" },
+      { type: "paragraph", content: "Your email platform is the foundation of your list. The right choice depends on your current stage, technical comfort, and long-term goals." },
+      { type: "list", content: "", items: [
+        "Beehiiv: The best platform for founder newsletters and content brands in 2026. Native monetisation, referral programme, and a clean UX. Free up to 2,500 subscribers",
+        "ConvertKit (Kit): The creator-focused standard — excellent automation and segmentation for building launch sequences. Free up to 1,000 subscribers",
+        "Mailchimp: The most recognisable brand, but increasingly bloated. Best for ecommerce with Shopify integration. Free up to 500 contacts",
+        "Loops: Built specifically for SaaS products — integrates with user lifecycle events directly. Excellent for product-led growth",
+        "Brevo (Sendinblue): Best value for high-volume senders — competitive pricing at scale"
+      ] },
+      { type: "heading", level: 2, content: "Creating a Lead Magnet That Actually Converts" },
+      { type: "paragraph", content: "A lead magnet is a free resource offered in exchange for an email address. The difference between a good lead magnet and a bad one is specificity: vague lead magnets ('free newsletter') have 1-2% conversion rates. Specific, high-value lead magnets ('37-point domain name checklist') can convert at 10-20%+." },
+      { type: "list", content: "", items: [
+        "Checklists and templates: High perceived value, low production cost — 'The SaaS Launch Checklist', 'Brand Naming Worksheet'",
+        "Mini guides and quick-start PDFs: A 5-page guide solving one specific problem converts better than a 50-page e-book on a broad topic",
+        "Free tools and calculators: A tool people use actively generates ongoing leads with zero additional effort",
+        "Email courses: 5-7 day email sequences teaching a specific skill — high perceived value and naturally introduce subscribers to your product",
+        "Resource libraries: Curated lists of the best tools, templates, or resources in your niche — valuable and shareable",
+        "Waitlists and early access: If you're pre-launch, a waitlist with genuine scarcity ('200 spots for beta access') converts extremely well"
+      ] },
+      { type: "callout", calloutType: "warning", content: "Don't create a lead magnet without validating demand first. Post about the topic on social media or in communities — if it generates genuine engagement, build the magnet. If it doesn't, save yourself the production time." },
+      { type: "heading", level: 2, content: "Optimising Your Opt-In Forms" },
+      { type: "paragraph", content: "Placement, copy, and design all dramatically affect opt-in conversion rates. The highest-converting placements for most sites are:" },
+      { type: "list", content: "", items: [
+        "Inline content upgrades: A specific, relevant lead magnet offered within a blog post performs 5-10x better than a generic sidebar form",
+        "Exit-intent popups: Triggered when a user moves to close the tab — controversial but effective at 3-8% conversion rates when well-timed",
+        "After-scroll popups: Appearing after a user has read 60-70% of an article — they've demonstrated intent, making them significantly more likely to convert",
+        "Dedicated landing pages: For your primary lead magnet, a standalone page with no navigation converting 100% of traffic to your list goal",
+        "Header banners and hello bars: Low-friction, persistent — particularly effective for newsletter sign-ups with a clear value proposition"
+      ] },
+      { type: "heading", level: 2, content: "Growing Your List Without Paid Ads" },
+      { type: "paragraph", content: "The fastest organic growth channels for email lists in 2026:" },
+      { type: "list", content: "", items: [
+        "Content marketing and SEO: Blog posts targeting searches for your lead magnet topic drive steady, compounding traffic",
+        "Twitter/X and LinkedIn: Share snippets from your newsletter publicly — turn your best content into social posts that drive subscriptions",
+        "Newsletter referral programmes: Beehiiv and SparkLoop let subscribers refer friends for rewards — one viral referral cycle can double your list",
+        "Community presence: Answer questions in relevant Reddit, Slack, and Discord communities with genuinely helpful responses — include your lead magnet where relevant",
+        "Podcast appearances: A guest spot on a relevant podcast with a clear CTA ('get the free checklist at [url]') can drive hundreds of high-intent subscribers in a day",
+        "Cross-newsletter promotions: Partner with adjacent newsletters for list swaps or paid spots — the audience is already email-engaged"
+      ] },
+      { type: "heading", level: 2, content: "What to Send Your List" },
+      { type: "paragraph", content: "The fastest way to kill a list you've worked hard to build is sending content people don't value. The highest-performing email content in 2026 is: personal, specific, and immediately actionable. The creator-media formula (what I learned this week, the one tool I'm using, the mistake I made) consistently outperforms corporate newsletter formats." },
+      { type: "list", content: "", items: [
+        "Welcome sequence (automated): 3-5 emails over 2 weeks introducing your brand, delivering the lead magnet, and setting expectations",
+        "Regular broadcasts: Weekly or bi-weekly newsletters with genuine value — no filler, no 'hope you had a great week' padding",
+        "Launch sequences: Pre-launch anticipation, open cart, close cart sequences for product launches",
+        "Re-engagement campaigns: Quarterly emails to subscribers who haven't opened in 90 days — re-engage or clean the list"
+      ] },
+      { type: "callout", calloutType: "cta", content: "A great email list starts with a memorable brand and domain. Generate yours today.", ctaLink: "/generate", ctaText: "Find Your Brand Name →" },
+    ],
+    faqs: [
+      { question: "What's a good email list open rate?", answer: "Average open rates vary significantly by industry and list size. For founder newsletters and niche B2B lists: 35-50% is excellent. For larger consumer lists: 20-30% is strong. The industry average across all email marketing is around 21-25%. More important than absolute open rate is the trend — a growing open rate signals your content is becoming more relevant to your audience." },
+      { question: "How often should you email your list?", answer: "Consistency matters more than frequency. A weekly email sent every Tuesday builds habit and expectation. A sporadic email every few months keeps people cold. For most founder brands, weekly or bi-weekly is the right cadence — frequent enough to stay top of mind, infrequent enough to maintain perceived value. The right answer is whatever frequency you can maintain with genuine quality long-term." },
+      { question: "What's the best free email marketing tool for beginners?", answer: "Beehiiv is the strongest free option in 2026 for content-first founders (free up to 2,500 subscribers with no feature restrictions). ConvertKit (Kit) is excellent for creators who need automation. Mailchimp remains the most recognised brand but has reduced its free tier significantly. Choose based on your primary use case: Beehiiv for newsletters, ConvertKit for courses/launches, Loops for SaaS products." },
+      { question: "How do you grow an email list without paid ads?", answer: "The most effective zero-cost strategies are: (1) create a specific, high-value lead magnet and promote it in communities where your audience is active, (2) write SEO content targeting searches related to your lead magnet topic, (3) appear as a guest on relevant podcasts with a clear subscriber CTA, (4) cross-promote with other newsletter creators in adjacent niches, and (5) share your newsletter content publicly on social media to give non-subscribers a taste of what they're missing." }
+    ]
+  },
+
+  {
+    slug: "startup-funding-options-explained",
+    title: "Startup Funding Options Explained: Bootstrap, Grants, Angels & VCs",
+    description: "Not all startup funding is created equal. Here's a founder's plain-English guide to every funding option available — from bootstrapping to VC — and how to know which is right for your business.",
+    seoTitle: "Startup Funding Options Explained 2026: Bootstrap, Grants, Angels & VCs | NamoLux",
+    metaDescription: "A complete guide to startup funding options in 2026. Covers bootstrapping, grants, angel investors, venture capital, crowdfunding, and revenue-based financing — with honest pros, cons, and guidance on which path fits your business.",
+    category: "Builder Insights",
+    readTime: 14,
+    publishedAt: "2026-03-15",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Every week, thousands of founders ask some version of the same question: 'How do I fund my startup?' The answer depends almost entirely on your business model, your growth ambitions, how much control you want to keep, and how fast you need to move. Here's a plain-English guide to every funding option available in 2026 — including several that most founders overlook entirely." },
+      { type: "heading", level: 2, content: "Option 1: Bootstrapping" },
+      { type: "paragraph", content: "Bootstrapping means building your company with your own money — either from savings, early revenue, or a combination. It's the path chosen by the majority of successful startups that you never read about on TechCrunch, because bootstrapped founders rarely issue press releases." },
+      { type: "list", content: "", items: [
+        "Pros: Full ownership and control, no investors to answer to, forced to build something that generates revenue early, no dilution",
+        "Cons: Slower growth, personal financial risk, harder to compete in markets requiring large upfront capital",
+        "Best for: SaaS, services, content businesses, marketplaces with organic growth — any business that can reach profitability with modest capital",
+        "Notable bootstrapped companies: Basecamp (37signals), Mailchimp (bootstrapped to $12B acquisition), Zoho, Calendly"
+      ] },
+      { type: "heading", level: 2, content: "Option 2: Friends and Family" },
+      { type: "paragraph", content: "Raising money from friends and family is often the first external capital a startup accesses — typically £10,000-£100,000 at the earliest stage. It's faster and less formal than other routes, but comes with significant relationship risk if the business fails." },
+      { type: "callout", calloutType: "warning", content: "Always document friends and family investments properly — a simple shareholders' agreement or convertible loan note. Undocumented investments create legal and relational disputes later. Never accept money someone cannot afford to lose." },
+      { type: "heading", level: 2, content: "Option 3: Grants" },
+      { type: "paragraph", content: "Grants are non-dilutive funding — you receive money without giving up equity. In the UK, significant grant funding is available from government and European bodies for technology and innovation companies." },
+      { type: "list", content: "", items: [
+        "Innovate UK Smart Grants: Up to £2m for ambitious R&D and innovation projects — highly competitive but potentially transformative",
+        "Innovate UK SMART (Feasibility & Industrial Research): Smaller grants (£25k-£500k) for earlier-stage innovation",
+        "Seed Enterprise Investment Scheme (SEIS) and EIS: Not grants, but UK government tax incentives that make investing in your startup significantly more attractive to angels and early investors",
+        "Local Enterprise Partnerships (LEPs): Regional funding bodies with grants and soft loans for businesses in specific areas",
+        "SBRI (Small Business Research Initiative): Government contracts for R&D — not grants exactly, but non-dilutive public sector revenue",
+        "Horizon Europe: For UK companies eligible to participate — large-scale research funding for ambitious technology projects"
+      ] },
+      { type: "heading", level: 2, content: "Option 4: Angel Investors" },
+      { type: "paragraph", content: "Angel investors are individuals — typically successful entrepreneurs or senior executives — who invest their personal capital in early-stage companies, usually in exchange for equity. The typical UK angel investment is £25,000-£150,000, though syndicates can pool angels for larger rounds." },
+      { type: "list", content: "", items: [
+        "Angels invest at pre-seed or seed stage, before most VCs will touch a deal",
+        "The best angels bring industry connections, customer introductions, and genuine mentorship — not just capital",
+        "Find angels through: UK Business Angels Association (UKBAA), Angel Investment Network, Syndicate Room, sector-specific networks, and warm introductions through accelerators",
+        "Most angels expect SEIS/EIS eligibility — structure your company to be eligible before approaching",
+        "Typical equity given: 5-15% for a seed round depending on valuation and amount raised"
+      ] },
+      { type: "heading", level: 2, content: "Option 5: Venture Capital" },
+      { type: "paragraph", content: "Venture capital is institutional investment from funds that have raised capital from limited partners (pension funds, family offices, endowments) to invest in high-growth startups. VCs are looking for businesses that could plausibly return 10-100x their investment — which means they only invest in companies with the potential for extremely large scale." },
+      { type: "list", content: "", items: [
+        "VC is NOT right for most startups — lifestyle businesses, niche services, and slow-growth companies will not get funded and don't need VC",
+        "UK seed VCs include: Seedcamp, Entrepreneur First, LocalGlobe, Passion Capital, Backed VC — each with specific theses and sectors",
+        "Series A typically requires £1m+ ARR with strong growth rates and clear product-market fit",
+        "VC comes with dilution (typically 20-30% per round), board seats, and pressure to grow at all costs",
+        "Be honest about whether you want a VC-scale outcome — most founders who raise VC wish they'd bootstrapped longer"
+      ] },
+      { type: "heading", level: 2, content: "Option 6: Crowdfunding" },
+      { type: "paragraph", content: "Equity crowdfunding platforms like Seedrs and Crowdcube allow you to raise investment from a large number of individual investors, typically in smaller amounts (£500-£5,000 each). This democratises funding and can create a community of brand advocates, but campaigns require significant preparation and marketing effort." },
+      { type: "list", content: "", items: [
+        "Seedrs and Crowdcube are the two dominant UK equity crowdfunding platforms",
+        "Successful campaigns typically have 30-40% of their funding committed before the public launch — don't launch cold",
+        "The community marketing effect is significant: crowdfunding investors are loud, loyal customers who tell everyone",
+        "Regulation A+ (US) and similar structures allow broader public capital raises for later-stage businesses",
+        "Reward-based crowdfunding (Kickstarter, Indiegogo): Pre-sell your product to validate demand and fund initial production — no equity given"
+      ] },
+      { type: "heading", level: 2, content: "Option 7: Revenue-Based Financing" },
+      { type: "paragraph", content: "Revenue-based financing (RBF) is a non-dilutive loan structure where repayments are tied to a percentage of your monthly revenue. You repay more in good months and less in slow months, until a fixed repayment cap is reached (typically 1.3-1.5x the amount borrowed). Clearco, Capchase, and Uncapped are the leading RBF providers in the UK." },
+      { type: "paragraph", content: "RBF is well-suited to SaaS businesses with predictable MRR that need capital for growth without giving up equity. It's faster than VC (often funded in days), but more expensive than traditional debt." },
+      { type: "heading", level: 2, content: "Option 8: Selling to Your First Customers" },
+      { type: "paragraph", content: "The most underrated funding option: sell before you build. A committed purchase order from a customer who needs your product to exist is the most validation-rich funding you can get. Pre-selling forces you to understand your customer deeply, creates revenue without dilution, and means you build exactly what the market will pay for — not what you think it wants." },
+      { type: "callout", calloutType: "cta", content: "Whatever path you choose, your brand is your first impression on every investor, customer, and partner. Start with a name that works.", ctaLink: "/generate", ctaText: "Generate Your Brand Name →" },
+    ],
+    faqs: [
+      { question: "What's the difference between angel investors and VCs?", answer: "Angels invest their own personal money, typically at pre-seed or seed stage (before product-market fit), in smaller amounts (£25k-£250k). VCs manage institutional funds and invest at seed, Series A, and beyond — typically £500k minimum, often millions. Angels move faster and take more personal risk; VCs have more capital, more diligence processes, and more structured governance expectations. Most startups should approach angels before VCs." },
+      { question: "Should I raise funding or bootstrap?", answer: "Bootstrap if: you can reach profitability without external capital, you want to maintain full control, your market doesn't require land-and-expand speed, or your business model doesn't have winner-take-all dynamics. Raise if: your market has strong network effects that reward the fastest grower, you need capital to build before you can sell, or the opportunity has a time-limited window. The vast majority of founders would be better served by bootstrapping longer than they do before raising." },
+      { question: "What startup grants are available in the UK?", answer: "Key UK grants: Innovate UK Smart Grants (up to £2m for R&D), Innovate UK SMART feasibility grants (£25k-£150k), local enterprise partnership grants (regional), SBRI government contracts (non-dilutive public sector revenue), and various sector-specific funds (Creative Industries, Clean Tech, Life Sciences). The Innovate UK website (innovateuk.ukri.org) is the central resource. Many are competitive — a clear, technically credible application is essential." },
+      { question: "How do I approach an angel investor for the first time?", answer: "The most effective route is a warm introduction — through a mutual founder, accelerator, or investor in your network. Cold approaches work but convert at much lower rates. When you do reach out: be specific about what you're building, for whom, and why now. Lead with traction (revenue, growth, customers) rather than vision. Keep the first email to 5-6 sentences with a one-line ask ('I'm raising a £150k seed round and would value 20 minutes to share what we're building'). Never attach a deck to a cold email — link to it instead." }
+    ]
+  },
+
 ]
 
 // Utility functions
