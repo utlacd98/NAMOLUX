@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next"
 import { getAllPosts } from "@/lib/blog"
+import { getAllNicheSlugs } from "@/lib/pseo-niches"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.namolux.com"
   const posts = getAllPosts()
+  const nicheSlugs = getAllNicheSlugs()
 
   // Blog post URLs
   const blogUrls: MetadataRoute.Sitemap = posts.map((post) => ({
@@ -11,6 +13,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.updatedAt || post.publishedAt),
     changeFrequency: "monthly",
     priority: 0.7,
+  }))
+
+  // pSEO niche pages
+  const pseoUrls: MetadataRoute.Sitemap = nicheSlugs.map((slug) => ({
+    url: `${baseUrl}/startup-name-ideas/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
   }))
 
   return [
@@ -33,6 +43,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     ...blogUrls,
+    {
+      url: `${baseUrl}/startup-name-ideas`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...pseoUrls,
     {
       url: `${baseUrl}/founder-signal`,
       lastModified: new Date(),
