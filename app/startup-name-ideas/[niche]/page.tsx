@@ -88,6 +88,17 @@ export default async function NichePage({ params }: NichePageProps) {
           description: name.meaning,
         })),
       },
+      {
+        "@type": "FAQPage",
+        mainEntity: data.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.a,
+          },
+        })),
+      },
     ],
   }
 
@@ -220,21 +231,48 @@ export default async function NichePage({ params }: NichePageProps) {
                   </div>
                 </section>
 
-                {/* What makes a good name — SEO section */}
+                {/* Real-world brand examples */}
                 <section className="mt-10">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    What Makes a Great {data.niche} Business Name?
+                    Real-World {data.niche} Brand Names — and Why They Work
                   </h2>
-                  <div className="prose prose-invert max-w-none">
-                    <p className="text-[#888] leading-relaxed mb-4">
-                      The best {data.niche.toLowerCase()} business names share several characteristics: they are short enough to remember and type easily, they are distinctive enough to trademark, and they convey the right feeling without being too literal or too generic.
-                    </p>
-                    <p className="text-[#888] leading-relaxed mb-4">
-                      When evaluating a name, apply the "radio test" — if someone heard your name spoken on the radio, could they spell it and find it? If not, you're losing customers before they even reach your website. For {data.niche.toLowerCase()} companies specifically, also consider whether the name will still make sense as you grow and potentially expand your offering.
-                    </p>
-                    <p className="text-[#888] leading-relaxed">
-                      NamoLux's Founder Signal™ score rates each name from 0–100 based on brandability, clarity, domain viability, and scalability. Names scoring above 85 represent the strongest candidates for building a lasting brand.
-                    </p>
+                  <div className="space-y-3">
+                    {data.realWorldExamples.map((ex) => (
+                      <div key={ex.brand} className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5">
+                        <p className="text-white font-semibold text-sm mb-1">{ex.brand}</p>
+                        <p className="text-[#777] text-sm leading-relaxed">{ex.why}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Common mistakes */}
+                <section className="mt-10">
+                  <h2 className="text-xl font-bold text-white mb-4">
+                    Common {data.niche} Naming Mistakes to Avoid
+                  </h2>
+                  <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5 space-y-3">
+                    {data.commonMistakes.map((mistake, i) => (
+                      <div key={i} className="flex items-start gap-3 text-sm text-[#aaa]">
+                        <span className="mt-0.5 flex-shrink-0 text-red-400 font-bold text-base leading-none">✕</span>
+                        {mistake}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* FAQ */}
+                <section className="mt-10">
+                  <h2 className="text-xl font-bold text-white mb-4">
+                    {data.niche} Naming FAQs
+                  </h2>
+                  <div className="space-y-4">
+                    {data.faqs.map((faq, i) => (
+                      <div key={i} className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5">
+                        <p className="text-white font-semibold text-sm mb-2">{faq.q}</p>
+                        <p className="text-[#777] text-sm leading-relaxed">{faq.a}</p>
+                      </div>
+                    ))}
                   </div>
                 </section>
 

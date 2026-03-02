@@ -5,6 +5,16 @@ export interface NameIdea {
   domain: string
 }
 
+export interface RealWorldExample {
+  brand: string
+  why: string
+}
+
+export interface NicheFaq {
+  q: string
+  a: string
+}
+
 export interface NicheData {
   slug: string
   niche: string
@@ -14,6 +24,9 @@ export interface NicheData {
   intro: string
   namingTips: string[]
   names: NameIdea[]
+  realWorldExamples: RealWorldExample[]
+  commonMistakes: string[]
+  faqs: NicheFaq[]
 }
 
 export const pseoNiches: NicheData[] = [
@@ -62,6 +75,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Novasynth", meaning: "Nova + synthesis — creating new intelligence from existing knowledge", score: 83, domain: "novasynth.ai" },
       { name: "Calyx AI", meaning: "Calyx (flower base) — the foundational intelligence layer everything grows from", score: 79, domain: "calyxai.com" },
     ],
+    realWorldExamples: [
+      { brand: "OpenAI", why: "Contradictory on purpose — 'Open' promises access, 'AI' states the category clearly. The tension made it memorable and philosophically interesting before they built anything." },
+      { brand: "Anthropic", why: "Greek: 'human-like'. Named to signal the company's thesis that AI should be studied from a humanistic angle. Scientific-sounding, credible, not obviously an AI company name — which made it stand out in 2021." },
+      { brand: "Midjourney", why: "Poetic and evocative — suggests being in the middle of a creative journey. Completely avoids the usual tech naming conventions, which built instant cult appeal among artists." },
+      { brand: "Perplexity", why: "Names the feeling of having a complex question answered. Most AI tools are named after what they do; Perplexity names why you'd use it. The unexpected word choice made it memorable instantly." },
+      { brand: "Cohere", why: "A single English word that describes what good NLP should do — make text cohere. Technically meaningful, easy to spell, and positions the company around language quality rather than raw capability." },
+    ],
+    commonMistakes: [
+      "Adding 'AI' as a suffix to a generic word (BrightAI, SmartAI, QuickAI) — the space is flooded with these and they're impossible to trademark",
+      "Using 'neural', 'synapse', 'cognitive' — once cutting-edge, now industry clichés that signal lack of originality",
+      "Choosing a name that only works if your AI product succeeds — names like 'Perfect AI' or 'AlwaysRight' create credibility problems from day one",
+      "Ignoring pronunciation — AI company names get spoken at conferences, on podcasts, and in meetings constantly. If people can't say it confidently, they won't repeat it",
+    ],
+    faqs: [
+      { q: "Should an AI startup name include the word 'AI'?", a: "Only if it adds clarity or you're specifically selling to non-technical buyers. Most sophisticated tech buyers don't need 'AI' in the name — the product demos itself. Overuse of 'AI' in names has made it feel generic. Names like Notion, Linear, or Figma became category-defining without describing their technology." },
+      { q: "Is a .ai domain worth the higher renewal cost?", a: "Yes, if you're specifically targeting the AI market or want the domain to signal your industry instantly. .ai renewals are typically £50-80/year vs £10-15 for .com, but the clarity and credibility it brings for an AI-focused product is often worth it." },
+      { q: "How do you make an AI company name feel trustworthy?", a: "Trust in AI comes from clarity and restraint, not hype. Names that sound precise, measured, and slightly formal (Anthropic, Cohere, Inflection) signal seriousness better than superlatives. Avoid names that over-promise ('PerfectAI', 'AllKnowing') — they set expectations no product can meet." },
+      { q: "What naming styles are working best for B2B AI companies in 2026?", a: "Short invented words (6-9 characters) with clean .ai or .com domains are performing best for B2B AI. Greek or Latin roots add perceived authority. Avoid portmanteaus that are hard to say ('Cognixalys') and focus on words that are immediately pronounceable and memorable after one hearing." },
+    ],
   },
   {
     slug: "fintech",
@@ -107,6 +139,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Solvent", meaning: "Solvent — always liquid, always reliable financial health", score: 84, domain: "solvent.io" },
       { name: "Meridian Fi", meaning: "Meridian — the point where financial flows converge and balance", score: 82, domain: "meridianfi.com" },
       { name: "Strata Fi", meaning: "Strata — layered financial products built for every level", score: 80, domain: "stratafi.com" },
+    ],
+    realWorldExamples: [
+      { brand: "Stripe", why: "A single common English word with no obvious finance connection — 'stripe' is simple, clean, and suggests linearity. It communicates ease of payment flow without using any payment terminology. One of the most successful B2B naming decisions of the 2010s." },
+      { brand: "Revolut", why: "Revolution + revolving credit — packs two meanings into six letters. The 'R' sound projects strength, the name implies change and constant motion. Immediately distinguishable from traditional banking names." },
+      { brand: "Monzo", why: "Invented word with no meaning — chosen entirely for sound. Hard consonants project reliability; short and punchy works on a bank card. The meaninglessness was intentional: it starts fresh with no baggage." },
+      { brand: "Wise", why: "Previously TransferWise — rebranded to a single adjective that embodies the product's core promise: financial wisdom, transparency, and smart decisions. The rebrand increased brand recall significantly." },
+      { brand: "Klarna", why: "Swedish for 'clear' — chosen to convey transparent, simple buy-now-pay-later. The Swedish origin gave it European credibility and a slightly exotic feel in English markets, making it more memorable than English equivalents." },
+    ],
+    commonMistakes: [
+      "Using 'pay', 'bank', 'fund', 'invest' as the primary word — these are overused, heavily regulated terms that create compliance complexity and blend into a crowded landscape",
+      "Choosing names that only work for one product — fintech companies pivot frequently; names like 'InstantLoans.io' become liabilities when you expand",
+      "Ignoring the trust dimension — clever, edgy names that work for consumer apps can alienate CFOs and compliance teams in B2B fintech",
+      "Not checking the name against major financial brands globally — fintech operates internationally from day one, and name conflicts in other markets create serious legal exposure",
+    ],
+    faqs: [
+      { q: "Can a fintech startup use 'bank' in its name?", a: "In most jurisdictions, using 'bank' in your company name requires a banking licence. In the UK, the FCA strictly regulates this. Use 'fi', 'financial', 'pay', or 'money' alternatives instead. Some countries have different rules — always check local financial regulations before finalising a name." },
+      { q: "Should a fintech name feel traditional or modern?", a: "It depends on your audience. Consumer fintech targeting millennials and Gen Z should feel modern, clean, and approachable. B2B fintech or infrastructure companies targeting banks and enterprises benefit from names that feel stable and credible, even if still modern. Stripe is modern; Visa is timeless — both work for their respective audiences." },
+      { q: "How important is the .com domain for a fintech startup?", a: "Extremely important. Financial services customers are more likely than average to distrust non-.com domains, especially for anything involving money transfer or storage. If your preferred .com is taken, getting a clean variant (getYourName.com, useYourName.com) is preferable to .io or .co for consumer fintech." },
+      { q: "What makes fintech names feel trustworthy?", a: "Short names (under 10 characters) with clean consonant sounds, no hyphens, and immediate pronounceability signal reliability. Names that feel slightly bank-like without being generic — think Starling, Monzo, Allica — carry weight because they balance novelty with stability cues." },
     ],
   },
   {
@@ -154,6 +205,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Zenith DeFi", meaning: "Peak performance — DeFi at its highest form", score: 84, domain: "zenithdefi.io" },
       { name: "Stasis", meaning: "Equilibrium — stable, balanced crypto assets and protocols", score: 81, domain: "stasis.io" },
     ],
+    realWorldExamples: [
+      { brand: "Ethereum", why: "Ether (the theoretical medium that fills space) + um (element suffix) — suggests a universal layer underlying everything digital. Named to feel foundational, not speculative. The naming philosophy of 'infrastructure' helped it attract serious developers over Bitcoin alternatives." },
+      { brand: "Solana", why: "Named after Solana Beach, California — a subtle geographic nod with no pretension. The Latin-sounding name evokes speed and energy ('sol' = sun). Completely avoids crypto buzzwords, which helped it feel more serious than competitors." },
+      { brand: "Uniswap", why: "Uni (single, unified) + swap — literal and clear about the core function. In DeFi naming, clarity often wins over cleverness because users need to trust they understand what a protocol does before interacting with it." },
+      { brand: "Chainlink", why: "Exactly describes the product — linking blockchains. Simple, memorable, and technically accurate. In a space full of invented words, a clear compound name stood out and earned immediate comprehension." },
+      { brand: "Aave", why: "Finnish for 'ghost' — intentionally abstract and mysterious, chosen by the Finnish founder. The non-English origin made it globally neutral and memorable. Shows that in Web3, unconventional naming sources can work when the product earns attention." },
+    ],
+    commonMistakes: [
+      "Using 'moon', 'rocket', 'safe', 'rug' or meme-associated language — these signal retail speculation rather than serious protocol development",
+      "Naming after the token ticker rather than building a brand (e.g., 'XRP Network') — inverts the relationship between brand and asset",
+      "Choosing names that sound too similar to existing protocols — the crypto community notices and it creates instant credibility problems",
+      "Forgetting the global audience — Web3 is inherently international; names with negative connotations in major languages (Mandarin, Spanish, Arabic) can cause serious harm at scale",
+    ],
+    faqs: [
+      { q: "Should a crypto project name match its token ticker?", a: "Not necessarily, though it helps with recognition. Many successful projects have names and tickers that clearly relate (Ethereum/ETH, Solana/SOL). If they don't match obviously, make sure both are independently memorable. The brand name matters more for longevity than the ticker." },
+      { q: "What TLD is best for a crypto or Web3 project?", a: ".io dominates in crypto and is widely trusted in the community. .xyz has become popular for Web3 projects wanting a 'generation next' feel. .com is still preferred for anything with mainstream ambitions. Avoid .org unless you're a genuinely non-profit DAO." },
+      { q: "How do you name a DAO versus a company?", a: "DAOs benefit from names that sound collective, distributed, or civic — like Nouns, MakerDAO, or Compound. The name should suggest community ownership rather than corporate control. Avoid names that sound like they belong to a single founder or team." },
+      { q: "Is it worth buying an ENS domain for my project name?", a: "Yes, if your project interacts directly with Ethereum. An ENS domain (yourproject.eth) signals Web3 nativity and can serve as a decentralised identifier. It's a small cost for significant credibility in DeFi-native communities." },
+    ],
   },
   {
     slug: "marketing",
@@ -199,6 +269,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Keynote Creative", meaning: "The keynote — the central message everything else supports", score: 82, domain: "keynotecreative.com" },
       { name: "Current Agency", meaning: "Always current — real-time brand strategy and execution", score: 84, domain: "currentagency.com" },
       { name: "Elevate Studio", meaning: "Elevated thinking, elevated results — for ambitious brands", score: 81, domain: "elevatestudio.com" },
+    ],
+    realWorldExamples: [
+      { brand: "Ogilvy", why: "A founder surname — but one that became shorthand for a philosophy. 'Ogilvy' now means 'classic advertising craft done with intelligence'. Founder names only work long-term when the founder's POV is so distinct it becomes a methodology." },
+      { brand: "Wieden+Kennedy", why: "Two surnames joined by a plus sign — unconventional punctuation that became iconic. The '+' suggests collaboration and addition rather than hierarchy. Now globally recognised with no first names needed." },
+      { brand: "AKQA", why: "Meaningless initialism chosen for global neutrality — works in any language, suggests nothing and therefore can become anything. The strongest brand asset in meaningless names is the work itself." },
+      { brand: "Mother", why: "Deliberately unexpected for an advertising agency — warm, unconditional, slightly irreverent. 'Mother' stood out in a sea of surname partnerships and abstract acronyms. Owning an everyday word in an unexpected context is a powerful brand strategy." },
+      { brand: "72andSunny", why: "Named after the temperature of a perfect California day — conveys warmth, optimism, and a place where good things happen naturally. Impossible to forget because no other agency would dare be this specific and human." },
+    ],
+    commonMistakes: [
+      "Using 'creative', 'digital', 'media', or 'solutions' as the primary descriptor — these words are invisible to clients who've seen thousands of agency pitches",
+      "Naming the agency after yourself too early — founder names require extraordinary personal reputation to carry weight; most founders aren't there yet when they start",
+      "Choosing a name that describes services rather than philosophy — the best agency names say nothing about what you do and everything about how you think",
+      "Picking geographic names that limit your perceived scope (e.g., 'Manchester Creative') if you have national or international ambitions",
+    ],
+    faqs: [
+      { q: "Should a marketing agency use a founder's name?", a: "Only if your personal reputation precedes you — clients are choosing you specifically — or if you're building a boutique where the founder's distinct POV is the product. For agencies planning to scale beyond the founder, an independent brand name gives you more flexibility and exit value." },
+      { q: "How long should a marketing agency name be?", a: "One or two words is ideal. One strong word (Resonance, Foundry, Catalyst) is memorable and projects confidence. Two words work when each adds meaning (Signal Works, Bold Bureau). Three words become harder to recall and can feel like a generic directory listing." },
+      { q: "Should the agency name describe the service or the outcome?", a: "The outcome. 'Growth Marketing Studio' describes a service. 'Momentum' describes an outcome. Clients don't buy services — they buy results, feelings, and transformation. Name the thing clients want, not the thing you do." },
+      { q: "Does the agency name matter for winning pitches?", a: "Yes, more than most founders expect. A memorable, distinctive agency name signals that you understand branding from first principles — which is precisely what clients are hiring you for. Showing up with a generic name in a pitch is an implicit demonstration of your limitations." },
     ],
   },
   {
@@ -246,6 +335,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Kinetica", meaning: "Kinetics — the science of movement applied to every workout", score: 85, domain: "kinetica.co" },
       { name: "Momentum Labs", meaning: "Building momentum that compounds — sustainable fitness gains", score: 83, domain: "momentumlabs.com" },
     ],
+    realWorldExamples: [
+      { brand: "Peloton", why: "French cycling term for the main group of riders in a race — implies community, competition, and momentum. Unknown to most consumers before the brand launched, which meant total ownership of the word. Now 'peloton' means the bike before it means the race." },
+      { brand: "Lululemon", why: "Invented word with deliberate alliteration — the three L's made it impossible to mishear or misspell. The playfulness signalled premium-casual positioning before anyone understood 'athleisure' as a category." },
+      { brand: "Whoop", why: "Onomatopoeic — it sounds like victory, like the noise you make when you nail a workout. Short, memorable, and impossible to confuse. The word had no fitness connotations before the brand; now it owns that space completely." },
+      { brand: "Hyrox", why: "Hybrid + ox (strength) — compound that suggests hybrid athletic capacity and raw power. The hard consonants (H, R, X) project intensity. Works on race bibs, merchandise, and announcer calls equally well." },
+      { brand: "Reebok", why: "Afrikaans for a small antelope — fast, agile, light-footed. The obscure etymology made it globally neutral and distinctive. Sound-wise, the hard 'k' ending projects energy and decisiveness." },
+    ],
+    commonMistakes: [
+      "Using 'fit', 'gym', 'strong', or 'sweat' as a standalone name or primary descriptor — the fitness industry is saturated with these and they're impossible to differentiate",
+      "Choosing a name that only works for your current format — a gym name that doesn't work for an app, merchandise, or online training limits your business model before you start",
+      "Picking aggressive/intimidating names for wellness and recovery brands — the energy must match the experience; a meditation app called 'Shred' would undermine trust immediately",
+      "Ignoring gender connotations — fitness brands often start serving one demographic and want to expand; check that your name doesn't accidentally exclude a large market",
+    ],
+    faqs: [
+      { q: "Should a fitness brand name be energetic or calming?", a: "Match the primary experience. High-intensity training brands benefit from short, punchy names with hard consonants (HYROX, Whoop, Torq). Yoga, recovery, and wellness brands should use softer sounds and longer words that feel measured and peaceful (Lululemon, Zenta, Revive). A mismatch between name and experience destroys brand coherence." },
+      { q: "How do you name a fitness brand that works across online and physical spaces?", a: "Test it on a gym sign, a phone app icon, workout gear, and an Instagram grid simultaneously. The name must work in all caps on a building, as a small icon at 16px, and spoken aloud in a podcast ad. If it fails any of these tests, rethink it." },
+      { q: "Is it better to name a fitness brand after the method or the feeling?", a: "The feeling almost always wins long-term. 'CrossFit' describes the method and became a commodity category anyone can imitate. 'Whoop' describes the feeling of success and is impossible to copy. Name the emotional experience, not the exercise format." },
+      { q: "Can a local gym name work as a national fitness brand?", a: "Rarely without a rebrand. Local gym names often include the owner's name, a street, or a local reference that has zero meaning outside the community. If you have national ambitions, build with a name that has no geographic ceiling from day one." },
+    ],
   },
   {
     slug: "saas",
@@ -291,6 +399,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Crestdb", meaning: "Crest + db — peak-performance database infrastructure", score: 82, domain: "crestdb.io" },
       { name: "Proxima", meaning: "Proxima (nearest) — the closest, most accessible developer toolchain", score: 84, domain: "proxima.io" },
       { name: "Dockside", meaning: "Dockside — where your containers, services, and pipelines are managed", score: 81, domain: "dockside.io" },
+    ],
+    realWorldExamples: [
+      { brand: "Notion", why: "A common English word meaning 'an idea or concept' — perfectly chosen for a tool where ideas take shape. The word had enough familiarity to be approachable but enough abstraction to contain anything. Now 'notion' means the tool before it means the word." },
+      { brand: "Linear", why: "The adjective — chosen to communicate the product's core philosophy: linear, streamlined issue tracking without bloat. One word that doubles as a manifesto. Every design decision flows from the name's promise." },
+      { brand: "Vercel", why: "Invented word — ver (version, verify) + cel (célèbre, cell) — sounds like a verb and a noun simultaneously. Projects modernity and function without describing either. The clean .com and strong consonants made it instantly credible in the developer community." },
+      { brand: "Figma", why: "From 'figura' (shape, figure) — evokes design and form without being literal. Short, pronounceable globally, completely ownable. The 'fig' sound is memorable; the '-ma' ending gives it a tool-like quality similar to other design nouns." },
+      { brand: "Loom", why: "A loom weaves threads together — a perfect metaphor for weaving video, voice, and screen into asynchronous communication. Single syllable, strong consonants, and a metaphor that explains the product without showing a single screenshot." },
+    ],
+    commonMistakes: [
+      "Naming the feature instead of the product — 'ScreenRecord Pro' describes a feature; 'Loom' describes a paradigm. Features get copied; paradigms get followed",
+      "Using 'hub', 'suite', 'platform', 'OS' as the primary name — enterprise SaaS buzzwords that mean everything to no one",
+      "Choosing a name that only works in English — SaaS is global from day one; check pronunciation and meaning in your three largest non-English markets",
+      "Making the name too technical for a product targeting non-technical buyers — developers love 'Kernal' and 'Terrabit'; a CEO buying HR software does not",
+    ],
+    faqs: [
+      { q: "What's the best TLD for a SaaS product in 2026?", a: ".io remains the most widely accepted TLD in the SaaS and developer tool space. .com is still the gold standard if available. For developer-focused tools specifically, .dev is gaining recognition. Avoid .net — it reads as dated in 2026 and developer audiences notice." },
+      { q: "Should a SaaS name describe what the product does?", a: "Only slightly, if at all. The most successful SaaS names hint at the value without describing the feature: Notion (ideas), Linear (flow), Vercel (deployment). Fully descriptive names like 'EmailScheduler' are hard to trademark, boring to brand, and limit your roadmap." },
+      { q: "How does a SaaS name affect developer adoption?", a: "Significantly. Developers are taste-makers — they adopt tools, talk about them, and often influence company-wide purchasing decisions. Names that feel clean, modern, and phonetically satisfying spread faster in developer communities. Names that feel corporate, acronym-heavy, or generic get eye-rolled in Slack channels." },
+      { q: "Should a B2B SaaS name feel different from a B2C SaaS name?", a: "Yes. B2B SaaS names benefit from sounding slightly more formal and credible — buyers need to defend the purchase to a CFO. B2C SaaS can be warmer, more playful, and more consumer-feeling. Notion works for both because it's abstract enough to mean different things to different audiences." },
     ],
   },
   {
@@ -338,6 +465,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Vault Supply", meaning: "From the vault — quality-locked products worth the investment", score: 82, domain: "vaultsupply.com" },
       { name: "Basecamp Store", meaning: "Your basecamp — essential gear and goods for life's adventures", score: 80, domain: "basecampstore.com" },
     ],
+    realWorldExamples: [
+      { brand: "Warby Parker", why: "Named after two Jack Kerouac characters — Warby Pepper and Zagg Parker. Completely disconnected from eyewear, which made it feel literary and distinctive. The oddness of the name made it impossible to forget and easy to talk about." },
+      { brand: "Glossier", why: "From 'glossy' — the magazine-quality finish applied to beauty retail. A single word that captures the brand's aspirational, editorial aesthetic without being literal about any product. Naming the feeling, not the category." },
+      { brand: "Allbirds", why: "A subtle nod to New Zealand (where birds evolved without natural predators) and the brand's natural, sustainable materials. Friendly, disarming, totally unexpected for a footwear brand — which is exactly why it worked." },
+      { brand: "Away", why: "A single evocative word that names the emotion of travel without being a luggage brand name. 'Away' means adventure, escape, movement — all the feelings a luggage brand wants to own. It works as a verb, an aspiration, and a brand." },
+      { brand: "ASOS", why: "Originally 'As Seen On Screen' — a name that was accidentally perfect for an era when people wanted celebrity outfits. Now purely an acronym with its own identity, showing that you can outgrow your original name if the brand grows fast enough." },
+    ],
+    commonMistakes: [
+      "Using 'shop', 'store', or 'mart' generically — these words add no distinctiveness and are the default choice for brands that haven't thought hard enough about their identity",
+      "Naming after your current product category (e.g. 'The Sneaker Store') — limits brand evolution when you inevitably expand your range",
+      "Choosing a name that's already a major competitor's tagline or product name — creates SEO and brand confusion from day one",
+      "Picking overly cute or punny names that work in conversation but look unprofessional on packaging, invoices, and media coverage",
+    ],
+    faqs: [
+      { q: "Should an ecommerce brand name reflect what it sells?", a: "Not necessarily. Some of the most successful ecommerce brands (Allbirds, Away, Glossier) chose names that reflect a feeling or philosophy rather than a product. Product-descriptive names limit future expansion and are harder to trademark. Aim for a name that captures your brand's personality and the feeling customers get from buying from you." },
+      { q: "How important is a .com domain for an ecommerce brand?", a: "Extremely important. For ecommerce specifically, .com is still the trust standard — customers type .com instinctively when looking for a brand's site. If your .com is taken and expensive, consider adding 'shop', 'get', or 'store' as a modifier before compromising to .co or .io, which can undermine perceived legitimacy with mainstream shoppers." },
+      { q: "What makes an ecommerce name work on social media?", a: "Short (under 12 characters), distinctive, and ideally available as @brandname across Instagram, TikTok, and Pinterest. Avoid names with numbers or special characters. The handle needs to be clean enough that influencers and customers can tag you without effort." },
+      { q: "Is it better to name after a founder or use an invented brand name for ecommerce?", a: "Invented brand names almost always outperform founder names for ecommerce because they're easier to trademark, easier to sell, and more flexible as the brand evolves. Founder names work when the founder's personal brand is the product (e.g. fashion designers). For product-led ecommerce, invest in a strong invented name." },
+    ],
   },
   {
     slug: "real-estate",
@@ -383,6 +529,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Stronghold", meaning: "The stronghold — property investments built to last", score: 84, domain: "stronghold.co" },
       { name: "Nestward", meaning: "Heading nestward — always finding the right home", score: 85, domain: "nestward.com" },
       { name: "Blueprint Realty", meaning: "Blueprint — the master plan for your property journey", score: 83, domain: "blueprintrealty.com" },
+    ],
+    realWorldExamples: [
+      { brand: "Zillow", why: "A completely invented word with no prior meaning — chosen to be distinctive, short, and ownable in a sea of 'Homes' and 'Realty' names. The double-L gives it visual rhythm. It now defines the category, which is the goal of any great brand name." },
+      { brand: "Opendoor", why: "Two simple words combined to create an idea — the open door of a home, but also the open door of opportunity in property. Immediately communicates the brand promise (make buying/selling easy and accessible) without being literal about the business model." },
+      { brand: "Compass", why: "A navigation metaphor perfectly suited to real estate — guiding buyers and sellers to the right destination. Single strong word, rich with meaning, impossible to confuse with a competitor. Works visually as a logo and conceptually as a brand philosophy." },
+      { brand: "Rightmove", why: "Functional and aspirational — 'the right move' is both the brand's service (finding properties) and the customer's goal (making the right life decision). It's the rare property brand name that's immediately understood by everyone and works as a phrase in everyday speech." },
+      { brand: "Purplebricks", why: "Named to be deliberately provocative — bricks in a colour no building company would use. The unusual name signals disruption before a single word of copy. It says 'we're not like the old guard' through colour and material alone. A bold bet that paid off in brand recognition." },
+    ],
+    commonMistakes: [
+      "Using geographic names that seem obvious locally but make national or international growth impossible — 'Manchester Homes' is a ceiling, not a brand",
+      "Naming after a founder (e.g. 'Johnson & Partners') when the business will likely be sold or have partners change — locks your brand equity in an individual rather than an idea",
+      "Choosing 'Homes', 'Properties', or 'Estates' as standalone names without a strong qualifier — these are category descriptors, not brand names, and are completely untrademarkable",
+      "Using apostrophes or hyphens in the business name — creates nightmare formatting issues across signage, URLs, email addresses, and legal documents",
+    ],
+    faqs: [
+      { q: "Should a real estate agency use a founder's name or a brand name?", a: "It depends on scale. For a boutique local agency where trust is personal, a founder's name can work — many top luxury agencies (Savills, Knight Frank) use founder names successfully. But for anything aiming to scale, be acquired, or operate across multiple locations, a brand name will serve you better. You can always put founder names in the tagline: 'Johnson Realty, founded by...'." },
+      { q: "What tone should a real estate brand name convey?", a: "For traditional residential agencies: trust, permanence, and local knowledge. For PropTech: modern, accessible, and efficient. For luxury property: exclusivity, aspiration, and craft. The mistake most agencies make is choosing a name that doesn't match their tier — a luxury developer with a budget-sounding name, or a digital-first platform with an old-fashioned name." },
+      { q: "How do you choose between a generic real estate name and something more distinctive?", a: "Ask: would someone be able to find my company on Google if they only remembered the name after hearing it once? Generic names ('Premier Properties', 'Homes Direct') are impossible to search for effectively and create years of SEO headaches. Distinctive names ('Hearthstone', 'Homeward', 'Compass') are searchable, ownable, and memorable." },
+      { q: "Does a .com domain matter for real estate or will .co.uk do?", a: "For UK-based agencies, .co.uk actually builds local trust — it signals 'this is a British company serving British buyers'. For PropTech platforms aiming at multiple markets, .com is preferable. The key is consistency: whatever TLD you choose, own it, and secure the others defensively to prevent competitor use." },
     ],
   },
   {
@@ -430,6 +595,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Lifeform Health", meaning: "Life + form — shaping a longer, fuller life through medicine", score: 82, domain: "lifeformhealth.com" },
       { name: "Revita", meaning: "Revitalise — restoring energy, health, and quality of life", score: 85, domain: "revita.co" },
     ],
+    realWorldExamples: [
+      { brand: "Hims & Hers", why: "Radically direct about the consumer — uses the personal pronoun so intimately that it breaks down the clinical distance most health brands maintain. The name removes the stigma from personal health topics by making the brand feel like a conversation between friends." },
+      { brand: "Calm", why: "A single English adjective used as a brand name — the exact feeling the product delivers. Nothing is promised that isn't immediately deliverable. The simplicity and directness became the brand's greatest marketing asset. It costs nothing to say and everyone immediately understands it." },
+      { brand: "Noom", why: "An invented word that sounds friendly, warm, and faintly playful — the opposite of clinical. Weight management brands often use serious, clinical names that create anxiety. Noom's warm, approachable sound design was a deliberate strategy to reduce the shame associated with diet products." },
+      { brand: "Headspace", why: "Names the mental state the product creates, not what the product is. 'Headspace' suggests clearing mental clutter and creating room — it's a metaphor for the benefit, not a description of the feature. This approach (naming the outcome) is one of the most powerful strategies in health brand naming." },
+      { brand: "Hinge Health", why: "Hinge — the joint that enables movement. For a musculoskeletal health company, it's both anatomically precise and metaphorically perfect. The name signals specialist knowledge without alienating non-medical audiences. Adding 'Health' made the category clear while 'Hinge' made it distinctive." },
+    ],
+    commonMistakes: [
+      "Using medical jargon that confuses or alienates consumer audiences — words like 'osteo', 'cardio', 'neuro' as prefixes signal clinical authority but create distance for patient-facing brands",
+      "Choosing words that imply medical claims you can't legally make — 'CureIt', 'HealFast', 'NoMorePain' create regulatory problems and damage credibility when products underdeliver",
+      "Making the name so gentle and soft it loses authority — health brands need warmth AND credibility; names that are only soft (Fluffy Health, Cosy Care) won't be taken seriously by healthcare professionals",
+      "Ignoring international implications — some health brand names that work in English have unfortunate meanings in other languages, which matters the moment you consider any cross-border expansion",
+    ],
+    faqs: [
+      { q: "Should a health startup name include 'health' or 'med' in it?", a: "Only if it adds clarity for your specific audience. Consumer health brands (Calm, Noom, Hims) have moved away from clinical suffixes and it has worked well. B2B or clinical brands targeting practitioners and insurers benefit from 'Health' or 'Med' because it signals the category to procurement teams who make buying decisions. Match the naming convention to your buyer's expectations." },
+      { q: "How do health brand naming rules differ from other sectors?", a: "Health brands face tighter regulatory constraints (you cannot imply medical cures or FDA-unapproved claims through your brand name), higher trust requirements, and must work across professional and consumer contexts. The name must pass a 'could a clinician recommend this without embarrassment?' test, a 'would a patient trust this?' test, and a 'does this create any regulatory exposure?' test simultaneously." },
+      { q: "What makes a health brand name feel trustworthy?", a: "Precision, restraint, and clarity. Names that over-promise ('Perfect Health', 'Total Cure') signal desperation or naivety. Names with clinical etymology (Latin/Greek roots) signal expertise. Names that describe a genuine human feeling ('Solace', 'Calm', 'Wellpath') create emotional trust. Avoid exclamation marks, superlatives, and anything that sounds like a pharmaceutical ad from 1990." },
+      { q: "Is a .health domain worth considering for a health startup?", a: "It's gaining recognition in the healthcare sector, particularly for B2B and professional platforms. For consumer-facing brands, .com remains the expectation. If your .com is taken, .co is preferable to .health for mainstream consumer trust, but .health can work well for professional networks, directories, and clinical tools where the TLD itself signals legitimacy." },
+    ],
   },
   {
     slug: "podcast",
@@ -475,6 +659,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Plainspeak", meaning: "No jargon, no fluff — plain speaking on complex topics", score: 84, domain: "plainspeak.fm" },
       { name: "Undercurrent", meaning: "The undercurrent — the forces shaping your world beneath the surface", score: 85, domain: "undercurrent.fm" },
       { name: "The Meridian", meaning: "The highest point of the day — the media brand you turn to first", score: 83, domain: "themeridian.fm" },
+    ],
+    realWorldExamples: [
+      { brand: "Gimlet Media", why: "A gimlet is a small tool for boring holes — and a cocktail. Gimlet Media chose a word that's unexpected, slightly literary, and creates instant curiosity. The name has nothing to do with podcasting, which made it stand out immediately in a sea of '[Something] Radio' and '[Something] Podcast Network' names." },
+      { brand: "Wondery", why: "Wonder + y — a name that evokes childlike curiosity and storytelling magic. For a true-crime and narrative podcast network, 'Wondery' positions the listening experience as wonder-inducing rather than just informative. The -y suffix makes it warm and informal, reducing the barrier to discovery." },
+      { brand: "Hardcore History", why: "Does exactly what the best descriptive podcast names do — tells you precisely what you're getting with its first word. 'Hardcore' signals depth, intensity, and non-superficiality. 'History' states the topic. No ambiguity, and yet the name still has personality because 'hardcore' is an unexpected word to put next to 'history'." },
+      { brand: "How I Built This", why: "A conversational phrase that poses an implicit question — the format IS the brand name. The listener knows they're going to hear stories of how companies were built. The name works because it names the discovery (how something was built) not the topic (business, startups). Guy Raz's phrasing became so synonymous with the format that it became iconic." },
+      { brand: "99% Invisible", why: "Named after the idea that 99% of design goes unnoticed — perfectly encapsulating the show's thesis in its name. Unusual, specific, slightly mathematical, and memorable for exactly those reasons. A brand name that only works if you understand the thesis, which means the people who get it feel immediately like they belong." },
+    ],
+    commonMistakes: [
+      "Using 'The [Topic] Podcast' as a name — almost impossible to distinguish in app stores where discovery relies on differentiation, and it signals the creator didn't invest enough thought in their brand",
+      "Choosing a name that's too inside-baseball for your niche — works great for your 1,000 early listeners but prevents discovery by mainstream audiences who don't recognise the reference",
+      "Naming the host instead of the show — unless your personal brand is already large enough to be the draw, a show named after an unknown person will not be discovered organically",
+      "Picking a name that's a common phrase or word with no distinctiveness ('The Conversation', 'Open Dialogue') — impossible to trademark, terrible for SEO, and indistinguishable in show art",
+    ],
+    faqs: [
+      { q: "Should a podcast name describe the topic or the feeling?", a: "Both approaches work, but describing the feeling tends to build more loyal audiences. 'Hardcore History' describes topic + intensity. '99% Invisible' describes a philosophy. 'The Long Game' describes a feeling. Topic-descriptive names get discovered more easily but attract more casual listeners. Philosophy-driven names attract deeper, more engaged communities. For a business, the latter builds a more valuable brand." },
+      { q: "Does the podcast name matter for Apple/Spotify discoverability?", a: "Yes, more than most creators realise. Apple Podcasts and Spotify use keyword matching in show names and descriptions. Having your core topic keyword in your show name gives you a meaningful discoverability advantage. Balance this with distinctiveness — 'Marketing Made Easy' is keyword-rich but has no brand differentiation, while 'Duct Tape Marketing' is distinctive and still findable." },
+      { q: "What's the ideal length for a podcast name?", a: "2-4 words is the sweet spot. Short enough to remember after a single hearing, long enough to convey what the show is about. One-word podcast names ('Revisionist History', 'Radiolab') work for established shows with marketing budgets. For new shows, 3 words that clearly communicate value are more discoverable than clever single words with no category signal." },
+      { q: "Should I include my name in the podcast if I'm building a personal brand?", a: "Only if your name already has search volume or you're committed to a personality-led brand long-term. 'The [Your Name] Show' is a valid format if you're building a personal brand, but it limits the show's ability to exist independently of you (for sale, collaboration, or guest co-hosts). Consider 'Show Name with [Your Name]' as an alternative that keeps the show name distinct." },
     ],
   },
   {
@@ -522,6 +725,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Quarter Moon", meaning: "The quarter moon — late-night coffee for the people still working", score: 83, domain: "quartermoon.co" },
       { name: "The Gather", meaning: "Where people gather — coffee as a reason to come together", score: 86, domain: "thegather.co" },
     ],
+    realWorldExamples: [
+      { brand: "Blue Bottle Coffee", why: "Named after the first European coffeehouse (The Blue Bottle, Vienna, 1683) — instantly communicates craft heritage, historical seriousness, and the idea that great coffee is centuries old. The name builds a mythology without a word of copy. For a specialty roaster, this kind of historical depth is exactly the right signal." },
+      { brand: "Intelligentsia", why: "Named after the 19th-century intellectual class — a completely unexpected word for a coffee brand that immediately positions the brand as serious, thoughtful, and non-mainstream. The provocation is the point: choosing 'Intelligentsia' is a signal to a particular kind of coffee drinker that this is not Starbucks." },
+      { brand: "Stumptown Coffee", why: "Named after Portland's nickname (a reference to the logged stumps left in the early city) — deeply local, deeply specific, and completely non-transferable as a brand idea. This specificity became its strength: 'Stumptown' means Portland, independence, and craft in the same breath as it means coffee." },
+      { brand: "Blank Street", why: "Minimalist, cool, and visually empty — the brand name is its aesthetic. 'Blank Street' communicates modern restraint, the absence of fuss, and a vaguely literary quality. For a coffee-forward quick-service brand targeting urban millennials, the name is the brief: clean, minimal, no unnecessary decoration." },
+      { brand: "Oatly", why: "Not a coffee brand, but a brand that became part of every coffee shop menu by naming their category with personality. 'Oatly' made oat milk sound fun, human, and slightly cheeky — the brand voice carried the product. For any café considering house-made alternative milks or branded products, Oatly's naming is the model to study." },
+    ],
+    commonMistakes: [
+      "Choosing a name that's either too cute or too generic — 'The Bean Scene' or 'Coffee Stop' have zero differentiation and make it impossible to build a brand worth anything beyond your block",
+      "Using geographic names when you plan to open multiple locations — 'Hackney Coffee' works for one shop but becomes a lie when you open in Shoreditch",
+      "Picking a name without testing how it looks handwritten on a coffee cup — café names must survive being written in marker by someone making 200 drinks before lunch",
+      "Choosing a name that's been trademarked by a larger chain — 'Grounds', 'Perk', 'The Daily Grind' have all been used extensively; a trademark dispute with a larger brand can close your business before you've found your rhythm",
+    ],
+    faqs: [
+      { q: "Should a coffee shop name be serious or playful?", a: "It should match your intended customer. Third-wave specialty cafés (targeting serious coffee enthusiasts) do better with names that signal craft, heritage, or precision (Blue Bottle, Intelligentsia, Stumptown). Neighbourhood cafés and quick-service concepts can lean warmer and more approachable. The mistake is choosing 'playful' to avoid the work of finding a genuinely distinctive serious name, or choosing 'serious' to seem premium when the café experience doesn't match." },
+      { q: "Does a coffee shop need a website domain?", a: "Yes — even for a single-location café. Customers look for opening hours, menus, and whether you're open before making the journey. A matching .com or .co domain gives you a professional home base for Google My Business, Instagram bio links, and any future online sales (beans, merchandise, subscriptions). Pick your name with domain availability in mind from day one." },
+      { q: "How do I check if a coffee shop name is already taken?", a: "Check: (1) trademark databases (UK Intellectual Property Office, US Patent and Trademark Office), (2) Companies House or your state business registry, (3) Google search, (4) Instagram/TikTok handles, and (5) domain availability. A name clear on all five fronts is genuinely available. Passing only 2-3 of these tests creates risk." },
+      { q: "Can a coffee shop name be too clever?", a: "Absolutely. Names that require explanation or that only work as a pun in written form ('Espresso Yourself', 'Pour Decisions') are clever once and irritating forever. Staff will explain the pun thousands of times. Customers will struggle to recommend the café verbally. The best café names are those that make people feel smart for understanding them, not ones that require the joke to be explained." },
+    ],
   },
   {
     slug: "gaming",
@@ -567,6 +789,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Axiom Games", meaning: "Self-evident excellence — games where quality is the baseline", score: 85, domain: "axiomgames.com" },
       { name: "Strikezone", meaning: "In the zone — competitive gaming in the perfect strike window", score: 83, domain: "strikezone.gg" },
       { name: "Crucible Games", meaning: "The crucible — where great games are forged under pressure", score: 86, domain: "cruciblegames.com" },
+    ],
+    realWorldExamples: [
+      { brand: "Riot Games", why: "Chose a word that signals chaos, energy, and rebellion — before a single game was built. 'Riot' promised something disruptive and player-obsessed. It turned out to be exactly right: Riot's philosophy of building games around community feedback and competitive play was genuinely riotous compared to the industry norm. The name set the expectation, and they delivered it." },
+      { brand: "Naughty Dog", why: "Self-deprecating and charming — a game studio that doesn't take itself too seriously. 'Naughty Dog' projects personality and approachability, which made them seem like underdogs before they became one of Sony's most acclaimed first-party studios. The name is genuinely warm, which is unusual in gaming, and it made their human-centred stories (The Last of Us, Uncharted) feel consistent with the brand." },
+      { brand: "Bungie", why: "An invented nonsense word with no prior meaning — completely ownable from day one. The name has no gaming associations, which meant Bungie could build any identity they wanted around it. Over 30 years, 'Bungie' became synonymous with precision action games and community-first culture. Proof that invented words can outlast trends." },
+      { brand: "Supercell", why: "A meteorological term for the most powerful type of thunderstorm — chosen to name a mobile gaming company that aimed to be the most powerful force in mobile games. The name projects scale, energy, and force. It's also unexpected enough to stick: most people don't know what a supercell is, which creates curiosity and makes the brand memorable." },
+      { brand: "Valve", why: "A functional word (a valve controls flow) that works as a metaphor for the company's role: controlling the flow of games to consumers. Simple, strong, industrial-sounding — appropriate for a company that wanted to seem like infrastructure rather than entertainment. Steam (their platform) continued this industrial naming theme perfectly." },
+    ],
+    commonMistakes: [
+      "Using words already trademarked by major studios — 'Apex', 'Nexus', 'Forge', 'Titan' all have existing trademark claims in the gaming space; thorough searching is essential before committing",
+      "Choosing a name that only works for your current genre — naming your studio after dark fantasy concepts limits you if you ever want to build a puzzle game or a children's mobile title",
+      "Ignoring how the name sounds in commentary and esports broadcast — gaming names are spoken constantly by streamers and commentators; names that are hard to pronounce or that sound similar to other brands create broadcast confusion",
+      "Using '.com' when '.gg' is available and appropriate — in gaming and esports, .gg is the recognised domain for brands, communities, and tools; choosing .com when .gg is your natural home signals you're not native to the culture",
+    ],
+    faqs: [
+      { q: "Should a game studio name reflect the type of games it makes?", a: "It helps, but it shouldn't be a hard rule. Naughty Dog makes story-driven action games, not dog games. Bungie makes shooters, not bungee-jumping simulators. The best studio names reflect the studio's attitude and culture, not their genre — because studios that lock themselves into a genre name limit their creative future. Names like 'Ironclad' or 'Forge' suggest craft and quality without specifying genre." },
+      { q: "What's the difference between a game studio name and an esports organisation name?", a: "Studio names need to age well and feel credible across decades (you're building IP that will be referenced for years). Esports org names need more immediate energy, edge, and visual punch — they appear on jerseys, streams, and highlights reels. Studios can afford to be more considered; esports brands need to be felt immediately. Hard consonants and aggressive imagery matter more for esports." },
+      { q: "How do you make a gaming brand name stand out in 2026?", a: "Avoid what everyone else is doing: overused words like 'apex', 'nexus', 'pixel', 'legend', 'epic', and 'infinity' are exhausted. Instead, look for words from unexpected domains (mythology, architecture, meteorology, geometry) that carry the right energy without the baggage. Unusual specificity — a name that seems almost wrong for a game studio — often creates the most memorable brands." },
+      { q: "Do you need separate branding for a game vs. a studio?", a: "Yes, ideally. The studio name is the long-term brand (Naughty Dog, Bungie, Valve). The game name is a product brand that needs to work independently in app stores, on box art, and in keyword searches. Your studio might make 10 games; each one needs to stand alone. Budget time for game-specific naming separate from your studio identity." },
     ],
   },
   {
@@ -614,6 +855,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Solstice Travel", meaning: "The turning point — journeys that change the direction of your life", score: 84, domain: "solsticetravel.com" },
       { name: "Immerse", meaning: "Total immersion — travel that goes below the surface of a destination", score: 87, domain: "immerse.co" },
     ],
+    realWorldExamples: [
+      { brand: "Airbnb", why: "Air bed and breakfast — abbreviated to something that sounds invented and fresh. The original name was descriptive of a scrappy product (air mattresses in an apartment); the abbreviation 'Airbnb' became a category-defining brand that sounds like it could mean almost anything. A reminder that the best brands evolve past their founding premise." },
+      { brand: "GetYourGuide", why: "Functional and friendly — tells you exactly what happens when you use it. For a marketplace connecting travellers with experiences and guides, the name is the user journey: get your guide. It's not the most poetic name, but its clarity drove conversion and made it easy to explain to millions of international customers across language barriers." },
+      { brand: "Remote Year", why: "Two words that created a new category — 'remote year' became the term for a year of travelling while working remotely, and the brand owned the category before remote work was mainstream. Naming a new behaviour before others name it is one of the highest-value brand strategies available." },
+      { brand: "Intrepid Travel", why: "'Intrepid' means fearless and adventurous — a single adjective that positions the brand as the choice for travellers who want real experiences, not resort holidays. The word has historical weight (intrepid explorers) without being clichéd. It signals the customer type before they've read a brochure." },
+      { brand: "Scott's Cheap Flights", why: "Honesty as a brand strategy — named after the founder and his expertise. 'Scott's' gives it personal authority; 'Cheap Flights' states the exact value proposition. The name has no pretension and appeals perfectly to cost-conscious travellers who feel excluded by glossy travel brands. Sometimes the most direct name is the best name." },
+    ],
+    commonMistakes: [
+      "Using destination-specific words in a travel brand name when you plan to cover multiple regions — 'European Escapes' is a ceiling, not a brand",
+      "Choosing travel clichés ('Wanderlust', 'Nomad', 'Adventure') that are already saturated across thousands of Instagram accounts and small agencies — no differentiation and poor trademark prospects",
+      "Naming too literally for the current business model — a 'Flight Deals' company becomes 'Experiences Company' over time; the name should work across the likely evolution of the business",
+      "Ignoring the multilingual traveller — travel brands reach international customers by definition; names that have negative or confusing meanings in other major languages will create real marketing problems",
+    ],
+    faqs: [
+      { q: "Should a travel brand name evoke a destination or a feeling?", a: "A feeling almost always wins. Destination-specific names limit you geographically and date quickly (trends shift). Feeling-based names ('Wayfarer', 'Roam', 'Immerse') work across all destinations, all seasons, and all customer types. The exception: if hyper-local authority is your competitive advantage (e.g. a specialist Japan tour operator), a destination-linked name can be a strength." },
+      { q: "What makes a travel brand name memorable?", a: "Movement, imagery, and sensory language. Words that evoke physical sensation (Overland, Traverse, Drift) stay in the memory because they create a felt experience when you read them. Travel is a physical, emotional experience — your name should trigger that anticipation. Abstract corporate-sounding names ('Global Travel Solutions') fail because they don't evoke the feeling travel is really about." },
+      { q: "How important is social media handle availability for a travel brand?", a: "Extremely important. Travel brands live on Instagram, TikTok, and YouTube — a consistent handle across platforms is essential for influencer partnerships, user-generated content, and discoverability. Before finalising any travel brand name, check that @brandname is available on Instagram, TikTok, YouTube, Pinterest, and X. The name you choose should be available as a clean, unmodified handle on all five." },
+      { q: "Is .co a legitimate alternative to .com for a travel brand?", a: "Yes, more than in most sectors. Travel brands are globally oriented, and international audiences are comfortable with .co. Many strong travel brands (Roam.co, Basecamp.co, Voyage.co) have made .co work well. If your .com is taken and expensive, .co is a credible alternative — but secure .com defensively if you can, to prevent confusion as you grow." },
+    ],
   },
   {
     slug: "consulting",
@@ -660,6 +920,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Echelon", meaning: "A level above — consulting for organisations ready to step up", score: 83, domain: "echelon.co" },
       { name: "Tenon Advisory", meaning: "Tenon (the joint that connects) — connecting strategy to execution", score: 82, domain: "tenonadvisory.com" },
     ],
+    realWorldExamples: [
+      { brand: "McKinsey & Company", why: "A founder's name that became so synonymous with a methodology and culture that it transcended the person. 'McKinsey' no longer means the man — it means a rigorous, elite approach to business strategy. The lesson: founder names can work long-term, but only if the founder's philosophy becomes an industry standard, not just a firm." },
+      { brand: "IDEO", why: "From 'idea' — a portmanteau that signals the firm's core belief that design and ideas are where consulting value comes from. Short, memorable, and slightly playful for a professional services firm, which was radical when it launched. IDEO's name told you their positioning before you'd read a word of their approach." },
+      { brand: "Bain & Company", why: "Another founder name that evolved into an ethos. But Bain's lasting brand contribution is 'Bain Way' — a consulting approach so distinctive it became a verb in private equity circles. Names become powerful when the firm behind them develops an approach distinctive enough to become a methodology." },
+      { brand: "Eden McCallum", why: "A boutique consultancy that built its brand around the idea of a network of expert independents rather than career consultants — and chose a human, approachable double-surname name to signal it. The name sounds like a law firm but the approach is radically different, creating a useful tension that makes the brand memorable." },
+      { brand: "Deloitte", why: "Named after founder William Welch Deloitte — now purely a brand, with no memory of the original person. Deloitte succeeded as a brand despite the name becoming disconnected from its origin because the firm invested in consistent positioning and high-profile client work that built the brand independent of the founder. Shows that heritage names can survive as long as the underlying positioning is strong." },
+    ],
+    commonMistakes: [
+      "Using 'solutions', 'partners', 'group', or 'associates' as the primary brand word — these are the most generic words in professional services and create no differentiation whatsoever",
+      "Naming after a specialisation that may evolve — 'Digital Transformation Partners' locks you into a trend, while 'Meridian Advisory' works regardless of what method is in fashion",
+      "Choosing a name that's too long or hard to say in a business meeting — consulting brands are referred by word of mouth constantly; names that require spelling out or that can be misheard create real friction",
+      "Ignoring the buyer's perspective — consulting buyers (C-suite executives) respond to names that project authority and gravitas; anything too playful or casual for your tier creates a credibility mismatch before the first meeting",
+    ],
+    faqs: [
+      { q: "Should a consulting firm use a founder's name or a brand name?", a: "Founder names work well when the founder has an established reputation in their industry and the firm will always reflect the founder's personal methodology. Brand names work better when you want to scale, hire other partners, or eventually sell the firm. A firm named after you is worth less on the open market than a brand with equity independent of any individual. If you're building to scale or exit, invest in a brand name from day one." },
+      { q: "What tone should a consulting firm name convey?", a: "Match your tier. Top-tier strategy consultancies project gravitas and restraint — their names are precise, often polysyllabic, and never frivolous. Specialist boutiques can afford more personality — a name that reflects their specific POV. Mid-market generalist consultancies often make the mistake of trying to sound like McKinsey with a weaker name. Better to be distinctive in your category than generic at a higher tier." },
+      { q: "How do you differentiate a consulting firm name from competitors?", a: "Most consulting names are geographic ('Midlands Consulting'), functional ('Operations Advisory'), or founder-based ('Smith & Associates'). The differentiation opportunity is in naming the philosophy: 'Fulcrum' (leverage), 'Prism' (clarity from complexity), 'Catalyst' (transformation without ownership). Names that describe how you think and work are far more differentiating than names that describe what you do or where you are." },
+      { q: "Does a consulting firm need a .com domain, or will .co work?", a: "For professional services targeting senior buyers, .com is effectively mandatory. Decision-makers at large organisations expect .com — anything else triggers a trust question, even subconsciously. If your preferred .com is taken, add a clear qualifier (AdvisoryFirmName.com rather than AdvisoryFirmName.co). The exception is boutique firms with a highly referred client base, where the website is secondary to reputation." },
+    ],
   },
   {
     slug: "sustainability",
@@ -705,6 +984,25 @@ export const pseoNiches: NicheData[] = [
       { name: "Crestline Green", meaning: "At the crest — leading green technology from the top down", score: 82, domain: "crestlinegreen.com" },
       { name: "Earthcraft", meaning: "Crafting solutions from and for the earth", score: 85, domain: "earthcraft.co" },
       { name: "Skyward Clean", meaning: "Heading skyward — clean energy reaching new heights", score: 83, domain: "skywardclean.com" },
+    ],
+    realWorldExamples: [
+      { brand: "Patagonia", why: "Named after a remote, wild region of South America — chosen to evoke adventure, wilderness, and the kind of extreme environments the brand's clothing was built for. The name carries a geography of the imagination: 'Patagonia' means somewhere vast, untamed, and worth protecting. It became the perfect name for a company whose mission is environmental protection." },
+      { brand: "Climeworks", why: "Precise, functional, and confidence-inspiring — 'Climeworks' tells you exactly what they do (work on climate) while the 'works' suffix suggests engineering credibility. For a direct air capture company that needs to build trust with investors and policy-makers, sounding like serious infrastructure rather than feel-good activism was a critical naming decision." },
+      { brand: "Oatly", why: "Not named as a 'sustainability brand', but became one — by making a sustainable choice (oat milk) feel fun, personal, and slightly rebellious. 'Oatly' is warm and playful where most food tech brands are cold and corporate. The lesson: sustainable products don't have to sound earnest to drive environmental impact. Sometimes the best sustainability brand name is the one that makes people smile." },
+      { brand: "Too Good To Go", why: "A phrase that captures the problem (food waste) and the solution (saving food that's too good to throw away) simultaneously. Five words that tell the whole story. The clarity was strategic: Too Good To Go needed to explain a new consumer behaviour (buying surplus restaurant food) and the name does the explaining before any marketing is needed." },
+      { brand: "Watershed", why: "A watershed is both a literal geographic feature (the area that drains into a river) and a metaphorical moment of change. For a climate accounting and carbon management platform, naming after the geographical feature that connects all water flow to the sea is poetic, precise, and carries the right gravitas. It names the moment of change without being preachy about it." },
+    ],
+    commonMistakes: [
+      "Using 'eco', 'green', or 'sustainable' as prefixes or suffixes — these words are overused to the point of meaning nothing, and worse, they signal virtue-signalling rather than genuine innovation to sophisticated audiences",
+      "Choosing names that are sentimentally environmental but scientifically vague ('EarthLove', 'PlanetFirst') — serious investors, procurement teams, and B2B buyers in climate tech expect names that signal technical credibility, not emotional aspiration",
+      "Naming after a specific technology that may become obsolete — 'Solar[Something]' works until solar becomes the boring baseline; 'Wind[Something]' is limiting if you diversify; choose names that work across technology transitions",
+      "Failing to test for greenwashing perception — some sustainability brand names, even with genuine intention behind them, read as marketing-led rather than science-led; get feedback from technical advisors and environmentally-savvy target customers before committing",
+    ],
+    faqs: [
+      { q: "How do you avoid greenwashing in a sustainability brand name?", a: "Name the mechanism, not the sentiment. 'Climeworks' (captures carbon) is specific and credible. 'GreenFuture' (vaguely positive) is not. Names that describe what you actually do technically — carbon capture, circular manufacturing, energy recovery — earn more trust than names that gesture toward environmental values. The more specific the claim implied by the name, the more it has to be backed by substance." },
+      { q: "Should a cleantech startup sound technical or accessible?", a: "It depends on your primary buyer. B2B cleantech targeting utilities, industrial companies, and government procurement needs technical credibility — names with 'tech', 'labs', or engineering-style precision (Climeworks, Carbix, Verdant Labs) perform well. Consumer sustainability brands need warmth and accessibility — Patagonia, Allbirds, Too Good To Go succeeded by making sustainability feel approachable rather than obligatory." },
+      { q: "Is .earth a credible TLD for sustainability brands?", a: ".earth is gaining recognition within the sustainability sector, particularly for NGOs, community projects, and mission-driven startups. For a startup raising VC funding or targeting large enterprise clients, .com remains more credible. If your preferred .com is expensive, .co or .earth are both legitimate alternatives — .earth adds a clear mission signal that can be a genuine differentiator for the right brand." },
+      { q: "Can a sustainability brand name be too earnest?", a: "Yes. Names that sound like charity campaigns ('SaveThePlanet', 'ClimateHope', 'GreenTomorrow') struggle to be taken seriously in commercial contexts, even when the underlying technology is world-class. The most respected climate brands (Watershed, Climeworks, Patagonia) have names that are serious, specific, or evocative — never saccharine. Earnestness in your mission is a strength; earnestness in your name can undermine commercial credibility." },
     ],
   },
 ]
