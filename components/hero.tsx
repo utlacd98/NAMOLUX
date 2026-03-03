@@ -121,6 +121,17 @@ function TypewriterSearch() {
 }
 
 export function Hero() {
+  const cardScrollRef = useRef<HTMLDivElement>(null)
+  const [activeCard, setActiveCard] = useState(0)
+
+  const handleCardScroll = () => {
+    if (!cardScrollRef.current) return
+    const { scrollLeft } = cardScrollRef.current
+    // card width 155 + gap 10 = 165px per slot
+    const index = Math.min(Math.round(scrollLeft / 165), 2)
+    setActiveCard(index)
+  }
+
   return (
     <section
       className="relative min-h-[100svh] overflow-clip pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
@@ -354,16 +365,25 @@ export function Hero() {
             <div className="flex items-center justify-between border-b border-border/20 bg-muted/10 px-4 py-3">
               <span className="text-sm font-medium text-foreground/80">Sample Results</span>
               <div className="flex items-center gap-1.5" aria-hidden="true">
-                <div className="h-1.5 w-1.5 rounded-full bg-[#D4A843]/70" />
-                <div className="h-1.5 w-1.5 rounded-full bg-border/40" />
-                <div className="h-1.5 w-1.5 rounded-full bg-border/40" />
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === activeCard ? "w-3 bg-[#D4A843]/80" : "w-1.5 bg-border/40"
+                    }`}
+                  />
+                ))}
               </div>
             </div>
-            <div className="scrollbar-hide -mx-0.5 flex gap-2.5 overflow-x-auto p-3 px-3">
+            <div
+              ref={cardScrollRef}
+              onScroll={handleCardScroll}
+              className="scrollbar-hide -mx-0.5 flex gap-2.5 overflow-x-auto p-3 px-3 snap-x snap-mandatory"
+            >
               {domainResults.slice(0, 3).map((result) => (
                 <div
                   key={result.name}
-                  className={`w-[155px] flex-shrink-0 rounded-xl border p-3 ${
+                  className={`w-[155px] flex-shrink-0 snap-start rounded-xl border p-3 ${
                     result.available
                       ? "border-emerald-500/20 bg-muted/25"
                       : "border-border/10 bg-muted/10 opacity-55"
