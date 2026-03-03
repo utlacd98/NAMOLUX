@@ -359,22 +359,34 @@ export function Hero() {
                 <div className="h-1.5 w-1.5 rounded-full bg-border/40" />
               </div>
             </div>
-            <div className="scrollbar-hide -mx-0.5 flex gap-3 overflow-x-auto p-3 px-0.5">
+            <div className="scrollbar-hide -mx-0.5 flex gap-2.5 overflow-x-auto p-3 px-3">
               {domainResults.slice(0, 3).map((result) => (
                 <div
                   key={result.name}
-                  className={
+                  className={`w-[155px] flex-shrink-0 rounded-xl border p-3 ${
                     result.available
-                      ? "w-[170px] flex-shrink-0 rounded-lg border border-border/10 bg-muted/20 p-3"
-                      : "w-[170px] flex-shrink-0 rounded-lg border border-border/10 bg-muted/10 p-3 opacity-50"
-                  }
+                      ? "border-emerald-500/20 bg-muted/25"
+                      : "border-border/10 bg-muted/10 opacity-55"
+                  }`}
                 >
-                  <div className="truncate text-sm font-semibold text-foreground">{result.name}</div>
-                  <div className="mt-1.5 flex items-center gap-2">
+                  {/* Domain name + availability dot */}
+                  <div className="flex items-start justify-between gap-1">
+                    <div className="min-w-0 truncate text-xs font-semibold text-foreground leading-snug">{result.name}</div>
+                    <div className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${result.available ? "bg-emerald-400" : "bg-red-400/60"}`} />
+                  </div>
+
+                  {/* Score + label */}
+                  <div className="mt-2 flex items-center gap-1">
+                    <TrendingUp className={`h-3 w-3 shrink-0 ${getSignalColor(result.label)}`} />
                     <span className={`text-xs font-bold tabular-nums ${getSignalColor(result.label)}`}>{result.score}</span>
-                    <span className={result.available ? "text-xs text-emerald-400" : "text-xs text-red-400/80"}>
-                      {result.available ? "Available" : "Taken"}
-                    </span>
+                    <span className={`text-xs ${getSignalColor(result.label)} opacity-80`}>· {result.label}</span>
+                  </div>
+
+                  {/* Available / Taken badge */}
+                  <div className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    result.available ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/10 text-red-400/80"
+                  }`}>
+                    {result.available ? <><Check className="h-2.5 w-2.5" /> Available</> : <><X className="h-2.5 w-2.5" /> Taken</>}
                   </div>
                 </div>
               ))}
