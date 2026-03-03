@@ -343,6 +343,33 @@ function BlogSection({ section }: { section: BlogSectionType }) {
         </div>
       )
 
+    case "dualCta":
+      return (
+        <div className="my-8 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-6 text-center">
+          {section.content ? (
+            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{section.content}</p>
+          ) : null}
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            {section.ctaLink && section.ctaText && (
+              <Button asChild className="gap-2">
+                <Link href={section.ctaLink}>
+                  {section.ctaText}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+            {section.ctaLink2 && section.ctaText2 && (
+              <Button asChild variant="outline" className="gap-2">
+                <Link href={section.ctaLink2}>
+                  {section.ctaText2}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )
+
     case "callout":
       return (
         <Callout
