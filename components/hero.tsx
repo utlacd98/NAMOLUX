@@ -166,7 +166,7 @@ export function Hero() {
       />
 
       <div className="relative mx-auto max-w-[1280px] px-6 md:px-12 lg:px-20">
-        <div className="grid min-h-[calc(100vh-10rem)] items-center gap-8 sm:gap-12 lg:grid-cols-[55%_45%] lg:gap-16">
+        <div className="grid items-center gap-8 sm:gap-12 sm:min-h-[calc(100vh-10rem)] lg:grid-cols-[55%_45%] lg:gap-16">
 
           {/* Left Column */}
           <div className="flex flex-col items-start text-left">
@@ -174,7 +174,7 @@ export function Hero() {
             {/* Headline — h1 for SEO */}
             <h1
               id="hero-heading"
-              className="animate-hero-fade-up hero-delay-1 font-bold tracking-tight text-foreground text-[1.9rem] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
+              className="animate-hero-fade-up hero-delay-1 font-bold tracking-tight text-foreground text-[1.65rem] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
             >
               <span className="block">
                 Find an{" "}
@@ -224,7 +224,7 @@ export function Hero() {
             </div>
 
             {/* Social Proof — avatar stack + stats */}
-            <div className="animate-hero-fade-up hero-delay-4 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+            <div className="animate-hero-fade-up hero-delay-4 mt-8 flex flex-row flex-wrap items-center gap-3 sm:gap-6">
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
                 <span className="text-sm text-[#666666]">
@@ -353,7 +353,11 @@ export function Hero() {
           <div className="overflow-hidden rounded-xl border border-border/20 bg-card/60 shadow-lg backdrop-blur-sm">
             <div className="flex items-center justify-between border-b border-border/20 bg-muted/10 px-4 py-3">
               <span className="text-sm font-medium text-foreground/80">Sample Results</span>
-              <span className="text-xs text-muted-foreground/70">Swipe</span>
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <div className="h-1.5 w-1.5 rounded-full bg-[#D4A843]/70" />
+                <div className="h-1.5 w-1.5 rounded-full bg-border/40" />
+                <div className="h-1.5 w-1.5 rounded-full bg-border/40" />
+              </div>
             </div>
             <div className="scrollbar-hide -mx-0.5 flex gap-3 overflow-x-auto p-3 px-0.5">
               {domainResults.slice(0, 3).map((result) => (

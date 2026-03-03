@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 export function FinalCTA() {
   return (
-    <section className="relative overflow-clip py-16 sm:py-24" aria-labelledby="final-cta-heading">
+    <section className="relative overflow-clip py-10 sm:py-16 lg:py-24" aria-labelledby="final-cta-heading">
       {/* Background Aura - contained within viewport */}
       <div className="pointer-events-none absolute inset-0 overflow-clip">
         <div

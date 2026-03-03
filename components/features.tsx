@@ -41,7 +41,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="overflow-clip py-16 sm:py-24" aria-labelledby="features-heading">
+    <section id="features" className="overflow-clip py-10 sm:py-16 lg:py-24" aria-labelledby="features-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 id="features-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -54,13 +54,13 @@ export function Features() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <div
                 key={feature.title}
-                className="group relative rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/20 hover:shadow-md hover:shadow-black/10 animate-fade-up"
+                className="group relative rounded-xl border border-border bg-card p-4 sm:p-6 transition-all duration-200 hover:border-primary/20 hover:shadow-md hover:shadow-black/10 animate-fade-up"
                 style={{
                   animationDelay: `${index * 0.08}s`,
                   animationFillMode: "forwards",
@@ -72,11 +72,11 @@ export function Features() {
                     New
                   </div>
                 )}
-                <div className="mb-4 inline-flex rounded-lg bg-muted p-3 text-primary transition-colors group-hover:bg-primary/10">
-                  <Icon className="h-6 w-6" aria-hidden="true" />
+                <div className="mb-3 inline-flex rounded-lg bg-muted p-2 sm:p-3 text-primary transition-colors group-hover:bg-primary/10">
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+                <h3 className="mb-1.5 text-sm font-semibold text-foreground sm:mb-2 sm:text-lg">{feature.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{feature.description}</p>
               </div>
             )
           })}

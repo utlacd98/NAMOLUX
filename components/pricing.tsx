@@ -16,7 +16,7 @@ export function Pricing() {
   ]
 
   return (
-    <section id="pricing" className="py-24" aria-labelledby="pricing-heading">
+    <section id="pricing" className="py-10 sm:py-16 lg:py-24" aria-labelledby="pricing-heading">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div
           className={cn("text-center animate-fade-up")}

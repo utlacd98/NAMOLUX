@@ -46,7 +46,7 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="overflow-clip bg-muted/30 py-16 sm:py-24" aria-labelledby="faq-heading">
+    <section id="faq" className="overflow-clip bg-muted/30 py-10 sm:py-16 lg:py-24" aria-labelledby="faq-heading">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 id="faq-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
