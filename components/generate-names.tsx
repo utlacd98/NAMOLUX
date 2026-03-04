@@ -1106,7 +1106,7 @@ export function GenerateNames() {
                       rows={6}
                       className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
                       style={{
-                        background: "#07080a",
+                        background: "rgba(255,255,255,0.06)",
                         border: "1px solid rgba(255,255,255,0.08)",
                         boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
                         transition: "border-color 0.2s, box-shadow 0.2s",
@@ -1193,7 +1193,7 @@ export function GenerateNames() {
                     id="industry"
                     value={selectedIndustry}
                     onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="h-12 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#07080a] [&>option]:text-white"
+                    className="h-12 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#0d0b07] [&>option]:text-white"
                     style={{
                       background: "#07080a",
                       border: "1px solid rgba(255,255,255,0.08)",
@@ -1208,7 +1208,7 @@ export function GenerateNames() {
                       e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
                     }}
                   >
-                    <option value="" className="bg-[#07080a] text-white/40">Select industry…</option>
+                    <option value="" className="bg-[#0d0b07] text-white/40">Select industry…</option>
                     {industryOptions.map((industry) => (
                       <option key={industry} value={industry}>{industry}</option>
                     ))}
