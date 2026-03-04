@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Menu, X, ChevronDown, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -70,15 +69,12 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4 sm:h-16">
           {/* Logo */}
-          <Link href="/" aria-label="NamoLux">
-            <Image
-              src="/luxwebindexlogo.svg"
-              alt="NamoLux"
-              width={160}
-              height={40}
-              className="h-9 w-auto"
-              priority
-            />
+          <Link
+            href="/"
+            className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-primary sm:text-2xl"
+            aria-label="NamoLux"
+          >
+            Namo<span className="text-[#D4A843]">Lux</span>
           </Link>
 
           {/* Desktop Nav - Centered */}
