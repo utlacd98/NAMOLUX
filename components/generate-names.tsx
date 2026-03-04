@@ -228,6 +228,14 @@ const STORAGE_KEYS = {
   SEARCH_HISTORY: "namolux_search_history",
 }
 
+const LOADING_STEPS = [
+  "Combining phonetics…",
+  "Checking availability…",
+  "Calculating Founder Signal™…",
+]
+
+const SAMPLE_KEYWORDS = ["luxury brand", "fintech", "wellness app"]
+
 const AUTO_FIND_TARGET_COM_COUNT = 5
 const AUTO_FIND_MAX_ATTEMPTS = 8
 const AUTO_FIND_TIME_CAP_MS = 20_000
@@ -396,6 +404,10 @@ export function GenerateNames() {
   // Mobile UI state
   const [isMobileShortlistOpen, setIsMobileShortlistOpen] = useState(false)
 
+  // Luxury UX state
+  const [aiHint, setAiHint] = useState<string | null>(null)
+  const [loadingStep, setLoadingStep] = useState(0)
+
   // SEO Potential Check modal state
   const [seoCheckDomain, setSeoCheckDomain] = useState<{ name: string; tld: string } | null>(null)
   const generationAbortRef = useRef<AbortController | null>(null)
@@ -462,6 +474,20 @@ export function GenerateNames() {
       console.error("Error saving shortlist:", e)
     }
   }, [shortlist])
+
+  // AI hint: debounced "analyzing…" hint while typing
+  useEffect(() => {
+    if (!keyword.trim() || keyword.length < 3) { setAiHint(null); return }
+    const t = setTimeout(() => setAiHint("⚡ AI analyzing keyword structure…"), 600)
+    return () => { clearTimeout(t); setAiHint(null) }
+  }, [keyword])
+
+  // Loading step cycle
+  useEffect(() => {
+    if (!isGenerating) { setLoadingStep(0); return }
+    const t = setInterval(() => setLoadingStep((s) => (s + 1) % LOADING_STEPS.length), 1200)
+    return () => clearInterval(t)
+  }, [isGenerating])
 
   // Save search history to localStorage
   const addToSearchHistory = (term: string) => {
@@ -954,22 +980,37 @@ export function GenerateNames() {
   }
 
   return (
-    <div className="noise-overlay relative min-h-screen overflow-clip bg-background">
-      {/* Background - subtle, contained within viewport */}
-      <div className="pointer-events-none absolute inset-0 overflow-clip" aria-hidden="true">
-        <div className="animate-luxury-aura absolute top-0 left-[10%] h-[30vh] w-[30vh] max-h-[300px] max-w-[300px] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/10 via-secondary/5 to-transparent blur-[80px] sm:h-[40vh] sm:w-[40vh] sm:max-h-[400px] sm:max-w-[400px] sm:blur-[100px] md:left-1/4" />
-        <div
-          className="animate-luxury-aura absolute right-[5%] bottom-0 h-[25vh] w-[25vh] max-h-[250px] max-w-[250px] rounded-full bg-gradient-to-tl from-secondary/8 via-primary/3 to-transparent blur-[70px] sm:h-[35vh] sm:w-[35vh] sm:max-h-[350px] sm:max-w-[350px] sm:blur-[90px]"
-          style={{ animationDelay: "-7s" }}
-        />
-      </div>
+    <div className="relative min-h-screen overflow-clip" style={{ background: "#050505" }}>
+      {/* Luxury background – layered gold radial glows */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: [
+            "radial-gradient(circle at 18% 12%, rgba(212,175,55,0.18) 0%, transparent 38%)",
+            "radial-gradient(circle at 82% 72%, rgba(212,175,55,0.13) 0%, transparent 42%)",
+            "radial-gradient(circle at 50% 50%, rgba(212,175,55,0.04) 0%, transparent 60%)",
+          ].join(","),
+        }}
+        aria-hidden="true"
+      />
+      {/* Subtle dot-grid texture */}
+      <div
+        className="pointer-events-none absolute inset-0 hidden sm:block"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(212,175,55,0.06) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 80%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 80%, transparent 100%)",
+        }}
+        aria-hidden="true"
+      />
 
       <div className="relative mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between sm:mb-6 md:mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:text-sm"
+            className="inline-flex items-center gap-1.5 text-xs text-white/40 transition-colors hover:text-white/80 sm:gap-2 sm:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Back
@@ -988,31 +1029,63 @@ export function GenerateNames() {
           {/* Main Content */}
           <div className="min-w-0">
             <div className="mb-4 sm:mb-6">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">Generate Domain Names</h1>
-              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-                Enter a keyword and let AI generate creative, available domain names for your brand.
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">
+                Discover a domain{" "}
+                <span
+                  style={{
+                    backgroundImage: "linear-gradient(90deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  worth building on.
+                </span>
+              </h1>
+              <p className="mt-2 text-sm text-white/50 sm:text-base">
+                AI-generated names, live availability checks, and Founder Signal™ scoring in seconds.
               </p>
             </div>
 
             <>
-            <div className="mb-6 rounded-xl border border-border bg-card/80 p-3 backdrop-blur-sm sm:mb-8 sm:rounded-2xl sm:p-4 md:p-6">
+            <div
+              className="mb-6 rounded-2xl border p-4 backdrop-blur-xl sm:mb-8 sm:p-5 md:p-7"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                borderColor: "rgba(212,175,55,0.18)",
+                boxShadow: "0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.08) inset",
+              }}
+            >
               {/* Mode Toggle */}
-              <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:flex sm:gap-2">
+              <div
+                className="mb-5 grid grid-cols-2 gap-1.5 rounded-xl p-1 sm:mb-7"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
                 <button
                   onClick={() => setIsBulkMode(false)}
                   className={cn(
-                    "min-h-[44px] rounded-lg px-3 py-2.5 text-xs font-medium transition-all sm:px-4 sm:text-sm",
-                    !isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                    "min-h-[42px] rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                    !isBulkMode
+                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
+                      : "text-white/60 hover:text-white/90"
                   )}
+                  style={!isBulkMode ? {
+                    background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                  } : {}}
                 >
                   ✨ AI Generate
                 </button>
                 <button
                   onClick={() => setIsBulkMode(true)}
                   className={cn(
-                    "min-h-[44px] rounded-lg px-3 py-2.5 text-xs font-medium transition-all sm:px-4 sm:text-sm",
-                    isBulkMode ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                    "min-h-[42px] rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                    isBulkMode
+                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
+                      : "text-white/60 hover:text-white/90"
                   )}
+                  style={isBulkMode ? {
+                    background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                  } : {}}
                 >
                   📋 Bulk Check
                 </button>
@@ -1022,7 +1095,7 @@ export function GenerateNames() {
               {isBulkMode ? (
                 <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <label htmlFor="bulk-input" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
+                    <label htmlFor="bulk-input" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
                       Paste domain names (one per line, max 50)
                     </label>
                     <textarea
@@ -1030,10 +1103,24 @@ export function GenerateNames() {
                       value={bulkInput}
                       onChange={(e) => setBulkInput(e.target.value)}
                       placeholder={"mybrand\ncoolstartup\nawesomeapp\ngreatidea"}
-                      rows={5}
-                      className="w-full rounded-lg border border-border/50 bg-background/50 p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:rounded-xl sm:p-4"
+                      rows={6}
+                      className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
+                      style={{
+                        background: "#07080a",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                        transition: "border-color 0.2s, box-shadow 0.2s",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
+                        e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                        e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                      }}
                     />
-                    <p className="mt-1.5 text-[10px] text-muted-foreground sm:mt-2 sm:text-xs">
+                    <p className="mt-2 text-[10px] text-white/30 sm:text-xs">
                       Enter domain names without TLD. We&apos;ll check all 6 TLDs for each name.
                     </p>
                   </div>
@@ -1043,7 +1130,7 @@ export function GenerateNames() {
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 {/* Keyword Input */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="keyword" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
+                  <label htmlFor="keyword" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
                     Keyword or concept
                   </label>
                   <input
@@ -1052,13 +1139,31 @@ export function GenerateNames() {
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-                    placeholder="e.g., fitness, finance, creative..."
-                    className="h-10 w-full rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4"
+                    placeholder="e.g., fitness, finance, creative…"
+                    className="h-12 w-full rounded-xl px-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none sm:h-14 sm:text-base"
+                    style={{
+                      background: "#07080a",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                    }}
                   />
+                  {/* AI analyzing hint */}
+                  {aiHint && !searchHistory.length && (
+                    <p className="mt-1.5 text-[11px] text-[#D4AF37]/70 animate-fade-up">{aiHint}</p>
+                  )}
                   {/* Search History */}
                   {searchHistory.length > 0 && (
                     <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-muted-foreground sm:text-xs">
+                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-white/30 sm:text-xs">
                         <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                         Recent:
                       </span>
@@ -1066,68 +1171,88 @@ export function GenerateNames() {
                         <button
                           key={term}
                           onClick={() => setKeyword(term)}
-                          className="max-w-[80px] truncate rounded-full bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:max-w-none sm:px-2.5 sm:py-1 sm:text-xs"
+                          className="max-w-[80px] truncate rounded-full px-2 py-0.5 text-[10px] text-white/40 transition-colors hover:text-white/80 sm:max-w-none sm:px-2.5 sm:py-1 sm:text-xs"
+                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
                         >
                           {term}
                         </button>
                       ))}
+                      {aiHint && (
+                        <span className="ml-auto text-[11px] text-[#D4AF37]/70 animate-fade-up">{aiHint}</span>
+                      )}
                     </div>
                   )}
                 </div>
 
                 {/* Industry Select */}
                 <div>
-                  <label htmlFor="industry" className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">
+                  <label htmlFor="industry" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
                     Industry (optional)
                   </label>
                   <select
                     id="industry"
                     value={selectedIndustry}
                     onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="h-10 w-full rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-12 sm:rounded-xl sm:px-4 [&>option]:bg-background [&>option]:text-foreground"
+                    className="h-12 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#07080a] [&>option]:text-white"
+                    style={{
+                      background: "#07080a",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                    }}
                   >
-                    <option value="" className="bg-background text-muted-foreground">
-                      Select industry...
-                    </option>
+                    <option value="" className="bg-[#07080a] text-white/40">Select industry…</option>
                     {industryOptions.map((industry) => (
-                      <option key={industry} value={industry} className="bg-background text-foreground">
-                        {industry}
-                      </option>
+                      <option key={industry} value={industry}>{industry}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Name Length */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-foreground sm:mb-2 sm:text-sm">Max name length</label>
-                  <div className="flex h-10 items-center gap-2 sm:h-12">
+                  <label className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">Max name length</label>
+                  <div className="flex h-12 items-center gap-3">
                     <input
                       type="range"
                       min={5}
                       max={15}
                       value={maxLength}
                       onChange={(e) => setMaxLength(Number(e.target.value))}
-                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
+                      className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
+                      style={{ background: "rgba(255,255,255,0.08)" }}
                     />
-                    <span className="w-6 text-xs text-muted-foreground sm:w-8 sm:text-sm">{maxLength}</span>
+                    <span className="w-8 text-center text-sm font-semibold text-[#D4AF37]">{maxLength}</span>
                   </div>
                 </div>
               </div>
 
               {/* Vibe Selection */}
-              <div className="mt-3 sm:mt-6">
-                <label className="mb-1.5 block text-xs font-medium text-foreground sm:mb-3 sm:text-sm">Brand vibe</label>
-                <div className="flex flex-wrap gap-1 sm:gap-2">
+              <div className="mt-4 sm:mt-6">
+                <label className="mb-2 block text-xs font-medium text-white/70 sm:mb-3 sm:text-sm">Brand vibe</label>
+                <div className="flex flex-wrap gap-2">
                   {vibeOptions.map((vibe) => (
                     <button
                       key={vibe.id}
                       onClick={() => setSelectedVibe(vibe.id)}
                       className={cn(
-                        "min-h-[36px] rounded-full px-2.5 py-1.5 text-[10px] font-medium transition-all sm:min-h-[40px] sm:px-4 sm:py-2 sm:text-sm",
+                        "min-h-[38px] rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
                         selectedVibe === vibe.id
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+                          ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.3)] hover:-translate-y-0.5"
+                          : "text-white/50 hover:text-white/80 hover:-translate-y-0.5",
                       )}
+                      style={selectedVibe === vibe.id ? {
+                        background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                      } : {
+                        background: "rgba(255,255,255,0.05)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
                     >
                       {vibe.label}
                     </button>
@@ -1318,15 +1443,27 @@ export function GenerateNames() {
               )}
 
               {/* Generate / Bulk Check Button */}
-              <Button
+              <button
                 onClick={isBulkMode ? handleBulkCheck : handleGenerate}
                 disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : (!keyword.trim() || isGenerating)}
-                className="mt-4 h-11 w-full gap-1.5 text-sm font-semibold sm:mt-6 sm:h-12 sm:gap-2 sm:text-base"
+                className={cn(
+                  "mt-5 h-13 w-full rounded-xl text-sm font-bold tracking-wide transition-all duration-200 sm:mt-7 sm:h-14 sm:text-base",
+                  "flex items-center justify-center gap-2",
+                  "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0",
+                  !isGenerating && "hover:-translate-y-0.5"
+                )}
+                style={{
+                  background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
+                  color: "#0a0800",
+                  boxShadow: isGenerating
+                    ? "0 4px 20px rgba(212,175,55,0.2)"
+                    : "0 6px 28px rgba(212,175,55,0.4), 0 2px 8px rgba(212,175,55,0.2)",
+                }}
               >
                 {isGenerating ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin sm:h-5 sm:w-5" />
-                    {isBulkMode ? "Checking..." : "Generating..."}
+                    {isBulkMode ? "Checking…" : "Generating…"}
                   </>
                 ) : isBulkMode ? (
                   <>
@@ -1339,12 +1476,40 @@ export function GenerateNames() {
                     Generate Names
                   </>
                 )}
-              </Button>
+              </button>
+
+              {/* Cinematic loading steps */}
+              {isGenerating && (
+                <div className="mt-4 flex flex-col items-center gap-1.5">
+                  {LOADING_STEPS.map((step, i) => (
+                    <div
+                      key={step}
+                      className={cn(
+                        "flex items-center gap-2 text-xs transition-all duration-500",
+                        i === loadingStep ? "text-[#D4AF37]" : i < loadingStep ? "text-white/30 line-through" : "text-white/20"
+                      )}
+                    >
+                      {i < loadingStep ? (
+                        <Check className="h-3 w-3 shrink-0 text-[#D4AF37]/50" />
+                      ) : i === loadingStep ? (
+                        <span className="relative inline-flex h-2 w-2 shrink-0">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#D4AF37]" />
+                        </span>
+                      ) : (
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-white/10" />
+                      )}
+                      {step}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Error Message */}
               {error && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-500/10 p-3 text-red-400 sm:mt-4 sm:gap-3 sm:rounded-xl sm:p-4">
-                  <AlertCircle className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                <div className="mt-4 flex items-center gap-2 rounded-xl p-4 text-red-400"
+                  style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                  <AlertCircle className="h-4 w-4 shrink-0" />
                   <p className="text-xs sm:text-sm">{error}</p>
                 </div>
               )}
@@ -1733,46 +1898,61 @@ export function GenerateNames() {
                   </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {filteredResults.map((result, index) => (
                     <div
                       key={result.fullDomain}
                       className={cn(
-                        "group rounded-xl border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card sm:p-4",
+                        "group rounded-2xl p-4 transition-all duration-200 sm:p-5",
                         "animate-fade-up opacity-0",
+                        result.available
+                          ? "hover:shadow-[0_8px_32px_rgba(212,175,55,0.08)]"
+                          : "opacity-60"
                       )}
                       style={{
+                        background: result.available ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+                        border: result.available
+                          ? "1px solid rgba(212,175,55,0.15)"
+                          : "1px solid rgba(255,255,255,0.06)",
                         animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
                         animationFillMode: "forwards",
                       }}
                     >
                       <div className="flex items-start justify-between gap-2 sm:items-center">
-                        <div className="flex items-start gap-2 sm:items-center sm:gap-4">
+                        <div className="flex items-start gap-3 sm:items-center sm:gap-4">
                           <span
-                            className={cn(
-                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8",
-                              result.available ? "bg-green-500/15 text-green-400" : "bg-muted text-muted-foreground",
-                            )}
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                            style={{
+                              background: result.available ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
+                              border: result.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                              color: result.available ? "#34d399" : "rgba(255,255,255,0.3)",
+                            }}
                           >
-                            {result.available ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                            {result.available ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
                           </span>
                           <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                              <span className="truncate text-base font-semibold text-foreground sm:text-lg">{result.name}</span>
-                              <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium sm:px-2 sm:text-xs", tldColors[result.tld] || "bg-muted text-muted-foreground")}>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-base font-bold text-white sm:text-lg">{result.name}</span>
+                              <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs", tldColors[result.tld] || "bg-white/10 text-white/50")}>
                                 .{result.tld}
                               </span>
+                              {/* Founder Signal score pill */}
+                              <span
+                                className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide"
+                                style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)", color: "#0a0800" }}
+                              >
+                                {result.score} FS™
+                              </span>
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground sm:gap-3 sm:text-xs">
-                              <span>Score: {result.score}</span>
-                              <span className="hidden sm:inline">Memorability: {result.memorability}</span>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
+                              <span>Memorability: {result.memorability}</span>
                               {result.pronounceable && (
-                                <span className="flex items-center gap-1 text-green-400">
+                                <span className="flex items-center gap-1 text-emerald-400/80">
                                   <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
                                 </span>
                               )}
                             </div>
-                            {/* Founder Signal Badge */}
+                            {/* Founder Signal Badge component */}
                             <FounderSignalBadge
                               name={result.name}
                               tld={result.tld}
@@ -1786,8 +1966,8 @@ export function GenerateNames() {
                                 return signal ? (
                                   <span className={cn(
                                     "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                                    signal.type === "positive" ? "bg-green-500/15 text-green-400" :
-                                    signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-muted text-muted-foreground"
+                                    signal.type === "positive" ? "bg-emerald-500/15 text-emerald-400" :
+                                    signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-white/5 text-white/40"
                                   )}>
                                     {signal.icon} {signal.text}
                                   </span>
@@ -1795,36 +1975,37 @@ export function GenerateNames() {
                               })()}
                               <button
                                 onClick={() => setSeoCheckDomain({ name: result.name, tld: result.tld })}
-                                className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
+                                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                                style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
                               >
                                 <Search className="h-2.5 w-2.5" />
-                                Check SEO Potential
+                                SEO Potential
                               </button>
                             </div>
                           </div>
                         </div>
 
-                        {/* Action buttons - always visible on mobile */}
-                        <div className="flex shrink-0 items-center gap-1 sm:gap-2 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
+                        {/* Action buttons */}
+                        <div className="flex shrink-0 items-center gap-1.5 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                           <button
                             onClick={() => copyToClipboard(result.fullDomain)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:h-auto sm:w-auto sm:p-2"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
                             title="Copy domain"
                           >
                             {copiedName === result.fullDomain ? (
-                              <CheckCircle className="h-4 w-4 text-green-400" />
+                              <CheckCircle className="h-4 w-4 text-emerald-400" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
                           </button>
                           <button
                             onClick={() => toggleShortlist(result.fullDomain)}
-                            className={cn(
-                              "flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-muted sm:h-auto sm:w-auto sm:p-2",
-                              shortlist.includes(result.fullDomain)
-                                ? "text-primary"
-                                : "text-muted-foreground hover:text-foreground",
-                            )}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                            style={{
+                              background: shortlist.includes(result.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
+                              color: shortlist.includes(result.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
+                            }}
                             title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
                           >
                             {shortlist.includes(result.fullDomain) ? (
@@ -1838,12 +2019,12 @@ export function GenerateNames() {
                               href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex h-9 items-center gap-1.5 rounded-lg bg-pink-500/15 px-2.5 text-xs font-semibold text-pink-400 transition-all hover:bg-pink-500/25 hover:scale-105 sm:h-auto sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+                              className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all hover:-translate-y-0.5 sm:px-4"
+                              style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
                               title="Buy this domain on Porkbun"
                             >
-                              <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden xs:inline">Buy Domain</span>
-                              <span className="xs:hidden">Buy</span>
+                              <ExternalLink className="h-3 w-3" />
+                              <span className="hidden sm:inline">Buy</span>
                             </a>
                           )}
                         </div>
@@ -1856,12 +2037,15 @@ export function GenerateNames() {
 
             {/* Social Handle Checker */}
             {results.length > 0 && (
-              <div className="mt-6 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm sm:mt-8 sm:p-6">
-                <h3 className="mb-3 text-base font-semibold text-foreground sm:mb-4 sm:text-lg">
+              <div
+                className="mt-6 rounded-2xl p-5 backdrop-blur-xl sm:mt-8 sm:p-6"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+              >
+                <h3 className="mb-2 text-base font-semibold text-white sm:text-lg">
                   🔍 Check Social Handle
                 </h3>
-                <p className="mb-3 text-xs text-muted-foreground sm:mb-4 sm:text-sm">
-                  Check if your brand name is available as a username on social platforms.
+                <p className="mb-4 text-xs text-white/35 sm:text-sm">
+                  Check if your brand name is available across social platforms.
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -1870,13 +2054,26 @@ export function GenerateNames() {
                     onChange={(e) => setSocialHandle(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && checkSocialHandles(socialHandle)}
                     placeholder="e.g., yourbrand"
-                    className="h-11 flex-1 rounded-lg border border-border/50 bg-background/50 px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-10 sm:px-4"
+                    className="h-11 flex-1 rounded-xl px-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
+                    style={{
+                      background: "#07080a",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                    }}
                   />
-                  <Button
+                  <button
                     onClick={() => checkSocialHandles(socialHandle)}
                     disabled={isCheckingSocials || !socialHandle.trim()}
-                    size="sm"
-                    className="h-11 min-w-[80px] sm:h-10"
+                    className="h-11 min-w-[80px] rounded-xl px-4 text-sm font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-40"
+                    style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)", color: "#0a0800" }}
                   >
                     {isCheckingSocials ? (
                       <>
@@ -1886,7 +2083,7 @@ export function GenerateNames() {
                     ) : (
                       "Check"
                     )}
-                  </Button>
+                  </button>
                 </div>
 
                 {/* Social Results */}
@@ -1924,14 +2121,39 @@ export function GenerateNames() {
 
             {/* Empty State */}
             {results.length === 0 && !isGenerating && (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-card/30 px-4 py-10 text-center sm:rounded-2xl sm:py-16">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 sm:mb-4 sm:h-16 sm:w-16 sm:rounded-2xl">
-                  <Zap className="h-6 w-6 text-primary sm:h-8 sm:w-8" />
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl px-6 py-12 text-center sm:py-20"
+                style={{ border: "1px dashed rgba(212,175,55,0.2)", background: "rgba(212,175,55,0.03)" }}
+              >
+                {/* Gold glow icon */}
+                <div
+                  className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl sm:h-20 sm:w-20"
+                  style={{
+                    background: "radial-gradient(circle, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.05) 70%)",
+                    border: "1px solid rgba(212,175,55,0.25)",
+                    boxShadow: "0 0 40px rgba(212,175,55,0.15)",
+                  }}
+                >
+                  <Sparkles className="h-7 w-7 text-[#D4AF37] sm:h-9 sm:w-9" />
                 </div>
-                <h3 className="text-base font-semibold text-foreground sm:text-lg">Ready to generate</h3>
-                <p className="mt-1 max-w-[280px] text-xs text-muted-foreground sm:max-w-sm sm:text-sm">
-                  Enter a keyword above and click generate to discover available domain names.
+                <h3 className="text-base font-semibold text-white sm:text-xl">Your results will appear here</h3>
+                <p className="mt-2 max-w-[260px] text-xs text-white/40 sm:max-w-sm sm:text-sm">
+                  Enter a keyword above and let AI surface brandable domains with live availability and Founder Signal™ scores.
                 </p>
+                {/* Sample keyword pills */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                  <span className="text-xs text-white/30">Try:</span>
+                  {SAMPLE_KEYWORDS.map((kw) => (
+                    <button
+                      key={kw}
+                      onClick={() => setKeyword(kw)}
+                      className="rounded-full px-3 py-1.5 text-xs font-medium text-[#D4AF37]/80 transition-all hover:text-[#D4AF37] hover:-translate-y-0.5"
+                      style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)" }}
+                    >
+                      {kw}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             </>
@@ -1939,10 +2161,20 @@ export function GenerateNames() {
 
           {/* Shortlist Sidebar - Hidden on mobile, shown on lg+ */}
           <div className="hidden lg:sticky lg:top-8 lg:block lg:self-start">
-            <div className="rounded-2xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
+            <div
+              className="rounded-2xl p-6 backdrop-blur-xl"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(212,175,55,0.15)",
+                boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
+              }}
+            >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">Shortlist</h3>
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                <h3 className="font-semibold text-white">Shortlist</h3>
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  style={{ background: "rgba(212,175,55,0.15)", color: "#D4AF37" }}
+                >
                   {shortlist.length} saved
                 </span>
               </div>
@@ -1950,54 +2182,66 @@ export function GenerateNames() {
               {shortlist.length > 0 ? (
                 <div className="space-y-2">
                   {shortlist.map((fullDomain) => (
-                    <div key={fullDomain} className="flex items-center justify-between gap-2 rounded-lg bg-background/50 p-3">
-                      <span className="font-medium text-foreground truncate">{fullDomain}</span>
+                    <div
+                      key={fullDomain}
+                      className="flex items-center justify-between gap-2 rounded-xl p-3"
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
                           href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-xs font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-all hover:-translate-y-0.5"
+                          style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
                         >
                           <ExternalLink className="h-3 w-3" />
                           Buy
                         </a>
                         <button
                           onClick={() => toggleShortlist(fullDomain)}
-                          className="text-muted-foreground hover:text-foreground p-1"
+                          className="p-1 text-white/30 transition-colors hover:text-white/70"
                         >
                           <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
                   ))}
-                  <Button onClick={exportShortlist} variant="outline" className="mt-4 w-full gap-2 bg-transparent">
+                  <button
+                    onClick={exportShortlist}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-white/50 transition-all hover:text-white/80"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
                     <Download className="h-4 w-4" />
                     Export List
-                  </Button>
+                  </button>
                 </div>
               ) : (
-                <p className="text-center text-sm text-muted-foreground">
-                  Click the bookmark icon to save domains to your shortlist.
+                <p className="text-center text-sm text-white/30">
+                  Click the bookmark icon on any result to save it here.
                 </p>
               )}
             </div>
 
             {/* Tips Card */}
-            <div className="mt-4 rounded-2xl border border-accent/20 bg-accent/5 p-6">
-              <h4 className="mb-2 font-semibold text-accent">Pro Tips</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+            <div
+              className="mt-4 rounded-2xl p-5"
+              style={{ background: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.12)" }}
+            >
+              <h4 className="mb-3 text-sm font-semibold text-[#D4AF37]">Founder Signal™ Tips</h4>
+              <ul className="space-y-2.5 text-sm text-white/40">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  Shorter names are more memorable
+                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
+                  Shorter names score higher for memorability
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
                   Avoid hyphens and numbers
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                  Test pronunciation with others
+                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
+                  .com scores highest for trust signals
                 </li>
               </ul>
             </div>
@@ -2008,12 +2252,16 @@ export function GenerateNames() {
         <div className="mt-6 lg:hidden">
           <button
             onClick={() => setIsMobileShortlistOpen(!isMobileShortlistOpen)}
-            className="flex w-full items-center justify-between rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm"
+            className="flex w-full items-center justify-between rounded-2xl p-4 backdrop-blur-sm transition-all"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212,175,55,0.15)" }}
           >
             <div className="flex items-center gap-3">
-              <Bookmark className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-foreground">Shortlist</span>
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              <Bookmark className="h-5 w-5 text-[#D4AF37]" />
+              <span className="font-semibold text-white">Shortlist</span>
+              <span
+                className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                style={{ background: "rgba(212,175,55,0.15)", color: "#D4AF37" }}
+              >
                 {shortlist.length} saved
               </span>
             </div>
@@ -2025,39 +2273,51 @@ export function GenerateNames() {
           </button>
 
           {isMobileShortlistOpen && (
-            <div className="mt-2 rounded-2xl border border-border/50 bg-card/50 p-4 backdrop-blur-sm">
+            <div
+              className="mt-2 rounded-2xl p-4 backdrop-blur-xl"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212,175,55,0.12)" }}
+            >
               {shortlist.length > 0 ? (
                 <div className="space-y-2">
                   {shortlist.map((fullDomain) => (
-                    <div key={fullDomain} className="flex items-center justify-between gap-2 rounded-lg bg-background/50 p-3">
-                      <span className="text-sm font-medium text-foreground truncate">{fullDomain}</span>
-                      <div className="flex items-center gap-1">
+                    <div
+                      key={fullDomain}
+                      className="flex items-center justify-between gap-2 rounded-xl p-3"
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    >
+                      <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
+                      <div className="flex items-center gap-1.5">
                         <a
                           href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md bg-pink-500/15 px-3 text-xs font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
+                          className="flex min-h-[40px] items-center gap-1 rounded-lg px-3 text-xs font-semibold"
+                          style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
                           Buy
                         </a>
                         <button
                           onClick={() => toggleShortlist(fullDomain)}
-                          className="min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground"
+                          className="flex min-h-[40px] min-w-[40px] items-center justify-center text-white/30 hover:text-white/70"
                         >
                           <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
                   ))}
-                  <Button onClick={exportShortlist} variant="outline" className="mt-4 w-full gap-2 bg-transparent">
+                  <button
+                    onClick={exportShortlist}
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-white/50 transition-all hover:text-white/80"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
                     <Download className="h-4 w-4" />
                     Export List
-                  </Button>
+                  </button>
                 </div>
               ) : (
-                <p className="text-center text-sm text-muted-foreground">
-                  Click the bookmark icon to save domains to your shortlist.
+                <p className="text-center text-sm text-white/30">
+                  Click the bookmark icon on any result to save it here.
                 </p>
               )}
             </div>
