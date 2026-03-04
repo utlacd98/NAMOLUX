@@ -1106,18 +1106,17 @@ export function GenerateNames() {
                       rows={6}
                       className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
                       style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                        background: "rgba(255,255,255,0.09)",
+                        border: "1px solid rgba(255,255,255,0.1)",
                         transition: "border-color 0.2s, box-shadow 0.2s",
                       }}
                       onFocus={(e) => {
                         e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                        e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                        e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                        e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                        e.currentTarget.style.boxShadow = "none"
                       }}
                     />
                     <p className="mt-2 text-[10px] text-white/30 sm:text-xs">
@@ -1142,18 +1141,17 @@ export function GenerateNames() {
                     placeholder="e.g., fitness, finance, creative…"
                     className="h-12 w-full rounded-xl px-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none sm:h-14 sm:text-base"
                     style={{
-                      background: "#07080a",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                      background: "rgba(255,255,255,0.09)",
+                      border: "1px solid rgba(255,255,255,0.1)",
                       transition: "border-color 0.2s, box-shadow 0.2s",
                     }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                      e.currentTarget.style.boxShadow = "none"
                     }}
                   />
                   {/* AI analyzing hint */}
@@ -1195,17 +1193,16 @@ export function GenerateNames() {
                     onChange={(e) => setSelectedIndustry(e.target.value)}
                     className="h-12 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#0d0b07] [&>option]:text-white"
                     style={{
-                      background: "#07080a",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                      background: "rgba(255,255,255,0.09)",
+                      border: "1px solid rgba(255,255,255,0.1)",
                     }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                      e.currentTarget.style.boxShadow = "none"
                     }}
                   >
                     <option value="" className="bg-[#0d0b07] text-white/40">Select industry…</option>
@@ -2056,17 +2053,16 @@ export function GenerateNames() {
                     placeholder="e.g., yourbrand"
                     className="h-11 flex-1 rounded-xl px-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
                     style={{
-                      background: "#07080a",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.4)",
+                      background: "rgba(255,255,255,0.09)",
+                      border: "1px solid rgba(255,255,255,0.1)",
                     }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(212,175,55,0.15)"
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                      e.currentTarget.style.boxShadow = "inset 0 2px 8px rgba(0,0,0,0.4)"
+                      e.currentTarget.style.boxShadow = "none"
                     }}
                   />
                   <button
