@@ -1073,7 +1073,7 @@ export function GenerateNames() {
                     background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
                   } : {}}
                 >
-                  ✨ AI Generate
+                  ✦ Generate Names
                 </button>
                 <button
                   onClick={() => setIsBulkMode(true)}
