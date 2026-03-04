@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
@@ -27,7 +27,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { FounderSignalBadge } from "@/components/founder-signal"
+import { FounderSignalPanel } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
 
@@ -506,6 +506,13 @@ export function GenerateNames() {
     if (showOnlyAvailable && !result.available) return false
     return true
   })
+
+  // Find the domain with the highest score among available results for "Founder Favourite"
+  const topPickDomain = useMemo(() => {
+    const available = filteredResults.filter((r) => r.available)
+    if (!available.length) return null
+    return available.reduce((best, r) => (r.score > best.score ? r : best)).fullDomain
+  }, [filteredResults])
 
   const stopAutoFindSearch = () => {
     generationStoppedRef.current = true
@@ -1896,138 +1903,169 @@ export function GenerateNames() {
                 </div>
 
                 <div className="space-y-2.5">
-                  {filteredResults.map((result, index) => (
-                    <div
-                      key={result.fullDomain}
-                      className={cn(
-                        "group rounded-2xl p-4 transition-all duration-200 sm:p-5",
-                        "animate-fade-up opacity-0",
-                        result.available
-                          ? "hover:shadow-[0_8px_32px_rgba(212,175,55,0.08)]"
-                          : "opacity-60"
-                      )}
-                      style={{
-                        background: result.available ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
-                        border: result.available
-                          ? "1px solid rgba(212,175,55,0.15)"
-                          : "1px solid rgba(255,255,255,0.06)",
-                        animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
-                        animationFillMode: "forwards",
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-2 sm:items-center">
-                        <div className="flex items-start gap-3 sm:items-center sm:gap-4">
-                          <span
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                            style={{
-                              background: result.available ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
-                              border: result.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
-                              color: result.available ? "#34d399" : "rgba(255,255,255,0.3)",
-                            }}
+                  {filteredResults.map((result, index) => {
+                    const isTopPick = result.fullDomain === topPickDomain
+                    return (
+                      <div
+                        key={result.fullDomain}
+                        className={cn(
+                          "group rounded-2xl transition-all duration-200",
+                          "animate-fade-up opacity-0",
+                          !result.available && "opacity-60"
+                        )}
+                        style={{
+                          background: isTopPick
+                            ? "linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.05) 100%)"
+                            : result.available ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+                          border: isTopPick
+                            ? "1px solid rgba(212,175,55,0.4)"
+                            : result.available ? "1px solid rgba(212,175,55,0.15)" : "1px solid rgba(255,255,255,0.06)",
+                          boxShadow: isTopPick ? "0 0 32px rgba(212,175,55,0.1), 0 8px 32px rgba(0,0,0,0.4)" : undefined,
+                          animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
+                          animationFillMode: "forwards",
+                        }}
+                      >
+                        {/* Founder Favourite banner */}
+                        {isTopPick && (
+                          <div
+                            className="flex items-center gap-2 rounded-t-2xl px-4 py-2"
+                            style={{ borderBottom: "1px solid rgba(212,175,55,0.2)", background: "rgba(212,175,55,0.07)" }}
                           >
-                            {result.available ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                          </span>
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-base font-bold text-white sm:text-lg">{result.name}</span>
-                              <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs", tldColors[result.tld] || "bg-white/10 text-white/50")}>
-                                .{result.tld}
-                              </span>
-                              {/* Founder Signal score pill */}
-                              <span
-                                className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide"
-                                style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)", color: "#0a0800" }}
-                              >
-                                {result.score} FS™
-                              </span>
-                            </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
-                              <span>Memorability: {result.memorability}</span>
-                              {result.pronounceable && (
-                                <span className="flex items-center gap-1 text-emerald-400/80">
-                                  <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
-                                </span>
-                              )}
-                            </div>
-                            {/* Founder Signal Badge component */}
-                            <FounderSignalBadge
-                              name={result.name}
-                              tld={result.tld}
-                              vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
-                            />
+                            <span className="text-sm">⭐</span>
+                            <span
+                              className="text-[11px] font-bold tracking-wide"
+                              style={{ color: "#D4AF37" }}
+                            >
+                              Founder Favourite
+                            </span>
+                            <span className="text-[10px] text-white/30">— highest Founder Signal™ in this batch</span>
+                          </div>
+                        )}
 
-                            {/* SEO Micro-Signal & Check Button */}
-                            <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                              {(() => {
-                                const signal = getSeoMicroSignal(result.name)
-                                return signal ? (
-                                  <span className={cn(
-                                    "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                                    signal.type === "positive" ? "bg-emerald-500/15 text-emerald-400" :
-                                    signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-white/5 text-white/40"
-                                  )}>
-                                    {signal.icon} {signal.text}
-                                  </span>
-                                ) : null
-                              })()}
-                              <button
-                                onClick={() => setSeoCheckDomain({ name: result.name, tld: result.tld })}
-                                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
-                                style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
+                        <div className={cn("p-4 sm:p-5", isTopPick && "pt-3.5")}>
+                          {/* Top row: availability + name + utility buttons */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-3">
+                              <span
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                                style={{
+                                  background: result.available ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
+                                  border: result.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                                  color: result.available ? "#34d399" : "rgba(255,255,255,0.3)",
+                                }}
                               >
-                                <Search className="h-2.5 w-2.5" />
-                                SEO Potential
+                                {result.available ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                              </span>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-base font-bold text-white sm:text-lg">{result.name}</span>
+                                <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs", tldColors[result.tld] || "bg-white/10 text-white/50")}>
+                                  .{result.tld}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Copy + Bookmark (always visible) */}
+                            <div className="flex shrink-0 items-center gap-1.5">
+                              <button
+                                onClick={() => copyToClipboard(result.fullDomain)}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
+                                title="Copy domain"
+                              >
+                                {copiedName === result.fullDomain ? (
+                                  <CheckCircle className="h-4 w-4 text-emerald-400" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => toggleShortlist(result.fullDomain)}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                style={{
+                                  background: shortlist.includes(result.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
+                                  color: shortlist.includes(result.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
+                                }}
+                                title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                              >
+                                {shortlist.includes(result.fullDomain) ? (
+                                  <BookmarkCheck className="h-4 w-4" />
+                                ) : (
+                                  <Bookmark className="h-4 w-4" />
+                                )}
                               </button>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Action buttons */}
-                        <div className="flex shrink-0 items-center gap-1.5 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
-                          <button
-                            onClick={() => copyToClipboard(result.fullDomain)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
-                            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
-                            title="Copy domain"
-                          >
-                            {copiedName === result.fullDomain ? (
-                              <CheckCircle className="h-4 w-4 text-emerald-400" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => toggleShortlist(result.fullDomain)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
-                            style={{
-                              background: shortlist.includes(result.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
-                              color: shortlist.includes(result.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
-                            }}
-                            title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
-                          >
-                            {shortlist.includes(result.fullDomain) ? (
-                              <BookmarkCheck className="h-4 w-4" />
-                            ) : (
-                              <Bookmark className="h-4 w-4" />
-                            )}
-                          </button>
+                          {/* Founder Signal Panel */}
+                          <FounderSignalPanel
+                            name={result.name}
+                            tld={result.tld}
+                            vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
+                          />
+
+                          {/* Buy button + scarcity text */}
                           {result.available && (
-                            <a
-                              href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all hover:-translate-y-0.5 sm:px-4"
-                              style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
-                              title="Buy this domain on Porkbun"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              <span className="hidden sm:inline">Buy</span>
-                            </a>
+                            <div className="mt-3">
+                              <a
+                                href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
+                                style={{
+                                  background: isTopPick
+                                    ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
+                                    : "rgba(212,175,55,0.12)",
+                                  color: isTopPick ? "#0a0800" : "#D4AF37",
+                                  border: isTopPick ? "none" : "1px solid rgba(212,175,55,0.25)",
+                                  boxShadow: isTopPick ? "0 4px 20px rgba(212,175,55,0.3)" : undefined,
+                                }}
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                Register Domain
+                              </a>
+                              <p className="mt-1.5 text-[10px] text-white/20">
+                                Available now — short domains sell fast
+                              </p>
+                            </div>
                           )}
+
+                          {/* Metrics */}
+                          <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
+                            <span>Memorability: {result.memorability}</span>
+                            {result.pronounceable && (
+                              <span className="flex items-center gap-1 text-emerald-400/80">
+                                <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* SEO Micro-Signal & Check Button */}
+                          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                            {(() => {
+                              const signal = getSeoMicroSignal(result.name)
+                              return signal ? (
+                                <span className={cn(
+                                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                  signal.type === "positive" ? "bg-emerald-500/15 text-emerald-400" :
+                                  signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-white/5 text-white/40"
+                                )}>
+                                  {signal.icon} {signal.text}
+                                </span>
+                              ) : null
+                            })()}
+                            <button
+                              onClick={() => setSeoCheckDomain({ name: result.name, tld: result.tld })}
+                              className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                              style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
+                            >
+                              <Search className="h-2.5 w-2.5" />
+                              SEO Potential
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )}

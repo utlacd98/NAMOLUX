@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronDown, ChevronUp, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
@@ -210,3 +210,135 @@ export function FounderSignalBadge({ name, tld, vibe }: FounderSignalBadgeProps)
   )
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getFsTierLabel(score: number): string {
+  if (score >= 95) return "Elite Brand Score"
+  if (score >= 85) return "Strong Brand Score"
+  if (score >= 70) return "Good Brand Score"
+  return "Starter Brand Score"
+}
+
+function getFsConfidenceLine(score: number): string {
+  if (score >= 95) return "Top 5% of generated names"
+  if (score >= 85) return "Highly brandable startup name"
+  if (score >= 70) return "Solid brand potential"
+  return "Decent early-stage brand name"
+}
+
+function getFsScoreColor(score: number): string {
+  if (score >= 95) return "#D4AF37"
+  if (score >= 85) return "#34d399"
+  if (score >= 70) return "#60a5fa"
+  return "rgba(255,255,255,0.35)"
+}
+
+// ─── FounderSignalPanel ───────────────────────────────────────────────────────
+
+interface FounderSignalPanelProps {
+  name: string
+  tld: string
+  vibe?: BrandVibe
+}
+
+export function FounderSignalPanel({ name, tld, vibe }: FounderSignalPanelProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const signal = calculateFounderSignal(name, tld, vibe)
+  const [displayScore, setDisplayScore] = useState(0)
+
+  useEffect(() => {
+    setDisplayScore(0)
+    const target = signal.score
+    const steps = 28
+    const intervalMs = 800 / steps
+    let step = 0
+    const id = setInterval(() => {
+      step++
+      setDisplayScore(Math.round((step / steps) * target))
+      if (step >= steps) {
+        setDisplayScore(target)
+        clearInterval(id)
+      }
+    }, intervalMs)
+    return () => clearInterval(id)
+  }, [signal.score])
+
+  const scoreColor = getFsScoreColor(signal.score)
+
+  return (
+    <div className="mt-2.5">
+      <div className="flex items-start gap-3">
+        {/* Animated numeric score tile */}
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-base font-black tabular-nums"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: `1px solid ${scoreColor}40`,
+            color: scoreColor,
+            boxShadow: `0 0 16px ${scoreColor}20`,
+          }}
+        >
+          {displayScore}
+        </div>
+
+        {/* Labels */}
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[11px] font-semibold tracking-wide text-white/50">
+              Founder Signal™
+            </span>
+            <span className="text-[10px] text-white/25">/ 100</span>
+          </div>
+          <div className="text-[11px] font-bold" style={{ color: scoreColor }}>
+            {getFsTierLabel(signal.score)}
+          </div>
+          <div className="mt-0.5 text-[10px] text-white/25">
+            {getFsConfidenceLine(signal.score)}
+          </div>
+        </div>
+      </div>
+
+      {/* Expand toggle */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="mt-1.5 flex items-center gap-1 text-[10px] text-white/25 transition-colors hover:text-white/50"
+      >
+        View analysis
+        {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      </button>
+
+      {/* Expanded breakdown */}
+      {isExpanded && (
+        <div
+          className="mt-2 animate-fade-up rounded-xl p-3 text-xs"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          <p className="mb-3 text-[11px] font-medium text-white/70">{signal.brutalVerdict}</p>
+          <div className="space-y-1.5">
+            {signal.insights.map((insight, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  "flex items-center gap-1.5 text-[11px]",
+                  insight.type === "positive" && "text-emerald-400",
+                  insight.type === "warning" && "text-yellow-400",
+                  insight.type === "negative" && "text-red-400"
+                )}
+              >
+                <span>{insight.type === "positive" ? "✔" : insight.type === "negative" ? "✖" : "⚠"}</span>
+                <span>{insight.text}</span>
+              </div>
+            ))}
+          </div>
+          <div
+            className="mt-3 flex items-start gap-1.5 pt-2 text-[10px] text-white/25"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            <Info className="mt-0.5 h-3 w-3 shrink-0" />
+            <span>Founder Signal™ estimates long-term brand strength. Not legal advice.</span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

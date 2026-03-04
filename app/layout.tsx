@@ -8,30 +8,34 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" })
 
 export const metadata: Metadata = {
-  title: "NamoLux - Domain Name Finder & SEO Audit",
+  title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
   description:
-    "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+    "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on. Free to try.",
   keywords: [
+    "AI domain name generator",
     "domain name finder",
     "domain availability checker",
+    "brandable domain names",
     "founder signal scoring",
     "free domain search",
     ".com domain search",
     "brand name ideas",
-    "startup naming",
+    "startup naming tool",
+    "business name generator",
     "seo audit tool",
+    "namolux",
   ],
-  authors: [{ name: "NamoLux" }],
+  authors: [{ name: "NamoLux", url: "https://www.namolux.com" }],
   creator: "NamoLux",
   publisher: "NamoLux",
   metadataBase: new URL("https://www.namolux.com"),
   alternates: {
-    canonical: "./",
+    canonical: "https://www.namolux.com/",
   },
   openGraph: {
-    title: "NamoLux - Domain Name Finder & SEO Audit",
+    title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
     description:
-      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+      "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on.",
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
@@ -39,18 +43,20 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/namnewlogo.png",
-        width: 400,
-        height: 400,
-        alt: "NamoLux - Domain Name Finder",
+        width: 1200,
+        height: 630,
+        alt: "NamoLux — AI Domain Name Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux - Domain Name Finder & SEO Audit",
+    title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
     description:
-      "Find available domain names in seconds, check live .com availability, and score each option with Founder Signal so you can choose a brand worth building on.",
+      "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on.",
     images: ["/namnewlogo.png"],
+    site: "@namolux",
+    creator: "@namolux",
   },
   robots: {
     index: true,
@@ -64,14 +70,17 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [{ url: "/namoluxfinalfav.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/namoluxfinalfav.svg", sizes: "180x180", type: "image/svg+xml" }],
-    shortcut: "/namoluxfinalfav.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.svg",
   },
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
   },
-  generator: "v0.app",
+  category: "technology",
 }
 
 export const viewport: Viewport = {
