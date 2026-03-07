@@ -3921,6 +3921,163 @@ export const blogPosts: BlogPost[] = [
     ]
   },
 
+  // ─── NEW ARTICLES ────────────────────────────────────────────────────────────
+
+  {
+    slug: "does-domain-name-affect-seo",
+    title: "Does Your Domain Name Affect SEO? What Founders Actually Need to Know",
+    description: "Your domain name affects SEO — but not in the way most founders think. Here's what actually matters and what's a myth.",
+    seoTitle: "Does Your Domain Name Affect SEO? (2026 Guide)",
+    metaDescription: "Does your domain name affect SEO rankings? Learn what domain names actually impact — CTR, brand search, backlinks — and what's a myth in 2026.",
+    category: "SEO Foundations",
+    readTime: 6,
+    publishedAt: "2026-03-06",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Founders spend weeks deliberating over domain names, partly because they believe the wrong thing: that choosing the right domain will give them an SEO edge. Sometimes they're right. Often they're worrying about the wrong things." },
+      { type: "paragraph", content: "Here's what the research and real-world data actually shows about domains and SEO — and where you should spend your decision-making energy." },
+      { type: "heading", level: 2, content: "The Death of Exact Match Domain Power" },
+      { type: "paragraph", content: "For years, owning bestcoffeegrinder.com gave you a meaningful ranking advantage for 'best coffee grinder.' Google's algorithm treated the exact keyword in the domain as a relevance signal." },
+      { type: "paragraph", content: "Then in 2012, Google launched the EMD (Exact Match Domain) update. Sites with exact-match domains but thin, low-quality content lost rankings overnight. The update didn't kill EMD advantage entirely — it killed the shortcut. Today, an exact-match domain on a site with great content still performs well, but it's the content doing the work, not the domain. If you're considering buying an exact-match domain specifically for SEO in 2026, don't." },
+      { type: "heading", level: 2, content: "What Your Domain Name Actually Affects" },
+      { type: "paragraph", content: "The domain itself doesn't rank. But it influences several factors that do." },
+      { type: "heading", level: 3, content: "Click-Through Rate" },
+      { type: "paragraph", content: "When your domain appears in search results, people decide in under a second whether to click. A brandable, trustworthy-looking domain gets clicked more than a generic keyword string. CTR is a ranking signal — if more people click your result and stay, Google notices. 'getmailrocket.com' will likely get higher CTR than 'emailmarketingsoftwaretool.com' even if the second one contains more keywords." },
+      { type: "heading", level: 3, content: "Brand Search Volume" },
+      { type: "paragraph", content: "As your business grows, people search directly for your brand name. 'Notion app', 'Stripe pricing', 'Figma tutorial' — these branded searches signal authority to Google. A distinctive, memorable name accelerates this. A generic name competes with existing search intent and builds brand search volume more slowly." },
+      { type: "heading", level: 3, content: "Backlink Anchor Text and Direct Traffic" },
+      { type: "paragraph", content: "When people link to your site, they often use your brand name as the anchor text. A distinctive name generates natural-looking anchor text. Short, memorable domains also generate more direct traffic — and direct traffic is a strong signal of brand authority that Google weighs." },
+      { type: "heading", level: 2, content: "Does Domain Extension Affect Rankings?" },
+      { type: "paragraph", content: "Google's official position: no. A .io domain will rank just as well as a .com for the same content and authority. The indirect effects (more direct traffic, higher CTR from mainstream audiences) may give .com a slight edge in some niches, but for technical audiences there's no meaningful ranking difference between .com, .io, and .ai." },
+      { type: "callout", calloutType: "tip", content: "What actually matters for domain SEO: a short, distinct, memorable name that people will remember and search for by name. The indirect effects of brand recognition compound over years. A forgettable name is an SEO liability in ways that don't show up in any audit tool." },
+      { type: "heading", level: 2, content: "The Real SEO Checklist for Your Domain" },
+      { type: "list", content: "", items: ["Check domain history — use the Wayback Machine to verify no previous spam or penalties", "Test distinctiveness — Google the name and see if unrelated content dominates", "Assess memorability — will people be able to type it directly from memory?", "Verify .com availability — to prevent brand traffic leakage, not for ranking reasons", "Consider citation ease — journalists and bloggers link more readily if the name is easy to reference"] },
+      { type: "heading", level: 2, content: "What Doesn't Matter (That Everyone Thinks Does)" },
+      { type: "list", content: "", items: ["Keywords in the domain name — minor signal at best, can look spammy", "Domain age — quality content history matters, not age alone", "TLD prestige — Google treats all TLDs equally in rankings", "Domain length for crawling — crawlers don't care about character count"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux scores every generated name on brand strength and memorability with Founder Signal™ — so you can choose a name that builds search authority over time.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Do keywords in a domain name help SEO?", answer: "Minimally, and less every year. Google's 2012 EMD update reduced ranking advantages for exact-match domains. In 2026, keywords in a domain are a very weak signal. A distinctive brandable name often outperforms a keyword-stuffed domain because it builds stronger brand search signals over time." },
+      { question: "Does a .com domain rank better than .io or .ai?", answer: "No — Google treats all standard TLDs equally in rankings. The indirect effects (more direct traffic, higher CTR from mainstream audiences) may give .com a slight edge in some niches, but for technical audiences there's no meaningful ranking difference." },
+      { question: "How do I check if a domain has an SEO history problem?", answer: "Use the Wayback Machine (web.archive.org) to see previous use. Check spam databases like Spamhaus. Search the domain in Google to see if indexed pages from previous owners appear. A spam history can carry ranking penalties that are hard to recover from." },
+    ]
+  } as BlogPost,
+
+  {
+    slug: "seo-friendly-startup-name",
+    title: "How to Name Your Startup for Search: SEO-Friendly Naming Strategy",
+    description: "The name you choose now will either compound your search authority or fight against it. Here's how to pick a startup name that's built for SEO.",
+    seoTitle: "SEO-Friendly Business Name: How to Name Your Startup for Search (2026)",
+    metaDescription: "Learn how to choose an SEO-friendly business name that builds branded search authority. Why brandable names beat keyword names and how to test searchability before committing.",
+    category: "SEO Foundations",
+    readTime: 7,
+    publishedAt: "2026-03-06",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Most founders name their startup based on what sounds good in a pitch deck. Few think about what happens when someone Googles it two years later. The name you choose now will either compound your search authority or fight against it for the life of the business." },
+      { type: "heading", level: 2, content: "Why Brandable Names Beat Keyword Names Long-Term" },
+      { type: "paragraph", content: "The intuition behind keyword names makes sense: if you name your company 'Fast Accounting Software', people searching 'fast accounting software' might find you. This works briefly, then creates persistent problems." },
+      { type: "paragraph", content: "Generic keyword names compete with editorial content, forum posts, comparison articles, and dozens of other sites that also rank for those terms. You don't own the phrase. And when you expand or pivot, a descriptive name becomes a cage. Stripe could expand into banking infrastructure; 'PaymentSimplified.com' couldn't." },
+      { type: "paragraph", content: "HubSpot, Mailchimp, and Intercom are all brandable names with no obvious keyword meaning. Each now dominates branded search in their category — not because of keywords in their names, but because their names are distinctive enough that brand searches compound over time." },
+      { type: "heading", level: 2, content: "The Searchability Problem: Names That Compete with Themselves" },
+      { type: "paragraph", content: "If you choose a name that's a common English word, you'll spend years fighting for search visibility against every other use of that word. Simple.com (banking app) had to compete with millions of pages that use the word 'simple'. Asana shares its name with a yoga pose. These companies overcame it, but it required far more SEO investment than if they'd chosen more distinctive names." },
+      { type: "list", content: "Names most likely to have this problem:", items: ["Single common English words (Simple, Plain, Clear, Pure)", "Everyday verbs (Flow, Build, Make, Launch)", "Generic adjectives used across industries (Smart, Fast, Easy, Pro)"] },
+      { type: "list", content: "Names that avoid it:", items: ["Invented words (Figma, Zara, Spotify)", "Unusual combinations (Mailchimp, HubSpot, Salesforce)", "Names with distinct phonetic signatures (Stripe, Slack, Zoom)"] },
+      { type: "heading", level: 2, content: "How Brand Search Volume Builds Authority" },
+      { type: "paragraph", content: "Branded searches — people typing your company name into Google — are the highest-intent traffic you'll ever get. When thousands of people do this, Google interprets it as a signal that your brand has real-world relevance. This compounds: more branded searches leads to higher perceived authority, which leads to better rankings for non-branded terms, which creates more site visitors, which creates more people who know the brand." },
+      { type: "callout", calloutType: "tip", content: "A startup with a distinctive name that earns 500 branded searches per month in year one will naturally build domain authority faster than a keyword-named competitor with 50 branded searches per month — even if content quality is identical. The name is the flywheel." },
+      { type: "heading", level: 2, content: "How to Test Searchability Before You Commit" },
+      { type: "list", content: "Run your top name candidates through these checks before registering:", items: ["Direct Google search — are results about your proposed brand or something else entirely?", "Google Trends — flat-line means you'll own the search; spiky patterns mean existing associations to fight", "'[Name] + your category' search — if nothing comes up, you have clean territory", "Social handle check — username availability tells you how saturated the name already is", "Google News test — existing media coverage means an established entity you'll be confused with"] },
+      { type: "heading", level: 2, content: "The Ideal Name for Search" },
+      { type: "paragraph", content: "For SEO purposes, the ideal startup name returns zero or near-zero results when searched alone, has no major brand or cultural entity already using it, and can be combined with your category keyword to create distinctive search phrases: 'Figma tutorial', 'Stripe API', 'Notion template'. The name you choose creates the search landscape you'll operate in for the next decade." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates startup names designed for brand strength and memorability, with SEO micro-signals on every result so you know which names are built to rank.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Should I use keywords in my startup name for SEO?", answer: "Only if the keywords don't limit your long-term brand. Generic keyword names compete with too many entities to build branded search authority. A distinctive name like Notion or Stripe builds SEO authority more effectively over time by generating branded searches that no competitor can rank for." },
+      { question: "How do I know if a name will be hard to rank for?", answer: "Google the name in isolation. If the first two pages are full of unrelated content, you have an uphill battle for brand name search visibility. Google Trends can show existing search patterns — high existing volume for a word means high competition." },
+      { question: "What's the best length for a startup name from an SEO perspective?", answer: "SEO doesn't have strong preferences on length, but brand authority does. Shorter names (6–10 characters) generate more direct traffic and are easier to search precisely. Names over 15 characters reduce direct traffic signals." },
+    ]
+  } as BlogPost,
+
+  {
+    slug: "what-makes-a-great-startup-name",
+    title: "What Makes a Great Startup Name? Lessons from Stripe, Notion, and Figma",
+    description: "Decode the naming principles behind Stripe, Notion, and Figma — and learn the 5 traits that make startup names scale.",
+    seoTitle: "What Makes a Good Startup Name? Lessons from Stripe, Notion & Figma",
+    metaDescription: "What makes a startup name great? We break down Stripe, Notion, and Figma to extract the 5 traits that make names scale — and the mistakes that hold early-stage brands back.",
+    category: "Builder Insights",
+    readTime: 8,
+    publishedAt: "2026-03-06",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Some startup names feel inevitable in retrospect. Stripe sounds like exactly what a payment company should be called. Notion fits a thinking tool perfectly. Figma is the kind of name that sounds like it couldn't have been anything else." },
+      { type: "paragraph", content: "But these names weren't discovered — they were built. Each one satisfies a set of criteria that most founders don't consciously apply when naming their own companies. Let's decode them." },
+      { type: "heading", level: 2, content: "Stripe: One Syllable, Clean, Evocative" },
+      { type: "paragraph", content: "Stripe is four letters, one syllable, and carries a subtle implication of streamlining. It doesn't mean 'payment processing' — it suggests simplicity, a clean line, something elegant running through complexity." },
+      { type: "list", content: "What makes it work:", items: ["Length: four characters. Types instantly, says instantly.", "Phonetics: hard consonant start, clean vowel, crisp ending. Easy across accents and languages.", "Brandable neutrality: it doesn't describe payments, so Stripe can expand into banking infrastructure without the name becoming a liability.", "Domain: Stripe.com. Clean. No modifiers."] },
+      { type: "paragraph", content: "The lesson from Stripe isn't to copy the style — it's that the best names suggest rather than describe. They evoke a feeling or quality rather than naming a feature." },
+      { type: "heading", level: 2, content: "Notion: Abstract But Memorable" },
+      { type: "paragraph", content: "Notion is a real English word meaning a concept or idea. For a productivity tool designed around thinking, it's semantically apt. But the genius is that 'notion' is just abstract enough that it doesn't lock the product into a single use case. You can have a Notion for notes, for projects, for wikis, for databases." },
+      { type: "paragraph", content: "This category of name — a real word, loosely evocative, distinctly not generic — is the hardest to find because the obvious ones are taken. Notion worked because the word wasn't already associated with any major tech product, and it's one syllable when spoken casually." },
+      { type: "heading", level: 2, content: "Figma: Invented, Phonetically Strong" },
+      { type: "paragraph", content: "Figma is a made-up word. It may derive from the Latin 'figma' (meaning form or shape) — appropriate for a design tool — but in practice nobody knew that when they first heard it. It worked anyway." },
+      { type: "paragraph", content: "Made-up words are the highest-risk, highest-reward naming strategy. Figma succeeds because it sounds like a word your brain can parse — two syllables, easy vowel-consonant pattern, a distinctive hard 'g' start. Many invented words fail because they're obviously constructed. Figma sounds like a word you've just forgotten." },
+      { type: "heading", level: 2, content: "The 5 Traits of Names That Scale" },
+      { type: "paragraph", content: "Looking across Stripe, Notion, Figma, Slack, Zoom, Linear, and Vercel — consistent patterns emerge:" },
+      { type: "list", content: "", items: ["Short. All are under 10 characters. Most are under 7. Length is the number one operational liability in a name.", "Pronounceable on first encounter. Native speakers of different languages can attempt them without embarrassment.", "Invented or not-yet-associated. Either completely made up or a real word with no dominant tech association already attached.", "Domain available. Not always .com at launch, but they eventually controlled the primary TLD.", "No negative connotations in target markets. Requires checking — names that work in English can fail in other languages."] },
+      { type: "heading", level: 2, content: "Mistakes That Kill Early-Stage Brands" },
+      { type: "list", content: "", items: ["Being too literal. A name that describes exactly what you do today will limit you the moment you expand.", "Being too generic. Single adjectives (Smart, Simple, Clear) create brand search nightmares.", "Chasing availability over quality. A name being available on .com is not a reason to use it.", "Ignoring the spoken test. Your name will be said in meetings, on calls, and on podcasts. Say it aloud 20 times.", "Founder attachment. You fall in love with a name you invented and stop evaluating objectively. Antidote: share it with five people who have no investment in your success."] },
+      { type: "callout", calloutType: "tip", content: "The five-years-from-now test: imagine your company has grown 10x and you're announcing a major product expansion. Does your name still work? If it feels limiting, you're building a naming problem into your foundation." },
+      { type: "heading", level: 2, content: "Building the Name You Don't Have to Change" },
+      { type: "paragraph", content: "The ideal startup name is one you can grow into, not grow out of. Stripe was doing payments. Now they're building financial infrastructure for the internet. The name still works. Notion was a note-taking app. Now it's a company operating system. The name still works." },
+      { type: "paragraph", content: "Choose a name with that kind of generosity, and you'll never have to spend six figures on a rebrand." },
+      { type: "callout", calloutType: "cta", content: "NamoLux uses Founder Signal™ to score names on the same criteria that make Stripe, Notion, and Figma successful — phonetic strength, memorability, brand risk, and scalability.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "What do Stripe, Notion, and Figma have in common as brand names?", answer: "All three are short (under 8 characters), phonetically clean, and abstract enough not to limit the company to a single product category. They're memorable without being try-hard, and they create distinctive branded search identities — nobody else can rank for 'Figma' except Figma." },
+      { question: "Should startup names be real words or invented words?", answer: "Both work, but each has trade-offs. Real words (Notion, Slack) are immediately processable but risk competing with existing associations. Invented words (Figma, Spotify) are completely ownable but need to sound like plausible words rather than obvious constructs. The safest invented words follow natural phoneme patterns." },
+      { question: "How long should a startup name be?", answer: "Under 10 characters is a strong target. Under 7 is ideal. Every character over 10 adds friction in URLs, business cards, verbal communication, and social handles. The most successful startup names average 5–7 characters." },
+    ]
+  } as BlogPost,
+
+  {
+    slug: "naming-startup-on-budget",
+    title: "Naming Your Startup on a Budget: How to Get a Premium Name Without Premium Prices",
+    description: "Naming agencies charge £10K–£50K. You don't need one. Here's how to get a great startup name for free — or close to it.",
+    seoTitle: "Startup Name Generator Free: Get a Premium Name Without the Agency Price Tag",
+    metaDescription: "You don't need a naming agency to get a great startup name. Compare AI generators, crowdsourced naming, and DIY — and learn how to evaluate quality without a branding expert.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-03-06",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Naming agencies charge £10,000–£50,000 for a brand name. Some charge more. The process takes months. And the name you end up with is often something a founder with a good brief could have generated in an afternoon." },
+      { type: "paragraph", content: "This isn't a knock on professional branding. It's a reminder that the expensive option isn't the only one — and at the early stage, it's rarely the right one." },
+      { type: "heading", level: 2, content: "What You're Actually Paying for with a Naming Agency" },
+      { type: "paragraph", content: "Naming firms sell three things: process, expertise, and liability transfer. Their process involves stakeholder interviews, linguistic analysis, trademark clearance in multiple territories, and multiple rounds of refinement." },
+      { type: "paragraph", content: "The liability transfer is the underrated one. When a £30,000 name turns out to have trademark conflicts or cultural problems in a key market, it's the agency's problem. For a funded company launching a flagship consumer brand, this value proposition makes sense. For a founder at the idea stage, you're buying a bicycle with a Ferrari budget." },
+      { type: "heading", level: 2, content: "AI Generators vs Crowdsourced Naming vs DIY" },
+      { type: "paragraph", content: "AI generators are the most efficient option for most early-stage founders. Modern tools produce dozens of viable options in seconds, check domain availability instantly, and score names for brand quality. The iteration cycle is minutes, not weeks. The cost is free or near-free." },
+      { type: "paragraph", content: "Crowdsourced naming platforms (Squadhelp, Naming Force) involve a brief submitted to a community of namers who compete to submit ideas. You pay a prize amount (typically £150–£500) and get 100–300 suggestions. Quality is inconsistent, but there's occasional creativity that pure AI misses. Turnaround is 7–10 days." },
+      { type: "paragraph", content: "DIY from scratch works if you have good instincts and time. The risk is founder attachment: you fall in love with a name because you made it, not because it's good." },
+      { type: "heading", level: 2, content: "How to Evaluate Name Quality Without a Branding Expert" },
+      { type: "paragraph", content: "Agencies charge partly because name evaluation is genuinely hard. But the framework they use isn't proprietary:" },
+      { type: "list", content: "", items: ["Phonetic test — can you say it naturally? Can someone spell it after hearing it once?", "Clarity test — is there a plausible, positive interpretation?", "Length test — ideally 6–10 characters, under 15 at most", "Uniqueness test — Google it; is there already a well-known brand using this name?", "Trademark test — search the USPTO or UKIPO for existing marks in your category (free, 10 minutes)", "48-hour test — do you still like it tomorrow? What do five uninvested people think?"] },
+      { type: "callout", calloutType: "tip", content: "Founder Signal™ in NamoLux automates the quality framework: it scores every name on phonetics, memorability, brand risk, and domain strength automatically — giving you agency-level evaluation in seconds, for free." },
+      { type: "heading", level: 2, content: "The One-Time Purchase Advantage" },
+      { type: "paragraph", content: "Subscription pricing is everywhere in software. Monthly charges for tools that become background infrastructure. A name generator that charges monthly creates the wrong incentive structure — you pay every month regardless of how often you generate names." },
+      { type: "paragraph", content: "A one-time purchase model aligns better with how founders actually use naming tools: intensively during a naming sprint, then rarely after. NamoLux is priced this way deliberately." },
+      { type: "heading", level: 2, content: "Getting to a Shortlist Fast" },
+      { type: "list", content: "The fastest path to a good name doesn't involve more options — it involves better filtering:", items: ["Write a brief: what the product does, who it's for, 3 adjectives that should describe the brand, 3 that shouldn't", "Generate broadly: run your core concept through an AI generator and get 20–30 options", "Eliminate, don't rank: cut anything that fails the phonetic test, trademark check, or availability check — get to 5–8", "Score the survivors: apply the quality framework or use a scoring tool", "Sleep on your top 2: the name that still feels right after 48 hours is your name"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates brandable startup names with instant domain checking and Founder Signal™ scoring — free to try, no account required.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Can I really get a good startup name for free?", answer: "Yes. Free AI name generators like NamoLux (one free generation per day) and Namelix produce genuinely useful options. The difference between a free tool and a £30,000 naming agency isn't name quality — it's the depth of linguistic analysis, trademark screening across territories, and account management. For most early-stage startups, the free tools are more than enough." },
+      { question: "Is a one-time payment better than a subscription for a name generator?", answer: "For most founders, yes. Naming work happens in bursts — intensive during a naming sprint, then rarely. A subscription charges every month regardless. NamoLux's one-time model means you pay once and access the tool whenever you need it." },
+      { question: "When does it make sense to hire a naming agency?", answer: "For well-funded companies (Series A+) launching flagship consumer brands where the name is a significant strategic asset, and where international trademark clearance is required. For seed-stage and bootstrapped founders, a structured DIY approach using good AI tools produces outcomes that are hard to distinguish from agency work at a fraction of the cost." },
+    ]
+  } as BlogPost,
+
 ]
 
 // Utility functions
