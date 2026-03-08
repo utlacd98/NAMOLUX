@@ -4078,6 +4078,396 @@ export const blogPosts: BlogPost[] = [
     ]
   } as BlogPost,
 
+  {
+    slug: "two-word-domain-names-guide",
+    title: "Two-Word Domain Names: Why They Work and How to Find a Good One",
+    description: "Two-word domain names hit the sweet spot between brevity and memorability. Here's how they work, why startups love them, and how to find one that's still available.",
+    seoTitle: "Two-Word Domain Names: The Complete Guide for Startups in 2026",
+    metaDescription: "Two-word domain names are the sweet spot for startup branding — short enough to type, rich enough to mean something. Learn how to find and evaluate them.",
+    category: "Domain Strategy",
+    readTime: 6,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "There's a naming goldilocks zone that most successful startups land in. Too short and you're in the territory of random five-letter invented words that mean nothing to anyone. Too long and you're keyword-stuffing a compound that nobody will remember after one encounter. Two-word domain names sit squarely in the middle — brief enough to type from memory, rich enough to carry meaning." },
+      { type: "heading", level: 2, content: "What Makes a Two-Word Domain Work" },
+      { type: "paragraph", content: "Not all two-word combinations are equal. The strongest two-word domains share three properties: phonetic compatibility (the two words sound natural together when spoken aloud), semantic fit (the words relate to the product, the feeling, or the audience in some meaningful way), and clean compound reading (when the two words are joined without spaces, no unintended words appear in the string)." },
+      { type: "heading", level: 2, content: "Types of Two-Word Domains" },
+      { type: "list", content: "The most common structural patterns in successful two-word startup names:", items: ["Action + Noun: Stripe, Basecamp, Shopify — verb or action word combined with a grounded noun", "Adjective + Noun: ClearBank, PureStorage — a quality modifier paired with a category word", "Invented + Real: GrowthLeap, NamoLux — one coined element paired with a real word for phonetic anchoring", "Noun + Noun: Dropbox, Mailchimp — two concrete nouns that together imply a category or function"] },
+      { type: "heading", level: 2, content: "The Awkward Reading Problem" },
+      { type: "paragraph", content: "Before registering any two-word domain, compress it and read it as a single string. The classic cautionary example is a hypothetical 'SpeedOfArt' — which compresses to a string containing an unintended word. The same issue affects category names, professional titles, and any domain where two words share a letter at their boundary. Always check what the joined version looks like before committing." },
+      { type: "heading", level: 2, content: "Finding Available Two-Word Domains" },
+      { type: "paragraph", content: "Short two-word .com domains are rare and expensive on the aftermarket. However, two-word .io and .ai domains are substantially more available at standard registration prices. AI name generators like NamoLux generate two-word brandable names by default and check availability across .com, .io, .ai, and .co simultaneously — so you can see your options across TLDs in a single pass rather than manually checking each extension." },
+      { type: "callout", calloutType: "tip", content: "NamoLux Founder Signal™ score helps identify which two-word names have strong phonetics and low brand risk before you register. Run your shortlist through scoring before paying for any domain." },
+      { type: "heading", level: 2, content: "Trademark and Brand Risk" },
+      { type: "paragraph", content: "Two-word names can hit trademark conflicts more easily than fully invented words, because both component words may already appear in registered trademarks. Before registering a domain or incorporating under a two-word name, run a free search on USPTO.gov (US) or trademarks.ipo.gov.uk (UK). Pay particular attention to trademarks in your specific category — identical names in unrelated industries are often legally coexistent, but same-category conflicts create genuine risk." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates two-word brandable startup names with Founder Signal™ scoring and real-time domain availability checking — free to try, no account required.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Are two-word domain names better than one-word?", answer: "One-word .com domains are almost never available at standard registration prices. Two-word names offer a realistic path to a strong, memorable domain without paying premium aftermarket prices. For most early-stage founders, a well-chosen two-word name is the practical optimum." },
+      { question: "How long should a two-word domain be?", answer: "Under 15 characters total including the TLD extension. The shorter, the better. Each individual word should ideally be under 10 characters. Anything longer and the domain becomes hard to type from memory and difficult to communicate verbally." },
+      { question: "Can I use a hyphen in a two-word domain?", answer: "Avoid hyphens. Hyphens are invisible in verbal communication — if you say your domain name aloud, the listener has no idea whether to type a hyphen or not. Hyphens are also hard to type correctly on mobile, and signal low-quality domains to users who've seen spam sites use hyphenated domains. Always go for the unhyphenated version." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "domain-name-for-app",
+    title: "Choosing a Domain Name for Your App: What's Different and What Matters",
+    description: "Apps have different domain needs than websites. Here's how to pick a domain that works across app stores, web, and brand — and doesn't paint you into a corner.",
+    seoTitle: "Domain Name for App: How to Choose the Right One in 2026",
+    metaDescription: "Choosing a domain for your app is different from choosing one for a website. Here's what changes and how to pick a name that works across web, iOS, and Android.",
+    category: "Domain Strategy",
+    readTime: 5,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "App naming has one constraint that website naming doesn't — the App Store and Google Play both index by app name, and the name you register is your brand in two additional discovery channels beyond search engines. A domain that works for a content site may be completely wrong for a mobile-first app that needs to be findable, pronounceable, and memorable across three different platforms simultaneously." },
+      { type: "heading", level: 2, content: "App Store Name vs Domain Name" },
+      { type: "paragraph", content: "Your App Store listing name and your domain don't have to match character-for-character, but they should be phonetically equivalent. If someone hears your app name mentioned in a podcast or recommended by a friend, they should be able to type your domain correctly without additional spelling guidance. When the App Store name and domain name diverge significantly, every verbal reference to your app creates a navigation problem." },
+      { type: "heading", level: 2, content: "Why App Founders Often Pick Longer Names — and Regret It" },
+      { type: "paragraph", content: "App stores display more characters in their listing titles than Google's title tag allows, which tempts founders into descriptive names. 'InvoiceManager Pro' reads clearly in the App Store, earns keyword placement in App Store Search, and explains the product immediately. The problem surfaces when you try to register invoicemanagerpro.com (taken), build a brand around a six-syllable name, and discover that users refer to the app as 'the invoice thing' because the full name is unwieldy." },
+      { type: "heading", level: 2, content: "TLD Choice for App Domains" },
+      { type: "paragraph", content: ".app is a real TLD operated by Google Registry with one meaningful property: HTTPS is required by default, which provides a minor security signal. .io remains the default for developer-focused apps and carries strong credibility in tech circles. .com is still the default assumption for most users navigating directly. For consumer apps targeting non-technical users, .com remains the safest choice. For developer tools or B2B SaaS, .io is well-established and expected." },
+      { type: "heading", level: 2, content: "Availability Reality" },
+      { type: "paragraph", content: "Most one-word .app domains are registered. Two-word .app domains are surprisingly available, partly because the TLD is newer and partly because many founders default to .com or .io. NamoLux generates names and checks .io and .ai availability in real-time — useful for app naming briefs where you need a name that works across both web and app stores." },
+      { type: "callout", calloutType: "tip", content: "If your app will be primarily marketed through word-of-mouth and referrals, prioritise a name that works verbally — short, no special characters, easy to spell after hearing once. A name that reads well on a screen but fails the verbal test will cost you referral traffic." },
+      { type: "heading", level: 2, content: "Brand Consistency Checklist" },
+      { type: "list", content: "Before committing to an app name, verify availability across all relevant channels:", items: ["Domain available on your chosen TLD (.com, .io, or .app)", "App Store name available (search the exact name in iOS App Store)", "Google Play name available (search in Play Store)", "Same handle available on Twitter/X and Instagram", "No existing trademark in your product category (check USPTO.gov)"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates app-ready brandable names with Founder Signal™ scoring and real-time domain checking — find a name that works across web and app stores.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Should my app name and domain name be identical?", answer: "Ideally yes. When they differ, every verbal reference to your app creates confusion — the listener doesn't know whether to search the App Store, type a URL, or Google the name. If you can't get the exact match domain, prioritise phonetic equivalence over exact character match." },
+      { question: "Is the .app domain worth using?", answer: "Yes, if you want a clean signal that the product is an app and don't mind the niche TLD. The mandatory HTTPS is a minor operational benefit. The downside: users still default-expect .com for direct navigation, so you may lose some traffic from people who type .com instinctively." },
+      { question: "What if my app name is already taken on the App Store?", answer: "You can submit apps with identical or very similar names to existing apps — App Store names are not protected by registration the way trademarks are. But you'll face serious discoverability problems and potential legal risk if the existing app has trademark protection in your category. The practical advice: change the name." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "domain-parking-explained",
+    title: "Domain Parking Explained: What It Is, When It Makes Sense, and When to Stop",
+    description: "Domain parking lets you hold a domain without building on it. But parked domains age, lose SEO potential, and carry costs. Here's when parking makes sense.",
+    seoTitle: "Domain Parking Explained: Is It Worth Parking Your Domain Names?",
+    metaDescription: "Domain parking means holding a domain without a live site. Learn when it makes strategic sense, what it costs, and when you should stop parking and start building.",
+    category: "Domain Strategy",
+    readTime: 5,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "You registered a domain. You haven't built anything on it yet. You're parking it. Every founder has a graveyard of parked domains — names that seemed like good ideas at the time, renewal notices that keep arriving, and a vague intention to 'do something with it eventually.' The question is whether that's a deliberate strategy or an expensive habit." },
+      { type: "heading", level: 2, content: "What Domain Parking Actually Means" },
+      { type: "paragraph", content: "Domain parking means pointing a domain at a registrar's default page or a basic placeholder — the domain resolves to something, but there's no live product or meaningful content. Registrars often monetise parked domains with pay-per-click ads, displaying generic ads related to the domain's keywords and earning small revenue from clicks. For most startup-style brandable domains, this PPC parking revenue is negligible." },
+      { type: "heading", level: 2, content: "The Two Kinds of Parking" },
+      { type: "paragraph", content: "Defensive parking means you registered the domain to stop someone else from taking it, with a genuine (if indefinite) intention to build on it or redirect it to your main domain. Speculative parking means you registered it because you think the name will appreciate in value — domain investing. Both are legitimate strategies, but they have different timelines, different costs, and different exit conditions. Conflating the two leads to indefinite holding of domains that should either be built on or dropped." },
+      { type: "heading", level: 2, content: "What Parking Does to Your SEO" },
+      { type: "paragraph", content: "A parked domain starts with zero domain authority. Google doesn't penalise parked domains — parking isn't a violation — but it doesn't reward them either. Every year a domain sits parked is a year without content indexing, link acquisition, or brand signals. When you eventually launch a product on a five-year-old parked domain, you're starting SEO from scratch anyway — the domain age doesn't transfer meaningful authority if the domain has never had content worth crawling." },
+      { type: "heading", level: 2, content: "Defensive Domain Registration — When It's Worth It" },
+      { type: "paragraph", content: "If you have a live brand with existing traffic and someone could register an adjacent domain to redirect that traffic or tarnish your brand, buying the variant and either parking it or redirecting it to your main domain is legitimate brand protection. The cost-benefit calculation changes entirely once you have an established brand to protect — a few pounds per year per variant domain is trivially cheap insurance." },
+      { type: "callout", calloutType: "tip", content: "If you've been parking a domain for more than 12 months with no concrete build plan attached to it, seriously consider letting it drop at renewal. Renewal fees compound. The opportunity cost of the mental overhead alone — the vague guilt every time a renewal notice arrives — is worth something." },
+      { type: "heading", level: 2, content: "Parking vs Redirect vs Minimal Landing Page" },
+      { type: "paragraph", content: "If you own a variant domain, redirect it with a 301 to your primary domain rather than parking it — this passes any incidental link equity and creates no confusion for users who navigate there directly. If you own a domain for a future product, a minimal 'coming soon' page with an email capture serves you better than a blank parking page. You can start building an audience, Google sees genuine intent, and you have something to share when the topic comes up." },
+      { type: "callout", calloutType: "cta", content: "Before parking another domain, make sure you've found a name worth building on. NamoLux generates quality-scored brandable names with real-time domain checking — free to try.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Does parking a domain affect SEO?", answer: "A parked domain isn't penalised, but it doesn't build any SEO equity either. Years of parking are years without content, links, or brand signals — meaning you start from zero when you eventually launch. Domain age alone provides minimal SEO benefit without a history of indexed content." },
+      { question: "Should I buy multiple domain extensions and park them?", answer: "For an established brand with existing traffic, buying .com/.io/.co variants and redirecting them to your primary domain is standard brand protection. For an early-stage startup with no traffic yet, spending £50–£100/year on defensive registrations is usually premature. Focus that budget on your primary domain and building the product." },
+      { question: "Can I make money from parking a domain?", answer: "PPC parking programs (Sedo, GoDaddy CashParking) exist and pay a small amount per click. The economics are poor unless you have a high-traffic generic keyword domain — think insurance.com or loans.com territory. Most startup-style brandable domains earn pennies per month from parking programs, making the revenue essentially irrelevant to the hold decision." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "schema-markup-for-startups",
+    title: "Schema Markup for Startups: How to Add Structured Data and Get Rich Results",
+    description: "Structured data (schema markup) helps Google understand your content and display rich results in search. Here's a practical guide for founders, no developer required.",
+    seoTitle: "Schema Markup for Startups: A Practical Structured Data Guide (2026)",
+    metaDescription: "Structured data schema markup helps Google display rich results for your site. Learn which schema types matter for startups and how to implement them without a developer.",
+    category: "SEO Foundations",
+    readTime: 7,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Rich results — the FAQ dropdowns, star ratings, article headers, and breadcrumbs you see above ordinary search results — are driven by schema markup. Most startup sites have none. That's an opportunity: adding schema to pages that already rank gets you more visual real estate in search results without requiring you to outrank anyone." },
+      { type: "heading", level: 2, content: "What Schema Markup Is" },
+      { type: "paragraph", content: "Schema markup is structured data you add to your HTML that tells Google explicitly what your content is — an Article, a FAQ, a Product, an Organisation. It doesn't change what users see on your page. It changes what Google understands about the page, and how Google can present it in search results. Schema.org is the standard vocabulary; JSON-LD is the implementation format Google explicitly recommends." },
+      { type: "heading", level: 2, content: "Which Schema Types Matter for Startups" },
+      { type: "list", content: "The highest-value schema types for early-stage startups and SaaS products:", items: ["Organisation: your company identity, logo, and social profile links — this is what populates your Knowledge Panel", "WebSite: enables the sitelinks search box that appears under your brand name in search results", "Article / BlogPosting: author attribution, published date, and hero image for rich article display", "FAQPage: each FAQ question and answer can appear as a collapsible dropdown directly under your search result — significant click-through uplift", "Product: price, availability, and rating display for any product you sell", "SoftwareApplication: app category, rating, operating system — the correct schema type for SaaS tools"] },
+      { type: "heading", level: 2, content: "How to Add JSON-LD Schema Without a Developer" },
+      { type: "paragraph", content: "JSON-LD schema lives in a single script block in your page's head section: <script type=\"application/ld+json\">{ your schema here }</script>. In Next.js, add it to your layout.tsx metadata or via a Script component with strategy='afterInteractive'. In WordPress, plugins like Yoast SEO and Rank Math handle the most common schema types automatically — Organisation, Article, and BreadcrumbList are all generated without writing any code." },
+      { type: "callout", calloutType: "tip", content: "The FAQPage schema is the highest-value quick win for most startup blogs. If you have FAQ sections on your pages, mark them up with FAQPage schema. FAQ rich results can double your search result footprint visually — showing two, three, or four additional lines under your listing — without requiring any ranking improvement." },
+      { type: "heading", level: 2, content: "Testing Your Schema" },
+      { type: "paragraph", content: "Google's Rich Results Test (search.google.com/test/rich-results) shows you exactly what schema Google can see on any URL and whether your markup qualifies for rich results. The Schema.org Validator catches syntax errors before you publish. Google Search Console shows validated structured data under the Enhancements tab, including any errors or warnings that are preventing rich result eligibility." },
+      { type: "heading", level: 2, content: "Common Mistakes" },
+      { type: "list", content: "Schema mistakes that prevent rich results or trigger manual actions:", items: ["Marking up content that isn't visible on the page — Google penalises schema that misrepresents page content", "Using Microdata instead of JSON-LD — harder to maintain and not Google's preferred format", "Not updating schema when content changes — stale schema creates inconsistencies Google flags", "Adding schema types that don't apply — a landing page doesn't need Article schema; a blog post doesn't need Product schema"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with real-time domain checking — find a name worth building your SEO strategy around.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Does schema markup directly improve rankings?", answer: "Not directly. Schema helps Google understand your content and display rich results — it doesn't boost your position itself. But rich results (FAQ dropdowns, article enhancements) typically increase click-through rates significantly, which indirectly signals quality to Google over time." },
+      { question: "Is JSON-LD or Microdata better for schema?", answer: "JSON-LD. Google explicitly recommends it, it's easier to maintain (lives in one script block rather than scattered through HTML attributes), and it doesn't break if your HTML structure changes. There's no practical reason to choose Microdata for a new implementation." },
+      { question: "How long does it take for schema to show up in search results?", answer: "Google needs to recrawl and reindex your page after you add schema. For new sites, this can take 2–4 weeks. For established sites with frequent Googlebot visits, schema changes often appear in search results within a few days. You can request indexing via Google Search Console URL Inspection to accelerate the process." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "seo-first-90-days-new-site",
+    title: "SEO in Your First 90 Days: What to Focus on When You Have No Traffic Yet",
+    description: "New sites start with zero authority. Here's the exact order of operations for SEO in your first 90 days — focusing on what actually moves the needle early.",
+    seoTitle: "SEO First 90 Days: A New Site Strategy That Actually Works (2026)",
+    metaDescription: "Starting SEO on a new site is different from growing an established one. Learn what to focus on in your first 90 days to build authority and get indexed fast.",
+    category: "SEO Foundations",
+    readTime: 7,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Most SEO advice is written for sites that already have traffic. The first 90 days of a new site is a fundamentally different challenge — you're not optimising, you're establishing. Google needs to trust you before it will rank you. The order in which you do things matters as much as the things you do." },
+      { type: "heading", level: 2, content: "Days 1–14: Technical Foundation" },
+      { type: "list", content: "The technical setup work that removes blockers before you create any content:", items: ["Submit your XML sitemap to Google Search Console", "Verify your Search Console property (DNS verification or HTML file method)", "Set canonical URLs to avoid duplication between www and non-www versions", "Confirm HTTPS is active and all HTTP URLs redirect correctly", "Check Core Web Vitals baseline using PageSpeed Insights (mobile tab)", "Set up Google Analytics 4 before publishing your first post", "Create and publish robots.txt confirming crawlability for Googlebot"] },
+      { type: "heading", level: 2, content: "Days 14–45: First Content Sprint" },
+      { type: "paragraph", content: "Your first content has two jobs: give Googlebot something substantive to index, and establish your topical relevance. Write 5–8 foundational posts around your core topic cluster. Don't try to cover 50 different keyword variations in your first month — establish depth on 3–4 related themes and let Google understand what your site is about. Posts of 1,500 words or more index faster on new sites because they contain more keyword signals and more internal linking opportunities." },
+      { type: "callout", calloutType: "tip", content: "For naming and domain-related businesses, the topic cluster is clear: brand naming, domain strategy, startup naming tools. Every post should link to at least one other post — internal linking from day one creates crawl paths even before external links exist, accelerating index coverage of your full content set." },
+      { type: "heading", level: 2, content: "Days 45–70: First Links" },
+      { type: "paragraph", content: "Without inbound links, new sites typically take 6–12 months to rank for anything competitive. Accelerate this by pursuing links that are genuinely achievable in your first months: submit to relevant directories (Product Hunt, G2, Capterra if applicable), write genuine guest posts on established industry blogs, get mentioned in newsletters in your niche, and make sure your product pages are shareable. Founders sharing their own tools on social media counts as link building when it generates real external links back to your domain." },
+      { type: "heading", level: 2, content: "Days 70–90: Content Expansion" },
+      { type: "paragraph", content: "Once you have a small core cluster indexed, expand laterally. Add posts targeting adjacent keywords and question-format queries (what, how, why) — these are often lower competition and frequently earn featured snippet placement. Review your earliest posts in Search Console: if they're getting impressions but low click-through, the title tag or meta description may need updating. Search Console data from your first 60 days is the most valuable keyword research you have." },
+      { type: "heading", level: 2, content: "What Not to Do in the First 90 Days" },
+      { type: "list", content: "Common mistakes that waste early-stage SEO effort:", items: ["Chasing competitive head terms — you will not rank for 'best domain name generator' as a new site", "Publishing 50 thin posts — 10 strong posts outperform 50 mediocre ones for new site authority", "Buying links — manual penalty risk that can set back a new site by months", "Obsessing over daily ranking changes — the first 90 days are about establishing index coverage, not tracking position movements"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates startup names with quality scoring and domain checking — get the naming decision right before you build the SEO strategy around it.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "How long does it take for a new site to rank on Google?", answer: "Most new sites start seeing meaningful organic traffic between 4–8 months after launch, assuming consistent content publication and some link acquisition. The 'Google sandbox' effect means even well-optimised new sites rank slowly for competitive terms in the first few months — focus on long-tail keywords and index coverage early, competitive terms later." },
+      { question: "Should I do keyword research before writing my first posts?", answer: "Yes, but keep it focused. For a new site, identify 3–5 topic clusters (groups of related keywords) rather than optimising each page for individual terms. Use Google Keyword Planner or Ahrefs/Semrush for volume data, and prioritise low-competition long-tail keywords over high-volume competitive terms where you have no chance of ranking yet." },
+      { question: "How many posts should I publish in my first 90 days?", answer: "Quality over quantity. 8–12 high-quality posts (1,200–2,000 words each) covering your core topic cluster will outperform 40 thin posts. Google's indexing of new sites is selective — every indexed page should demonstrate genuine expertise on its topic." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "mobile-seo-checklist-2026",
+    title: "Mobile SEO Checklist 2026: What Google Actually Checks for Mobile-First Indexing",
+    description: "Google indexes the mobile version of your site first. Here's a practical checklist for making sure your mobile experience isn't silently killing your rankings.",
+    seoTitle: "Mobile SEO Checklist 2026: Mobile-First Indexing Guide for Startups",
+    metaDescription: "Google uses mobile-first indexing — it judges your site by the mobile version, not desktop. This checklist covers every mobile SEO factor that affects your rankings.",
+    category: "SEO Foundations",
+    readTime: 6,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "In 2023, Google completed its transition to mobile-first indexing — meaning it now ranks your site based on how it looks and performs on mobile, not desktop. A site that's polished on desktop but sluggish or hard to read on mobile is being evaluated on its worst version. For many startup sites built with desktop-first assumptions, this is a silent ranking problem." },
+      { type: "heading", level: 2, content: "What Mobile-First Indexing Actually Means" },
+      { type: "paragraph", content: "Googlebot primarily crawls and indexes the mobile version of your pages. If your mobile and desktop versions have different content — if mobile hides sections that appear on desktop — Google sees only what mobile shows. This catches sites that use CSS to hide large content blocks on mobile for layout reasons: that content becomes essentially invisible to Google's index." },
+      { type: "heading", level: 2, content: "Core Mobile SEO Checklist" },
+      { type: "list", content: "The technical mobile SEO factors Google evaluates during crawling and indexing:", items: ["Responsive design: same HTML served at all viewports, CSS adapts the layout", "Identical content on mobile and desktop: no sections hidden via CSS that contain keyword content", "Tap targets at least 48×48px (Google's minimum threshold for usability)", "No horizontal scrolling at any standard mobile viewport width", "Body text readable without zooming — minimum 16px font size for body copy", "Page load under 3 seconds on a standard 4G connection (test with PageSpeed Insights mobile tab)", "No intrusive interstitials that block content when landing on mobile — this is a direct ranking penalty", "All images load on mobile — don't indefinitely defer below-the-fold images", "Canonical tags consistent between any mobile and desktop URL variants"] },
+      { type: "heading", level: 2, content: "Core Web Vitals on Mobile" },
+      { type: "paragraph", content: "LCP (Largest Contentful Paint) is typically worse on mobile due to smaller CPUs and slower connections — aim for under 2.5 seconds. CLS (Cumulative Layout Shift) is often worse on mobile too: images without explicit dimensions, late-loading web fonts, and injected ads all cause layout shifts that degrade both user experience and Core Web Vitals scores. INP (Interaction to Next Paint) replaced FID in 2024 and measures responsiveness to user interactions — heavy JavaScript execution on mobile is the primary cause of poor INP scores." },
+      { type: "callout", calloutType: "tip", content: "Test your mobile experience by emulating a real device, not just dragging your browser window narrow. Chrome DevTools → Toggle Device Toolbar → select a real device profile (iPhone SE or Galaxy S8) with network throttling set to Fast 4G. This gives you a realistic picture of what most mobile users experience." },
+      { type: "heading", level: 2, content: "Mobile-Specific Content Issues" },
+      { type: "paragraph", content: "Accordions and collapsible sections are common on mobile layouts for space efficiency. Google can read collapsed content, but it may be weighted lower than always-visible content. Use accordions for supplementary content (FAQs, secondary information) rather than for core keyword content. Infinite scroll is another common mobile pattern that Googlebot cannot reliably crawl — paginate content instead of using infinite scroll on pages you want indexed." },
+      { type: "heading", level: 2, content: "Quick Wins That Have Immediate Impact" },
+      { type: "list", content: "Changes you can make this week that improve mobile SEO measurably:", items: ["Add explicit width and height attributes to all img tags — prevents Cumulative Layout Shift", "Preload your largest above-the-fold image using <link rel='preload'> — direct LCP improvement", "Remove any popup or interstitial that triggers within 30 seconds of landing on mobile", "Preload your primary web font or switch to a system font stack to eliminate Flash of Invisible Text on slow connections"] },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates startup names with quality scoring and real-time domain availability — built with mobile-first performance as a core requirement.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Does having a separate mobile site (m.subdomain) hurt SEO?", answer: "It creates significant complexity without modern benefits. Responsive design on a single URL is Google's recommended approach. Separate mobile sites require careful canonical setup, consistent redirect management, and ongoing content synchronisation. New sites should always use responsive design — there's no scenario where a separate m.subdomain is the right choice for a startup launching today." },
+      { question: "If my mobile site is slow, does that hurt my desktop rankings too?", answer: "Yes. Since mobile-first indexing, Google's evaluation of your site is based primarily on the mobile experience. A slow mobile site hurts rankings across all devices, including desktop. There's no longer a meaningful separation between 'mobile ranking' and 'desktop ranking' in Google's primary index." },
+      { question: "How do I check if Google is using mobile-first indexing for my site?", answer: "In Google Search Console, go to Settings > Crawl stats. If the primary crawler shown is 'Googlebot Smartphone', your site is on mobile-first indexing — which is now essentially all sites. You can also use URL Inspection and select 'Test Live URL' to see which Googlebot version was used for the most recent crawl." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "pre-launch-waitlist-strategy",
+    title: "How to Build a Pre-Launch Waitlist That Actually Converts",
+    description: "A waitlist gives you launch-day momentum, email subscribers, and proof of demand. Here's how to build one that converts beyond 'enter your email' mediocrity.",
+    seoTitle: "Pre-Launch Waitlist Strategy: How to Build and Convert a Launch Waitlist",
+    metaDescription: "A pre-launch waitlist builds demand before you ship. Learn how to set up a waitlist that converts, grows virally, and gives you real insights before launch day.",
+    category: "Builder Insights",
+    readTime: 6,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "A waitlist is not a holding page. Done well, it's your first product — a mechanism for proving demand, building an email list, and generating the social proof that makes your actual launch land harder. Done poorly, it's a form field that collects 50 addresses from people who've forgotten about you by launch day. The difference is almost entirely in execution, not in the concept." },
+      { type: "heading", level: 2, content: "The Minimum Viable Waitlist" },
+      { type: "paragraph", content: "You need four things: a landing page with a clear value proposition (what is this and why should I care — one sentence), an email capture form with a single field (just email — every additional field costs you signups), a confirmation email that sets expectations (when will they hear from you, what's next), and a way to refer others. That's the complete set. You don't need a polished product screenshot, a pricing table, or a team page." },
+      { type: "heading", level: 2, content: "Making It Viral — The Referral Loop" },
+      { type: "paragraph", content: "Services like Viral Loops and ReferralHero let waitlist members move up the queue by referring others. Each referral gives you a new subscriber, social proof that the referrer thought it was worth sharing, and data on where your audience congregates. The mechanics of the reward matter significantly: 'refer 3 friends, jump 100 spots' outperforms 'refer friends to get early access' because the reward is concrete, the requirement is specific, and the outcome is immediately visible." },
+      { type: "heading", level: 2, content: "What to Do With Waitlist Members Before You Launch" },
+      { type: "list", content: "The engagement sequence that keeps a waitlist warm between signup and launch:", items: ["Send a welcome email immediately — intent is highest in the first 10 minutes after signup", "Send 2–3 content emails that build anticipation: behind-the-scenes updates, feature previews, founder story", "Run a quick survey (3 questions maximum) to understand why they signed up and what they're hoping for", "Share milestones: '500 people on the list — here's what that means for the launch timeline'", "Don't go silent for months and then announce a launch — maintain momentum with regular touchpoints"] },
+      { type: "callout", calloutType: "tip", content: "The waitlist is your first user research panel. A single question — 'What's the #1 thing you're hoping this solves?' — gives you language directly from your future users that you can use verbatim in your landing page copy and product positioning." },
+      { type: "heading", level: 2, content: "Naming and Domain Before Your Waitlist Goes Live" },
+      { type: "paragraph", content: "Your waitlist URL becomes a piece of brand collateral that you'll share, print, and reference for months before launch. Launching at a URL shortener or a generic subdomain signals low confidence in the brand. A proper domain costs £10–£15 per year and makes every reference to your waitlist shareable and professional. Use NamoLux to find a name with strong brand fundamentals before you commit to a domain — it's much cheaper to change the name before the waitlist than after it." },
+      { type: "heading", level: 2, content: "Waitlist to Launch Conversion" },
+      { type: "paragraph", content: "A well-nurtured waitlist converts 20–30% of signups to active users in the first month after launch. Below 10% usually means the waitlist wasn't properly maintained. Measure open rate on your launch email (target 40% or above for a properly nurtured list), click-through from the launch email to your product page, and activation rate — the percentage of users who complete the key action in your product within the first session." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with real-time domain availability — find a name worth building your waitlist around.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "How many waitlist signups do I need before launching?", answer: "There's no universal number. 100 engaged signups from your exact target audience is more valuable than 5,000 broadly interested people. Focus on qualification over volume: are these people who have the problem your product solves, at the scale where your product is relevant to them?" },
+      { question: "Should I charge for waitlist access or keep it free?", answer: "Paid waitlists (where access costs a small fee like £5–£20) dramatically improve conversion rates because they filter for genuine intent. The trade-off: you reduce volume significantly. For B2B products, a paid waitlist is often a credibility signal. For consumer products, free waitlists with a referral mechanism typically grow faster and are the right default." },
+      { question: "What platform should I use to build a waitlist?", answer: "Mailchimp, ConvertKit, or Beehiiv for simple email-only waitlists with no viral mechanics. Waitlisty, Viral Loops, or ReferralHero for referral-based queue mechanics. You can also build a minimal custom form using Supabase or Airtable as the backend if you want full control. The platform matters much less than the copy and value proposition on your landing page." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "cold-email-for-founders",
+    title: "Cold Email for Founders: How to Write Outreach That Gets Replies",
+    description: "Cold email is still one of the highest-ROI channels for early-stage founders. Here's how to write outreach that doesn't get deleted on first glance.",
+    seoTitle: "Cold Email for Founders: Writing B2B Outreach That Gets Replies in 2026",
+    metaDescription: "Cold email remains one of the most effective early-stage sales channels for founders. Learn how to write subject lines, intros, and CTAs that actually get replies.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Cold email has a reputation problem. The reason is that most founders write it like marketers, not like humans — they optimise for persuasiveness rather than genuineness, and recipients can feel the difference immediately. The mechanics of a cold email that actually gets a reply are simple. Executing them without overthinking it is the harder part." },
+      { type: "heading", level: 2, content: "Why Most Founder Cold Emails Fail" },
+      { type: "list", content: "The patterns that get cold emails deleted before the second sentence:", items: ["Too long — a wall of text signals 'I need a lot from you'", "Feature-first rather than problem-first — opens with the product pitch, not the recipient's situation", "Generic opening — 'I hope this finds you well' tells the reader you know nothing specific about them", "Weak CTA — multiple options, or an option that requires too much commitment to say yes to", "No personalisation signal — nothing that proves you've thought specifically about this recipient"] },
+      { type: "heading", level: 2, content: "The 4-Line Cold Email Structure" },
+      { type: "paragraph", content: "Line 1 is the hook: one sentence that proves you know something specific about this person or their situation — not a compliment, a specific observation. Line 2 is the problem: one sentence that names the problem you solve without naming your product — you're establishing relevance, not pitching yet. Line 3 is the offer: a concrete CTA with a specific action ('I can send a 3-minute Loom showing how this works — worth it?') rather than 'let me know if you're interested.' Line 4 is the exit: one sentence that reduces commitment and makes it easy to say no ('If the timing's off, no problem — happy to reconnect later')." },
+      { type: "heading", level: 2, content: "Subject Lines That Actually Get Opened" },
+      { type: "paragraph", content: "The best-performing subject line patterns: question subject lines that reference something specific (not 'Quick question' — that's become a spam signal), short lines under six words, and lines that don't look like marketing. The worst: 'Following up on our conversation' when there was no conversation, 'Check out our new tool', and clickbait questions with no specificity. Subject lines that read like a human wrote them to one specific person consistently outperform subject lines optimised for marketing metrics." },
+      { type: "callout", calloutType: "tip", content: "Write your cold email and then cut it in half. Then cut it in half again. If you can't make your point in 100 words, you don't understand your point well enough yet. The constraint forces clarity." },
+      { type: "heading", level: 2, content: "Personalisation That Scales" },
+      { type: "paragraph", content: "True one-to-one personalisation — reading someone's last 10 tweets before emailing them — doesn't scale. Structured personalisation does: define 3–4 audience segments (bootstrapped SaaS founders with MRR above £10k, e-commerce operators in fashion), write one highly specific first line for each segment, personalise only that first line, and keep the rest of the email templated. This produces the appearance of genuine personalisation at scale without requiring hours per recipient." },
+      { type: "heading", level: 2, content: "Follow-Up Sequencing" },
+      { type: "paragraph", content: "One follow-up is almost always worth sending — reply rates on follow-up emails are often 30–40% of the total replies from an entire sequence. Three or more follow-ups starts feeling like harassment. The optimal sequence: Day 1 (original email), Day 4 (short follow-up with one new piece of context or a different angle), Day 10 (closing email: 'I'll assume the timing isn't right — happy to reconnect when that changes'). Stop there." },
+      { type: "heading", level: 2, content: "Deliverability Basics" },
+      { type: "paragraph", content: "If your emails land in spam, the copy doesn't matter. Use a separate sending domain rather than your primary brand domain — protect your brand domain's sender reputation. Set up SPF, DKIM, and DMARC records on your sending domain. Warm up new sending addresses gradually, starting at 20–30 emails per day and scaling up over 4–6 weeks. Keep bounce rates below 3% by validating email addresses before sending." },
+      { type: "callout", calloutType: "cta", content: "Before you start outreach, make sure your brand name and domain are ready to withstand scrutiny. NamoLux generates quality-scored startup names with real-time domain checking.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "How many cold emails should I send per day?", answer: "For a new sending domain, start with 20–30 per day and scale up over 4–6 weeks. For an established sending domain with good reputation, 100–150 per day per inbox is a reasonable ceiling. Above 200 from a single inbox, deliverability typically degrades and your sender score takes a measurable hit." },
+      { question: "Should I use HTML or plain-text emails for cold outreach?", answer: "Plain text. HTML formatting signals marketing automation, which primes recipients for deletion before they've read a word. A plain-text email with a clear human voice is harder to dismiss than a branded HTML email with a logo and footer — it reads like a colleague, not a campaign." },
+      { question: "What reply rate should I expect from cold email?", answer: "A well-targeted sequence to a relevant audience with strong copy should produce 10–20% reply rates. Below 5% usually indicates a deliverability problem, a targeting problem (wrong audience), or a copy problem (the email doesn't resonate with the recipient's actual situation). Generic outreach to broad purchased lists typically produces 1–3%." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "bootstrapped-vs-funded-startup",
+    title: "Bootstrapped vs Funded: Which Path Is Right for Your Startup?",
+    description: "VC funding gets most of the press, but bootstrapping builds most of the businesses. Here's an honest comparison of both paths — and how to decide which one fits your situation.",
+    seoTitle: "Bootstrapped vs VC Funded Startup: Which Path Is Right for You in 2026?",
+    metaDescription: "Bootstrapping vs VC funding is not a values debate — it's a strategic choice based on your market, product, and goals. Here's how to think through the decision honestly.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "The bootstrapped vs funded debate is often framed as a values question. 'Real founders bootstrap.' 'Serious companies raise money.' Both framings are wrong. The right funding strategy depends on the specific constraints of your market, your product category, and your personal goals — not on ideology. Here's how to think about it without the cultural baggage." },
+      { type: "heading", level: 2, content: "What Bootstrapping Actually Means" },
+      { type: "paragraph", content: "Bootstrapping is building a company on revenue rather than investor capital. It doesn't mean doing everything yourself, refusing to hire, or never spending money. It means your growth is constrained by and funded by customer revenue. The practical implication: you need to reach revenue before you run out of personal runway. This constraint focuses the mind in ways that can be genuinely advantageous — bootstrapped founders are often faster to find revenue-generating features because they have no alternative." },
+      { type: "heading", level: 2, content: "What Raising Venture Capital Actually Means" },
+      { type: "paragraph", content: "Venture capital is not free money — it's a financial instrument with specific expectations attached. VC funds need 10x or greater returns within 7–10 years to satisfy their own investors. Accepting VC means accepting those expectations as part of your operating reality. A business that generates £1M per year in profit and grows 15% annually is a genuine success by most standards — but a failure by VC portfolio logic, where most investments are expected to go to zero and the winners need to compensate with outsized returns." },
+      { type: "heading", level: 2, content: "When Bootstrapping Is the Right Choice" },
+      { type: "list", content: "Bootstrapping tends to be the right path when:", items: ["Your target market can be reached without a large sales team or expensive distribution", "You can reach meaningful revenue within 12–18 months of launch", "Your product category doesn't require regulatory approvals or hardware manufacturing", "You value control and optionality over speed of scale", "Your personal financial situation allows 12–24 months of reduced income"] },
+      { type: "heading", level: 2, content: "When Raising Capital Is the Right Choice" },
+      { type: "list", content: "Venture capital tends to be the right tool when:", items: ["You're in a winner-takes-most market where speed of distribution is the deciding factor (payments, marketplaces, social networks)", "Your product has high upfront R&D or regulatory costs — biotech, fintech infrastructure, hardware", "You're competing against funded incumbents who can outspend you in customer acquisition", "You have a credible path to £100M+ in revenue and a market large enough to support it"] },
+      { type: "callout", calloutType: "tip", content: "The best bootstrapped businesses find a market niche too small for VCs to care about but large enough to support a profitable business or small team. The best VC-backed businesses go after markets so large that the economics of hypergrowth make sense. Know which category your market falls into before making a funding decision." },
+      { type: "heading", level: 2, content: "The Middle Path — Revenue-Based Financing and Angels" },
+      { type: "paragraph", content: "Between bootstrapping and institutional VC, there's a useful spectrum. Angel investors provide capital from their own funds with lighter governance and typically smaller check sizes. Revenue-based financing lets you repay a multiple of the investment as a percentage of revenue — no equity dilution. Friends and family rounds can provide early runway without full VC terms. These middle-ground options provide capital without requiring the growth trajectory that institutional VC demands." },
+      { type: "heading", level: 2, content: "Brand and Domain Implications" },
+      { type: "paragraph", content: "Funded startups often need to move fast on brand decisions — including domain names — because competitive dynamics accelerate once capital is deployed. Bootstrapped founders have more time but fewer resources for brand work. Either way, your domain and company name lock in early and change expensively. Tools that help you make a good naming decision quickly — rather than spending months on it — serve both paths equally well." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names in minutes — whether you're bootstrapping carefully or moving fast on VC capital.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Can I bootstrap a SaaS business?", answer: "Yes, and many of the most profitable SaaS businesses are bootstrapped. Basecamp, Balsamiq, and Transistor are well-known examples. The key constraint: SaaS typically requires a longer time-to-revenue runway than a service business, because you're building before you're earning. Personal financial runway matters more for SaaS bootstrapping than for service-business bootstrapping." },
+      { question: "What's the risk of taking VC money you don't need?", answer: "Taking VC changes your incentives and your relationship with the business in ways that are hard to reverse. You're now legally and morally obligated to pursue growth trajectories that return the fund's capital. A decision to stay small, optimise for lifestyle, or exit at a modest valuation becomes harder to make once investors who need a 10x return are on your cap table." },
+      { question: "How do bootstrapped founders get their first customers?", answer: "The most reliable channels for bootstrapped founders without marketing budgets: cold outreach (time-intensive but effectively free), content SEO (takes 6–12 months to build but compounds over time), communities and forums where your target customers are already active, and product-led growth — building virality into the product itself through referral mechanics or 'Powered by' links." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "squadhelp-vs-namolux",
+    title: "Squadhelp vs NamoLux: Which Naming Tool Gets You to a Better Name?",
+    description: "Squadhelp uses human creativity at scale. NamoLux uses AI with quality scoring. Both generate startup names — here's which approach produces better results for your situation.",
+    seoTitle: "Squadhelp vs NamoLux: Which Naming Tool Is Better for Startups in 2026?",
+    metaDescription: "Squadhelp uses crowdsourced human naming. NamoLux uses AI with Founder Signal™ scoring. Compare both tools honestly to pick the right one for your naming project.",
+    category: "Tool Comparisons",
+    readTime: 6,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Squadhelp and NamoLux represent two different philosophies about how you arrive at a great startup name. Squadhelp bet on human creativity at scale — thousands of real namers competing to win your brief. NamoLux bet on AI generation with structured quality evaluation. This comparison looks at the practical trade-offs for founders who need a name they can actually build a company on." },
+      { type: "heading", level: 2, content: "Feature Comparison" },
+      { type: "paragraph", content: "Squadhelp runs naming contests: you submit a brief, 100–400 human namers submit ideas over 7–10 days, you select a winner, and Squadhelp conducts trademark screening on the winning name. Brand identity packages (logo, colour palette) are available as add-ons. Contest fees start at £150 and scale to £500 or more for premium guaranteed contests. NamoLux generates names instantly from a brand brief, applies Founder Signal™ scoring to every result (covering phonetics, memorability, brand risk, and domain quality), checks domain availability across .com, .io, .ai, and .co in real-time, and operates on a free tier with a one-time purchase for full access. Results in under a minute." },
+      { type: "heading", level: 2, content: "Name Quality: Can AI Match Human Creativity?" },
+      { type: "paragraph", content: "Squadhelp's ceiling is higher. 300 human namers bring cultural intuition, wordplay, and creative leaps that AI generation doesn't consistently replicate. But Squadhelp's floor is also lower — the majority of submissions in a typical contest are not usable. The median quality across 300 submissions is often lower than the top 10 NamoLux results, because human namers submit filler alongside genuine creativity to increase their chances of winning the contest fee." },
+      { type: "heading", level: 2, content: "Speed and Iteration" },
+      { type: "paragraph", content: "If you need a name this week, Squadhelp's 7–10 day minimum window is a blocker. NamoLux produces results in under a minute. For founders doing iterative naming work — testing briefs, exploring different directions, refining based on what comes back — AI generation's speed is a significant practical advantage. You can run five different brief variations in the time it takes to write a Squadhelp contest brief." },
+      { type: "callout", calloutType: "tip", content: "Consider using NamoLux first (free, instant, quality-scored) and Squadhelp second — only if none of the AI-generated names are compelling after two or three brief iterations. The combination gives you AI speed for early exploration and human creativity as a fallback for genuinely difficult briefs." },
+      { type: "heading", level: 2, content: "Pricing" },
+      { type: "paragraph", content: "Squadhelp contests start at £150 and scale to £500 or more for premium contests with guaranteed winner selection. Trademark screening on the winning name is typically an additional £100–£300. NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. The total cost difference for a naming project: NamoLux is typically 10–30 times cheaper than a Squadhelp contest." },
+      { type: "heading", level: 2, content: "Who Each Tool Is For" },
+      { type: "paragraph", content: "Squadhelp is the right choice for funded companies (Seed stage or beyond) who want maximum creative input, need trademark clearance built into the process, and have a 1–2 week timeline. NamoLux is the right choice for bootstrapped and early-stage founders who need a decision in days rather than weeks, want objective quality scoring rather than pure volume of options, and prefer a one-time cost model over a per-project agency fee." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain availability — free to try, results in under a minute.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Does Squadhelp guarantee a name I'll like?", answer: "Not exactly. Guaranteed contests ensure you select a winner (you cannot close the contest without picking one), but there's no guarantee of name quality. If you run a guaranteed contest and find none of the submissions strong, you're still required to select a winner. Non-guaranteed contests allow rejection of all submissions and a refund, but this is designed as an exception, not a standard outcome." },
+      { question: "Can NamoLux replace the creative quality of human namers?", answer: "For most early-stage founders, yes. The Founder Signal™ scoring provides structured quality evaluation that helps identify the best AI-generated names — which are often as strong as the top 5% of human-submitted names in a Squadhelp contest. For high-budget, high-stakes naming exercises at Series B or beyond, where the name is a major strategic asset, human creativity is worth the premium." },
+      { question: "Is there trademark screening in NamoLux?", answer: "Not automated. NamoLux checks domain availability in real-time but does not include USPTO or UKIPO trademark search. After shortlisting names using Founder Signal™ scoring, run a free trademark search on USPTO.gov or trademarks.ipo.gov.uk before registering your domain or incorporating under the name." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "looka-vs-namolux",
+    title: "Looka vs NamoLux: Naming + Logo vs Naming + Scoring",
+    description: "Looka is a logo generator that offers name suggestions. NamoLux is a name generator with quality scoring. They sound similar but serve different moments in the brand-building process.",
+    seoTitle: "Looka vs NamoLux: Which Tool Is Better for Startup Naming in 2026?",
+    metaDescription: "Looka generates logos and includes name suggestions. NamoLux generates names and scores them with Founder Signal™. Compare both tools to understand which one you need.",
+    category: "Tool Comparisons",
+    readTime: 5,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Both Looka and NamoLux sit at the early stage of brand creation, and both offer name generation as a feature. But they've made opposite bets about what the hard problem actually is. Looka thinks the hard problem is making your brand look professional. NamoLux thinks the hard problem is picking a name that will still serve you in five years. That difference in philosophy produces tools with meaningfully different strengths." },
+      { type: "heading", level: 2, content: "What Looka Does" },
+      { type: "paragraph", content: "Looka is primarily a logo generator. You enter your company name, choose style preferences and colour palettes, and it produces logo options across typeface and layout combinations. As part of its workflow, it also suggests company names — but names are a secondary feature, not the primary value proposition. Looka's core value is: walk in with a rough idea, walk out with a name and a logo in under an hour." },
+      { type: "heading", level: 2, content: "What NamoLux Does" },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief (keywords, industry, the feeling you want the brand to evoke), checks domain availability across .com, .io, .ai, and .co in real-time, and scores every name with Founder Signal™ — a 0–100 rating covering phonetics, memorability, brand risk, and domain quality. There's no logo generation, but there's a structured framework for deciding which generated names are actually worth committing to — which is a different and harder problem than generating a visual treatment." },
+      { type: "heading", level: 2, content: "The Naming Quality Gap" },
+      { type: "paragraph", content: "Looka's names are generated to be aesthetically pleasing alongside a logo preview — they're evaluated for how they look, not for phonetic strength, trademark risk, or brand scalability. NamoLux's names come with explicit quality scoring. If you generate 20 names in NamoLux, you can immediately identify the top 3 based on Founder Signal™ scores rather than picking the one that happens to look best in a particular typeface next to a particular icon." },
+      { type: "callout", calloutType: "tip", content: "Logo design and name selection should be sequential, not simultaneous. Pick a name first using objective quality criteria — phonetics, memorability, domain availability, trademark risk. Then design a logo around the name. Picking a name because it looks good in a specific typeface is optimising for the wrong variable." },
+      { type: "heading", level: 2, content: "Pricing Comparison" },
+      { type: "paragraph", content: "Looka is free to explore but requires payment to download: £65 or more for a single logo download, £96 or more for a full brand kit with social assets. NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. If you need both a name and a logo, using NamoLux for the name and Looka for the logo (two separate one-time costs) makes more economic sense than using either tool alone for both jobs." },
+      { type: "heading", level: 2, content: "The Two-Tool Approach" },
+      { type: "paragraph", content: "The most efficient workflow: use NamoLux to find and score your name, confirm domain availability, and run your shortlist through Founder Signal™. Once you have a final candidate that scores well and has a clean domain, use Looka to generate logo concepts around that confirmed name. The combination costs less than a freelance designer for equivalent output and gives you full control over both decisions." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain checking — start with the name before you design the logo.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Can I use Looka for name generation only?", answer: "Yes, you can browse Looka's name suggestions without purchasing a logo. But name generation is not Looka's primary feature, and the suggestions aren't evaluated for phonetic quality, trademark risk, or domain availability. If name selection is your priority, NamoLux provides a more structured and thorough approach." },
+      { question: "Does NamoLux offer any visual brand assets?", answer: "Not currently. NamoLux focuses on name generation and quality evaluation — Founder Signal™ scoring and real-time domain availability checking. For logos and visual brand assets, use a dedicated tool like Looka or Brandmark, or work with a freelance designer after finalising your name." },
+      { question: "Which tool should I use first?", answer: "NamoLux first, Looka second. Locking in a name before designing a logo is the correct sequence. Designing a logo first creates psychological anchoring — you start evaluating name options based on aesthetic compatibility with the logo rather than on the brand fundamentals that actually matter for long-term success." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "godaddy-domain-generator-vs-namolux",
+    title: "GoDaddy Business Name Generator vs NamoLux: What's the Difference?",
+    description: "GoDaddy's name generator optimises for domain registration. NamoLux optimises for brand quality. Here's what that difference means for your naming decision.",
+    seoTitle: "GoDaddy Business Name Generator vs NamoLux: Which Is Better for Startups?",
+    metaDescription: "GoDaddy's domain generator finds available names to register. NamoLux scores name quality with Founder Signal™. Compare both to understand which tool fits your needs.",
+    category: "Tool Comparisons",
+    readTime: 5,
+    publishedAt: "2026-03-08",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "GoDaddy's business name generator is one of the most widely used naming tools in the world — primarily because GoDaddy is the world's largest domain registrar and funnels domain discovery directly into registration. NamoLux is built around a different goal: helping founders make a better naming decision, not just find an available one. Here's what that means in practice." },
+      { type: "heading", level: 2, content: "What GoDaddy's Generator Does" },
+      { type: "paragraph", content: "GoDaddy's tool generates name variations based on keyword input, checks availability across .com and other TLDs, and presents results with immediate Add to Cart options for registration. It's optimised for the top of GoDaddy's sales funnel: get you to a domain registration as efficiently as possible. The UX is clean, the availability checking is accurate, and the path from name to registered domain is seamless." },
+      { type: "heading", level: 2, content: "What NamoLux Does Differently" },
+      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — not just keyword variations — applies Founder Signal™ scoring to every result (covering phonetics, memorability, brand risk, and domain quality), and checks availability across .com, .io, .ai, and .co simultaneously. The goal is not to get you to a domain registration quickly. The goal is to help you arrive at a name that's actually worth building a company on." },
+      { type: "heading", level: 2, content: "The Fundamental Difference in Philosophy" },
+      { type: "paragraph", content: "GoDaddy shows you what's available. NamoLux shows you what's good. These are different questions with different answers. A domain can be available because nobody wanted it, or because it's a genuinely strong brand-quality name that hasn't been registered yet. GoDaddy's tool treats all available domains equally. Founder Signal™ is designed specifically to distinguish between these two cases." },
+      { type: "callout", calloutType: "tip", content: "Domain availability is table stakes — almost any combination of letters that isn't currently registered is technically available. The useful question is whether the name is actually strong enough to build a brand on. That's what quality scoring answers, and it's a question domain registrar tools aren't designed to ask." },
+      { type: "heading", level: 2, content: "When GoDaddy's Generator Is the Right Tool" },
+      { type: "paragraph", content: "If you've already decided on a name and need to confirm availability and register it quickly, GoDaddy's workflow is excellent — fast, accurate, and integrated with registration. It's also better for domain-first workflows where you're searching for available exact-match keyword domains rather than generating brandable names from a creative brief." },
+      { type: "heading", level: 2, content: "When NamoLux Is the Right Tool" },
+      { type: "paragraph", content: "When you're starting from a blank page with only a brief — what the product does, who it's for, the feeling you want the brand to evoke — and you want quality scoring to help evaluate which generated names are actually worth committing to. NamoLux is built for the naming decision phase; GoDaddy is built for the registration phase. They're sequential tools, not competing alternatives." },
+      { type: "heading", level: 2, content: "Pricing" },
+      { type: "paragraph", content: "GoDaddy's generator is free to use; you pay only for domain registration (typically £12–£20 per year for a .com). NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. If budget is the primary constraint, use NamoLux free tier to shortlist candidates and GoDaddy to check final availability and register — the combination costs nothing beyond the domain registration fee." },
+      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain availability — make a better naming decision before you register.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+    ],
+    faqs: [
+      { question: "Does GoDaddy's generator use AI for name generation?", answer: "GoDaddy uses pattern-matching and keyword variation rather than generative AI in the modern sense. The output tends toward keyword-compound names — HealthTrack, QuickInvoice, ProManage — rather than the invented or evocative names that AI generation produces. This makes GoDaddy's tool strong for exact-match domain searches and weaker for creative brand naming." },
+      { question: "Can I register domains through NamoLux?", answer: "NamoLux checks availability in real-time and links to registration via partner registrars. GoDaddy's tool is tightly integrated with its own registration flow. If you find a name you like in NamoLux, you can register it through whichever registrar you prefer — Namecheap, Google Domains, Cloudflare, or GoDaddy. There's no lock-in." },
+      { question: "Which tool has better domain availability data?", answer: "GoDaddy has direct access to registry data via its registrar relationships and is highly accurate for .com availability. NamoLux checks availability in real-time across .com, .io, .ai, and .co simultaneously, which is more useful for founders who are open to non-.com TLDs and want to see all options in a single pass." }
+    ]
+  } as BlogPost,
+
 ]
 
 // Utility functions
