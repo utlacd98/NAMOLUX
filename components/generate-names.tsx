@@ -24,6 +24,7 @@ import {
   Search,
   Eye,
   Lock,
+  Lightbulb,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -112,6 +113,7 @@ interface DomainResult {
   whyItWorks?: string
   brandableScore?: number
   pronounceabilityScore?: number
+  meaning?: string
 }
 
 type AutoFindMustIncludeKeyword = "exact" | "partial" | "none"
@@ -565,7 +567,6 @@ export function GenerateNames() {
 
   const extractDomainNames = (domains: any[]): string[] => {
     const uniqueNames = new Set<string>()
-
     for (const domain of domains || []) {
       const rawName = typeof domain?.name === "string" ? domain.name : ""
       const normalised = normaliseDomainName(rawName)
@@ -573,15 +574,30 @@ export function GenerateNames() {
         uniqueNames.add(normalised)
       }
     }
-
     return Array.from(uniqueNames)
+  }
+
+  const extractDomainData = (domains: any[]): { names: string[]; meanings: Record<string, string> } => {
+    const uniqueNames = new Set<string>()
+    const meanings: Record<string, string> = {}
+    for (const domain of domains || []) {
+      const rawName = typeof domain?.name === "string" ? domain.name : ""
+      const normalised = normaliseDomainName(rawName)
+      if (normalised.length >= 3 && normalised.length <= 63) {
+        uniqueNames.add(normalised)
+        if (typeof domain?.meaning === "string" && domain.meaning.trim().length > 0) {
+          meanings[normalised] = domain.meaning.trim()
+        }
+      }
+    }
+    return { names: Array.from(uniqueNames), meanings }
   }
 
   const requestGeneratedNames = async (
     seedKeyword: string,
     count: number | null,
     signal: AbortSignal,
-  ): Promise<string[]> => {
+  ): Promise<{ names: string[]; meanings: Record<string, string> }> => {
     const payload: Record<string, unknown> = {
       keyword: seedKeyword,
       vibe: selectedVibe,
@@ -611,7 +627,7 @@ export function GenerateNames() {
       throw new Error(responseData.error || "Failed to generate domain names")
     }
 
-    return extractDomainNames(responseData.domains || [])
+    return extractDomainData(responseData.domains || [])
   }
 
   const requestAvailability = async (
@@ -828,12 +844,13 @@ export function GenerateNames() {
     addToSearchHistory(baseKeyword)
 
     try {
-      const initialNames = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      const { names: initialNames, meanings: initialMeanings } = await requestGeneratedNames(baseKeyword, null, abortController.signal)
       if (initialNames.length === 0) {
         throw new Error("No domain candidates were generated. Please try again.")
       }
 
-      const initialResults = await requestAvailability(initialNames, undefined, abortController.signal)
+      const initialResults = (await requestAvailability(initialNames, undefined, abortController.signal))
+        .map(r => ({ ...r, meaning: initialMeanings[r.name] ?? r.meaning }))
       setResults(initialResults)
 
       if (autoFindComMode) {
@@ -870,14 +887,15 @@ export function GenerateNames() {
               setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
 
               const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
-              const remixedNames = await requestGeneratedNames(
+              const { names: remixedNames, meanings: remixMeanings } = await requestGeneratedNames(
                 remixSeed,
                 AUTO_FIND_BATCH_SIZE,
                 abortController.signal,
               )
 
               if (remixedNames.length > 0) {
-                const comResults = await requestAvailability(remixedNames, ["com"], abortController.signal)
+                const comResults = (await requestAvailability(remixedNames, ["com"], abortController.signal))
+                  .map(r => ({ ...r, meaning: remixMeanings[r.name] ?? r.meaning }))
                 comPicks = mergeAvailableComResults(comPicks, comResults)
                 setAvailableComPicks(comPicks)
               }
@@ -1995,6 +2013,20 @@ export function GenerateNames() {
                               </button>
                             </div>
                           </div>
+
+                          {/* Name Meaning */}
+                          {result.meaning && (
+                            <div className="mt-3 rounded-lg px-3 py-2.5"
+                              style={{ background: "rgba(255,255,255,0.025)", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                              <div className="mb-1 flex items-center gap-1.5">
+                                <Lightbulb className="h-3 w-3 shrink-0" style={{ color: "#D4AF37" }} />
+                                <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#D4AF37" }}>
+                                  Name Origin
+                                </span>
+                              </div>
+                              <p className="text-[11px] leading-relaxed text-white/45">{result.meaning}</p>
+                            </div>
+                          )}
 
                           {/* Founder Signal Panel */}
                           <FounderSignalPanel

@@ -257,8 +257,9 @@ Requirements:
 Return ONLY a JSON array of domain name suggestions (without .com extension), each with:
 - name: the domain name
 - reasoning: brief explanation of why this name works
+- meaning: 1-2 sentences covering (a) the linguistic root or word inspiration behind the name, (b) what kind of brand or industry it suits, and (c) the emotional tone it conveys. Keep it concise and punchy — no more than 40 words total.
 
-Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...]`
+Format: [{"name": "example", "reasoning": "combines X with Y for Z effect", "meaning": "Derived from 'X' + 'Y' — evokes Z. Suits [industry]. Feels [tone]."}, ...]`
 
     const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
@@ -311,6 +312,10 @@ Format: [{"name": "example", "reasoning": "combines X with Y for Z effect"}, ...
               typeof item?.reasoning === "string" && item.reasoning.trim().length > 0
                 ? item.reasoning.trim()
                 : "Generated for brandability and memorability.",
+            meaning:
+              typeof item?.meaning === "string" && item.meaning.trim().length > 0
+                ? item.meaning.trim()
+                : undefined,
           }
         })
         .filter(Boolean)
