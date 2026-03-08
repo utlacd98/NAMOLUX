@@ -10,6 +10,7 @@ import {
   Target, LineChart as LineChartIcon, AlertTriangle, Trophy, ArrowUpRight, ArrowDownRight,
   Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock, Clapperboard, Play
 } from "lucide-react"
+import NextLink from "next/link"
 import { adCampaigns, generateAdScript, type AdCampaign } from "@/lib/ads-data"
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
   { id: "marketing", label: "Marketing Agent", icon: Megaphone },
   { id: "blog", label: "Blog Editor", icon: PenTool },
   { id: "ads", label: "Ads Library", icon: Clapperboard },
+  { id: "social-generator", label: "Post Graphic Generator", icon: Sparkles, href: "/admin/social-generator" },
 ]
 
 type BlogCategory = "Domain Strategy" | "SEO Foundations" | "Builder Insights"
@@ -764,13 +766,28 @@ export default function MetricsPage() {
         {/* Sidebar Navigation */}
         <nav className={`${mobileNavOpen ? "block" : "hidden"} lg:block w-48 shrink-0 border-r border-border/40 min-h-[calc(100vh-57px)] bg-background`}>
           <div className="p-2 space-y-1">
-            {NAV_ITEMS.map((item) => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); setMobileNavOpen(false) }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${activeTab === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}>
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            ))}
+            {NAV_ITEMS.map((item) =>
+              "href" in item ? (
+                <NextLink
+                  key={item.id}
+                  href={item.href as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  style={{ borderTop: "1px solid rgba(212,175,55,0.12)", marginTop: "4px", paddingTop: "10px" }}
+                >
+                  <item.icon className="h-4 w-4" style={{ color: "#D4AF37" }} />
+                  <span style={{ color: "rgba(212,175,55,0.85)" }}>{item.label}</span>
+                  <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
+                </NextLink>
+              ) : (
+                <button key={item.id} onClick={() => { setActiveTab(item.id); setMobileNavOpen(false) }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${activeTab === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}>
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </button>
+              )
+            )}
           </div>
         </nav>
 
