@@ -2,119 +2,83 @@
 
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
-import { Check, X, Search, TrendingUp, Star, ArrowRight, Zap, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Check, X, TrendingUp, ArrowRight, Zap, ShieldCheck, Star } from "lucide-react"
 
 const domainResults = [
-  { name: "luminova.com", available: true, score: 92, label: "Elite" },
-  { name: "velvetcraft.io", available: true, score: 84, label: "Strong" },
-  { name: "darkforge.com", available: false, score: 52, label: "Risky" },
-  { name: "eclipsebrand.co", available: true, score: 71, label: "Viable" },
-  { name: "obsidianlab.com", available: true, score: 78, label: "Strong" },
+  { name: "luminova", tld: ".com", available: true, score: 92, label: "Elite", top: true },
+  { name: "velvetcraft", tld: ".io", available: true, score: 84, label: "Strong", top: false },
+  { name: "darkforge", tld: ".com", available: false, score: 52, label: "Risky", top: false },
+  { name: "eclipsebrand", tld: ".co", available: true, score: 71, label: "Good", top: false },
+  { name: "obsidianlab", tld: ".com", available: true, score: 78, label: "Strong", top: false },
 ]
 
-const searchPhrases = [
-  "luxury web agency",
-  "fintech startup",
-  "fitness app",
-  "AI SaaS tool",
-  "creative studio",
-]
-
+const searchPhrases = ["luxury web agency", "fintech startup", "fitness app", "AI SaaS tool", "creative studio"]
 const avatarSeeds = [
-  { initials: "AK", bg: "#1a1a1a" },
-  { initials: "MJ", bg: "#1e1a14" },
-  { initials: "SR", bg: "#141a1a" },
-  { initials: "TW", bg: "#1a141e" },
-  { initials: "OP", bg: "#1a1e14" },
+  { initials: "AK", bg: "#1a1a1a" }, { initials: "MJ", bg: "#1e1a14" },
+  { initials: "SR", bg: "#141a1a" }, { initials: "TW", bg: "#1a141e" }, { initials: "OP", bg: "#1a1e14" },
 ]
 
-function getSignalColor(label: string): string {
-  switch (label) {
-    case "Elite":
-    case "Strong":
-      return "text-emerald-400"
-    case "Viable":
-      return "text-amber-400"
-    case "Risky":
-      return "text-orange-400"
-    default:
-      return "text-muted-foreground"
-  }
+function getScoreColor(label: string): string {
+  if (label === "Elite") return "#D4AF37"
+  if (label === "Strong") return "#34d399"
+  if (label === "Good") return "#60a5fa"
+  return "#f87171"
 }
 
-function useCountUp(target: number, duration: number = 1000, delay: number = 0, start: boolean = true) {
+function useCountUp(target: number, duration = 900, delay = 0) {
   const [count, setCount] = useState(0)
-  const frameRef = useRef<number>()
-
+  const frame = useRef<number>()
   useEffect(() => {
-    if (!start) return
     const startTime = performance.now() + delay
-    const animate = (currentTime: number) => {
-      if (currentTime < startTime) {
-        frameRef.current = requestAnimationFrame(animate)
-        return
-      }
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const easeOut = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.round(easeOut * target))
-      if (progress < 1) frameRef.current = requestAnimationFrame(animate)
+    const animate = (now: number) => {
+      if (now < startTime) { frame.current = requestAnimationFrame(animate); return }
+      const p = Math.min((now - startTime) / duration, 1)
+      setCount(Math.round((1 - Math.pow(1 - p, 3)) * target))
+      if (p < 1) frame.current = requestAnimationFrame(animate)
     }
-    frameRef.current = requestAnimationFrame(animate)
-    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current) }
-  }, [target, duration, delay, start])
-
+    frame.current = requestAnimationFrame(animate)
+    return () => { if (frame.current) cancelAnimationFrame(frame.current) }
+  }, [target, duration, delay])
   return count
 }
 
-function AnimatedScore({ score, label, delay }: { score: number; label: string; delay: number }) {
-  const count = useCountUp(score, 1000, delay, true)
+function ScoreBar({ score, label }: { score: number; label: string }) {
+  const [w, setW] = useState(0)
+  const color = getScoreColor(label)
+  useEffect(() => { const t = setTimeout(() => setW(score), 80); return () => clearTimeout(t) }, [score])
   return (
-    <span className={`flex items-center gap-1 text-xs font-bold tabular-nums ${getSignalColor(label)}`}>
-      <TrendingUp className="h-3 w-3" />
-      {count}
-    </span>
+    <div className="h-1 w-14 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+      <div className="h-full rounded-full transition-all duration-1000"
+        style={{ width: `${w}%`, background: color, boxShadow: `0 0 6px ${color}50` }} />
+    </div>
   )
 }
 
+function AnimatedScore({ score, delay }: { score: number; delay: number }) {
+  const count = useCountUp(score, 900, delay)
+  return <span className="tabular-nums font-black">{count}</span>
+}
+
 function TypewriterSearch() {
-  const [displayText, setDisplayText] = useState("")
-  const [phraseIndex, setPhraseIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
-
+  const [text, setText] = useState("")
+  const [phraseIdx, setPhraseIdx] = useState(0)
+  const [deleting, setDeleting] = useState(false)
   useEffect(() => {
-    const phrase = searchPhrases[phraseIndex]
-    const typingSpeed = isDeleting ? 40 : 80
-    const pauseAtEnd = 2000
-    const pauseAtStart = 400
-
-    const timeout = setTimeout(() => {
-      if (!isDeleting && displayText === phrase) {
-        setTimeout(() => setIsDeleting(true), pauseAtEnd)
-        return
-      }
-      if (isDeleting && displayText === "") {
-        setIsDeleting(false)
-        setPhraseIndex((i) => (i + 1) % searchPhrases.length)
-        setTimeout(() => {}, pauseAtStart)
-        return
-      }
-      setDisplayText(isDeleting
-        ? phrase.slice(0, displayText.length - 1)
-        : phrase.slice(0, displayText.length + 1)
-      )
-    }, typingSpeed)
-
-    return () => clearTimeout(timeout)
-  }, [displayText, isDeleting, phraseIndex])
-
+    const phrase = searchPhrases[phraseIdx]
+    let id: ReturnType<typeof setTimeout>
+    if (!deleting && text === phrase) { id = setTimeout(() => setDeleting(true), 2000) }
+    else if (deleting && text === "") { setDeleting(false); setPhraseIdx(i => (i + 1) % searchPhrases.length) }
+    else { id = setTimeout(() => setText(deleting ? phrase.slice(0, text.length - 1) : phrase.slice(0, text.length + 1)), deleting ? 40 : 75) }
+    return () => clearTimeout(id)
+  }, [text, deleting, phraseIdx])
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-background/40 px-4 py-2.5">
-      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-      <span className="text-sm text-foreground/80 min-w-0">
-        {displayText}
-        <span className="animate-cursor-blink ml-0.5 inline-block w-px h-3.5 bg-[#D4A843] align-middle" />
+    <div className="flex items-center gap-3 rounded-xl px-4 py-3"
+      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="h-4 w-4 shrink-0 rounded-full flex items-center justify-center" style={{ background: "rgba(212,175,55,0.2)" }}>
+        <div className="h-1.5 w-1.5 rounded-full" style={{ background: "#D4AF37" }} />
+      </div>
+      <span className="text-sm text-white/70 min-w-0">
+        {text}<span className="animate-cursor-blink ml-0.5 inline-block w-px h-3.5 bg-[#D4AF37] align-middle" />
       </span>
     </div>
   )
@@ -123,293 +87,315 @@ function TypewriterSearch() {
 export function Hero() {
   const cardScrollRef = useRef<HTMLDivElement>(null)
   const [activeCard, setActiveCard] = useState(0)
-
   const handleCardScroll = () => {
     if (!cardScrollRef.current) return
-    const { scrollLeft } = cardScrollRef.current
-    // card width 155 + gap 10 = 165px per slot
-    const index = Math.min(Math.round(scrollLeft / 165), 2)
-    setActiveCard(index)
+    setActiveCard(Math.min(Math.round(cardScrollRef.current.scrollLeft / 165), 2))
   }
 
   return (
-    <section
-      className="relative min-h-[100svh] overflow-clip pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-24 lg:pt-40"
-      aria-labelledby="hero-heading"
-    >
-      {/* Base gradient background */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: "linear-gradient(to bottom, hsl(0 0% 4%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 6%) 100%)",
-        }}
-        aria-hidden="true"
-      />
+    <section className="relative min-h-[100svh] overflow-clip pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-28 lg:pt-40"
+      aria-labelledby="hero-heading">
 
-      {/* Dot grid pattern */}
-      <div
-        className="pointer-events-none absolute inset-0 hidden sm:block"
+      {/* Background */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true"
+        style={{ background: "linear-gradient(160deg, #060606 0%, #080808 50%, #050505 100%)" }} />
+
+      {/* Dot grid */}
+      <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden="true"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(212,168,67,0.07) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgba(212,175,55,0.06) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 70%, transparent 100%)",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 70%, transparent 100%)",
-        }}
-        aria-hidden="true"
-      />
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%)",
+        }} />
 
-      <div className="pointer-events-none absolute inset-0 bg-black/30 sm:bg-transparent" aria-hidden="true" />
+      {/* Gold aura left */}
+      <div className="pointer-events-none absolute hidden lg:block" aria-hidden="true"
+        style={{
+          top: "10%", left: "-5%", width: "55vw", height: "55vw", maxWidth: 760, maxHeight: 760,
+          background: "radial-gradient(ellipse at center, rgba(212,175,55,0.07) 0%, rgba(212,175,55,0.02) 45%, transparent 70%)",
+          filter: "blur(40px)",
+        }} />
 
-      {/* Aura glows */}
-      <div className="pointer-events-none absolute inset-0 hidden overflow-clip sm:block" aria-hidden="true">
-        <div className="animate-luxury-aura absolute left-[15%] top-[20%] h-[50vh] w-[50vh] max-h-[500px] max-w-[500px] rounded-full bg-gradient-to-br from-primary/20 via-secondary/10 to-transparent blur-[150px]" />
-        <div
-          className="animate-luxury-aura absolute bottom-[20%] right-[10%] h-[40vh] w-[40vh] max-h-[400px] max-w-[400px] rounded-full bg-gradient-to-bl from-secondary/15 via-primary/10 to-transparent blur-[120px]"
-          style={{ animationDelay: "-10s", animationDuration: "25s" }}
-        />
-      </div>
-
-      {/* Subtle gold radial glow behind headline */}
-      <div
-        className="pointer-events-none absolute left-[10%] top-[25%] hidden h-[600px] w-[600px] rounded-full lg:block"
-        style={{ background: "radial-gradient(circle, rgba(212, 168, 67, 0.03) 0%, transparent 70%)" }}
-        aria-hidden="true"
-      />
+      {/* Gold aura right */}
+      <div className="pointer-events-none absolute hidden lg:block" aria-hidden="true"
+        style={{
+          top: "20%", right: "0%", width: "40vw", height: "60vw", maxWidth: 640, maxHeight: 820,
+          background: "radial-gradient(ellipse at center, rgba(212,175,55,0.09) 0%, rgba(212,175,55,0.02) 50%, transparent 72%)",
+          filter: "blur(60px)",
+        }} />
 
       <div className="relative mx-auto max-w-[1280px] px-6 md:px-12 lg:px-20">
-        <div className="grid items-center gap-8 sm:gap-12 sm:min-h-[calc(100vh-10rem)] lg:grid-cols-[55%_45%] lg:gap-16">
+        <div className="grid items-center gap-10 sm:gap-14 sm:min-h-[calc(100vh-10rem)] lg:grid-cols-[54%_46%] lg:gap-16">
 
-          {/* Left Column */}
+          {/* LEFT */}
           <div className="flex flex-col items-start text-left">
 
-            {/* Headline — h1 for SEO */}
-            <h1
-              id="hero-heading"
-              className="animate-hero-fade-up hero-delay-1 font-bold tracking-tight text-foreground text-[1.65rem] leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl"
-            >
-              <span className="block">
-                Find an{" "}
-                <span
-                  className="text-[#D4A843] animate-shimmer-once"
-                  style={{
-                    backgroundImage: "linear-gradient(90deg, #D4A843 0%, #f0ca6e 40%, #D4A843 60%, #b8902a 100%)",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundSize: "200% 100%",
-                  }}
-                >
-                  available domain
-                </span>
+            {/* Intro pill */}
+            <div className="animate-hero-fade-up hero-delay-1 mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest"
+              style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.25)", color: "#D4AF37" }}>
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
               </span>
-              <span className="mt-1 block sm:mt-2">worth building a company on.</span>
-            </h1>
-
-            {/* Subtext */}
-            <p className="animate-hero-fade-up hero-delay-2 mt-6 max-w-xl text-lg leading-relaxed text-[#a0a0a0] md:text-xl">
-              Generate brandable domain names with AI, check availability in real time, and score every name with{" "}
-              <span className="font-semibold text-white">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
-            </p>
-
-            {/* CTAs */}
-            <div className="mt-8 flex w-full flex-col sm:w-auto">
-              <Button
-                asChild
-                size="lg"
-                className="animate-hero-fade-up hero-delay-2 group h-14 w-full bg-[#D4A843] px-8 text-lg font-semibold text-black transition-all duration-200 hover:bg-[#e0b84d] hover:scale-[1.02] sm:w-auto"
-              >
-                <Link href="/generate">
-                  <span className="flex items-center justify-center gap-2">
-                    Generate names free
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-                  </span>
-                </Link>
-              </Button>
-
-              <Link
-                href="#pricing"
-                className="animate-hero-fade-up hero-delay-3 mt-3 text-center text-sm font-medium text-[#a0a0a0] underline-offset-4 transition-colors hover:text-white hover:underline sm:text-left"
-              >
-                See what Pro includes →
-              </Link>
+              Founder Signal™ Powered · AI Naming
             </div>
 
-            {/* Social Proof — avatar stack + stats */}
-            <div className="animate-hero-fade-up hero-delay-4 mt-8 flex flex-row flex-wrap items-center gap-3 sm:gap-6">
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
-                <span className="text-sm text-[#666666]">
-                  <span className="font-semibold text-white">10,000+</span> names generated
-                </span>
+            {/* Headline */}
+            <h1 id="hero-heading"
+              className="animate-hero-fade-up hero-delay-1 font-black tracking-tight text-white"
+              style={{ fontSize: "clamp(2rem, 5.5vw, 4.5rem)", lineHeight: 1.07, letterSpacing: "-0.03em" }}>
+              Find a domain{" "}
+              <span style={{
+                backgroundImage: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 40%, #E8C84A 60%, #B8922E 100%)",
+                backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              }}>worth building</span>
+              <br /><span className="text-white/90">a company on.</span>
+            </h1>
+
+            {/* Sub */}
+            <p className="animate-hero-fade-up hero-delay-2 mt-6 max-w-lg leading-relaxed text-white/50"
+              style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)" }}>
+              AI-generated brandable names, live availability checking, and every result scored with{" "}
+              <span className="font-semibold text-white/80">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
+            </p>
+
+            {/* CTA */}
+            <div className="animate-hero-fade-up hero-delay-2 mt-9 flex flex-col gap-3 w-full sm:w-auto">
+              <Link href="/generate"
+                className="group inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold text-black transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
+                style={{
+                  background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
+                  boxShadow: "0 6px 30px rgba(212,175,55,0.4), 0 1px 0 rgba(255,255,255,0.15) inset",
+                }}>
+                Generate names free
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/30">
+                {["No account required", "1 free generation/day", "Instant results"].map(t => (
+                  <span key={t} className="flex items-center gap-1">
+                    <Check className="h-3 w-3 text-emerald-500/70" /> {t}
+                  </span>
+                ))}
               </div>
-              <div className="flex items-center gap-2.5">
-                {/* Stacked avatar circles */}
-                <div className="flex -space-x-2">
-                  {avatarSeeds.map((a) => (
-                    <div
-                      key={a.initials}
-                      className="h-6 w-6 rounded-full border border-[#D4A843]/30 flex items-center justify-center text-[8px] font-bold text-[#D4A843]"
-                      style={{ background: a.bg }}
-                      aria-hidden="true"
-                    >
-                      {a.initials}
+            </div>
+
+            {/* Social proof tiles */}
+            <div className="animate-hero-fade-up hero-delay-4 mt-10 flex flex-row flex-wrap items-center gap-3">
+              {[
+                {
+                  icon: <Zap className="h-4 w-4 text-[#D4AF37]" />,
+                  num: "10,000+", sub: "Names generated"
+                },
+                {
+                  icon: (
+                    <div className="flex -space-x-1.5">
+                      {avatarSeeds.map(a => (
+                        <div key={a.initials} className="h-6 w-6 rounded-full flex items-center justify-center text-[8px] font-bold"
+                          style={{ background: a.bg, border: "1.5px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}
+                          aria-hidden="true">{a.initials}</div>
+                      ))}
                     </div>
-                  ))}
+                  ),
+                  num: "Founders", sub: "& agencies"
+                },
+                {
+                  icon: <ShieldCheck className="h-4 w-4 text-emerald-400/70" />,
+                  num: "One-time", sub: "No subscription"
+                },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-2.5"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  {item.icon}
+                  <div>
+                    <div className="text-sm font-bold text-white">{item.num}</div>
+                    <div className="text-[10px] text-white/30 uppercase tracking-wide">{item.sub}</div>
+                  </div>
                 </div>
-                <span className="text-sm text-[#666666]">
-                  Trusted by <span className="font-semibold text-white">founders & agencies</span>
-                </span>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Column - Domain Results Card */}
+          {/* RIGHT — results card */}
           <div className="relative hidden lg:block">
-            <div
-              className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-primary/15 via-secondary/10 to-transparent blur-[80px]"
-              aria-hidden="true"
-            />
 
-            <div
-              className="animate-hero-fade-up hero-delay-card group relative overflow-hidden rounded-2xl border border-border/30 bg-card/80 shadow-2xl shadow-black/40 backdrop-blur-lg transition-transform duration-500 hover:scale-[1.01]"
-              style={{ animationDuration: "0.6s" }}
-            >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 via-transparent to-secondary/5 pointer-events-none" />
+            {/* Floating FS badge */}
+            <div className="animate-hero-fade-up hero-delay-card absolute -top-5 -right-4 z-10 flex items-center gap-1.5 rounded-xl px-3 py-2"
+              style={{ background: "rgba(8,8,8,0.95)", border: "1px solid rgba(212,175,55,0.35)", boxShadow: "0 0 20px rgba(212,175,55,0.15)" }}>
+              <Star className="h-3.5 w-3.5 text-[#D4AF37]" />
+              <span className="text-xs font-bold text-[#D4AF37]">Founder Signal™</span>
+            </div>
 
-              {/* Card Header */}
-              <div className="relative border-b border-border/30 bg-gradient-to-r from-muted/30 to-transparent px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1.5">
-                      <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
-                      <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
-                      <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
-                    </div>
-                    <span className="text-sm font-medium text-foreground/80">Domain Results</span>
+            {/* Floating availability chip */}
+            <div className="animate-hero-fade-up absolute -bottom-4 -left-6 z-10 flex items-center gap-2 rounded-xl px-3.5 py-2.5"
+              style={{ animationDelay: "1.2s", background: "rgba(8,8,8,0.95)", border: "1px solid rgba(52,211,153,0.3)", boxShadow: "0 0 20px rgba(52,211,153,0.1)" }}>
+              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-soft-blink" />
+              <span className="text-xs font-semibold text-emerald-400">Live availability</span>
+            </div>
+
+            {/* Card glow */}
+            <div className="absolute -inset-6 -z-10 rounded-3xl" aria-hidden="true"
+              style={{ background: "radial-gradient(ellipse at center, rgba(212,175,55,0.08) 0%, transparent 70%)", filter: "blur(20px)" }} />
+
+            {/* Card */}
+            <div className="animate-hero-fade-up hero-delay-card relative overflow-hidden rounded-2xl transition-transform duration-500 hover:scale-[1.01]"
+              style={{
+                background: "rgba(10,10,10,0.95)",
+                border: "1px solid rgba(212,175,55,0.2)",
+                boxShadow: "0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,175,55,0.05), inset 0 1px 0 rgba(255,255,255,0.04)",
+                backdropFilter: "blur(20px)",
+              }}>
+
+              {/* Gold top line */}
+              <div className="absolute top-0 left-0 right-0 h-px" aria-hidden="true"
+                style={{ background: "linear-gradient(to right, transparent 10%, rgba(212,175,55,0.6) 50%, transparent 90%)" }} />
+
+              {/* Header */}
+              <div className="relative flex items-center justify-between px-6 py-4"
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                    <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(239,68,68,0.6)" }} />
+                    <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(234,179,8,0.6)" }} />
+                    <div className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(34,197,94,0.6)" }} />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-soft-blink" />
-                    Live
-                  </div>
+                  <span className="text-sm font-semibold text-white/70">Domain Results</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-emerald-400"
+                  style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-soft-blink" />
+                  Live
                 </div>
               </div>
 
-              {/* Typewriter Search Input */}
-              <div className="relative border-b border-border/20 px-6 py-4">
+              {/* Typewriter */}
+              <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                 <TypewriterSearch />
               </div>
 
-              {/* Domain Results */}
-              <div className="relative space-y-1.5 p-4">
-                {domainResults.map((result, index) => {
-                  const rowDelay = 600 + (index * 150)
-                  const scoreDelay = rowDelay + 300
-                  const badgeDelay = scoreDelay + 1000
-
+              {/* Results */}
+              <div className="p-3 space-y-1.5">
+                {domainResults.map((result, i) => {
+                  const rowDelay = 500 + i * 130
+                  const sc = getScoreColor(result.label)
                   return (
-                    <div
-                      key={result.name}
-                      className={`animate-hero-fade-up flex items-center justify-between gap-3 rounded-xl px-4 py-3 ${
-                        result.available ? "bg-muted/20" : "bg-muted/10 opacity-50"
-                      }`}
-                      style={{ animationDelay: `${rowDelay}ms` }}
-                    >
-                      <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="text-sm font-semibold text-foreground">{result.name}</span>
-                        <div className="flex items-center gap-2">
-                          <AnimatedScore score={result.score} label={result.label} delay={scoreDelay} />
-                          <span className="text-xs text-muted-foreground/60">|</span>
-                          <span className={`text-xs font-medium ${getSignalColor(result.label)}`}>{result.label}</span>
+                    <div key={result.name}
+                      className={`animate-hero-fade-up relative overflow-hidden rounded-xl px-4 py-3.5 transition-all duration-200 ${!result.available ? "opacity-45" : ""}`}
+                      style={{
+                        animationDelay: `${rowDelay}ms`,
+                        background: result.top ? "rgba(212,175,55,0.06)" : result.available ? "rgba(255,255,255,0.025)" : "rgba(255,255,255,0.01)",
+                        border: result.top ? "1px solid rgba(212,175,55,0.25)" : "1px solid rgba(255,255,255,0.04)",
+                      }}>
+                      {result.top && (
+                        <div className="absolute top-0 left-0 right-0 flex items-center gap-1.5 px-4 py-1"
+                          style={{ background: "rgba(212,175,55,0.12)", borderBottom: "1px solid rgba(212,175,55,0.2)" }}>
+                          <span className="text-[10px]">⭐</span>
+                          <span className="text-[10px] font-bold tracking-wider uppercase text-[#D4AF37]">Founder Favourite</span>
+                        </div>
+                      )}
+                      <div className={`flex items-center justify-between gap-3 ${result.top ? "mt-5" : ""}`}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-baseline gap-0.5">
+                            <span className="text-sm font-bold text-white">{result.name}</span>
+                            <span className="text-xs font-medium text-white/35">{result.tld}</span>
+                          </div>
+                          <div className="mt-1.5 flex items-center gap-2.5">
+                            <TrendingUp className="h-3 w-3 shrink-0" style={{ color: sc }} />
+                            <span className="text-xs" style={{ color: sc }}>
+                              <AnimatedScore score={result.score} delay={rowDelay + 300} />
+                            </span>
+                            <ScoreBar score={result.score} label={result.label} />
+                            <span className="text-[10px] font-semibold" style={{ color: `${sc}99` }}>{result.label}</span>
+                          </div>
+                        </div>
+                        <div className="animate-badge-pop flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+                          style={{
+                            animationDelay: `${rowDelay + 500}ms`,
+                            background: result.available ? "rgba(52,211,153,0.1)" : "rgba(239,68,68,0.08)",
+                            border: result.available ? "1px solid rgba(52,211,153,0.25)" : "1px solid rgba(239,68,68,0.15)",
+                            color: result.available ? "#34d399" : "#f87171",
+                          }}>
+                          {result.available ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {result.available ? "Available" : "Taken"}
                         </div>
                       </div>
-                      <span
-                        className={`animate-badge-pop flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                          result.available ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/10 text-red-400/80"
-                        }`}
-                        style={{ animationDelay: `${badgeDelay}ms` }}
-                      >
-                        {result.available ? (
-                          <><Check className="h-3 w-3" /> Available</>
-                        ) : (
-                          <><X className="h-3 w-3" /> Taken</>
-                        )}
-                      </span>
                     </div>
                   )
                 })}
               </div>
 
-              {/* Card Footer */}
-              <div className="relative border-t border-border/20 bg-muted/10 px-6 py-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#888888]">
-                    <Star className="mr-1 inline-block h-3 w-3 text-[#D4A843]" />
-                    Founder Signal™ scores included
-                  </span>
-                  <Link
-                    href="/generate"
-                    className="text-xs font-medium text-[#D4A843] transition-colors hover:underline"
-                  >
-                    Try it free →
-                  </Link>
+              {/* Footer */}
+              <div className="flex items-center justify-between px-5 py-3.5"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.015)" }}>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-4 w-4 rounded-full flex items-center justify-center" style={{ background: "rgba(212,175,55,0.15)" }}>
+                    <Star className="h-2.5 w-2.5 text-[#D4AF37]" />
+                  </div>
+                  <span className="text-[11px] text-white/30">Scored by Founder Signal™</span>
                 </div>
+                <Link href="/generate" className="text-xs font-semibold transition-opacity hover:opacity-70" style={{ color: "#D4AF37" }}>
+                  Try free →
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile card */}
-        <div className="relative mt-10 lg:hidden">
-          <div className="absolute -top-5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
-          <div className="overflow-hidden rounded-xl border border-border/20 bg-card/60 shadow-lg backdrop-blur-sm">
-            <div className="flex items-center justify-between border-b border-border/20 bg-muted/10 px-4 py-3">
-              <span className="text-sm font-medium text-foreground/80">Sample Results</span>
+        {/* MOBILE CARD */}
+        <div className="mt-10 lg:hidden">
+          <div className="overflow-hidden rounded-2xl"
+            style={{ background: "rgba(10,10,10,0.95)", border: "1px solid rgba(212,175,55,0.18)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+            <div className="flex items-center justify-between px-4 py-3"
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <div className="flex items-center gap-2">
+                <Star className="h-3.5 w-3.5 text-[#D4AF37]" />
+                <span className="text-sm font-semibold text-white/70">Sample Results</span>
+              </div>
               <div className="flex items-center gap-1.5" aria-hidden="true">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === activeCard ? "w-3 bg-[#D4A843]/80" : "w-1.5 bg-border/40"
-                    }`}
-                  />
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: i === activeCard ? 12 : 6, background: i === activeCard ? "#D4AF37" : "rgba(255,255,255,0.2)" }} />
                 ))}
               </div>
             </div>
-            <div
-              ref={cardScrollRef}
-              onScroll={handleCardScroll}
-              className="scrollbar-hide -mx-0.5 flex gap-2.5 overflow-x-auto p-3 px-3 snap-x snap-mandatory"
-            >
-              {domainResults.slice(0, 3).map((result) => (
-                <div
-                  key={result.name}
-                  className={`w-[155px] flex-shrink-0 snap-start rounded-xl border p-3 ${
-                    result.available
-                      ? "border-emerald-500/20 bg-muted/25"
-                      : "border-border/10 bg-muted/10 opacity-55"
-                  }`}
-                >
-                  {/* Domain name + availability dot */}
-                  <div className="flex items-start justify-between gap-1">
-                    <div className="min-w-0 truncate text-xs font-semibold text-foreground leading-snug">{result.name}</div>
-                    <div className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${result.available ? "bg-emerald-400" : "bg-red-400/60"}`} />
+            <div ref={cardScrollRef} onScroll={handleCardScroll}
+              className="scrollbar-hide flex gap-2.5 overflow-x-auto p-3 snap-x snap-mandatory">
+              {domainResults.slice(0, 3).map(result => {
+                const sc = getScoreColor(result.label)
+                return (
+                  <div key={result.name} className="w-[158px] flex-shrink-0 snap-start rounded-xl p-3"
+                    style={{
+                      background: result.top ? "rgba(212,175,55,0.06)" : result.available ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+                      border: result.top ? "1px solid rgba(212,175,55,0.3)" : result.available ? "1px solid rgba(52,211,153,0.15)" : "1px solid rgba(255,255,255,0.06)",
+                      opacity: result.available ? 1 : 0.5,
+                    }}>
+                    {result.top && <div className="mb-2 text-[9px] font-bold uppercase tracking-widest" style={{ color: "#D4AF37" }}>⭐ Founder Favourite</div>}
+                    <div className="flex items-start justify-between gap-1">
+                      <div>
+                        <span className="text-xs font-bold text-white">{result.name}</span>
+                        <span className="text-[10px] text-white/35">{result.tld}</span>
+                      </div>
+                      <div className="h-1.5 w-1.5 shrink-0 mt-1 rounded-full" style={{ background: result.available ? "#34d399" : "#f87171" }} />
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-1.5">
+                      <TrendingUp className="h-3 w-3 shrink-0" style={{ color: sc }} />
+                      <span className="text-xs font-black" style={{ color: sc }}>{result.score}</span>
+                      <ScoreBar score={result.score} label={result.label} />
+                    </div>
+                    <div className="mt-1 text-[10px] font-semibold" style={{ color: `${sc}90` }}>{result.label}</div>
+                    <div className="mt-2.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold"
+                      style={{
+                        background: result.available ? "rgba(52,211,153,0.1)" : "rgba(239,68,68,0.08)",
+                        color: result.available ? "#34d399" : "#f87171",
+                        border: result.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(239,68,68,0.15)",
+                      }}>
+                      {result.available ? <Check className="h-2.5 w-2.5" /> : <X className="h-2.5 w-2.5" />}
+                      {result.available ? "Available" : "Taken"}
+                    </div>
                   </div>
-
-                  {/* Score + label */}
-                  <div className="mt-2 flex items-center gap-1">
-                    <TrendingUp className={`h-3 w-3 shrink-0 ${getSignalColor(result.label)}`} />
-                    <span className={`text-xs font-bold tabular-nums ${getSignalColor(result.label)}`}>{result.score}</span>
-                    <span className={`text-xs ${getSignalColor(result.label)} opacity-80`}>· {result.label}</span>
-                  </div>
-
-                  {/* Available / Taken badge */}
-                  <div className={`mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    result.available ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/10 text-red-400/80"
-                  }`}>
-                    {result.available ? <><Check className="h-2.5 w-2.5" /> Available</> : <><X className="h-2.5 w-2.5" /> Taken</>}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
