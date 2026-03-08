@@ -86,6 +86,7 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
 
+
           {/* Logo */}
           <Link
             href="/"
@@ -248,124 +249,123 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Nav Overlay */}
-        {isOpen && (
-          <div
-            className="fixed inset-0 top-16 z-40 md:hidden overflow-y-auto overscroll-contain"
-            style={{ background: "rgba(4,4,4,0.98)", backdropFilter: "blur(20px)" }}
-          >
-            <div className="p-5 pb-10 flex flex-col gap-1">
-              {navLinks.map((link) =>
-                link.href.startsWith("/") ? (
+      </div>
+
+      {/* Mobile Nav Overlay — outside max-w container so fixed/absolute works correctly */}
+      {isOpen && (
+        <div
+          className="absolute left-0 right-0 top-full z-40 md:hidden overflow-y-auto overscroll-contain"
+          style={{
+            height: "calc(100svh - 4rem)",
+            background: "rgba(4,4,4,0.98)",
+            borderTop: "1px solid rgba(212,175,55,0.12)",
+          }}
+        >
+          <div className="p-5 pb-10 flex flex-col gap-1">
+            {navLinks.map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-white/60 transition-colors hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-white/60 transition-colors hover:text-white"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
+
+            <div className="my-4 h-px" style={{ background: "rgba(212,175,55,0.12)" }} />
+
+            <div className="px-1">
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/25">Resources</p>
+              {resourceLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-lg px-4 py-2.5 text-sm text-white/50 transition-colors hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="my-4 h-px" style={{ background: "rgba(212,175,55,0.12)" }} />
+
+            <div className="flex flex-col gap-3 px-1">
+              {user ? (
+                <>
                   <Link
-                    key={link.href}
-                    href={link.href}
+                    href="/dashboard"
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-lg px-4 py-3 text-sm font-medium text-white/60 transition-colors hover:bg-white/05 hover:text-white"
+                    className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white/60"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)" }}
                   >
-                    {link.label}
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
                   </Link>
-                ) : (
-                  <a
-                    key={link.href}
-                    href={link.href}
+                  <Link
+                    href="/generate"
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-lg px-4 py-3 text-sm font-medium text-white/60 transition-colors hover:bg-white/05 hover:text-white"
+                    className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-black"
+                    style={{
+                      background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                      boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
+                    }}
                   >
-                    {link.label}
-                  </a>
-                ),
+                    <Sparkles className="h-4 w-4" />
+                    Generate Names
+                  </Link>
+                  <button
+                    className="rounded-lg py-3 text-sm text-white/30 transition-colors hover:text-white/60"
+                    style={{ border: "1px solid rgba(255,255,255,0.06)" }}
+                    onClick={async () => {
+                      await supabase.auth.signOut()
+                      setIsOpen(false)
+                      window.location.href = "/"
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center rounded-xl py-3.5 text-sm font-medium text-white/70"
+                    style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/generate"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-black"
+                    style={{
+                      background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                      boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Generate Names Free
+                  </Link>
+                </>
               )}
-
-              <div
-                className="my-4 h-px"
-                style={{ background: "rgba(212,175,55,0.12)" }}
-              />
-
-              <div className="px-1">
-                <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/25">Resources</p>
-                {resourceLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className="block rounded-lg px-4 py-2.5 text-sm text-white/50 transition-colors hover:bg-white/05 hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-
-              <div
-                className="my-4 h-px"
-                style={{ background: "rgba(212,175,55,0.12)" }}
-              />
-
-              <div className="flex flex-col gap-3 px-1">
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white/60"
-                      style={{ border: "1px solid rgba(255,255,255,0.1)" }}
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/generate"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-black"
-                      style={{
-                        background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
-                        boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
-                      }}
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Generate Names
-                    </Link>
-                    <button
-                      className="rounded-lg py-3 text-sm text-white/30 transition-colors hover:text-white/60"
-                      style={{ border: "1px solid rgba(255,255,255,0.06)" }}
-                      onClick={async () => {
-                        await supabase.auth.signOut()
-                        setIsOpen(false)
-                        window.location.href = "/"
-                      }}
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/sign-in"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center rounded-xl py-3.5 text-sm font-medium text-white/70"
-                      style={{ border: "1px solid rgba(255,255,255,0.1)" }}
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/generate"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-black"
-                      style={{
-                        background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
-                        boxShadow: "0 4px 20px rgba(212,175,55,0.3)",
-                      }}
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Generate Names Free
-                    </Link>
-                  </>
-                )}
-              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   )
 }
