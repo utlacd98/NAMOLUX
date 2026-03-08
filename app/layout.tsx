@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/namnewlogo.png",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "NamoLux — AI Domain Name Generator",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
     description:
       "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on.",
-    images: ["/namnewlogo.png"],
+    images: ["/opengraph-image"],
     site: "@namolux",
     creator: "@namolux",
   },
