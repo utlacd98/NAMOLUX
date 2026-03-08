@@ -144,13 +144,13 @@ export function Hero() {
             {/* Headline */}
             <h1 id="hero-heading"
               className="animate-hero-fade-up hero-delay-1 w-full font-black tracking-tight text-white"
-              style={{ fontSize: "clamp(1.75rem, 6vw, 4.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
-              <span className="block">Find a domain</span>
-              <span style={{
+              style={{ fontSize: "clamp(1.75rem, 6vw, 4.5rem)", lineHeight: 1.15, letterSpacing: "-0.03em", wordBreak: "break-word", overflowWrap: "break-word" }}>
+              <span className="block sm:inline">Find a domain </span>
+              <span className="block sm:inline" style={{
                 backgroundImage: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 40%, #E8C84A 60%, #B8922E 100%)",
                 backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>worth building</span>
-              <span className="text-white/90"> a company on.</span>
+              <span className="block text-white/90 sm:inline"> a company on.</span>
             </h1>
 
             {/* Sub */}
@@ -162,10 +162,12 @@ export function Hero() {
             {/* CTA */}
             <div className="animate-hero-fade-up hero-delay-2 mt-8 flex w-full flex-col gap-3 sm:w-auto">
               <Link href="/generate"
-                className="group flex w-full items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold text-black transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
+                className="group flex w-full items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
                 style={{
                   background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
                   boxShadow: "0 6px 30px rgba(212,175,55,0.4), 0 1px 0 rgba(255,255,255,0.15) inset",
+                  color: "#000000",
+                  WebkitTextFillColor: "#000000",
                 }}>
                 Generate names free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
