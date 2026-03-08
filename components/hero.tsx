@@ -129,10 +129,10 @@ export function Hero() {
         <div className="grid items-center gap-10 sm:gap-14 sm:min-h-[calc(100vh-10rem)] lg:grid-cols-[54%_46%] lg:gap-16">
 
           {/* LEFT */}
-          <div className="flex flex-col items-start text-left">
+          <div className="flex w-full min-w-0 flex-col text-left">
 
             {/* Intro pill */}
-            <div className="animate-hero-fade-up hero-delay-1 mb-5 inline-flex max-w-full items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest sm:px-4 sm:text-[11px]"
+            <div className="animate-hero-fade-up hero-delay-1 mb-5 inline-flex max-w-full self-start items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest sm:px-4 sm:text-[11px]"
               style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.25)", color: "#D4AF37" }}>
               <span className="relative flex h-1.5 w-1.5 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
@@ -154,15 +154,15 @@ export function Hero() {
             </h1>
 
             {/* Sub */}
-            <p className="animate-hero-fade-up hero-delay-2 mt-5 max-w-lg text-sm leading-relaxed text-white/50 sm:text-base">
+            <p className="animate-hero-fade-up hero-delay-2 mt-5 w-full text-sm leading-relaxed text-white/50 sm:max-w-lg sm:text-base">
               AI-generated brandable names, live availability checking, and every result scored with{" "}
               <span className="font-semibold text-white/80">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
             </p>
 
             {/* CTA */}
-            <div className="animate-hero-fade-up hero-delay-2 mt-8 flex w-full flex-col gap-3 sm:w-auto">
+            <div className="animate-hero-fade-up hero-delay-2 mt-8 flex w-full flex-col gap-3">
               <Link href="/generate"
-                className="group flex w-full items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
+                className="group flex items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold transition-all duration-200 hover:-translate-y-0.5 sm:self-start"
                 style={{
                   background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
                   boxShadow: "0 6px 30px rgba(212,175,55,0.4), 0 1px 0 rgba(255,255,255,0.15) inset",
