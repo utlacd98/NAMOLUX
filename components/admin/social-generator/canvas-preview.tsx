@@ -3,112 +3,224 @@
 import { forwardRef } from "react"
 import type { PostConfig } from "./types"
 import { PLATFORMS, PREVIEW_WIDTH } from "./types"
-import { PhoneMockup } from "./phone-mockup"
 
-interface CanvasPreviewProps {
+interface TemplateProps {
   config: PostConfig
+  w: number  // preview canvas width  (px)
+  h: number  // preview canvas height (px)
 }
 
-// ── shared helpers ────────────────────────────────────────────────────────────
-function GoldLine({ style }: { style?: React.CSSProperties }) {
+// ─── Shared primitives ────────────────────────────────────────────────────────
+
+function GoldRule({ w, style }: { w?: string; style?: React.CSSProperties }) {
   return (
     <div
       style={{
         height: "2px",
-        background: "linear-gradient(to right, transparent, #D4AF37 30%, #F6E27A 50%, #D4AF37 70%, transparent)",
+        width: w ?? "100%",
+        background:
+          "linear-gradient(to right, transparent, #D4AF37 20%, #F6E27A 50%, #D4AF37 80%, transparent)",
+        flexShrink: 0,
         ...style,
       }}
     />
   )
 }
 
-function GoldBullet({ text, fontSize, accentColor }: { text: string; fontSize: number; accentColor: string }) {
+function NamoLogo({ size, accent }: { size: number; accent: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", marginBottom: `${fontSize * 0.6}px` }}>
-      <span style={{ color: accentColor, fontSize: `${fontSize + 2}px`, lineHeight: 1.4, flexShrink: 0 }}>✦</span>
-      <span
+    <div style={{ display: "flex", alignItems: "center", gap: size * 0.3 }}>
+      <div
         style={{
-          color: "rgba(255,255,255,0.85)",
-          fontSize: `${fontSize}px`,
-          lineHeight: 1.5,
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        {text}
-      </span>
-    </div>
-  )
-}
-
-function CheckRow({
-  text,
-  check,
-  fontSize,
-  accentColor,
-}: {
-  text: string
-  check: boolean
-  fontSize: number
-  accentColor: string
-}) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: `${fontSize * 0.5}px` }}>
-      <span
-        style={{
-          color: check ? accentColor : "#ef4444",
-          fontSize: `${fontSize + 2}px`,
-          fontWeight: "bold",
+          width: size * 1.4,
+          height: size * 1.4,
+          borderRadius: size * 0.25,
+          background: `linear-gradient(135deg, ${accent}, #F6E27A)`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 900,
+          fontSize: size * 0.9,
+          color: "#000",
+          fontFamily: "Arial Black, Arial, sans-serif",
           flexShrink: 0,
-          width: "16px",
         }}
       >
-        {check ? "✓" : "✗"}
-      </span>
+        N
+      </div>
       <span
         style={{
-          color: check ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)",
-          fontSize: `${fontSize}px`,
-          textDecoration: check ? "none" : "line-through",
-          fontFamily: "Arial, sans-serif",
+          color: "#ffffff",
+          fontWeight: 800,
+          fontSize: size,
+          fontFamily: "Arial Black, Arial, sans-serif",
+          letterSpacing: "-0.02em",
         }}
       >
-        {text}
+        Namo
+        <span
+          style={{
+            background: `linear-gradient(135deg, ${accent}, #F6E27A)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Lux
+        </span>
       </span>
     </div>
   )
 }
 
-// ── Template A: Product Showcase ──────────────────────────────────────────────
-function TemplateA({ config, scale }: { config: PostConfig; scale: number }) {
-  const hs = config.headlineFontSize * scale
-  const bs = config.bodyFontSize * scale
-  const phoneW = Math.round(130 * scale)
-  const phoneH = Math.round(260 * scale)
+function PhoneFrame({
+  screenshot,
+  width,
+  height,
+}: {
+  screenshot?: string
+  width: number
+  height: number
+}) {
+  const border = Math.max(5, Math.round(width * 0.045))
+  const radius = Math.round(width * 0.16)
+  const notchW = Math.round(width * 0.38)
+  const notchH = Math.round(width * 0.1)
 
+  return (
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: radius,
+        border: `${border}px solid rgba(255,255,255,0.88)`,
+        background: "#0e0e14",
+        boxShadow:
+          "0 20px 60px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06)",
+        overflow: "hidden",
+        position: "relative",
+        flexShrink: 0,
+      }}
+    >
+      {/* Notch */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: notchW,
+          height: notchH,
+          borderRadius: `0 0 ${notchH}px ${notchH}px`,
+          background: "rgba(255,255,255,0.88)",
+          zIndex: 10,
+        }}
+      />
+      {/* Screen */}
+      {screenshot ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={screenshot}
+          alt="screenshot"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+      ) : (
+        <PlaceholderScreen width={width} height={height} />
+      )}
+    </div>
+  )
+}
+
+function PlaceholderScreen({ width, height }: { width: number; height: number }) {
+  const p = width * 0.12
+  const r = width * 0.08
+  const row = height * 0.07
+  const gap = height * 0.025
   return (
     <div
       style={{
         width: "100%",
         height: "100%",
+        background: "linear-gradient(160deg, #131318 0%, #0c0c11 100%)",
+        padding: `${p * 1.4}px ${p}px ${p}px`,
+        display: "flex",
+        flexDirection: "column",
+        gap,
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Gold bar */}
+      <div
+        style={{
+          width: "75%",
+          height: row * 0.6,
+          borderRadius: r,
+          background: "linear-gradient(90deg, #D4AF37, #F6E27A)",
+          marginBottom: gap,
+        }}
+      />
+      {/* Grey bars */}
+      {[80, 60, 70, 60, 70, 55].map((pct, i) => (
+        <div
+          key={i}
+          style={{
+            width: `${pct}%`,
+            height: i === 3 ? row * 0.9 : row * 0.55,
+            borderRadius: r * 0.6,
+            background: i === 3 ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.07)",
+            border: i === 3 ? "1px solid rgba(212,175,55,0.2)" : "none",
+          }}
+        />
+      ))}
+      <div
+        style={{
+          width: "80%",
+          height: row,
+          borderRadius: r,
+          background: "linear-gradient(135deg, #D4AF37, #F6E27A)",
+          marginTop: "auto",
+        }}
+      />
+    </div>
+  )
+}
+
+// ─── Template A — Product Showcase ───────────────────────────────────────────
+function TemplateA({ config, w, h }: TemplateProps) {
+  // Responsive font scale based on canvas dimensions
+  const hs = Math.round(w * (config.headlineFontSize / 520))
+  const bs = Math.round(w * (config.bodyFontSize / 520))
+  const pad = Math.round(w * 0.05)
+
+  // Phone dimensions: fit into content area
+  const contentH = h - pad * 2 - hs * 2.4 - 20 - 24 // rough content row height
+  const phoneH = Math.max(80, Math.min(contentH * 0.95, h * 0.48))
+  const phoneW = Math.round(phoneH / 2.1)
+
+  return (
+    <div
+      style={{
+        width: w,
+        height: h,
         background: config.bgColor,
         position: "relative",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: `${28 * scale}px ${32 * scale}px`,
-        fontFamily: "Arial, sans-serif",
+        padding: `${pad}px ${pad}px ${pad * 0.8}px`,
+        boxSizing: "border-box",
+        fontFamily: "Arial Black, Arial, sans-serif",
       }}
     >
-      {/* Gold radial glow top-right */}
+      {/* Gold radial glow — top right */}
       <div
         style={{
           position: "absolute",
           top: 0,
           right: 0,
           width: "65%",
-          height: "55%",
+          height: "60%",
           background:
-            "radial-gradient(ellipse at 90% 5%, rgba(212,175,55,0.30) 0%, rgba(212,175,55,0.08) 45%, transparent 70%)",
+            "radial-gradient(ellipse at 88% 8%, rgba(212,175,55,0.32) 0%, rgba(212,175,55,0.08) 45%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -119,8 +231,8 @@ function TemplateA({ config, scale }: { config: PostConfig; scale: number }) {
           bottom: 0,
           left: 0,
           right: 0,
-          height: "30%",
-          background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%)",
+          height: "28%",
+          background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
           pointerEvents: "none",
         }}
       />
@@ -129,40 +241,80 @@ function TemplateA({ config, scale }: { config: PostConfig; scale: number }) {
       <h1
         style={{
           color: "#ffffff",
-          fontSize: `${hs}px`,
-          fontWeight: "900",
-          lineHeight: 1.1,
+          fontSize: hs,
+          fontWeight: 900,
+          lineHeight: 1.08,
           textTransform: "uppercase",
-          letterSpacing: "-0.02em",
+          letterSpacing: "-0.025em",
           margin: 0,
-          marginBottom: `${16 * scale}px`,
+          marginBottom: Math.round(h * 0.035),
           position: "relative",
           zIndex: 1,
           whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
         }}
       >
         {config.headline}
       </h1>
 
-      {/* Gold divider */}
-      <GoldLine style={{ marginBottom: `${20 * scale}px`, position: "relative", zIndex: 1 }} />
+      {/* Gold rule */}
+      <GoldRule style={{ marginBottom: Math.round(h * 0.04) }} />
 
-      {/* Content row */}
+      {/* Content row — fills remaining space */}
       <div
         style={{
           display: "flex",
           flex: 1,
-          gap: `${24 * scale}px`,
+          gap: Math.round(w * 0.04),
           alignItems: "center",
           position: "relative",
           zIndex: 1,
           overflow: "hidden",
+          minHeight: 0,
         }}
       >
         {/* Features list */}
-        <div style={{ flex: "0 0 42%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          {config.features.map((f, i) => (
-            <GoldBullet key={i} text={f} fontSize={bs} accentColor={config.accentColor} />
+        <div
+          style={{
+            flex: "0 0 44%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: Math.round(h * 0.025),
+          }}
+        >
+          {config.features.slice(0, 4).map((f, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: Math.round(bs * 0.7),
+              }}
+            >
+              <span
+                style={{
+                  color: config.accentColor,
+                  fontSize: bs * 0.9,
+                  lineHeight: 1.5,
+                  flexShrink: 0,
+                  fontWeight: 900,
+                }}
+              >
+                ✦
+              </span>
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.88)",
+                  fontSize: bs,
+                  lineHeight: 1.45,
+                  fontFamily: "Arial, sans-serif",
+                  fontWeight: 500,
+                }}
+              >
+                {f}
+              </span>
+            </div>
           ))}
         </div>
 
@@ -173,71 +325,76 @@ function TemplateA({ config, scale }: { config: PostConfig; scale: number }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            position: "relative",
-            gap: `${(-phoneW * 0.2)}px`,
+            gap: Math.round(phoneW * (-0.18)), // slight overlap
+            paddingTop: Math.round(phoneH * 0.05),
           }}
         >
-          {config.screenshots.length >= 2 ? (
-            <>
-              <div style={{ transform: "rotate(-4deg) translateY(10px)", zIndex: 1 }}>
-                <PhoneMockup screenshot={config.screenshots[0]} width={phoneW} height={phoneH} />
-              </div>
-              <div style={{ transform: "rotate(3deg) translateY(-6px)", zIndex: 2 }}>
-                <PhoneMockup screenshot={config.screenshots[1]} width={phoneW} height={phoneH} />
-              </div>
-            </>
-          ) : config.screenshots.length === 1 ? (
-            <>
-              <div style={{ transform: "rotate(-4deg) translateY(10px)", zIndex: 1 }}>
-                <PhoneMockup screenshot={config.screenshots[0]} width={phoneW} height={phoneH} />
-              </div>
-              <div style={{ transform: "rotate(3deg) translateY(-6px)", zIndex: 2 }}>
-                <PhoneMockup width={phoneW} height={phoneH} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ transform: "rotate(-4deg) translateY(10px)", zIndex: 1 }}>
-                <PhoneMockup width={phoneW} height={phoneH} />
-              </div>
-              <div style={{ transform: "rotate(3deg) translateY(-6px)", zIndex: 2 }}>
-                <PhoneMockup width={phoneW} height={phoneH} />
-              </div>
-            </>
-          )}
+          <div style={{ marginTop: Math.round(phoneH * 0.06) }}>
+            <PhoneFrame
+              screenshot={config.screenshots[0]}
+              width={phoneW}
+              height={phoneH}
+            />
+          </div>
+          <div style={{ marginTop: 0, zIndex: 2 }}>
+            <PhoneFrame
+              screenshot={config.screenshots[1]}
+              width={Math.round(phoneW * 0.88)}
+              height={Math.round(phoneH * 0.88)}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div style={{ position: "relative", zIndex: 1, marginTop: `${16 * scale}px` }}>
-        <GoldLine style={{ marginBottom: `${12 * scale}px` }} />
-        <p
+      {/* CTA */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          marginTop: Math.round(h * 0.03),
+          display: "flex",
+          alignItems: "center",
+          gap: Math.round(bs * 0.6),
+        }}
+      >
+        <GoldRule style={{ width: Math.round(w * 0.12), flexShrink: 0 }} />
+        <span
           style={{
             color: config.accentColor,
-            fontSize: `${bs * 1.1}px`,
-            fontWeight: "700",
-            margin: 0,
-            letterSpacing: "0.05em",
+            fontSize: Math.round(bs * 1.05),
+            fontWeight: 800,
+            letterSpacing: "0.04em",
+            fontFamily: "Arial Black, Arial, sans-serif",
           }}
         >
-          {config.ctaText}{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)" }}>{config.ctaUrl}</span>
-        </p>
+          {config.ctaText}
+        </span>
+        <span
+          style={{
+            color: "rgba(255,255,255,0.75)",
+            fontSize: Math.round(bs * 1.05),
+            fontWeight: 700,
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          {config.ctaUrl}
+        </span>
       </div>
     </div>
   )
 }
 
-// ── Template B: Name Spotlight ────────────────────────────────────────────────
-function TemplateB({ config, scale }: { config: PostConfig; scale: number }) {
-  const hs = config.headlineFontSize * scale
-  const bs = config.bodyFontSize * scale
+// ─── Template B — Name Spotlight ─────────────────────────────────────────────
+function TemplateB({ config, w, h }: TemplateProps) {
+  const hs = Math.round(w * (config.headlineFontSize / 520))
+  const bs = Math.round(w * (config.bodyFontSize / 520))
+  const pad = Math.round(w * 0.07)
 
   return (
     <div
       style={{
-        width: "100%",
-        height: "100%",
+        width: w,
+        height: h,
         background: config.bgColor,
         position: "relative",
         overflow: "hidden",
@@ -245,7 +402,8 @@ function TemplateB({ config, scale }: { config: PostConfig; scale: number }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: `${36 * scale}px ${40 * scale}px`,
+        padding: `${pad}px`,
+        boxSizing: "border-box",
         fontFamily: "Arial, sans-serif",
         textAlign: "center",
       }}
@@ -254,275 +412,383 @@ function TemplateB({ config, scale }: { config: PostConfig; scale: number }) {
       <div
         style={{
           position: "absolute",
-          top: "50%",
+          top: "40%",
           left: "50%",
-          transform: "translate(-50%, -60%)",
+          transform: "translate(-50%, -50%)",
           width: "70%",
           height: "70%",
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${config.accentColor}22 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${config.accentColor}1A 0%, transparent 70%)`,
           pointerEvents: "none",
         }}
       />
-
-      {/* Label */}
-      <p
+      {/* Top border accent */}
+      <GoldRule
         style={{
-          color: config.accentColor,
-          fontSize: `${bs * 0.8}px`,
-          fontWeight: "700",
-          letterSpacing: "0.2em",
-          textTransform: "uppercase",
-          margin: 0,
-          marginBottom: `${12 * scale}px`,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          width: "100%",
+        }}
+      />
+
+      {/* Label pill */}
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: bs * 0.4,
+          background: `${config.accentColor}15`,
+          border: `1px solid ${config.accentColor}30`,
+          borderRadius: 100,
+          padding: `${bs * 0.25}px ${bs * 0.8}px`,
+          marginBottom: h * 0.03,
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        ✦ NAME SPOTLIGHT ✦
-      </p>
+        <span
+          style={{
+            color: config.accentColor,
+            fontSize: bs * 0.7,
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}
+        >
+          ✦ NAME SPOTLIGHT ✦
+        </span>
+      </div>
 
       {/* Domain name */}
       <h1
         style={{
           color: "#ffffff",
-          fontSize: `${hs * 1.2}px`,
-          fontWeight: "900",
+          fontSize: hs * 1.15,
+          fontWeight: 900,
           margin: 0,
-          marginBottom: `${8 * scale}px`,
+          marginBottom: h * 0.025,
           letterSpacing: "-0.02em",
           position: "relative",
           zIndex: 1,
+          fontFamily: "Arial Black, Arial, sans-serif",
         }}
       >
         {config.domainName || "CloudSync.io"}
       </h1>
 
-      <GoldLine style={{ width: "60%", marginBottom: `${16 * scale}px` }} />
+      <GoldRule w="55%" style={{ marginBottom: h * 0.03 }} />
 
       {/* Score badge */}
       <div
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: `${8 * scale}px`,
-          background: "rgba(255,255,255,0.05)",
-          border: `1px solid ${config.accentColor}55`,
-          borderRadius: `${12 * scale}px`,
-          padding: `${10 * scale}px ${24 * scale}px`,
-          marginBottom: `${24 * scale}px`,
+          gap: bs * 0.8,
+          background: "rgba(255,255,255,0.04)",
+          border: `1.5px solid ${config.accentColor}45`,
+          borderRadius: bs * 0.9,
+          padding: `${bs * 0.7}px ${bs * 1.6}px`,
+          marginBottom: h * 0.04,
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <span
           style={{
             color: config.accentColor,
-            fontSize: `${hs}px`,
-            fontWeight: "900",
+            fontSize: hs * 1.3,
+            fontWeight: 900,
             lineHeight: 1,
+            fontFamily: "Arial Black, Arial, sans-serif",
           }}
         >
           {config.score}
         </span>
         <div style={{ textAlign: "left" }}>
-          <p
+          <div
             style={{
-              color: "rgba(255,255,255,0.4)",
-              fontSize: `${bs * 0.7}px`,
-              margin: 0,
-              letterSpacing: "0.1em",
+              color: "rgba(255,255,255,0.35)",
+              fontSize: bs * 0.65,
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
+              lineHeight: 1.2,
             }}
           >
             / 100
-          </p>
-          <p
+          </div>
+          <div
             style={{
               color: "#ffffff",
-              fontSize: `${bs * 0.9}px`,
-              fontWeight: "700",
-              margin: 0,
-              letterSpacing: "0.05em",
+              fontSize: bs * 0.85,
+              fontWeight: 700,
+              lineHeight: 1.2,
             }}
           >
             {config.scoreLabel}
-          </p>
+          </div>
         </div>
       </div>
 
       {/* Traits */}
-      <div style={{ textAlign: "left", width: "100%", maxWidth: `${280 * scale}px` }}>
-        {config.traits.slice(0, 5).map((t, i) => (
+      <div
+        style={{
+          textAlign: "left",
+          width: "100%",
+          maxWidth: w * 0.6,
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        {config.traits.slice(0, Math.min(5, Math.floor((h * 0.25) / (bs * 1.6)))).map((t, i) => (
           <div
             key={i}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: `${8 * scale}px`,
-              marginBottom: `${6 * scale}px`,
+              gap: bs * 0.55,
+              marginBottom: bs * 0.45,
             }}
           >
-            <span style={{ color: config.accentColor, fontSize: `${bs}px` }}>✓</span>
-            <span style={{ color: "rgba(255,255,255,0.75)", fontSize: `${bs * 0.9}px` }}>{t}</span>
+            <span style={{ color: config.accentColor, fontSize: bs, fontWeight: 700 }}>✓</span>
+            <span style={{ color: "rgba(255,255,255,0.72)", fontSize: bs * 0.88 }}>{t}</span>
           </div>
         ))}
       </div>
 
-      <GoldLine style={{ width: "100%", marginTop: `${20 * scale}px`, marginBottom: `${12 * scale}px` }} />
-
+      <GoldRule style={{ width: "100%", marginTop: h * 0.025, marginBottom: h * 0.02 }} />
       <p
         style={{
           color: config.accentColor,
-          fontSize: `${bs}px`,
-          fontWeight: "700",
+          fontSize: bs,
+          fontWeight: 700,
           margin: 0,
-          letterSpacing: "0.08em",
+          letterSpacing: "0.07em",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        {config.ctaText} {config.ctaUrl}
+        {config.ctaText}{" "}
+        <span style={{ color: "rgba(255,255,255,0.8)" }}>{config.ctaUrl}</span>
       </p>
     </div>
   )
 }
 
-// ── Template C: Comparison ────────────────────────────────────────────────────
-function TemplateC({ config, scale }: { config: PostConfig; scale: number }) {
-  const hs = config.headlineFontSize * scale * 0.75
-  const bs = config.bodyFontSize * scale * 0.9
+// ─── Template C — Comparison ──────────────────────────────────────────────────
+function TemplateC({ config, w, h }: TemplateProps) {
+  const hs = Math.round(w * (config.headlineFontSize / 520) * 0.72)
+  const bs = Math.round(w * (config.bodyFontSize / 520) * 0.88)
+  const pad = Math.round(w * 0.048)
 
-  const maxRows = Math.max(config.ourFeatures.length, config.theirFeatures.length)
+  // How many rows fit — compute available space
+  const headlineH = hs * 1.3 + pad * 0.8
+  const colHeaderH = bs * 2.6 + pad * 0.6
+  const ctaH = bs * 2.2 + pad * 0.8
+  const ruleH = 2 + pad * 0.8
+  const availRows = h - pad * 2 - headlineH - colHeaderH - ctaH - ruleH * 2
+  const rowItemH = bs * 2.2 + 5
+  const maxRows = Math.max(2, Math.floor(availRows / rowItemH))
+  const rowCount = Math.min(maxRows, config.ourFeatures.length, config.theirFeatures.length)
 
   return (
     <div
       style={{
-        width: "100%",
-        height: "100%",
+        width: w,
+        height: h,
         background: config.bgColor,
         position: "relative",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: `${24 * scale}px ${32 * scale}px`,
+        padding: `${pad}px`,
+        boxSizing: "border-box",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      {/* Glow */}
+      {/* Glow top right */}
       <div
         style={{
           position: "absolute",
           top: 0,
           right: 0,
-          width: "50%",
-          height: "45%",
+          width: "55%",
+          height: "50%",
           background:
-            "radial-gradient(ellipse at 80% 10%, rgba(212,175,55,0.18) 0%, transparent 65%)",
+            "radial-gradient(ellipse at 85% 8%, rgba(212,175,55,0.18) 0%, transparent 60%)",
           pointerEvents: "none",
         }}
       />
+      {/* Gold top accent line */}
+      <GoldRule style={{ position: "absolute", top: 0, left: 0, right: 0, width: "100%" }} />
 
-      {/* Headline */}
-      <h1
+      {/* Header row: NamoLux logo + headline */}
+      <div
         style={{
-          color: "#ffffff",
-          fontSize: `${hs}px`,
-          fontWeight: "900",
-          letterSpacing: "-0.01em",
-          textTransform: "uppercase",
-          margin: 0,
-          marginBottom: `${14 * scale}px`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: pad * 0.6,
           position: "relative",
           zIndex: 1,
         }}
       >
-        {config.headline}
-      </h1>
+        <h1
+          style={{
+            color: "#ffffff",
+            fontSize: hs,
+            fontWeight: 900,
+            letterSpacing: "-0.01em",
+            textTransform: "uppercase",
+            margin: 0,
+            flex: 1,
+            fontFamily: "Arial Black, Arial, sans-serif",
+            lineHeight: 1.15,
+          }}
+        >
+          {config.headline}
+        </h1>
+        <NamoLogo size={bs * 0.85} accent={config.accentColor} />
+      </div>
 
-      <GoldLine style={{ marginBottom: `${16 * scale}px` }} />
+      <GoldRule style={{ marginBottom: pad * 0.7 }} />
 
       {/* Column headers */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: `${16 * scale}px`,
-          marginBottom: `${12 * scale}px`,
+          gap: pad * 0.6,
+          marginBottom: pad * 0.5,
+          position: "relative",
+          zIndex: 1,
         }}
       >
+        {/* NamoLux */}
         <div
           style={{
-            background: `${config.accentColor}18`,
-            border: `1px solid ${config.accentColor}40`,
-            borderRadius: `${8 * scale}px`,
-            padding: `${8 * scale}px ${14 * scale}px`,
+            background: `${config.accentColor}1A`,
+            border: `1.5px solid ${config.accentColor}40`,
+            borderRadius: bs * 0.7,
+            padding: `${bs * 0.5}px ${bs * 0.9}px`,
             textAlign: "center",
           }}
         >
           <span
             style={{
               color: config.accentColor,
-              fontSize: `${bs * 1.1}px`,
-              fontWeight: "800",
-              letterSpacing: "0.05em",
+              fontSize: bs * 1.05,
+              fontWeight: 800,
+              letterSpacing: "0.03em",
+              fontFamily: "Arial Black, Arial, sans-serif",
             }}
           >
             NamoLux ✦
           </span>
         </div>
+        {/* Competitor */}
         <div
           style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: `${8 * scale}px`,
-            padding: `${8 * scale}px ${14 * scale}px`,
+            background: "rgba(255,255,255,0.025)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: bs * 0.7,
+            padding: `${bs * 0.5}px ${bs * 0.9}px`,
             textAlign: "center",
           }}
         >
-          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: `${bs * 1.1}px`, fontWeight: "700" }}>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.45)",
+              fontSize: bs * 1.05,
+              fontWeight: 700,
+            }}
+          >
             {config.competitor || "Namelix"}
           </span>
         </div>
       </div>
 
       {/* Feature rows */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: `${6 * scale}px` }}>
-        {Array.from({ length: maxRows }).map((_, i) => (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: Math.round(pad * 0.28),
+          flex: 1,
+          position: "relative",
+          zIndex: 1,
+          overflow: "hidden",
+        }}
+      >
+        {Array.from({ length: rowCount }).map((_, i) => (
           <div
             key={i}
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: `${16 * scale}px`,
+              gap: pad * 0.6,
             }}
           >
+            {/* Our feature */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: `${8 * scale}px`,
-                background: "rgba(212,175,55,0.04)",
-                border: "1px solid rgba(212,175,55,0.1)",
-                borderRadius: `${6 * scale}px`,
-                padding: `${6 * scale}px ${10 * scale}px`,
+                gap: bs * 0.5,
+                background: "rgba(212,175,55,0.05)",
+                border: "1px solid rgba(212,175,55,0.12)",
+                borderRadius: bs * 0.5,
+                padding: `${bs * 0.45}px ${bs * 0.65}px`,
               }}
             >
-              <span style={{ color: config.accentColor, fontSize: `${bs}px`, fontWeight: "bold" }}>✓</span>
-              <span style={{ color: "rgba(255,255,255,0.85)", fontSize: `${bs * 0.85}px` }}>
+              <span
+                style={{
+                  color: config.accentColor,
+                  fontSize: bs,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                ✓
+              </span>
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.85)",
+                  fontSize: bs * 0.82,
+                  lineHeight: 1.3,
+                }}
+              >
                 {config.ourFeatures[i] || ""}
               </span>
             </div>
+            {/* Their feature */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: `${8 * scale}px`,
-                background: "rgba(255,255,255,0.02)",
+                gap: bs * 0.5,
+                background: "rgba(255,255,255,0.018)",
                 border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: `${6 * scale}px`,
-                padding: `${6 * scale}px ${10 * scale}px`,
+                borderRadius: bs * 0.5,
+                padding: `${bs * 0.45}px ${bs * 0.65}px`,
               }}
             >
-              <span style={{ color: "#ef4444", fontSize: `${bs}px`, fontWeight: "bold" }}>✗</span>
               <span
                 style={{
-                  color: "rgba(255,255,255,0.3)",
-                  fontSize: `${bs * 0.85}px`,
+                  color: "#ef4444",
+                  fontSize: bs,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                ✗
+              </span>
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.28)",
+                  fontSize: bs * 0.82,
+                  lineHeight: 1.3,
                   textDecoration: "line-through",
                 }}
               >
@@ -533,32 +799,39 @@ function TemplateC({ config, scale }: { config: PostConfig; scale: number }) {
         ))}
       </div>
 
-      <GoldLine style={{ marginTop: `${14 * scale}px`, marginBottom: `${10 * scale}px` }} />
-      <p
-        style={{
-          color: config.accentColor,
-          fontSize: `${bs}px`,
-          fontWeight: "700",
-          margin: 0,
-          letterSpacing: "0.05em",
-        }}
+      <GoldRule style={{ marginTop: pad * 0.5, marginBottom: pad * 0.4 }} />
+      <div
+        style={{ display: "flex", alignItems: "center", gap: bs * 0.5, position: "relative", zIndex: 1 }}
       >
-        {config.ctaText} <span style={{ color: "rgba(255,255,255,0.8)" }}>{config.ctaUrl}</span>
-      </p>
+        <span
+          style={{
+            color: config.accentColor,
+            fontSize: bs * 0.95,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+          }}
+        >
+          {config.ctaText}
+        </span>
+        <span style={{ color: "rgba(255,255,255,0.7)", fontSize: bs * 0.95, fontWeight: 500 }}>
+          {config.ctaUrl}
+        </span>
+      </div>
     </div>
   )
 }
 
-// ── Template D: Stat/Quote ────────────────────────────────────────────────────
-function TemplateD({ config, scale }: { config: PostConfig; scale: number }) {
-  const hs = config.headlineFontSize * scale
-  const bs = config.bodyFontSize * scale
+// ─── Template D — Stat / Quote ────────────────────────────────────────────────
+function TemplateD({ config, w, h }: TemplateProps) {
+  const hs = Math.round(w * (config.headlineFontSize / 520))
+  const bs = Math.round(w * (config.bodyFontSize / 520))
+  const pad = Math.round(w * 0.08)
 
   return (
     <div
       style={{
-        width: "100%",
-        height: "100%",
+        width: w,
+        height: h,
         background: config.bgColor,
         position: "relative",
         overflow: "hidden",
@@ -566,34 +839,33 @@ function TemplateD({ config, scale }: { config: PostConfig; scale: number }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: `${40 * scale}px ${44 * scale}px`,
+        padding: `${pad}px`,
+        boxSizing: "border-box",
         fontFamily: "Arial, sans-serif",
         textAlign: "center",
       }}
     >
-      {/* Multiple glow layers */}
+      {/* Corner glow layers */}
       <div
         style={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "80%",
-          height: "80%",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${config.accentColor}15 0%, transparent 65%)`,
+          inset: 0,
+          background: `radial-gradient(ellipse at 50% 40%, ${config.accentColor}14 0%, transparent 65%)`,
           pointerEvents: "none",
         }}
       />
+      <GoldRule style={{ position: "absolute", top: 0, left: 0, right: 0, width: "100%" }} />
+      <GoldRule style={{ position: "absolute", bottom: 0, left: 0, right: 0, width: "100%" }} />
 
-      {/* Quote mark or icon */}
+      {/* Quote glyph */}
       <div
         style={{
-          color: `${config.accentColor}40`,
-          fontSize: `${hs * 2}px`,
-          lineHeight: 0.8,
-          fontWeight: "900",
-          marginBottom: `${16 * scale}px`,
+          color: `${config.accentColor}30`,
+          fontSize: hs * 2.4,
+          lineHeight: 0.7,
+          fontWeight: 900,
+          marginBottom: h * 0.02,
+          fontFamily: "Georgia, serif",
           position: "relative",
           zIndex: 1,
         }}
@@ -601,33 +873,34 @@ function TemplateD({ config, scale }: { config: PostConfig; scale: number }) {
         "
       </div>
 
-      {/* Stat or quote */}
+      {/* Big number / stat */}
       <h1
         style={{
           color: config.accentColor,
-          fontSize: `${hs * 1.8}px`,
-          fontWeight: "900",
+          fontSize: hs * 2,
+          fontWeight: 900,
           margin: 0,
-          marginBottom: `${12 * scale}px`,
-          letterSpacing: "-0.03em",
+          marginBottom: h * 0.02,
+          letterSpacing: "-0.04em",
           lineHeight: 1,
           position: "relative",
           zIndex: 1,
+          fontFamily: "Arial Black, Arial, sans-serif",
         }}
       >
         {config.statNumber || config.headline}
       </h1>
 
-      <GoldLine style={{ width: "50%", marginBottom: `${16 * scale}px` }} />
+      <GoldRule w="45%" style={{ marginBottom: h * 0.025 }} />
 
       <p
         style={{
-          color: "rgba(255,255,255,0.7)",
-          fontSize: `${bs * 1.1}px`,
-          lineHeight: 1.5,
+          color: "rgba(255,255,255,0.65)",
+          fontSize: bs * 1.15,
+          lineHeight: 1.55,
           margin: 0,
-          marginBottom: `${32 * scale}px`,
-          maxWidth: `${320 * scale}px`,
+          marginBottom: h * 0.05,
+          maxWidth: w * 0.7,
           position: "relative",
           zIndex: 1,
         }}
@@ -635,100 +908,98 @@ function TemplateD({ config, scale }: { config: PostConfig; scale: number }) {
         {config.statLabel || config.subtitle}
       </p>
 
-      {/* Logo + URL */}
+      {/* Logo footer */}
       <div
         style={{
           position: "absolute",
-          bottom: `${28 * scale}px`,
+          bottom: pad * 0.9,
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          gap: `${6 * scale}px`,
+          gap: bs * 0.6,
+          zIndex: 1,
         }}
       >
-        <GoldLine style={{ width: `${120 * scale}px` }} />
-        <div style={{ display: "flex", alignItems: "center", gap: `${8 * scale}px` }}>
-          <div
-            style={{
-              width: `${20 * scale}px`,
-              height: `${20 * scale}px`,
-              borderRadius: `${4 * scale}px`,
-              background: `linear-gradient(135deg, ${config.accentColor}, #F6E27A)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: `${bs * 0.75}px`,
-              fontWeight: "900",
-              color: "#000",
-            }}
-          >
-            N
-          </div>
-          <span style={{ color: config.accentColor, fontSize: `${bs * 0.9}px`, fontWeight: "700" }}>
-            {config.ctaUrl}
-          </span>
-        </div>
+        <NamoLogo size={bs * 0.9} accent={config.accentColor} />
+        <span
+          style={{
+            color: `${config.accentColor}99`,
+            fontSize: bs * 0.75,
+            fontWeight: 600,
+            letterSpacing: "0.05em",
+          }}
+        >
+          {config.ctaUrl}
+        </span>
       </div>
     </div>
   )
 }
 
-// ── Template E: Tip/Insight ───────────────────────────────────────────────────
-function TemplateE({ config, scale }: { config: PostConfig; scale: number }) {
-  const hs = config.headlineFontSize * scale * 0.85
-  const bs = config.bodyFontSize * scale
+// ─── Template E — Tip / Insight ───────────────────────────────────────────────
+function TemplateE({ config, w, h }: TemplateProps) {
+  const hs = Math.round(w * (config.headlineFontSize / 520) * 0.82)
+  const bs = Math.round(w * (config.bodyFontSize / 520))
+  const pad = Math.round(w * 0.052)
+
+  // How many tips fit
+  const afterHeader = h - pad * 2 - hs * 1.3 - pad - 2 - pad * 0.6 - bs * 2.4
+  const tipH = bs * 2.2 + pad * 0.35
+  const maxTips = Math.max(2, Math.floor(afterHeader / tipH))
+  const tipCount = Math.min(maxTips, config.tips.length)
 
   return (
     <div
       style={{
-        width: "100%",
-        height: "100%",
+        width: w,
+        height: h,
         background: config.bgColor,
         position: "relative",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: `${28 * scale}px ${36 * scale}px`,
+        padding: `${pad}px`,
+        boxSizing: "border-box",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      {/* Glow */}
+      {/* Gold glow top-left */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: 0,
-          width: "60%",
-          height: "50%",
-          background: `radial-gradient(ellipse at 20% 10%, ${config.accentColor}18 0%, transparent 65%)`,
+          width: "55%",
+          height: "45%",
+          background: `radial-gradient(ellipse at 15% 10%, ${config.accentColor}1C 0%, transparent 65%)`,
           pointerEvents: "none",
         }}
       />
+      <GoldRule style={{ position: "absolute", top: 0, left: 0, right: 0, width: "100%" }} />
 
       {/* Icon + label */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: `${10 * scale}px`,
-          marginBottom: `${16 * scale}px`,
+          gap: bs * 0.7,
+          marginBottom: pad * 0.5,
           position: "relative",
           zIndex: 1,
         }}
       >
         <div
           style={{
-            width: `${36 * scale}px`,
-            height: `${36 * scale}px`,
-            borderRadius: `${8 * scale}px`,
-            background: `${config.accentColor}22`,
-            border: `1px solid ${config.accentColor}44`,
+            width: bs * 2.2,
+            height: bs * 2.2,
+            borderRadius: bs * 0.5,
+            background: `${config.accentColor}1E`,
+            border: `1px solid ${config.accentColor}40`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: `${bs * 1.1}px`,
+            fontSize: bs * 1.1,
             flexShrink: 0,
           }}
         >
@@ -737,62 +1008,74 @@ function TemplateE({ config, scale }: { config: PostConfig; scale: number }) {
         <span
           style={{
             color: config.accentColor,
-            fontSize: `${bs * 0.75}px`,
-            fontWeight: "700",
-            letterSpacing: "0.15em",
+            fontSize: bs * 0.7,
+            fontWeight: 700,
+            letterSpacing: "0.18em",
             textTransform: "uppercase",
           }}
         >
           FOUNDER TIP
         </span>
+        <div style={{ flex: 1 }} />
+        <NamoLogo size={bs * 0.75} accent={config.accentColor} />
       </div>
 
       {/* Headline */}
       <h1
         style={{
           color: "#ffffff",
-          fontSize: `${hs}px`,
-          fontWeight: "900",
+          fontSize: hs,
+          fontWeight: 900,
           lineHeight: 1.15,
           margin: 0,
-          marginBottom: `${14 * scale}px`,
-          letterSpacing: "-0.01em",
+          marginBottom: pad * 0.55,
+          letterSpacing: "-0.015em",
           position: "relative",
           zIndex: 1,
+          fontFamily: "Arial Black, Arial, sans-serif",
           whiteSpace: "pre-wrap",
         }}
       >
         {config.headline}
       </h1>
 
-      <GoldLine style={{ marginBottom: `${18 * scale}px` }} />
+      <GoldRule style={{ marginBottom: pad * 0.55 }} />
 
       {/* Tips */}
-      <div style={{ flex: 1, position: "relative", zIndex: 1 }}>
-        {config.tips.map((tip, i) => (
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: Math.round(pad * 0.35),
+          position: "relative",
+          zIndex: 1,
+          overflow: "hidden",
+        }}
+      >
+        {config.tips.slice(0, tipCount).map((tip, i) => (
           <div
             key={i}
             style={{
               display: "flex",
-              gap: `${12 * scale}px`,
-              marginBottom: `${10 * scale}px`,
+              gap: bs * 0.75,
               alignItems: "flex-start",
             }}
           >
             <div
               style={{
-                width: `${22 * scale}px`,
-                height: `${22 * scale}px`,
+                width: bs * 1.55,
+                height: bs * 1.55,
                 borderRadius: "50%",
-                background: `${config.accentColor}22`,
-                border: `1px solid ${config.accentColor}55`,
+                background: `${config.accentColor}1E`,
+                border: `1px solid ${config.accentColor}50`,
                 flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: config.accentColor,
-                fontSize: `${bs * 0.75}px`,
-                fontWeight: "800",
+                fontSize: bs * 0.72,
+                fontWeight: 800,
                 marginTop: "1px",
               }}
             >
@@ -800,8 +1083,8 @@ function TemplateE({ config, scale }: { config: PostConfig; scale: number }) {
             </div>
             <p
               style={{
-                color: "rgba(255,255,255,0.82)",
-                fontSize: `${bs * 0.95}px`,
+                color: "rgba(255,255,255,0.8)",
+                fontSize: bs * 0.92,
                 lineHeight: 1.5,
                 margin: 0,
               }}
@@ -812,49 +1095,56 @@ function TemplateE({ config, scale }: { config: PostConfig; scale: number }) {
         ))}
       </div>
 
-      <GoldLine style={{ marginTop: `${12 * scale}px`, marginBottom: `${10 * scale}px` }} />
-      <p
-        style={{
-          color: config.accentColor,
-          fontSize: `${bs}px`,
-          fontWeight: "700",
-          margin: 0,
-          letterSpacing: "0.05em",
-        }}
+      <GoldRule style={{ marginTop: pad * 0.5, marginBottom: pad * 0.38 }} />
+      <div
+        style={{ display: "flex", alignItems: "center", gap: bs * 0.5, position: "relative", zIndex: 1 }}
       >
-        {config.ctaText} <span style={{ color: "rgba(255,255,255,0.8)" }}>{config.ctaUrl}</span>
-      </p>
+        <span
+          style={{
+            color: config.accentColor,
+            fontSize: bs * 0.92,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+          }}
+        >
+          {config.ctaText}
+        </span>
+        <span style={{ color: "rgba(255,255,255,0.68)", fontSize: bs * 0.92 }}>
+          {config.ctaUrl}
+        </span>
+      </div>
     </div>
   )
 }
 
-// ── Main canvas preview ───────────────────────────────────────────────────────
-export const CanvasPreview = forwardRef<HTMLDivElement, CanvasPreviewProps>(function CanvasPreview(
-  { config },
-  ref,
-) {
-  const platform = PLATFORMS[config.platform]
-  const previewHeight = Math.round(PREVIEW_WIDTH * (platform.height / platform.width))
-  const scale = PREVIEW_WIDTH / 600 // base scale (templates designed at 600px width)
+// ─── Main canvas preview component ───────────────────────────────────────────
+interface CanvasPreviewProps {
+  config: PostConfig
+}
 
-  const templateProps = { config, scale }
+export const CanvasPreview = forwardRef<HTMLDivElement, CanvasPreviewProps>(
+  function CanvasPreview({ config }, ref) {
+    const platform = PLATFORMS[config.platform]
+    const previewH = Math.round(PREVIEW_WIDTH * (platform.height / platform.width))
+    const props: TemplateProps = { config, w: PREVIEW_WIDTH, h: previewH }
 
-  return (
-    <div
-      ref={ref}
-      style={{
-        width: `${PREVIEW_WIDTH}px`,
-        height: `${previewHeight}px`,
-        position: "relative",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
-    >
-      {config.template === "A" && <TemplateA {...templateProps} />}
-      {config.template === "B" && <TemplateB {...templateProps} />}
-      {config.template === "C" && <TemplateC {...templateProps} />}
-      {config.template === "D" && <TemplateD {...templateProps} />}
-      {config.template === "E" && <TemplateE {...templateProps} />}
-    </div>
-  )
-})
+    return (
+      <div
+        ref={ref}
+        style={{
+          width: PREVIEW_WIDTH,
+          height: previewH,
+          position: "relative",
+          overflow: "hidden",
+          display: "block",
+        }}
+      >
+        {config.template === "A" && <TemplateA {...props} />}
+        {config.template === "B" && <TemplateB {...props} />}
+        {config.template === "C" && <TemplateC {...props} />}
+        {config.template === "D" && <TemplateD {...props} />}
+        {config.template === "E" && <TemplateE {...props} />}
+      </div>
+    )
+  },
+)
