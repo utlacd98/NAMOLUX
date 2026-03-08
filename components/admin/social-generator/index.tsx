@@ -4,8 +4,12 @@ import { useState, useRef, useCallback } from "react"
 import { CanvasPreview } from "./canvas-preview"
 import { EditorPanel } from "./editor-panel"
 import type { PostConfig, Preset } from "./types"
-import { DEFAULT_CONFIG, PLATFORMS, PREVIEW_WIDTH } from "./types"
+import { DEFAULT_CONFIG, PLATFORMS } from "./types"
 import { Download, Save, Copy, ChevronDown, Trash2, Monitor } from "lucide-react"
+
+// The right-panel preview is capped at this display width (px).
+// The actual canvas renders at full platform resolution, then scales down.
+const DISPLAY_MAX_WIDTH = 540
 
 function loadPresets(): Preset[] {
   if (typeof window === "undefined") return []
@@ -27,10 +31,18 @@ export function SocialGenerator() {
   const [presetName, setPresetName] = useState("")
   const [showPresets, setShowPresets] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  // This ref points to the FULL-RESOLUTION div, not the scaled preview wrapper
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const platform = PLATFORMS[config.platform]
-  const previewHeight = Math.round(PREVIEW_WIDTH * (platform.height / platform.width))
+  const exportW = platform.width
+  const exportH = platform.height
+
+  // Scale factor so the preview fits nicely in the right panel
+  const previewScale = Math.min(1, DISPLAY_MAX_WIDTH / exportW)
+  const displayW = Math.round(exportW * previewScale)
+  const displayH = Math.round(exportH * previewScale)
 
   function patch(partial: Partial<PostConfig>) {
     setConfig((prev) => ({ ...prev, ...partial }))
@@ -41,17 +53,42 @@ export function SocialGenerator() {
       if (!canvasRef.current || exporting) return
       setExporting(true)
       try {
+        // Wait for fonts and images to be ready
+        await document.fonts.ready
+
+        const imgs = Array.from(canvasRef.current.querySelectorAll("img"))
+        await Promise.all(
+          imgs.map((img) =>
+            img.complete
+              ? Promise.resolve()
+              : new Promise<void>((resolve) => {
+                  img.onload = () => resolve()
+                  img.onerror = () => resolve()
+                }),
+          ),
+        )
+
         const html2canvas = (await import("html2canvas")).default
-        const scale = platform.width / PREVIEW_WIDTH
+
         const canvas = await html2canvas(canvasRef.current, {
-          scale,
+          // Capture at the full export size — the div IS already that size
+          width: exportW,
+          height: exportH,
+          // 2× scale for retina-quality output
+          scale: 2,
           useCORS: true,
           allowTaint: true,
           logging: false,
           backgroundColor: config.bgColor,
-          width: PREVIEW_WIDTH,
-          height: previewHeight,
+          // Ignore scroll offset — the div renders at top:0 left:0
+          scrollX: 0,
+          scrollY: 0,
+          x: 0,
+          y: 0,
+          windowWidth: exportW,
+          windowHeight: exportH,
         })
+
         const date = new Date().toISOString().slice(0, 10).replace(/-/g, "_")
         const filename = `namolux_${config.platform}_${date}.${format}`
         const link = document.createElement("a")
@@ -63,12 +100,12 @@ export function SocialGenerator() {
         link.click()
       } catch (err) {
         console.error("Export failed:", err)
-        alert("Export failed. Please try again.")
+        alert("Export failed — check console for details.")
       } finally {
         setExporting(false)
       }
     },
-    [config, platform, previewHeight, exporting],
+    [config, exportW, exportH, exporting],
   )
 
   function handleCopyCaption() {
@@ -105,10 +142,7 @@ export function SocialGenerator() {
   }
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: "#050505", color: "#fff" }}
-    >
+    <div className="min-h-screen" style={{ background: "#050505", color: "#fff" }}>
       {/* Top bar */}
       <div
         className="sticky top-0 z-50 flex items-center justify-between px-6 py-3"
@@ -119,7 +153,6 @@ export function SocialGenerator() {
         }}
       >
         <div className="flex items-center gap-3">
-          {/* N logo */}
           <div
             className="flex h-7 w-7 items-center justify-center rounded-md text-sm font-black text-black"
             style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
@@ -127,15 +160,18 @@ export function SocialGenerator() {
             N
           </div>
           <div>
-            <span className="text-sm font-bold text-white">Social Post Generator</span>
-            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(212,175,55,0.6)" }}>
+            <span className="text-sm font-bold text-white">Post Graphic Generator</span>
+            <span
+              className="ml-2 text-[10px] font-semibold uppercase tracking-wider"
+              style={{ color: "rgba(212,175,55,0.6)" }}
+            >
               Admin Tool
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Presets */}
+          {/* Presets dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowPresets(!showPresets)}
@@ -160,7 +196,6 @@ export function SocialGenerator() {
                   boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
                 }}
               >
-                {/* Save new preset */}
                 <div className="flex gap-2 mb-2">
                   <input
                     value={presetName}
@@ -229,7 +264,7 @@ export function SocialGenerator() {
             {copied ? "Copied!" : "Copy Caption"}
           </button>
 
-          {/* Export buttons */}
+          {/* Export PNG */}
           <button
             onClick={() => handleExport("png")}
             disabled={exporting}
@@ -237,8 +272,10 @@ export function SocialGenerator() {
             style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
           >
             <Download className="h-3.5 w-3.5" />
-            {exporting ? "Exporting..." : "PNG"}
+            {exporting ? "Exporting…" : "PNG"}
           </button>
+
+          {/* Export JPG */}
           <button
             onClick={() => handleExport("jpeg")}
             disabled={exporting}
@@ -257,7 +294,7 @@ export function SocialGenerator() {
 
       {/* Split layout */}
       <div className="flex h-[calc(100vh-52px)]">
-        {/* Left: Editor */}
+        {/* Left: Editor panel */}
         <div
           className="flex-shrink-0 overflow-y-auto p-5"
           style={{
@@ -269,41 +306,73 @@ export function SocialGenerator() {
           <EditorPanel config={config} onChange={patch} />
         </div>
 
-        {/* Right: Preview */}
+        {/* Right: Preview panel */}
         <div
-          className="flex-1 flex flex-col items-center justify-center gap-4 overflow-auto"
+          className="flex-1 flex flex-col items-center justify-start gap-6 overflow-auto py-8 px-6"
           style={{ background: "rgba(0,0,0,0.4)" }}
         >
-          {/* Platform info badge */}
-          <div className="flex items-center gap-2">
+          {/* Platform info */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Monitor className="h-3.5 w-3.5" style={{ color: "rgba(212,175,55,0.6)" }} />
             <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-              {platform.label} — {platform.width}×{platform.height}px preview at {PREVIEW_WIDTH}px
+              {platform.label} — {exportW}×{exportH}px export &nbsp;·&nbsp; preview at{" "}
+              {Math.round(previewScale * 100)}%
             </span>
           </div>
 
-          {/* Canvas preview */}
+          {/*
+           * SCALE WRAPPER — display only.
+           * Sets a clipping box of displayW × displayH so the surrounding layout
+           * sees the correct dimensions, while the inner full-size div is
+           * CSS-scaled down visually.
+           */}
           <div
-            className="shadow-2xl"
             style={{
-              boxShadow: "0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.08)",
-              borderRadius: "2px",
+              width: displayW,
+              height: displayH,
+              overflow: "hidden", // clips the scaled child for display only
+              flexShrink: 0,
+              boxShadow:
+                "0 40px 120px rgba(0,0,0,0.85), 0 0 0 1px rgba(212,175,55,0.1)",
             }}
           >
-            <CanvasPreview ref={canvasRef} config={config} />
+            {/*
+             * FULL-RESOLUTION div — this is what html2canvas captures.
+             * It renders at exportW × exportH and is scaled down via transform.
+             * NO overflow:hidden here — that would clip the capture.
+             */}
+            <div
+              style={{
+                transform: `scale(${previewScale})`,
+                transformOrigin: "top left",
+                width: exportW,
+                height: exportH,
+              }}
+            >
+              <CanvasPreview
+                ref={canvasRef}
+                config={config}
+                exportWidth={exportW}
+                exportHeight={exportH}
+              />
+            </div>
           </div>
 
           {/* Caption preview */}
           <div
-            className="max-w-lg rounded-xl p-4 mx-6"
+            className="rounded-xl p-4 flex-shrink-0"
             style={{
+              width: displayW,
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.07)",
             }}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(212,175,55,0.5)" }}>
-                Caption Template — {platform.label}
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider"
+                style={{ color: "rgba(212,175,55,0.5)" }}
+              >
+                Caption — {platform.label}
               </span>
               <button
                 onClick={handleCopyCaption}
@@ -313,7 +382,10 @@ export function SocialGenerator() {
                 {copied ? "✓ Copied" : "Copy"}
               </button>
             </div>
-            <p className="text-xs leading-relaxed whitespace-pre-line" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p
+              className="text-xs leading-relaxed whitespace-pre-line"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               {platform.caption}
             </p>
           </div>

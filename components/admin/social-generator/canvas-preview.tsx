@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react"
 import type { PostConfig } from "./types"
-import { PLATFORMS, PREVIEW_WIDTH } from "./types"
+import { PLATFORMS } from "./types"
 
 interface TemplateProps {
   config: PostConfig
@@ -1118,25 +1118,32 @@ function TemplateE({ config, w, h }: TemplateProps) {
 }
 
 // ─── Main canvas preview component ───────────────────────────────────────────
+// ─── Public export ────────────────────────────────────────────────────────────
+// The ref points to the FULL-RESOLUTION div (platform.width × platform.height).
+// The caller wraps it in a CSS-scaled container for display purposes only.
+
 interface CanvasPreviewProps {
   config: PostConfig
+  /** Full export width in px (e.g. 1080, 1200) */
+  exportWidth: number
+  /** Full export height in px (e.g. 1080, 630) */
+  exportHeight: number
 }
 
 export const CanvasPreview = forwardRef<HTMLDivElement, CanvasPreviewProps>(
-  function CanvasPreview({ config }, ref) {
-    const platform = PLATFORMS[config.platform]
-    const previewH = Math.round(PREVIEW_WIDTH * (platform.height / platform.width))
-    const props: TemplateProps = { config, w: PREVIEW_WIDTH, h: previewH }
+  function CanvasPreview({ config, exportWidth, exportHeight }, ref) {
+    const props: TemplateProps = { config, w: exportWidth, h: exportHeight }
 
     return (
+      // NO overflow:hidden here — that would clip the export
       <div
         ref={ref}
         style={{
-          width: PREVIEW_WIDTH,
-          height: previewH,
+          width: exportWidth,
+          height: exportHeight,
           position: "relative",
-          overflow: "hidden",
           display: "block",
+          flexShrink: 0,
         }}
       >
         {config.template === "A" && <TemplateA {...props} />}
