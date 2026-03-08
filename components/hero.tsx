@@ -93,7 +93,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[100svh] overflow-clip pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-28 lg:pt-40"
+    <section className="relative min-h-[100svh] overflow-hidden pb-8 pt-24 sm:pb-20 sm:pt-32 lg:pb-28 lg:pt-40"
       aria-labelledby="hero-heading">
 
       {/* Background */}
@@ -125,14 +125,14 @@ export function Hero() {
           filter: "blur(60px)",
         }} />
 
-      <div className="relative mx-auto max-w-[1280px] px-6 md:px-12 lg:px-20">
+      <div className="relative mx-auto max-w-[1280px] px-5 md:px-12 lg:px-20">
         <div className="grid items-center gap-10 sm:gap-14 sm:min-h-[calc(100vh-10rem)] lg:grid-cols-[54%_46%] lg:gap-16">
 
           {/* LEFT */}
           <div className="flex flex-col items-start text-left">
 
             {/* Intro pill */}
-            <div className="animate-hero-fade-up hero-delay-1 mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest"
+            <div className="animate-hero-fade-up hero-delay-1 mb-5 inline-flex max-w-full items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest sm:px-4 sm:text-[11px]"
               style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.25)", color: "#D4AF37" }}>
               <span className="relative flex h-1.5 w-1.5 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
@@ -143,27 +143,26 @@ export function Hero() {
 
             {/* Headline */}
             <h1 id="hero-heading"
-              className="animate-hero-fade-up hero-delay-1 font-black tracking-tight text-white"
-              style={{ fontSize: "clamp(2rem, 5.5vw, 4.5rem)", lineHeight: 1.07, letterSpacing: "-0.03em" }}>
-              Find a domain{" "}
+              className="animate-hero-fade-up hero-delay-1 w-full font-black tracking-tight text-white"
+              style={{ fontSize: "clamp(1.75rem, 6vw, 4.5rem)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
+              <span className="block">Find a domain</span>
               <span style={{
                 backgroundImage: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 40%, #E8C84A 60%, #B8922E 100%)",
                 backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
               }}>worth building</span>
-              <br /><span className="text-white/90">a company on.</span>
+              <span className="text-white/90"> a company on.</span>
             </h1>
 
             {/* Sub */}
-            <p className="animate-hero-fade-up hero-delay-2 mt-6 max-w-lg leading-relaxed text-white/50"
-              style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)" }}>
+            <p className="animate-hero-fade-up hero-delay-2 mt-5 max-w-lg text-sm leading-relaxed text-white/50 sm:text-base">
               AI-generated brandable names, live availability checking, and every result scored with{" "}
               <span className="font-semibold text-white/80">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
             </p>
 
             {/* CTA */}
-            <div className="animate-hero-fade-up hero-delay-2 mt-9 flex flex-col gap-3 w-full sm:w-auto">
+            <div className="animate-hero-fade-up hero-delay-2 mt-8 flex w-full flex-col gap-3 sm:w-auto">
               <Link href="/generate"
-                className="group inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold text-black transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
+                className="group flex w-full items-center justify-center gap-2.5 rounded-xl px-8 py-4 text-base font-bold text-black transition-all duration-200 hover:-translate-y-0.5 sm:w-auto"
                 style={{
                   background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
                   boxShadow: "0 6px 30px rgba(212,175,55,0.4), 0 1px 0 rgba(255,255,255,0.15) inset",
