@@ -321,36 +321,32 @@ export function SocialGenerator() {
           </div>
 
           {/*
-           * SCALE WRAPPER — display only.
-           * Sets a clipping box of displayW × displayH so the surrounding layout
-           * sees the correct dimensions, while the inner full-size div is
-           * CSS-scaled down visually.
+           * DISPLAY wrapper — visual preview only, no ref.
+           * The inner full-size div is CSS-scaled down. This wrapper clips it
+           * to displayW × displayH for layout purposes.
+           * The ref / capture target lives OUTSIDE any transform parent (below).
            */}
           <div
             style={{
               width: displayW,
               height: displayH,
-              overflow: "hidden", // clips the scaled child for display only
+              overflow: "hidden",
               flexShrink: 0,
               boxShadow:
                 "0 40px 120px rgba(0,0,0,0.85), 0 0 0 1px rgba(212,175,55,0.1)",
             }}
           >
-            {/*
-             * FULL-RESOLUTION div — this is what html2canvas captures.
-             * It renders at exportW × exportH and is scaled down via transform.
-             * NO overflow:hidden here — that would clip the capture.
-             */}
             <div
               style={{
                 transform: `scale(${previewScale})`,
                 transformOrigin: "top left",
                 width: exportW,
                 height: exportH,
+                pointerEvents: "none",
               }}
             >
+              {/* Display copy — no ref */}
               <CanvasPreview
-                ref={canvasRef}
                 config={config}
                 exportWidth={exportW}
                 exportHeight={exportH}
@@ -390,6 +386,32 @@ export function SocialGenerator() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/*
+       * OFF-SCREEN CAPTURE TARGET — this is what html2canvas actually reads.
+       * position:fixed + large negative left pushes it off-screen.
+       * Crucially it has NO transformed parent, so html2canvas reads true pixel
+       * dimensions for every element (no scale distortion → no 0-height canvases).
+       */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: -(exportW + 200),
+          width: exportW,
+          height: exportH,
+          pointerEvents: "none",
+          zIndex: -9999,
+        }}
+        aria-hidden="true"
+      >
+        <CanvasPreview
+          ref={canvasRef}
+          config={config}
+          exportWidth={exportW}
+          exportHeight={exportH}
+        />
       </div>
     </div>
   )
