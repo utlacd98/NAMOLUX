@@ -181,39 +181,96 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Social proof tiles */}
-            <div className="animate-hero-fade-up hero-delay-4 mt-10 flex flex-row flex-wrap items-center gap-3">
-              {[
-                {
-                  icon: <Zap className="h-4 w-4 text-[#D4AF37]" />,
-                  num: "10,000+", sub: "Names generated"
-                },
-                {
-                  icon: (
-                    <div className="flex -space-x-1.5">
-                      {avatarSeeds.map(a => (
-                        <div key={a.initials} className="h-6 w-6 rounded-full flex items-center justify-center text-[8px] font-bold"
-                          style={{ background: a.bg, border: "1.5px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}
-                          aria-hidden="true">{a.initials}</div>
-                      ))}
-                    </div>
-                  ),
-                  num: "Founders", sub: "& agencies"
-                },
-                {
-                  icon: <ShieldCheck className="h-4 w-4 text-emerald-400/70" />,
-                  num: "One-time", sub: "No subscription"
-                },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-2.5"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  {item.icon}
-                  <div>
-                    <div className="text-sm font-bold text-white">{item.num}</div>
-                    <div className="text-[10px] text-white/30 uppercase tracking-wide">{item.sub}</div>
+            {/* Social proof marquee */}
+            <div className="animate-hero-fade-up hero-delay-4 mt-10 relative w-full overflow-hidden">
+              {/* Left fade */}
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-14 z-10"
+                style={{ background: "linear-gradient(to right, #060606 0%, transparent 100%)" }} />
+              {/* Right fade */}
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-14 z-10"
+                style={{ background: "linear-gradient(to left, #060606 0%, transparent 100%)" }} />
+
+              {/* Track — items duplicated for seamless loop */}
+              <div className="flex w-max animate-marquee hover:[animation-play-state:paused] [&:active]:[animation-play-state:paused] gap-3 py-1">
+                {[
+                  {
+                    icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,
+                    num: "10,000+", sub: "Names generated",
+                  },
+                  {
+                    icon: (
+                      <div className="flex shrink-0 -space-x-1.5" aria-hidden="true">
+                        {avatarSeeds.slice(0, 3).map(a => (
+                          <div key={a.initials} className="h-5 w-5 rounded-full flex items-center justify-center text-[7px] font-bold"
+                            style={{ background: a.bg, border: "1.5px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}>
+                            {a.initials}
+                          </div>
+                        ))}
+                      </div>
+                    ),
+                    num: "Founders", sub: "& agencies",
+                  },
+                  {
+                    icon: <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400/70" />,
+                    num: "One-time", sub: "No subscription",
+                  },
+                  {
+                    icon: <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500/70" />,
+                    num: "Instant", sub: "Results",
+                  },
+                  {
+                    icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,
+                    num: ".com .io .ai", sub: "Checked live",
+                  },
+                  {
+                    icon: <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]/70" />,
+                    num: "No account", sub: "Required",
+                  },
+                  // Duplicated for seamless loop
+                  {
+                    icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,
+                    num: "10,000+", sub: "Names generated",
+                  },
+                  {
+                    icon: (
+                      <div className="flex shrink-0 -space-x-1.5" aria-hidden="true">
+                        {avatarSeeds.slice(0, 3).map(a => (
+                          <div key={a.initials + "2"} className="h-5 w-5 rounded-full flex items-center justify-center text-[7px] font-bold"
+                            style={{ background: a.bg, border: "1.5px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}>
+                            {a.initials}
+                          </div>
+                        ))}
+                      </div>
+                    ),
+                    num: "Founders", sub: "& agencies",
+                  },
+                  {
+                    icon: <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400/70" />,
+                    num: "One-time", sub: "No subscription",
+                  },
+                  {
+                    icon: <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500/70" />,
+                    num: "Instant", sub: "Results",
+                  },
+                  {
+                    icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,
+                    num: ".com .io .ai", sub: "Checked live",
+                  },
+                  {
+                    icon: <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]/70" />,
+                    num: "No account", sub: "Required",
+                  },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 rounded-full px-3.5 py-2 shrink-0"
+                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    {item.icon}
+                    <span className="text-xs font-bold text-white">{item.num}</span>
+                    <span className="text-[10px] text-white/30 uppercase tracking-wide">{item.sub}</span>
+                    {/* separator dot */}
+                    <span className="ml-1 h-1 w-1 rounded-full shrink-0" style={{ background: "rgba(255,255,255,0.12)" }} />
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
