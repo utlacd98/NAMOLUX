@@ -6,19 +6,108 @@ import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 export const runtime = "nodejs"
 export const maxDuration = 60
 
-const STRATEGIES = [
-  "BLENDING: fuse two relevant words into one smooth portmanteau (e.g. keyword + related concept merged)",
-  "TRUNCATION: shorten the keyword by removing vowels or syllables to create a punchy abbreviated name",
-  "PHONETIC RESPELLING: respell the keyword or concept phonetically to make it unique (e.g. Lyft, Fiverr, Tumblr)",
-  "PREFIX/SUFFIX: add power prefixes or suffixes (get, try, use, go, my, -ly, -ify, -io, -hub, -base, -spot)",
-  "LETTER SWAP: replace letters in the keyword with similar-sounding letters to create a distinctive brand variant",
-  "CROSS-KEYWORD MASHUP: combine the keyword with the industry or vibe context to form a brand-new compound name",
-]
-
-const BATCH_SIZE = 13 // 6 strategies × ~13 = ~75 combos total
+// Each batch asks for this many candidates; 6 batches × 13 ≈ 75 total combos tested
+const BATCH_SIZE = 13
 const MAX_FOUND = 10
 const MAX_BATCHES = 6
 
+// ---------------------------------------------------------------------------
+// Server-side pronounceability filter
+// Catches garbage names that slip through despite prompt instructions.
+// ---------------------------------------------------------------------------
+const ALLOWED_CLUSTERS = /str|nch|nds|nks|ght|tch|dge|nge|rch|rds|rks|rts|nts|mps|lts|fts|cts|spl|spr|scr/gi
+
+function isPronounceable(name: string): boolean {
+  // Must contain at least one vowel
+  if (!/[aeiou]/i.test(name)) return false
+
+  // Must be at least 3 characters
+  if (name.length < 3) return false
+
+  // No triple repeated characters
+  if (/(.)\1\1/.test(name)) return false
+
+  // Reject 3+ consecutive consonants (after masking known-good clusters)
+  const masked = name.replace(ALLOWED_CLUSTERS, "aa")
+  if (/[^aeiou]{3,}/i.test(masked)) return false
+
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Prompt
+// ---------------------------------------------------------------------------
+function buildPrompt(
+  keyword: string,
+  industry: string,
+  vibe: string,
+  maxLength: number,
+  batchSize: number,
+  alreadySeen: Set<string>,
+): { system: string; user: string } {
+  const seen = Array.from(alreadySeen).slice(0, 50).join(", ") || "none"
+
+  const system = `You are an elite brand naming consultant. Your job is to generate startup names that sound like real companies — names that could appear on a Y Combinator demo day stage, an App Store listing, or a billboard.
+
+NAMING STRATEGIES (use a mix of all of these across the batch):
+
+1. SMOOTH BLENDS: Merge two keyword fragments into a word that flows naturally when spoken aloud.
+   Good: Spotify, Shopify, Cloudera — Bad: cluync, synkd, hubynx
+
+2. REAL WORD ROOTS WITH TWISTS: Take a recognizable English, Latin, or Greek root and add a fresh ending.
+   Good: Notion, Figma, Asana, Canva, Trello — e.g. for "cloud": Cloudara, Nimbus, Stratos, Vaultic
+
+3. INVENTED BUT PRONOUNCEABLE: New words that follow natural English phonetics. Must pass the meeting test.
+   Good: Zapier, Webflow, Loom, Vercel, Retool — Bad: twkz, clynq, xynco
+
+4. COMPOUND WORDS: Combine two short real words.
+   Good: Dropbox, Mailchimp, Basecamp — e.g. CloudVault, SyncWave, HubPulse
+
+5. SOFT SUFFIXES: Add endings that make words feel like established brands.
+   Use: -ly, -ify, -io, -fy, -ra, -va, -ia, -os, -ix, -er, -le, -co, -go, -zo, -ta, -ka
+   Good: Stackly, Vaultify, Pulseio, Cloudra — never drop vowels from suffixes
+
+6. SHORT AND PUNCHY: 1-2 syllable invented words that feel bold.
+   Good: Stripe, Bolt, Arc, Ramp, Deel, Brex — e.g. Clova, Hubra, Voxel, Zentro
+
+ABSOLUTE RULES:
+- Every name MUST be easy to pronounce on first reading
+- Every name MUST contain at least one clear vowel (a, e, i, o, u)
+- NEVER generate keyboard smashes or random letter combos
+- NEVER remove vowels from the middle of words ("cloud" → never "cld")
+- NEVER stack 3+ consonants in a row without a vowel between them
+- Names must feel like they belong on a startup homepage, not a password generator
+- Aim for 4–8 characters. Short is better but never at cost of pronounceability
+- Each name must be a single lowercase word — no spaces, hyphens, or numbers
+- Vary strategies across the batch — do not repeat the same pattern
+- Think about how it SOUNDS when spoken, not just how it looks written
+
+DO NOT suggest any of these already-generated names: ${seen}
+
+QUALITY CHECK FOR EACH NAME BEFORE INCLUDING IT:
+✓ Can I say this clearly in one attempt?
+✓ Does this sound like a company that could raise funding?
+✓ Would a founder be proud to put this on their business card?
+✓ Is it NOT a typo or misspelling of another word?
+If any answer is no — discard it.
+
+Return ONLY a JSON array of lowercase strings. No explanations, no markdown, no extra text.`
+
+  const user = `Keywords: "${keyword}"
+Industry: ${industry || "technology"}
+Brand vibe: ${vibe || "modern"}
+Max length: ${maxLength} characters
+
+Generate exactly ${batchSize} unique, brandable .com domain name candidates.
+Mix all 6 strategies across the batch.
+Return ONLY: ["name1","name2","name3",...]`
+
+  return { system, user }
+}
+
+// ---------------------------------------------------------------------------
+// OpenAI call
+// ---------------------------------------------------------------------------
 function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 }
@@ -28,53 +117,51 @@ async function generateBatch(
   vibe: string,
   industry: string,
   maxLength: number,
-  strategy: string,
   alreadySeen: Set<string>,
   signal: AbortSignal,
 ): Promise<string[]> {
   const client = getClient()
-
-  const systemPrompt = `You are an expert startup naming consultant specialising in .com domain names.
-Rules:
-- Output ONLY a JSON array of strings — no explanation, no markdown, no code fences
-- Each entry is the domain SLD only (no .com, no dots, no hyphens, letters only)
-- Max ${maxLength} characters per name
-- Every name must be easy to pronounce and remember
-- Apply ONLY the strategy specified — do not mix strategies
-- Do NOT suggest: ${Array.from(alreadySeen).slice(0, 40).join(", ") || "none"}`
-
-  const userPrompt = `Keyword: "${keyword}"
-Vibe: ${vibe || "modern"}
-Industry: ${industry || "technology"}
-Strategy: ${strategy}
-
-Generate exactly ${BATCH_SIZE} .com domain name candidates using ONLY the strategy above.
-Return ONLY a JSON array like: ["name1","name2","name3"]`
+  const { system, user } = buildPrompt(keyword, industry, vibe, maxLength, BATCH_SIZE, alreadySeen)
 
   const completion = await client.chat.completions.create(
     {
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
+        { role: "system", content: system },
+        { role: "user", content: user },
       ],
-      temperature: 0.95,
-      max_tokens: 200,
+      temperature: 0.92,
+      max_tokens: 300,
     },
     { signal },
   )
 
   const content = completion.choices[0]?.message?.content?.trim() || "[]"
-  const match = content.match(/\[[\s\S]*\]/)
+  const match = content.match(/\[[\s\S]*?\]/)
   if (!match) return []
 
-  const names: unknown[] = JSON.parse(match[0])
-  return names
-    .filter((n): n is string => typeof n === "string")
-    .map((n) => n.toLowerCase().replace(/[^a-z0-9]/g, ""))
-    .filter((n) => n.length >= 3 && n.length <= maxLength && !alreadySeen.has(n))
+  let names: unknown[]
+  try {
+    names = JSON.parse(match[0])
+  } catch {
+    return []
+  }
+
+  return (
+    names
+      .filter((n): n is string => typeof n === "string")
+      // Normalise: lowercase, letters only
+      .map((n) => n.toLowerCase().replace(/[^a-z]/g, ""))
+      // Basic length and dedup filter
+      .filter((n) => n.length >= 3 && n.length <= maxLength && !alreadySeen.has(n))
+      // Server-side pronounceability gate
+      .filter(isPronounceable)
+  )
 }
 
+// ---------------------------------------------------------------------------
+// SSE route
+// ---------------------------------------------------------------------------
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const keyword = (searchParams.get("keyword") || "").trim()
@@ -88,8 +175,6 @@ export async function GET(request: NextRequest) {
 
   const encoder = new TextEncoder()
   const abortController = new AbortController()
-
-  // If the client disconnects, abort our own work
   request.signal.addEventListener("abort", () => abortController.abort())
 
   const stream = new ReadableStream({
@@ -98,7 +183,7 @@ export async function GET(request: NextRequest) {
         try {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`))
         } catch {
-          // controller may already be closed
+          // controller already closed
         }
       }
 
@@ -110,30 +195,31 @@ export async function GET(request: NextRequest) {
           if (found.length >= MAX_FOUND) break
           if (abortController.signal.aborted) break
 
-          const strategy = STRATEGIES[batchIdx % STRATEGIES.length]
-
           send({
             type: "progress",
             batch: batchIdx + 1,
             totalBatches: MAX_BATCHES,
             found: found.length,
-            message: `Batch ${batchIdx + 1}/${MAX_BATCHES} — generating with strategy: ${strategy.split("(")[0].trim()}…`,
+            message: `Round ${batchIdx + 1}/${MAX_BATCHES} — generating candidates…`,
           })
 
           let candidates: string[] = []
           try {
-            candidates = await generateBatch(keyword, vibe, industry, maxLength, strategy, seen, abortController.signal)
+            candidates = await generateBatch(keyword, vibe, industry, maxLength, seen, abortController.signal)
           } catch (err: unknown) {
             if (abortController.signal.aborted) break
-            const errorMsg = err instanceof Error ? err.message : String(err)
-            send({ type: "error", message: `AI generation failed: ${errorMsg}`, partial: true })
+            send({
+              type: "error",
+              message: `AI generation failed: ${err instanceof Error ? err.message : String(err)}`,
+              partial: found.length > 0,
+            })
             break
           }
 
-          // Add to seen
+          // Mark all candidates as seen so next batch doesn't duplicate
           candidates.forEach((n) => seen.add(n))
 
-          // Check each candidate
+          // Check .com availability for each candidate
           for (const name of candidates) {
             if (found.length >= MAX_FOUND) break
             if (abortController.signal.aborted) break
@@ -144,7 +230,6 @@ export async function GET(request: NextRequest) {
               const avResult = await checkAvailability(domain, { signal: abortController.signal })
               if (!avResult.available) continue
 
-              // Score it
               const scored = scoreName({
                 name,
                 tld: "com",
@@ -152,20 +237,21 @@ export async function GET(request: NextRequest) {
                 keywords: [keyword],
               })
 
-              const result = {
-                name,
-                tld: "com",
-                fullDomain: domain,
-                available: true,
-                score: scored.score,
-                label: scored.label,
-                reasons: scored.reasons,
-                breakdown: scored.breakdown,
-              }
-
               found.push(domain)
 
-              send({ type: "result", result })
+              send({
+                type: "result",
+                result: {
+                  name,
+                  tld: "com",
+                  fullDomain: domain,
+                  available: true,
+                  score: scored.score,
+                  label: scored.label,
+                  reasons: scored.reasons,
+                  breakdown: scored.breakdown,
+                },
+              })
 
               send({
                 type: "progress",
@@ -176,8 +262,7 @@ export async function GET(request: NextRequest) {
               })
             } catch (err: unknown) {
               if (abortController.signal.aborted) break
-              // Silently skip failed availability checks — don't abort the whole search
-              console.error(`Deep search availability check failed for ${domain}:`, err)
+              console.error(`Deep search: availability check failed for ${domain}:`, err)
             }
           }
         }
@@ -188,12 +273,15 @@ export async function GET(request: NextRequest) {
           message:
             found.length === 0
               ? "No available .com names found. Try a different keyword."
-              : `Search complete — found ${found.length} available .com name${found.length === 1 ? "" : "s"}.`,
+              : `Search complete — ${found.length} available .com name${found.length === 1 ? "" : "s"} confirmed.`,
         })
       } catch (err: unknown) {
         if (!abortController.signal.aborted) {
-          const errorMsg = err instanceof Error ? err.message : String(err)
-          send({ type: "error", message: errorMsg, partial: found.length > 0 })
+          send({
+            type: "error",
+            message: err instanceof Error ? err.message : String(err),
+            partial: found.length > 0,
+          })
         }
       } finally {
         try {
