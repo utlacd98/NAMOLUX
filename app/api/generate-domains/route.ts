@@ -240,42 +240,77 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a prompt for GPT to generate domain names
-    const prompt = `Generate ${safeCount} creative, short, and memorable domain names based on the following criteria:
+    const systemPrompt = `You are an elite startup naming consultant who has named companies that went on to raise millions. Your names appear on Y Combinator stages, App Store listings, and billboards.
 
-Keyword/Concept: ${keyword}
-Brand Vibe: ${vibe || "modern"}
+QUALITY BENCHMARK — your names should feel like these:
+5 letters: Slack, Figma, Canva, Plaid, Brex, Stripe
+6 letters: Notion, Vercel, Linear, Ripple
+7 letters: Dropbox, Webflow, Sendgrid
+
+NAMING APPROACHES (use a variety across the batch):
+
+APPROACH 1 — REAL WORDS IN NEW CONTEXTS:
+Use actual English words that take on fresh meaning in a startup context.
+Examples: Notion, Linear, Plaid, Bolt, Ramp, Loom
+Try: words related to the keywords' concepts, emotions, or outcomes.
+
+APPROACH 2 — RECOGNIZABLE ROOTS WITH CLEAN ENDINGS:
+Take a word root people know and add a natural-sounding ending.
+Examples: Shopify, Spotify, Cloudera, Atlassian
+Good endings: -ify, -era, -io, -ly, -fy, -able, -ica, -ora, -ova, -ura
+The root must be instantly recognizable.
+
+APPROACH 3 — TWO REAL WORD COMPOUNDS:
+Combine two short, real English words.
+Examples: Dropbox, Mailchimp, Basecamp, Coinbase, Hubspot
+Both words should be common and easy to spell.
+
+APPROACH 4 — LATIN/GREEK INSPIRED:
+Use roots that feel sophisticated and timeless.
+Examples: Asana, Palantir, Astra, Lucid, Zenith
+
+APPROACH 5 — PHONETIC INVENTIONS (max 3 per batch):
+New words following natural English phonetics. CVCV or CVC-CVC patterns.
+Examples: Voxel, Zentro, Kinsta, Rivvo, Talora, Navix
+Never 3+ consonants in a row without a vowel. Never drop vowels from real words.
+
+HARD RULES:
+- Every name pronounceable on FIRST attempt by an English speaker
+- Every name contains clear vowel sounds with natural consonant-vowel rhythm
+- Never stack 3+ consonants without a vowel between them
+- Never drop vowels from real words ("cloud" never becomes "cld")
+- Name looks INTENTIONAL — not a misspelling or typo
+- Prioritize names with inherent meaning related to keywords/industry
+- No more than 2 names per batch using the same approach
+- Each name a single lowercase word, no hyphens or numbers
+
+QUALITY CHECK before including any name:
+✓ Can I say it clearly in one attempt?
+✓ Does it look like a real company name?
+✓ Would a founder be proud to put this on their website?
+✓ Does it connect to the keywords or industry?`
+
+    const userPrompt = `Generate ${safeCount} startup name candidates.
+Keywords: ${keyword}
 Industry: ${industry || "general"}
-Maximum Length: ${maxLength || 10} characters
+Brand vibe: ${vibe || "modern"}
+Max length: ${maxLength || 10} characters
 
-Requirements:
-- Names should be pronounceable and easy to remember
-- Avoid hyphens and numbers
-- Mix of different styles: compound words, invented words, prefixes/suffixes
-- Consider adding trendy suffixes like: ly, io, ify, hub, lab, ware, base, spot, zone
-- Consider prefixes like: go, get, try, my, use
+Return ONLY a JSON array where each item has:
+- name: the domain name (lowercase, no extension, no hyphens)
+- reasoning: which approach was used and why it works
+- meaning: 1-2 sentences: (a) linguistic root/inspiration, (b) brand/industry fit, (c) emotional tone. Max 40 words.
 
-Return ONLY a JSON array of domain name suggestions (without .com extension), each with:
-- name: the domain name
-- reasoning: brief explanation of why this name works
-- meaning: 1-2 sentences covering (a) the linguistic root or word inspiration behind the name, (b) what kind of brand or industry it suits, and (c) the emotional tone it conveys. Keep it concise and punchy — no more than 40 words total.
-
-Format: [{"name": "example", "reasoning": "combines X with Y for Z effect", "meaning": "Derived from 'X' + 'Y' — evokes Z. Suits [industry]. Feels [tone]."}, ...]`
+Format: [{"name": "...", "reasoning": "...", "meaning": "..."}, ...]`
 
     const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content:
-            "You are a creative branding expert specializing in domain name generation. You create short, memorable, and brandable domain names.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
-      temperature: 0.9,
-      max_tokens: 1000,
+      temperature: 0.92,
+      max_tokens: 1200,
     })
 
     const responseText = completion.choices[0]?.message?.content || "[]"

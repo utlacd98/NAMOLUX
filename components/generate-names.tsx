@@ -224,6 +224,7 @@ const generateMockResults = (keyword: string): DomainResult[] => {
 
 // Available TLDs for filtering
 const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"]
+const TLD_PRIORITY = ["com", "io", "co", "ai", "app", "dev"]
 
 // LocalStorage keys
 const STORAGE_KEYS = {
@@ -510,12 +511,40 @@ export function GenerateNames() {
     return true
   })
 
-  // Find the domain with the highest score among available results for "Founder Favourite"
-  const topPickDomain = useMemo(() => {
-    const available = filteredResults.filter((r) => r.available)
-    if (!available.length) return null
-    return available.reduce((best, r) => (r.score > best.score ? r : best)).fullDomain
-  }, [filteredResults])
+  // Group all results by name — one card per name, all checked TLDs shown as badges
+  const groupedResults = useMemo(() => {
+    const map = new Map<string, DomainResult[]>()
+    for (const r of results) {
+      const existing = map.get(r.name) ?? []
+      map.set(r.name, [...existing, r])
+    }
+    return Array.from(map.entries())
+      .filter(([, tldList]) => {
+        if (selectedTldFilter && !tldList.some((r) => r.tld === selectedTldFilter)) return false
+        if (showOnlyAvailable && !tldList.some((r) => r.available)) return false
+        return true
+      })
+      .map(([name, tldList]) => {
+        const sorted = [...tldList].sort((a, b) => {
+          const ai = TLD_PRIORITY.indexOf(a.tld)
+          const bi = TLD_PRIORITY.indexOf(b.tld)
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+        })
+        const available = sorted.filter((r) => r.available)
+        const best =
+          available.length > 0
+            ? available.reduce((b, r) => (r.score > b.score ? r : b))
+            : sorted[0]
+        return { name, tlds: sorted, best, hasAvailable: available.length > 0 }
+      })
+  }, [results, selectedTldFilter, showOnlyAvailable])
+
+  // "Founder Favourite" — name with highest score among groups that have an available TLD
+  const topPickName = useMemo(() => {
+    const withAvail = groupedResults.filter((g) => g.hasAvailable)
+    if (!withAvail.length) return null
+    return withAvail.reduce((best, g) => (g.best.score > best.best.score ? g : best)).name
+  }, [groupedResults])
 
   const stopAutoFindSearch = () => {
     generationStoppedRef.current = true
@@ -1839,7 +1868,7 @@ export function GenerateNames() {
               <div className="min-w-0">
                 <div className="mb-3 space-y-2 sm:mb-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:space-y-0">
                   <h2 className="text-sm font-semibold text-foreground sm:text-lg">
-                    Results <span className="text-xs text-muted-foreground sm:text-base">({filteredResults.length} of {results.length})</span>
+                    Results <span className="text-xs text-muted-foreground sm:text-base">({groupedResults.length} name{groupedResults.length !== 1 ? "s" : ""})</span>
                   </h2>
                   <div className="flex items-center justify-between gap-2 sm:gap-4">
                     {/* CSV Export Button */}
@@ -1930,23 +1959,24 @@ export function GenerateNames() {
                 />
 
                 <div className="space-y-2.5">
-                  {filteredResults.map((result, index) => {
-                    const isTopPick = result.fullDomain === topPickDomain
+                  {groupedResults.map(({ name, tlds, best, hasAvailable }, index) => {
+                    const isTopPick = name === topPickName
+                    const availableTlds = tlds.filter((r) => r.available)
                     return (
                       <div
-                        key={result.fullDomain}
+                        key={name}
                         className={cn(
                           "group rounded-2xl transition-all duration-200",
                           "animate-fade-up opacity-0",
-                          !result.available && "opacity-60"
+                          !hasAvailable && "opacity-60"
                         )}
                         style={{
                           background: isTopPick
                             ? "linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0.05) 100%)"
-                            : result.available ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
+                            : hasAvailable ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.02)",
                           border: isTopPick
                             ? "1px solid rgba(212,175,55,0.4)"
-                            : result.available ? "1px solid rgba(212,175,55,0.15)" : "1px solid rgba(255,255,255,0.06)",
+                            : hasAvailable ? "1px solid rgba(212,175,55,0.15)" : "1px solid rgba(255,255,255,0.06)",
                           boxShadow: isTopPick ? "0 0 32px rgba(212,175,55,0.1), 0 8px 32px rgba(0,0,0,0.4)" : undefined,
                           animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
                           animationFillMode: "forwards",
@@ -1959,10 +1989,7 @@ export function GenerateNames() {
                             style={{ borderBottom: "1px solid rgba(212,175,55,0.2)", background: "rgba(212,175,55,0.07)" }}
                           >
                             <span className="text-sm">⭐</span>
-                            <span
-                              className="text-[11px] font-bold tracking-wide"
-                              style={{ color: "#D4AF37" }}
-                            >
+                            <span className="text-[11px] font-bold tracking-wide" style={{ color: "#D4AF37" }}>
                               Founder Favourite
                             </span>
                             <span className="text-[10px] text-white/30">— highest Founder Signal™ in this batch</span>
@@ -1970,51 +1997,85 @@ export function GenerateNames() {
                         )}
 
                         <div className={cn("p-4 sm:p-5", isTopPick && "pt-3.5")}>
-                          {/* Top row: availability + name + utility buttons */}
+                          {/* Top row: availability icon + name + copy/bookmark */}
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-3">
-                              <span
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-                                style={{
-                                  background: result.available ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
-                                  border: result.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
-                                  color: result.available ? "#34d399" : "rgba(255,255,255,0.3)",
-                                }}
-                              >
-                                {result.available ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                              </span>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-base font-bold text-white sm:text-lg">{result.name}</span>
-                                <span className={cn("shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs", tldColors[result.tld] || "bg-white/10 text-white/50")}>
-                                  .{result.tld}
+                            <div className="flex flex-col gap-2">
+                              {/* Name + availability dot */}
+                              <div className="flex items-center gap-3">
+                                <span
+                                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                                  style={{
+                                    background: hasAvailable ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
+                                    border: hasAvailable ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                                    color: hasAvailable ? "#34d399" : "rgba(255,255,255,0.3)",
+                                  }}
+                                >
+                                  {hasAvailable ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
                                 </span>
+                                <span className="text-base font-bold text-white sm:text-lg">{name}</span>
+                              </div>
+
+                              {/* TLD badges — green + clickable if available, gray + strikethrough if taken */}
+                              <div className="ml-11 flex flex-wrap gap-1.5">
+                                {tlds.map((r) =>
+                                  r.available ? (
+                                    <a
+                                      key={r.tld}
+                                      href={`https://porkbun.com/checkout/search?q=${r.fullDomain}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5 sm:text-xs"
+                                      style={{
+                                        background: "rgba(52,211,153,0.1)",
+                                        color: "#34d399",
+                                        border: "1px solid rgba(52,211,153,0.2)",
+                                      }}
+                                      title={`Register ${r.fullDomain}`}
+                                    >
+                                      .{r.tld} ✓
+                                    </a>
+                                  ) : (
+                                    <span
+                                      key={r.tld}
+                                      className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs"
+                                      style={{
+                                        background: "rgba(255,255,255,0.03)",
+                                        color: "rgba(255,255,255,0.18)",
+                                        border: "1px solid rgba(255,255,255,0.05)",
+                                        textDecoration: "line-through",
+                                      }}
+                                    >
+                                      .{r.tld}
+                                    </span>
+                                  )
+                                )}
                               </div>
                             </div>
 
-                            {/* Copy + Bookmark (always visible) */}
+                            {/* Copy + Bookmark */}
                             <div className="flex shrink-0 items-center gap-1.5">
                               <button
-                                onClick={() => copyToClipboard(result.fullDomain)}
+                                onClick={() => copyToClipboard(best.fullDomain)}
                                 className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
                                 style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
-                                title="Copy domain"
+                                title="Copy best domain"
                               >
-                                {copiedName === result.fullDomain ? (
+                                {copiedName === best.fullDomain ? (
                                   <CheckCircle className="h-4 w-4 text-emerald-400" />
                                 ) : (
                                   <Copy className="h-4 w-4" />
                                 )}
                               </button>
                               <button
-                                onClick={() => toggleShortlist(result.fullDomain)}
+                                onClick={() => toggleShortlist(best.fullDomain)}
                                 className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
                                 style={{
-                                  background: shortlist.includes(result.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
-                                  color: shortlist.includes(result.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
+                                  background: shortlist.includes(best.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
+                                  color: shortlist.includes(best.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
                                 }}
-                                title={shortlist.includes(result.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                                title={shortlist.includes(best.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
                               >
-                                {shortlist.includes(result.fullDomain) ? (
+                                {shortlist.includes(best.fullDomain) ? (
                                   <BookmarkCheck className="h-4 w-4" />
                                 ) : (
                                   <Bookmark className="h-4 w-4" />
@@ -2023,57 +2084,70 @@ export function GenerateNames() {
                             </div>
                           </div>
 
-                          {/* Name Meaning */}
-                          {result.meaning && (
-                            <div className="mt-3 rounded-lg px-3 py-2.5"
-                              style={{ background: "rgba(255,255,255,0.025)", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                          {/* Name Meaning — shown once per name */}
+                          {best.meaning && (
+                            <div
+                              className="mt-3 rounded-lg px-3 py-2.5"
+                              style={{ background: "rgba(255,255,255,0.025)", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+                            >
                               <div className="mb-1 flex items-center gap-1.5">
                                 <Lightbulb className="h-3 w-3 shrink-0" style={{ color: "#D4AF37" }} />
                                 <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#D4AF37" }}>
                                   Name Origin
                                 </span>
                               </div>
-                              <p className="text-[11px] leading-relaxed text-white/45">{result.meaning}</p>
+                              <p className="text-[11px] leading-relaxed text-white/45">{best.meaning}</p>
                             </div>
                           )}
 
-                          {/* Founder Signal Panel */}
+                          {/* Founder Signal Panel — shown once per name */}
                           <FounderSignalPanel
-                            name={result.name}
-                            tld={result.tld}
+                            name={best.name}
+                            tld={best.tld}
                             vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
                           />
 
-                          {/* Buy button + scarcity text */}
-                          {result.available && (
-                            <div className="mt-3">
-                              <a
-                                href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
-                                style={{
-                                  background: isTopPick
-                                    ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
-                                    : "rgba(212,175,55,0.12)",
-                                  color: isTopPick ? "#0a0800" : "#D4AF37",
-                                  border: isTopPick ? "none" : "1px solid rgba(212,175,55,0.25)",
-                                  boxShadow: isTopPick ? "0 4px 20px rgba(212,175,55,0.3)" : undefined,
-                                }}
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                                Register Domain
-                              </a>
-                              <p className="mt-1.5 text-[10px] text-white/20">
-                                Available now — short domains sell fast
-                              </p>
+                          {/* Register buttons — one per available TLD, best TLD most prominent */}
+                          {hasAvailable && (
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              {availableTlds.map((r, i) => (
+                                <a
+                                  key={r.tld}
+                                  href={`https://porkbun.com/checkout/search?q=${r.fullDomain}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
+                                  style={{
+                                    background:
+                                      i === 0 && isTopPick
+                                        ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
+                                        : i === 0
+                                        ? "rgba(212,175,55,0.12)"
+                                        : "rgba(255,255,255,0.05)",
+                                    color: i === 0 && isTopPick ? "#0a0800" : i === 0 ? "#D4AF37" : "rgba(255,255,255,0.45)",
+                                    border:
+                                      i === 0 && isTopPick
+                                        ? "none"
+                                        : i === 0
+                                        ? "1px solid rgba(212,175,55,0.25)"
+                                        : "1px solid rgba(255,255,255,0.08)",
+                                    boxShadow: i === 0 && isTopPick ? "0 4px 20px rgba(212,175,55,0.3)" : undefined,
+                                  }}
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                  Register .{r.tld}
+                                </a>
+                              ))}
+                              {availableTlds.length === 1 && (
+                                <p className="text-[10px] text-white/20">Available now — short domains sell fast</p>
+                              )}
                             </div>
                           )}
 
                           {/* Metrics */}
                           <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
-                            <span>Memorability: {result.memorability}</span>
-                            {result.pronounceable && (
+                            <span>Memorability: {best.memorability}</span>
+                            {best.pronounceable && (
                               <span className="flex items-center gap-1 text-emerald-400/80">
                                 <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
                               </span>
@@ -2083,19 +2157,24 @@ export function GenerateNames() {
                           {/* SEO Micro-Signal & Check Button */}
                           <div className="mt-1.5 flex flex-wrap items-center gap-2">
                             {(() => {
-                              const signal = getSeoMicroSignal(result.name)
+                              const signal = getSeoMicroSignal(name)
                               return signal ? (
-                                <span className={cn(
-                                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                                  signal.type === "positive" ? "bg-emerald-500/15 text-emerald-400" :
-                                  signal.type === "warning" ? "bg-orange-500/15 text-orange-400" : "bg-white/5 text-white/40"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                                    signal.type === "positive"
+                                      ? "bg-emerald-500/15 text-emerald-400"
+                                      : signal.type === "warning"
+                                      ? "bg-orange-500/15 text-orange-400"
+                                      : "bg-white/5 text-white/40"
+                                  )}
+                                >
                                   {signal.icon} {signal.text}
                                 </span>
                               ) : null
                             })()}
                             <button
-                              onClick={() => setSeoCheckDomain({ name: result.name, tld: result.tld })}
+                              onClick={() => setSeoCheckDomain({ name: best.name, tld: best.tld })}
                               className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
                               style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
                             >
