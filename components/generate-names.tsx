@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils"
 import { FounderSignalPanel } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
+import { DeepSearch } from "@/components/deep-search"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -1919,6 +1920,14 @@ export function GenerateNames() {
                     {showOnlyAvailable ? "✓ Avail." : "Avail. Only"}
                   </button>
                 </div>
+
+                {/* Deep Search for .com — sits between filter bar and results */}
+                <DeepSearch
+                  keyword={keyword}
+                  vibe={selectedVibe}
+                  industry={selectedIndustry}
+                  maxLength={maxLength}
+                />
 
                 <div className="space-y-2.5">
                   {filteredResults.map((result, index) => {
