@@ -365,6 +365,7 @@ export function GenerateNames() {
   const [maxLength, setMaxLength] = useState(10)
   const [results, setResults] = useState<DomainResult[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generationId, setGenerationId] = useState(0)
   const [shortlist, setShortlist] = useState<string[]>([])
   const [copiedName, setCopiedName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -520,7 +521,8 @@ export function GenerateNames() {
     }
     return Array.from(map.entries())
       .filter(([, tldList]) => {
-        if (selectedTldFilter && !tldList.some((r) => r.tld === selectedTldFilter)) return false
+        // TLD filter: show names where that TLD is available (not just checked)
+        if (selectedTldFilter && !tldList.some((r) => r.tld === selectedTldFilter && r.available)) return false
         if (showOnlyAvailable && !tldList.some((r) => r.available)) return false
         return true
       })
@@ -868,6 +870,7 @@ export function GenerateNames() {
     setError(null)
     setSelectedTldFilter(null) // Reset filters on new search
     setShowOnlyAvailable(false)
+    setGenerationId((n) => n + 1) // Reset Deep Search on new generation
 
     // Add to search history
     const baseKeyword = keyword.trim()
@@ -1952,6 +1955,7 @@ export function GenerateNames() {
 
                 {/* Deep Search for .com — sits between filter bar and results */}
                 <DeepSearch
+                  key={generationId}
                   keyword={keyword}
                   vibe={selectedVibe}
                   industry={selectedIndustry}
