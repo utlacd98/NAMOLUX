@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import OpenAI from "openai"
 import { checkAvailability } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
+import { buildGenerationPrompt } from "@/lib/brandExamples"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -34,76 +35,6 @@ function isPronounceable(name: string): boolean {
   return true
 }
 
-// ---------------------------------------------------------------------------
-// Prompt
-// ---------------------------------------------------------------------------
-function buildPrompt(
-  keyword: string,
-  industry: string,
-  vibe: string,
-  maxLength: number,
-  batchSize: number,
-  alreadySeen: Set<string>,
-): { system: string; user: string } {
-  const seen = Array.from(alreadySeen).slice(0, 50).join(", ") || "none"
-
-  const system = `You are an elite brand naming consultant. Your job is to generate startup names that sound like real companies — names that could appear on a Y Combinator demo day stage, an App Store listing, or a billboard.
-
-NAMING STRATEGIES (use a mix of all of these across the batch):
-
-1. SMOOTH BLENDS: Merge two keyword fragments into a word that flows naturally when spoken aloud.
-   Good: Spotify, Shopify, Cloudera — Bad: cluync, synkd, hubynx
-
-2. REAL WORD ROOTS WITH TWISTS: Take a recognizable English, Latin, or Greek root and add a fresh ending.
-   Good: Notion, Figma, Asana, Canva, Trello — e.g. for "cloud": Cloudara, Nimbus, Stratos, Vaultic
-
-3. INVENTED BUT PRONOUNCEABLE: New words that follow natural English phonetics. Must pass the meeting test.
-   Good: Zapier, Webflow, Loom, Vercel, Retool — Bad: twkz, clynq, xynco
-
-4. COMPOUND WORDS: Combine two short real words.
-   Good: Dropbox, Mailchimp, Basecamp — e.g. CloudVault, SyncWave, HubPulse
-
-5. SOFT SUFFIXES: Add endings that make words feel like established brands.
-   Use: -ly, -ify, -io, -fy, -ra, -va, -ia, -os, -ix, -er, -le, -co, -go, -zo, -ta, -ka
-   Good: Stackly, Vaultify, Pulseio, Cloudra — never drop vowels from suffixes
-
-6. SHORT AND PUNCHY: 1-2 syllable invented words that feel bold.
-   Good: Stripe, Bolt, Arc, Ramp, Deel, Brex — e.g. Clova, Hubra, Voxel, Zentro
-
-ABSOLUTE RULES:
-- Every name MUST be easy to pronounce on first reading
-- Every name MUST contain at least one clear vowel (a, e, i, o, u)
-- NEVER generate keyboard smashes or random letter combos
-- NEVER remove vowels from the middle of words ("cloud" → never "cld")
-- NEVER stack 3+ consonants in a row without a vowel between them
-- Names must feel like they belong on a startup homepage, not a password generator
-- Aim for 4–8 characters. Short is better but never at cost of pronounceability
-- Each name must be a single lowercase word — no spaces, hyphens, or numbers
-- Vary strategies across the batch — do not repeat the same pattern
-- Think about how it SOUNDS when spoken, not just how it looks written
-
-DO NOT suggest any of these already-generated names: ${seen}
-
-QUALITY CHECK FOR EACH NAME BEFORE INCLUDING IT:
-✓ Can I say this clearly in one attempt?
-✓ Does this sound like a company that could raise funding?
-✓ Would a founder be proud to put this on their business card?
-✓ Is it NOT a typo or misspelling of another word?
-If any answer is no — discard it.
-
-Return ONLY a JSON array of lowercase strings. No explanations, no markdown, no extra text.`
-
-  const user = `Keywords: "${keyword}"
-Industry: ${industry || "technology"}
-Brand vibe: ${vibe || "modern"}
-Max length: ${maxLength} characters
-
-Generate exactly ${batchSize} unique, brandable .com domain name candidates.
-Mix all 6 strategies across the batch.
-Return ONLY: ["name1","name2","name3",...]`
-
-  return { system, user }
-}
 
 // ---------------------------------------------------------------------------
 // OpenAI call
@@ -121,7 +52,15 @@ async function generateBatch(
   signal: AbortSignal,
 ): Promise<string[]> {
   const client = getClient()
-  const { system, user } = buildPrompt(keyword, industry, vibe, maxLength, BATCH_SIZE, alreadySeen)
+  const { system, user } = buildGenerationPrompt({
+    keywords: keyword,
+    industry: industry || "general",
+    brandVibe: vibe || "modern",
+    maxLength,
+    batchSize: BATCH_SIZE,
+    outputFormat: "names-only",
+    alreadySeen: Array.from(alreadySeen),
+  })
 
   const completion = await client.chat.completions.create(
     {

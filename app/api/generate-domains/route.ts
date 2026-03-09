@@ -4,6 +4,7 @@ import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind
 import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import { buildGenerationPrompt } from "@/lib/brandExamples"
 
 // Lazy initialization to avoid build-time errors
 let openaiInstance: OpenAI | null = null
@@ -239,69 +240,15 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create a prompt for GPT to generate domain names
-    const systemPrompt = `You are an elite startup naming consultant who has named companies that went on to raise millions. Your names appear on Y Combinator stages, App Store listings, and billboards.
-
-QUALITY BENCHMARK — your names should feel like these:
-5 letters: Slack, Figma, Canva, Plaid, Brex, Stripe
-6 letters: Notion, Vercel, Linear, Ripple
-7 letters: Dropbox, Webflow, Sendgrid
-
-NAMING APPROACHES (use a variety across the batch):
-
-APPROACH 1 — REAL WORDS IN NEW CONTEXTS:
-Use actual English words that take on fresh meaning in a startup context.
-Examples: Notion, Linear, Plaid, Bolt, Ramp, Loom
-Try: words related to the keywords' concepts, emotions, or outcomes.
-
-APPROACH 2 — RECOGNIZABLE ROOTS WITH CLEAN ENDINGS:
-Take a word root people know and add a natural-sounding ending.
-Examples: Shopify, Spotify, Cloudera, Atlassian
-Good endings: -ify, -era, -io, -ly, -fy, -able, -ica, -ora, -ova, -ura
-The root must be instantly recognizable.
-
-APPROACH 3 — TWO REAL WORD COMPOUNDS:
-Combine two short, real English words.
-Examples: Dropbox, Mailchimp, Basecamp, Coinbase, Hubspot
-Both words should be common and easy to spell.
-
-APPROACH 4 — LATIN/GREEK INSPIRED:
-Use roots that feel sophisticated and timeless.
-Examples: Asana, Palantir, Astra, Lucid, Zenith
-
-APPROACH 5 — PHONETIC INVENTIONS (max 3 per batch):
-New words following natural English phonetics. CVCV or CVC-CVC patterns.
-Examples: Voxel, Zentro, Kinsta, Rivvo, Talora, Navix
-Never 3+ consonants in a row without a vowel. Never drop vowels from real words.
-
-HARD RULES:
-- Every name pronounceable on FIRST attempt by an English speaker
-- Every name contains clear vowel sounds with natural consonant-vowel rhythm
-- Never stack 3+ consonants without a vowel between them
-- Never drop vowels from real words ("cloud" never becomes "cld")
-- Name looks INTENTIONAL — not a misspelling or typo
-- Prioritize names with inherent meaning related to keywords/industry
-- No more than 2 names per batch using the same approach
-- Each name a single lowercase word, no hyphens or numbers
-
-QUALITY CHECK before including any name:
-✓ Can I say it clearly in one attempt?
-✓ Does it look like a real company name?
-✓ Would a founder be proud to put this on their website?
-✓ Does it connect to the keywords or industry?`
-
-    const userPrompt = `Generate ${safeCount} startup name candidates.
-Keywords: ${keyword}
-Industry: ${industry || "general"}
-Brand vibe: ${vibe || "modern"}
-Max length: ${maxLength || 10} characters
-
-Return ONLY a JSON array where each item has:
-- name: the domain name (lowercase, no extension, no hyphens)
-- reasoning: which approach was used and why it works
-- meaning: 1-2 sentences: (a) linguistic root/inspiration, (b) brand/industry fit, (c) emotional tone. Max 40 words.
-
-Format: [{"name": "...", "reasoning": "...", "meaning": "..."}, ...]`
+    // Build prompt using curated industry brand examples
+    const { system: systemPrompt, user: userPrompt } = buildGenerationPrompt({
+      keywords: keyword,
+      industry: industry || "general",
+      brandVibe: vibe || "modern",
+      maxLength: maxLength || 10,
+      batchSize: safeCount,
+      outputFormat: "with-metadata",
+    })
 
     const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
