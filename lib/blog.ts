@@ -4468,6 +4468,596 @@ export const blogPosts: BlogPost[] = [
     ]
   } as BlogPost,
 
+  // ─── 3 × Domain Strategy ───────────────────────────────────────────────────
+
+  {
+    slug: "dot-com-vs-dot-ai-for-startups",
+    title: ".com vs .ai for Startups: Which TLD Should You Choose?",
+    description: "Should your AI startup choose .ai over .com? We break down the real tradeoffs between TLDs so you can make the right call for your brand.",
+    seoTitle: ".com vs .ai for Startups: Which Domain Extension Is Right in 2026?",
+    metaDescription: "Choosing between .com and .ai for your startup domain? This guide covers trust, SEO, availability, and long-term brand risk for both TLDs.",
+    category: "Domain Strategy",
+    readTime: 6,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "The .ai domain has gone from obscure to everywhere in the last three years. If you're building anything with an AI angle, you've almost certainly considered it. But is it actually a good choice? Or is .com still the only domain that matters? Here's a clear-headed breakdown." },
+      { type: "heading", level: 2, content: "Why .ai Has Become Appealing" },
+      { type: "paragraph", content: "The country code TLD for Anguilla has been repurposed as the de facto domain for AI products. It's short, signals the product category instantly, and available names that are taken on .com are often open on .ai. Prominent AI companies — Perplexity, Character.ai, Mistral, and dozens of YC-backed startups — use .ai domains as their primary addresses." },
+      { type: "heading", level: 2, content: "The Case for .com" },
+      { type: "list", content: "", items: [
+        "Higher inherent trust — users expect important businesses to be on .com",
+        "Lower friction: people auto-complete with .com when typing from memory",
+        "Email deliverability is better from .com domains in some spam filters",
+        "Investors and press still treat .com as the default professional choice",
+        "No geopolitical dependency on a Caribbean island nation's registry policies"
+      ]},
+      { type: "callout", calloutType: "tip", content: "The 'muscle memory' problem: when someone remembers your product as Notion, they type notion.com. If you're on notion.ai, you're silently leaking traffic to whoever owns the .com." },
+      { type: "heading", level: 2, content: "The Case for .ai" },
+      { type: "list", content: "", items: [
+        "Immediately signals AI/tech category to your audience",
+        "Shorter names available that are taken on .com",
+        "Lower registration cost than premium .com alternatives",
+        "Strong brand equity in the AI product space specifically",
+        "Increasingly mainstream — users in tech have normalised non-.com TLDs"
+      ]},
+      { type: "heading", level: 2, content: "Who Should Choose .ai" },
+      { type: "paragraph", content: "If your product is genuinely AI-powered, your audience is technical, and the .com equivalent of your name is either unavailable or prohibitively expensive, .ai is a legitimate choice. The risk is real but manageable if you move fast, build strong brand recognition, and eventually acquire the .com." },
+      { type: "heading", level: 2, content: "Who Should Stick With .com" },
+      { type: "paragraph", content: "If your customers are non-technical (small business owners, consumers, enterprises outside tech), the trust signal of .com still matters significantly. If your marketing involves radio, podcast advertising, or any medium where people hear your domain and type it from memory, .com is far safer. And if you plan to raise from traditional VCs or enterprise sales cycles, expect subtle bias toward .com." },
+      { type: "heading", level: 2, content: "The Ideal Scenario" },
+      { type: "paragraph", content: "Own both. Launch on whichever makes sense for your immediate audience. Redirect one to the other. Budget to acquire the .com within 2-3 years of meaningful traction. Most successful .ai companies do exactly this — they launch on .ai and quietly acquire the .com as revenue allows." },
+      { type: "callout", calloutType: "cta", content: "Check availability on .com, .ai, and .io simultaneously for any name.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "Does .ai hurt SEO compared to .com?", answer: "Not meaningfully. Google treats TLDs as equal signals for international sites. The ranking difference between .ai and .com is negligible — what matters far more is content quality, backlinks, and site authority. Choose based on branding, not SEO." },
+      { question: "Is .ai expensive to register?", answer: ".ai domains cost roughly $60–$80 per year through most registrars, compared to $12–$15 for .com. That's a meaningful premium, but not a dealbreaker for most startups. Factor in the multi-year cost when making your decision." },
+      { question: "Can I switch from .ai to .com later?", answer: "Yes, but it's not painless. You'll need to set up 301 redirects, update all marketing materials, notify users, and monitor for traffic loss during the transition. It's manageable but costs time and money. Better to make the right call upfront." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "domain-name-for-ecommerce",
+    title: "How to Choose a Domain Name for an E-commerce Store",
+    description: "E-commerce domain decisions are different from SaaS or content sites. Here's the framework for picking a name that converts, ranks, and scales.",
+    seoTitle: "How to Choose a Domain Name for E-commerce: A Complete Guide",
+    metaDescription: "Picking a domain name for your online store requires different thinking than other types of sites. Learn what works, what hurts conversions, and how to check availability fast.",
+    category: "Domain Strategy",
+    readTime: 7,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Choosing a domain for an e-commerce store involves tradeoffs that don't apply to SaaS products or content sites. Your domain affects trust at checkout, SEO for product searches, return customer behaviour, and how easily people refer you to friends. Get it wrong and it costs you conversions every day." },
+      { type: "heading", level: 2, content: "E-commerce Domains Are Judged at the Point of Purchase" },
+      { type: "paragraph", content: "When someone is about to enter their credit card, they look at the URL. A domain that looks unprofessional, generic, or suspicious causes cart abandonment — silently, without any error message telling you why. The trust bar for e-commerce domains is higher than for any other type of site." },
+      { type: "heading", level: 2, content: "The Case for .com in E-commerce" },
+      { type: "paragraph", content: "For retail, .com is not optional — it's table stakes. Your customers are not developers who've normalised .io or .ai. They're everyday shoppers who trust .com and have mild suspicion of anything else. If you can't get the .com of your desired name, either buy it from its current owner or choose a different name." },
+      { type: "callout", calloutType: "warning", content: "Selling on anything other than .com in e-commerce is a conversion risk. The research is consistent: non-.com TLDs reduce checkout trust for retail customers who aren't tech-native." },
+      { type: "heading", level: 2, content: "Brandable vs Descriptive for E-commerce" },
+      { type: "paragraph", content: "Both strategies can work, but they serve different goals. Descriptive domains ('bestrunningshoes.com', 'organicskincare.com') can perform well for SEO, particularly for product category searches. Brandable domains build long-term brand equity that doesn't depend on a single keyword. The right choice depends on your growth strategy." },
+      { type: "list", content: "", items: [
+        "SEO-first strategy: lean slightly descriptive but not generic (e.g., 'glossier.com' hints at gloss without being 'glossylipgloss.com')",
+        "Brand-first strategy: go fully brandable and invest in building brand recognition",
+        "Hybrid: brandable name that rhymes with or evokes the category without being literal"
+      ]},
+      { type: "heading", level: 2, content: "Length and Memorability for Return Customers" },
+      { type: "paragraph", content: "E-commerce relies heavily on repeat purchases. A customer who loved their first order needs to be able to find you again without searching — which means typing your domain directly. Short domains (under 12 characters) dramatically outperform longer ones for direct type-in traffic, which is the highest-converting traffic channel for retail." },
+      { type: "heading", level: 2, content: "What to Avoid Specifically in E-commerce" },
+      { type: "list", content: "", items: [
+        "Hyphens — look spammy to shoppers and reduce trust at checkout",
+        "Numbers — 'buy2shoes.com' looks like a discount spam site",
+        "Generic category words — 'shoponline.com' adds no brand value",
+        "Copied-brand names with slight variations — trademark risk and confuses customers",
+        "Country-code TLDs for global stores — .co.uk for a US audience creates hesitation"
+      ]},
+      { type: "heading", level: 2, content: "Check These Before You Commit" },
+      { type: "list", content: "", items: [
+        "Domain history: was it previously a different store or penalised site?",
+        "Trademark conflicts: search USPTO before you print packaging",
+        "Social handle availability: consistent handles across Instagram, TikTok, Pinterest matter enormously for e-commerce",
+        "Pronunciation: can your customer service team say it clearly on the phone?",
+        "International: does the name mean anything offensive in other languages?"
+      ]},
+      { type: "callout", calloutType: "cta", content: "Find available .com names for your e-commerce brand — scored for trust, memorability, and brandability.", ctaLink: "/generate", ctaText: "Generate Store Names →" }
+    ],
+    faqs: [
+      { question: "Should I use my product category in my e-commerce domain?", answer: "Partially. A domain that hints at your category without being generic performs best — think Glossier (beauty), Allbirds (footwear), Warby Parker (eyewear). Pure category names like 'shoesusa.com' have low brand equity and high competition for SEO. Brandable names with category associations outperform both extremes." },
+      { question: "What if the .com of my store name is taken and expensive?", answer: "You have three options: negotiate to buy it (often achievable for $1,000–$5,000 for non-premium domains), choose a different name where the .com is available, or launch on .com with a modified name (e.g., get [brand]shop.com or [brand]store.com as a bridge). Don't launch an e-commerce store on a non-.com TLD if you can help it." },
+      { question: "Does my domain name directly affect my Google Shopping rankings?", answer: "Domain name alone has a small direct effect on Shopping rankings. However, brand search volume, click-through rates, and brand trust signals all influence organic placement over time — and all three are affected by how memorable and trustworthy your domain is. A stronger domain name indirectly improves your SEO trajectory." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "domain-name-after-pivot",
+    title: "What to Do With Your Domain When Your Startup Pivots",
+    description: "Your startup pivoted. Your domain no longer fits. Here's the practical playbook for handling domain transitions without killing your SEO or confusing your users.",
+    seoTitle: "Domain Name Strategy After a Startup Pivot: What to Do Next",
+    metaDescription: "Pivoted your startup and your domain no longer fits? Learn how to handle the domain transition, protect SEO, and choose the right moment to rebrand.",
+    category: "Domain Strategy",
+    readTime: 6,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "You built a project management tool called Taskly, pivoted to HR software, and now your domain is wrong. Or you went from a niche B2C product to a broader B2B platform and your narrow domain name is making enterprise sales harder. This happens to a lot of startups. Here's how to handle it without losing what you've built." },
+      { type: "heading", level: 2, content: "Step 1: Decide Whether to Rebrand at All" },
+      { type: "paragraph", content: "Not every pivot requires a new domain. If your pivot is a product change but your audience and brand equity are intact, keeping the existing domain and adjusting your messaging is often the better move. Rebranding has real costs — SEO, trust, muscle memory, materials — and those costs compound if you do it before you have clarity on your new direction." },
+      { type: "callout", calloutType: "tip", content: "Rule of thumb: rebrand the domain when the old name actively creates confusion for new customers, not just when it feels slightly off. Inconvenience for you is not sufficient reason to rebrand." },
+      { type: "heading", level: 2, content: "When You Should Change Your Domain" },
+      { type: "list", content: "", items: [
+        "The name describes your old product category so literally that new customers are confused",
+        "You're targeting a new audience that has different trust signals from your original domain",
+        "You're entering a segment where the name creates competitive disadvantage",
+        "You raised a round and have runway to absorb the transition costs",
+        "A better name and domain are available and the opportunity cost of waiting is high"
+      ]},
+      { type: "heading", level: 2, content: "The SEO Transition Playbook" },
+      { type: "paragraph", content: "Domain migrations are one of the most dangerous SEO events you can put your site through. Done wrong, you can lose 50-80% of organic traffic in the months after migration. Done right, you can migrate with minimal lasting impact." },
+      { type: "heading", level: 3, content: "Before Migration" },
+      { type: "list", content: "", items: [
+        "Run a full crawl of your old domain — document every URL that has backlinks or traffic",
+        "Export all Google Search Console data (impressions, clicks, rankings by URL)",
+        "Set up the new domain in Google Search Console before you migrate",
+        "Prepare a comprehensive 301 redirect map: every old URL should redirect to the closest matching new URL"
+      ]},
+      { type: "heading", level: 3, content: "During Migration" },
+      { type: "list", content: "", items: [
+        "Implement 301 redirects at the server level — never rely on JavaScript redirects",
+        "Submit a change of address request in Google Search Console",
+        "Update your XML sitemap on the new domain and resubmit",
+        "Update your robots.txt to allow full crawling of the new domain"
+      ]},
+      { type: "heading", level: 3, content: "After Migration" },
+      { type: "list", content: "", items: [
+        "Monitor rankings and traffic daily for the first 3 weeks",
+        "Reach out to your highest-value backlink sources to request link updates",
+        "Keep the old domain live with redirects for at least 12 months",
+        "Monitor for crawl errors in Search Console and fix any broken redirect chains"
+      ]},
+      { type: "heading", level: 2, content: "Handling User Communication" },
+      { type: "paragraph", content: "Your existing users need to know before the transition happens. Email them with the new domain and a clear explanation. Update your email footer, email signatures, and any in-app references to the old domain. The worst outcome is existing users thinking your old domain was taken down or that you went out of business." },
+      { type: "heading", level: 2, content: "Choosing the New Domain" },
+      { type: "paragraph", content: "Don't rush this. The cost of a second pivot-forced rebrand is higher than the cost of taking an extra week to get the name right. Look for a name that's broad enough to accommodate future pivots — something that describes your customer or feeling rather than your product specifically." },
+      { type: "callout", calloutType: "cta", content: "Find a domain name broad enough to grow with your startup — scored for brand strength and longevity.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "How long does it take to recover SEO after a domain migration?", answer: "Full SEO recovery from a domain migration typically takes 3–6 months. The first 4–6 weeks often show a temporary traffic dip as Google re-indexes the new domain. By month 3, most well-executed migrations are back to or above their pre-migration baseline. Poorly executed migrations can take 12+ months to recover." },
+      { question: "Should I keep the old domain forever?", answer: "Keep it live with 301 redirects for at least 12 months, ideally longer. The old domain likely has backlinks pointing to it that continue to pass link equity through the redirects. Dropping the old domain too early can cause a second traffic dip. Many large companies keep redirect domains live indefinitely for this reason." },
+      { question: "Can I sell my old domain after pivoting?", answer: "Yes. Your old domain may have value to another company in your original niche. After confirming redirects are fully in place and your traffic has stabilised on the new domain, you can list it for sale on marketplaces like Sedo or Afternic. This can partially offset the cost of the new domain." }
+    ]
+  } as BlogPost,
+
+  // ─── 3 × SEO Foundations ───────────────────────────────────────────────────
+
+  {
+    slug: "pillar-pages-topic-clusters-guide",
+    title: "Pillar Pages and Topic Clusters: The SEO Architecture That Compounds",
+    description: "Pillar pages and topic clusters help new sites build topical authority faster. Here's how to structure yours from scratch.",
+    seoTitle: "Pillar Pages and Topic Clusters: A Complete Guide for New Sites",
+    metaDescription: "Learn how to build pillar pages and topic clusters that compound SEO traffic over time. Includes structure, internal linking strategy, and examples.",
+    category: "SEO Foundations",
+    readTime: 8,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "If you're publishing content without a clear architecture, you're making SEO harder than it needs to be. Pillar pages and topic clusters are the structural approach that lets new sites build topical authority efficiently — ranking for broad terms while also capturing long-tail traffic from supporting posts." },
+      { type: "heading", level: 2, content: "What Is a Pillar Page?" },
+      { type: "paragraph", content: "A pillar page is a comprehensive, long-form piece of content that covers a broad topic at a high level. It's designed to be the definitive resource for that topic on your site — typically 2,000–4,000 words — linking out to more specific 'cluster' posts that cover subtopics in depth." },
+      { type: "heading", level: 2, content: "What Is a Topic Cluster?" },
+      { type: "paragraph", content: "A topic cluster is the group of content pages built around a single pillar page. The pillar page targets the broad keyword. Each cluster page targets a specific long-tail variation. All cluster pages link back to the pillar, and the pillar links to each cluster. This bidirectional linking structure tells Google that your site has deep authority on the topic." },
+      { type: "callout", calloutType: "tip", content: "Think of a pillar page as the hub of a wheel. Cluster posts are the spokes. Google follows the spokes to understand the breadth of your coverage, and the hub accumulates authority from all the spokes." },
+      { type: "heading", level: 2, content: "Why This Architecture Works" },
+      { type: "list", content: "", items: [
+        "Internal links distribute authority across all cluster pages",
+        "Pillar pages often rank for competitive head terms through their breadth",
+        "Cluster pages capture long-tail searches with low competition",
+        "The structure signals topical expertise to Google's algorithms",
+        "Content compounds — each new cluster page strengthens all existing cluster pages"
+      ]},
+      { type: "heading", level: 2, content: "How to Build Your First Pillar Page" },
+      { type: "heading", level: 3, content: "1. Choose the Right Topic" },
+      { type: "paragraph", content: "Your pillar topic should be broad enough to have 8-15 subtopics, relevant to your product or service, and at a competition level your domain can eventually compete at. For a new site, avoid pillar topics where every ranking page has a domain rating above 70." },
+      { type: "heading", level: 3, content: "2. Map the Cluster" },
+      { type: "paragraph", content: "Before writing the pillar page, list every subtopic question your target reader might have. These become your cluster pages. For a pillar page on 'domain name strategy', cluster pages might include: how to choose a TLD, short vs long domains, domain name psychology, checking domain history, and so on." },
+      { type: "heading", level: 3, content: "3. Write the Pillar Page" },
+      { type: "paragraph", content: "Cover the topic comprehensively but not exhaustively. The pillar page introduces and summarises each subtopic, then links to the cluster page for readers who want to go deeper. Every section of the pillar page should correspond to a cluster post." },
+      { type: "heading", level: 3, content: "4. Build the Cluster Posts" },
+      { type: "paragraph", content: "Each cluster post targets a specific long-tail keyword related to the pillar topic. It should be more detailed than the pillar's coverage of that subtopic, and it should link back to the pillar page in its introduction or conclusion." },
+      { type: "heading", level: 2, content: "Internal Linking Rules for Topic Clusters" },
+      { type: "list", content: "", items: [
+        "Every cluster page must link to the pillar page with keyword-rich anchor text",
+        "The pillar page must link to every cluster page",
+        "Cluster pages can link to each other when content is complementary",
+        "Use descriptive anchor text — not 'click here' or 'read more'",
+        "Add new links from old cluster pages whenever a new cluster post is published"
+      ]},
+      { type: "heading", level: 2, content: "How Many Clusters Do You Need?" },
+      { type: "paragraph", content: "Start with 5-8 cluster pages per pillar. This is enough to establish topical depth without spreading resources too thin. Add more cluster pages over time as you identify new question variants from Google Search Console data and user behaviour." },
+      { type: "callout", calloutType: "cta", content: "A strong domain name is the foundation for topical authority. Find yours.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "How long should a pillar page be?", answer: "Typically 2,000–4,000 words for competitive topics. The length should match the depth required to cover the topic thoroughly at a summary level. Avoid padding — Google can detect thin content regardless of word count. Match the length of what's already ranking for your target keyword." },
+      { question: "Should my pillar page or cluster pages be published first?", answer: "Publish the pillar page first, then cluster pages. The pillar page acts as the cornerstone — cluster pages derive additional authority from linking back to it, and that dynamic works better when the pillar exists first. However, don't wait for a perfect pillar page before publishing any content." },
+      { question: "Can I convert existing blog posts into a topic cluster?", answer: "Yes — this is one of the highest-ROI SEO tasks for sites that have published content without architecture. Audit your existing posts, identify natural pillar topics, create or designate pillar pages, and add bidirectional internal links. The results are often visible within 60-90 days." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "ai-overviews-seo-strategy",
+    title: "How to Rank in Google AI Overviews (and Whether You Should Try)",
+    description: "Google's AI Overviews are changing organic search results. Here's what you need to know and how to adjust your content strategy.",
+    seoTitle: "Google AI Overviews SEO Strategy: How to Get Featured in 2026",
+    metaDescription: "Google AI Overviews appear above organic results for many queries. Learn what types of content get included, how to optimise for them, and whether it's worth pursuing.",
+    category: "SEO Foundations",
+    readTime: 7,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Google AI Overviews — the AI-generated summaries that appear above organic results — have fundamentally changed what showing up on page one means. For some queries, the Overview takes up the entire above-the-fold view, reducing clicks to organic results significantly. Here's what's actually happening and how to think about it." },
+      { type: "heading", level: 2, content: "What Are Google AI Overviews?" },
+      { type: "paragraph", content: "AI Overviews are summaries generated by Google's AI systems and displayed at the top of search results for informational queries. They pull content from multiple sources, synthesise an answer, and attribute the sources with links. They appear most frequently for how-to, what-is, and comparison queries — the bread and butter of informational content marketing." },
+      { type: "heading", level: 2, content: "The Good News and the Bad News" },
+      { type: "paragraph", content: "The bad news: AI Overviews reduce click-through rates for informational content in many niches. If your page ranked number one for 'how to choose a domain name' and an AI Overview now answers that question without requiring a click, your traffic for that query drops." },
+      { type: "paragraph", content: "The good news: sites cited in AI Overviews receive credibility signals that can strengthen brand recognition and click-through rates for related queries. Being cited in an AI Overview is a quality signal — and it tends to correlate with improved rankings for the cited pages." },
+      { type: "callout", calloutType: "tip", content: "Data from early AI Overview rollouts suggests that cited sources see 20–40% lower click volume for that specific query but higher branded search volume overall. The trade-off depends on your business model." },
+      { type: "heading", level: 2, content: "What Content Gets Included in AI Overviews" },
+      { type: "list", content: "", items: [
+        "Content that directly and concisely answers the query in the first 100 words",
+        "Pages with clear E-E-A-T signals: demonstrated author expertise, clear sourcing",
+        "Well-structured content with headers matching common question variants",
+        "Pages already ranking in the top 5 for the target query",
+        "Content with strong internal linking and topical authority signals"
+      ]},
+      { type: "heading", level: 2, content: "How to Optimise for AI Overview Inclusion" },
+      { type: "heading", level: 3, content: "1. Answer the Query Directly in Your Opening" },
+      { type: "paragraph", content: "AI systems prefer content that gets to the point. Put a clear, direct answer to the primary query in your first paragraph. Don't bury the answer behind context and preamble — AI extraction systems weight content at the top of the page higher." },
+      { type: "heading", level: 3, content: "2. Use Structured Formats" },
+      { type: "paragraph", content: "Numbered lists, comparison tables, and definition-style headings make content easier for AI systems to parse and extract. If the target query has a list-format intent ('what are the X ways to…'), answer in a numbered list near the top of the page." },
+      { type: "heading", level: 3, content: "3. Strengthen E-E-A-T" },
+      { type: "list", content: "", items: [
+        "Add clear author attribution with credentials or experience indicators",
+        "Include publication dates and update dates",
+        "Cite primary sources and data",
+        "Link to authoritative external sources where relevant",
+        "Build author pages that demonstrate expertise in your niche"
+      ]},
+      { type: "heading", level: 2, content: "When AI Overviews Are Good for Your Business" },
+      { type: "paragraph", content: "If your business model depends on brand recognition rather than pure content click volume — SaaS, services, physical products — being cited in AI Overviews builds brand awareness at no additional cost. Every Overview citation is a mention of your brand to a searcher who may not click but will remember the attribution." },
+      { type: "heading", level: 2, content: "When AI Overviews Hurt Your Business" },
+      { type: "paragraph", content: "If you monetise content through display advertising, affiliate links, or paywalled content, AI Overviews directly reduce your revenue per search. For these business models, the strategic response is to shift toward content types where AI Overviews appear less frequently: opinion pieces, original research, tools and interactive content, and highly specific long-tail queries." },
+      { type: "callout", calloutType: "cta", content: "Strong SEO starts with a credible domain. Score yours for brand strength before your first piece of content goes live.", ctaLink: "/generate", ctaText: "Find Your Domain on NamoLux →" }
+    ],
+    faqs: [
+      { question: "Do AI Overviews appear for all search queries?", answer: "No. As of 2026, AI Overviews appear most frequently for informational queries — how-to, what-is, definition, comparison — and less for navigational (brand name searches) and transactional (purchase-intent) queries. Commercial and local searches see fewer AI Overviews, which is why local SEO and e-commerce SEO are less disrupted than content marketing." },
+      { question: "Is it possible to opt out of being included in AI Overviews?", answer: "Not via a specific AI Overviews exclusion. However, Google respects noindex tags and robots.txt, which would exclude pages from all Google features including AI Overviews. Using noindex to exclude your best content from AI Overviews would also remove it from organic rankings — a worse trade-off for most sites." },
+      { question: "Should I stop producing informational content because of AI Overviews?", answer: "No. Informational content still drives brand awareness, builds topical authority, earns backlinks, and supports customers through your funnel. The metrics change — you'll see lower organic CTR for some queries — but the strategic value of high-quality informational content remains significant. The adaptation is to focus on content that supplements AI answers rather than purely duplicating them." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "seo-for-zero-budget-founders",
+    title: "SEO for Zero-Budget Founders: What to Do When You Can't Pay for Traffic",
+    description: "Paid ads aren't an option. Here's the SEO playbook for founders with more time than money — what actually works when you're starting from zero.",
+    seoTitle: "Zero-Budget SEO for Founders: A Practical Playbook for 2026",
+    metaDescription: "Can't afford paid ads? This zero-budget SEO guide shows founders exactly what to do to build organic traffic from scratch — without tools, agencies, or ad spend.",
+    category: "SEO Foundations",
+    readTime: 7,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "SEO advice is usually written for marketing teams with budgets, agencies, and a stable of writers. If you're a founder with £0 for marketing and more spare hours than spare cash, most of that advice isn't useful. Here's what actually works when you're starting from zero — the activities that have the highest return per hour of founder time." },
+      { type: "heading", level: 2, content: "Set Realistic Expectations" },
+      { type: "paragraph", content: "Zero-budget SEO works. But it works slowly. You should expect 6-12 months before seeing meaningful organic traffic, and 12-24 months before SEO becomes a reliable customer acquisition channel. If you need customers in the next 30 days, SEO is the wrong strategy. If you have runway and time, it's one of the best investments you can make." },
+      { type: "heading", level: 2, content: "The Zero-Budget SEO Stack" },
+      { type: "heading", level: 3, content: "1. Google Search Console (Free, Essential)" },
+      { type: "paragraph", content: "This is the only tool you actually need. It shows you which queries your pages appear for, which pages are indexed, what your click-through rates are, and where Google is struggling to crawl your site. Set this up on day one and check it weekly." },
+      { type: "heading", level: 3, content: "2. Google Analytics 4 (Free, Important)" },
+      { type: "paragraph", content: "Shows you which pages drive engagement and which drive bounces. Free, connects to Search Console, and gives you the traffic data you need to prioritise your content efforts." },
+      { type: "heading", level: 3, content: "3. Ahrefs Free Tools or Semrush Free Tier" },
+      { type: "paragraph", content: "You can do basic keyword research with the free tiers of both tools. Limited queries per day, but enough for a solo founder to plan content." },
+      { type: "callout", calloutType: "tip", content: "You don't need a paid SEO tool. Search Console + Google Analytics + careful competitor analysis will get you 80% of the insight a paid tool provides, at zero cost." },
+      { type: "heading", level: 2, content: "Where to Spend Your Hours" },
+      { type: "heading", level: 3, content: "Hour 1-10: Technical Foundation" },
+      { type: "list", content: "", items: [
+        "Submit your sitemap to Google Search Console",
+        "Check that all important pages are indexable (no accidental noindex tags)",
+        "Verify your site loads in under 3 seconds on mobile (use Google PageSpeed Insights)",
+        "Ensure HTTPS is configured correctly",
+        "Fix any broken internal links"
+      ]},
+      { type: "heading", level: 3, content: "Hour 10-30: Keyword Research and Content Planning" },
+      { type: "paragraph", content: "Find 10-15 keywords with clear intent where the ranking pages are weak. 'Weak' means: short content, no structured data, low backlink counts, or content that doesn't actually answer the query well. These are your winnable gaps." },
+      { type: "heading", level: 3, content: "Hour 30+: Write Content That Deserves to Rank" },
+      { type: "paragraph", content: "Write one comprehensive piece per week minimum. Each piece should be the best available resource on that specific topic. Not longer for the sake of it — better. Answer the question the searcher is actually asking, support it with evidence, and format it for scanning." },
+      { type: "heading", level: 2, content: "The Free Link-Building Moves" },
+      { type: "list", content: "", items: [
+        "Post original data or research on Reddit, Hacker News, or relevant communities — earns natural links",
+        "Answer questions on Quora with genuinely useful responses that reference your content",
+        "Guest post on industry newsletters — most accept well-written submissions for free",
+        "Get listed in free directories relevant to your niche",
+        "Comment thoughtfully on relevant blog posts with a link to your deeper content"
+      ]},
+      { type: "heading", level: 2, content: "What Not to Do Without Budget" },
+      { type: "list", content: "", items: [
+        "Don't buy backlinks — the risk-reward is terrible for small sites",
+        "Don't publish thin AI-generated content at scale — Google penalises it",
+        "Don't ignore technical SEO hoping content will compensate",
+        "Don't try to rank for head terms on a domain with zero authority"
+      ]},
+      { type: "callout", calloutType: "cta", content: "Start your SEO journey with a domain that builds trust from day one.", ctaLink: "/generate", ctaText: "Find Your Domain with NamoLux →" }
+    ],
+    faqs: [
+      { question: "How many articles should I publish per week with zero budget?", answer: "Quality beats quantity. One genuinely excellent, well-researched piece per week will outperform five mediocre pieces published daily. Early-stage sites with limited domain authority need content that earns links and engagement — thin content at scale won't achieve that." },
+      { question: "Can I do SEO entirely with free tools?", answer: "Yes. Google Search Console and Google Analytics are free and cover the core data you need. For keyword research, the free tiers of Ahrefs and Semrush plus manual competitor analysis are sufficient for early-stage SEO. Paid tools speed up the process but aren't required to get results." },
+      { question: "Should I focus on SEO before or after product-market fit?", answer: "Both simultaneously, at low intensity. Publish content that helps your target users solve real problems — this builds organic traffic AND informs you about customer pain points. The founders who wait for PMF to start SEO are typically 12+ months behind those who started content on day one." }
+    ]
+  } as BlogPost,
+
+  // ─── 3 × Builder Insights ──────────────────────────────────────────────────
+
+  {
+    slug: "product-market-fit-signals",
+    title: "7 Signals That You've Actually Hit Product-Market Fit",
+    description: "Product-market fit is real when customers show you — not when you decide. Here are the concrete signals that mean you've found it.",
+    seoTitle: "7 Signs You've Hit Product-Market Fit: Real Signals Founders Should Watch",
+    metaDescription: "Wondering if you've hit product-market fit? Stop guessing — look for these 7 concrete signals in your data, user behaviour, and conversations.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Product-market fit isn't a feeling — it's a pattern of evidence. Founders routinely declare PMF based on enthusiasm from early users, a good week of signups, or a complimentary tweet. But the difference between 'interesting early signal' and 'actual product-market fit' matters enormously for how you should run your business." },
+      { type: "heading", level: 2, content: "The Only Definition That Matters" },
+      { type: "paragraph", content: "Marc Andreessen's original definition: 'Product-market fit means being in a good market with a product that can satisfy that market.' In practice: do enough customers want your product badly enough that your business can grow sustainably? The key word is 'enough' — you need density of demand, not just existence of demand." },
+      { type: "heading", level: 2, content: "Signal 1: You Can't Keep Up With Inbound Demand" },
+      { type: "paragraph", content: "Before PMF, every new user is the result of active effort — outreach, ads, posting, persuasion. After PMF, users start finding you. Word of mouth creates organic demand that you're not working to generate. If you woke up tomorrow and stopped all marketing activity, would new users still sign up? If yes, you're approaching PMF." },
+      { type: "heading", level: 2, content: "Signal 2: The Retention Curve Flattens" },
+      { type: "paragraph", content: "Plot your user retention over time. Without PMF, the curve keeps declining — every cohort gradually churns toward zero. With PMF, the curve flattens — there's a baseline of users who stick around month after month. Even if only 20% retain, a flat retention curve means you've found something valuable." },
+      { type: "callout", calloutType: "tip", content: "The exact retention benchmark depends on your product type. SaaS: 80%+ monthly retention. Mobile apps: 30%+ after 30 days. Marketplaces: 25%+ after 90 days. The absolute number matters less than the shape of the curve." },
+      { type: "heading", level: 2, content: "Signal 3: Customers Are Upset When You Announce Downtime" },
+      { type: "paragraph", content: "Post a scheduled maintenance notice and measure the reaction. If users shrug, you're not mission-critical. If users panic, complain, or ask when you'll be back, you've built something they depend on. The intensity of the reaction to loss is one of the clearest signals of true fit." },
+      { type: "heading", level: 2, content: "Signal 4: The 40% Rule (Sean Ellis Test)" },
+      { type: "paragraph", content: "Survey your active users: 'How would you feel if you could no longer use [product]?' If 40%+ say 'very disappointed', you have PMF. Below 40% — especially below 20% — and you need to keep iterating. Run this survey on users who have been active in the last 2 weeks for meaningful results." },
+      { type: "heading", level: 2, content: "Signal 5: Users Refer Without Being Asked" },
+      { type: "paragraph", content: "When someone sends your product link to a friend unprompted, they're spending social capital to recommend you. This only happens when they're confident the recommendation will land. Organic referrals — not from a referral programme, but from genuine enthusiasm — are one of the strongest PMF signals available to a pre-scale startup." },
+      { type: "heading", level: 2, content: "Signal 6: Sales Cycles Get Shorter" },
+      { type: "paragraph", content: "Before PMF, convincing each new customer requires extensive education, objection handling, and persuasion. After PMF, customers come in pre-convinced. They've heard about you, understand the value, and are ready to try or buy with minimal friction. If you're spending less time per conversion than you were six months ago, something has clicked." },
+      { type: "heading", level: 2, content: "Signal 7: You're Turning Customers Away" },
+      { type: "paragraph", content: "When demand outstrips your capacity to serve customers well, that's a PMF signal. A waiting list that fills faster than you expected, enterprise customers offering to pay more for priority, or support tickets that you genuinely can't keep up with — these are problems you'd much rather have than the alternative." },
+      { type: "heading", level: 2, content: "What PMF Doesn't Look Like" },
+      { type: "list", content: "", items: [
+        "Positive feedback from friends and family",
+        "A good launch day on Product Hunt",
+        "Interest from investors (investors are not customers)",
+        "A viral tweet about your product",
+        "Lots of signups with no activation or retention"
+      ]},
+      { type: "callout", calloutType: "cta", content: "Building toward PMF? Start with a name that's worth building on.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "Can you have PMF in one segment but not another?", answer: "Absolutely, and this is common. Many B2B products have strong PMF with one industry vertical but weak fit with others. If your retention is strong with customers from one sector but churns rapidly from another, focus all your energy on the segment where fit exists. Trying to force fit across multiple segments simultaneously is one of the most common early-stage mistakes." },
+      { question: "What should I do differently once I hit PMF?", answer: "Shift your focus from discovery to delivery. Before PMF, everything is an experiment. After PMF, your job is to serve the existing fit at scale. Invest in onboarding, reduce time-to-value, build the retention loops that keep happy customers, and systematise what's working rather than continuing to explore what else might work." },
+      { question: "Is PMF permanent or can you lose it?", answer: "You can lose it. Market conditions change, competitors emerge, and customer expectations evolve. Companies that achieved PMF in 2020 sometimes lost it by 2024 as the market shifted around them. PMF is a snapshot, not a destination — which is why the best companies continuously monitor retention, NPS, and competitive positioning even after achieving initial fit." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "churn-reduction-playbook",
+    title: "How to Reduce Churn in Your First 6 Months",
+    description: "Early churn is a product problem disguised as a retention problem. Here's the practical playbook for diagnosing and fixing it in your first 6 months.",
+    seoTitle: "How to Reduce SaaS Churn in the First 6 Months: A Founder's Playbook",
+    metaDescription: "High churn in your first 6 months? Learn how to diagnose whether it's an onboarding issue, positioning problem, or wrong audience — and how to fix it.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "High churn in your first 6 months is almost never a retention problem. It's a symptom of something earlier in the funnel: wrong audience, unclear onboarding, product that doesn't deliver its promised value quickly enough. The solution isn't a drip email sequence — it's fixing the underlying cause. Here's how to find it." },
+      { type: "heading", level: 2, content: "Diagnose Before You Fix" },
+      { type: "paragraph", content: "Churn at day 7 has a different cause than churn at month 3. The first step is to segment your churned users by when they left — not just that they left. Each cohort of churners tells a different story." },
+      { type: "heading", level: 3, content: "Day 1–7 Churn: Activation Problem" },
+      { type: "paragraph", content: "Users who leave in the first week never reached the 'aha moment' — the point at which they understood the value of your product. This is almost always an onboarding problem. Your product didn't show them value fast enough, or required too much setup to get there." },
+      { type: "heading", level: 3, content: "Week 2–4 Churn: Habit Formation Failure" },
+      { type: "paragraph", content: "These users activated but didn't build a habit of returning. Either the use case isn't frequent enough to create habit naturally, or there's no re-engagement mechanism pulling them back. Look at whether churned users in this cohort were using a core feature or only peripheral ones." },
+      { type: "heading", level: 3, content: "Month 2–6 Churn: Value Delivery or Fit Problem" },
+      { type: "paragraph", content: "Users who stay for months before churning are the most informative. They gave you a real chance. When they leave, it means one of: the product didn't deliver on a specific promised outcome, a competitor did something better, their needs changed, or they were the wrong customer segment from the start." },
+      { type: "callout", calloutType: "tip", content: "The single highest-ROI churn-reduction activity: email or call every churned user within 48 hours of cancellation. Ask one question: 'What would have made you stay?' The answers are almost always immediately actionable." },
+      { type: "heading", level: 2, content: "The Onboarding Audit" },
+      { type: "paragraph", content: "If your early churn is concentrated in the first two weeks, audit your onboarding flow:" },
+      { type: "list", content: "", items: [
+        "Map every step from signup to first meaningful outcome",
+        "Find where users drop off (funnel analytics or simple observation)",
+        "Ask 10 new users to share their screen during onboarding",
+        "Identify the 'aha moment' and measure how long it takes users to reach it",
+        "Remove every step that doesn't directly lead to the aha moment"
+      ]},
+      { type: "heading", level: 2, content: "The ICP Audit" },
+      { type: "paragraph", content: "If users are churning after 60-90 days despite completing onboarding, your ICP (ideal customer profile) definition may be too broad. Compare churned users to retained users across: company size, industry, use case, how they heard about you, and what they said in their initial signup survey. Look for patterns. The customers who stay longest are telling you who your product actually serves." },
+      { type: "heading", level: 2, content: "Quick Churn-Reduction Tactics That Work" },
+      { type: "list", content: "", items: [
+        "Reduce time-to-value: remove every friction point between signup and first success",
+        "Personalise onboarding by use case — don't show a solopreneur the enterprise features",
+        "Build a 'success milestone' email that fires when a user hits a key activation event",
+        "Proactively reach out to users who haven't engaged in 72 hours",
+        "Create a 'getting started' checklist that gives new users clear wins in the first session"
+      ]},
+      { type: "heading", level: 2, content: "What Won't Fix Churn" },
+      { type: "list", content: "", items: [
+        "A better cancellation flow — users who want to leave will leave",
+        "Discounts at cancellation — this attracts the wrong type of user going forward",
+        "More features — if users aren't using existing features, new ones won't help",
+        "Better email drip campaigns on top of a broken product experience"
+      ]},
+      { type: "callout", calloutType: "cta", content: "The right brand name reduces churn at the top of the funnel — customers who chose you deliberately stay longer.", ctaLink: "/generate", ctaText: "Find Your Name with NamoLux →" }
+    ],
+    faqs: [
+      { question: "What's an acceptable churn rate for an early-stage SaaS?", answer: "Monthly churn below 5% is generally acceptable for early-stage B2B SaaS. Below 2% monthly (roughly 22% annual) is considered good. The earlier you are, the more volatile churn will be — a few enterprise cancellations can spike your churn rate significantly. Focus on the trend direction more than the absolute number in your first 12 months." },
+      { question: "Should I offer discounts to reduce churn?", answer: "Rarely. Discounting at cancellation attracts price-sensitive customers who will churn again at the next billing cycle. It also sets a precedent that the list price isn't real. The one exception: if a user needs to pause rather than cancel due to a temporary circumstance (parental leave, project delay), a pause option is better than a discount." },
+      { question: "How many churned users should I talk to?", answer: "Talk to all of them if your volume allows — especially in the first 6 months when churn conversations are data collection, not just retention attempts. Once you're at scale (100+ churns per month), a structured survey with follow-up calls for the most informative segments is more efficient. Qualitative insights from real conversations are irreplaceable in the early stage." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "founder-distribution-channels",
+    title: "The 5 Distribution Channels That Work Without a Marketing Budget",
+    description: "Before you spend money on marketing, exhaust these five distribution channels that cost nothing but founder time.",
+    seoTitle: "5 Free Distribution Channels for Founders Without a Marketing Budget",
+    metaDescription: "No marketing budget? These 5 distribution channels cost nothing but time and can drive real customers for early-stage startups — before you spend a penny on ads.",
+    category: "Builder Insights",
+    readTime: 6,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "The pressure to run paid ads before you understand your customer is one of the most expensive mistakes early-stage founders make. Before you spend anything, there are five distribution channels that cost only founder time — and that regularly drive the first $10k MRR for startups without a marketing budget." },
+      { type: "heading", level: 2, content: "Channel 1: Direct Outreach" },
+      { type: "paragraph", content: "The most underrated channel at every stage. Find the exact people who have the problem you solve — LinkedIn, Twitter/X, Reddit, community Slack groups — and send them a short, personalised message. Not a pitch. A question or observation that demonstrates you understand their situation." },
+      { type: "paragraph", content: "A good cold message: 'Hi Sarah, I saw you posted about struggles with [specific problem] last week. We built something specifically for that — would you be open to 15 minutes this week to see if it's relevant?' Response rates above 10% are achievable. No ad budget required." },
+      { type: "callout", calloutType: "tip", content: "The single best ROI activity before you have any marketing budget: send 20 personalised outreach messages every weekday for 8 weeks. That's 800 targeted conversations. Track responses, learn from no-replies, and iterate the message. Most founders do this for one week and quit." },
+      { type: "heading", level: 2, content: "Channel 2: Communities" },
+      { type: "paragraph", content: "Every niche has communities: Reddit subreddits, Discord servers, Facebook groups, Slack workspaces, forum threads, LinkedIn groups. Your target customers are already in them. The strategy isn't to spam links — it's to become a genuinely useful participant who occasionally references their own product in relevant context." },
+      { type: "paragraph", content: "Post original research, share a framework you use, answer questions thoroughly. Build reputation first. Users who discover you through your expertise in a community convert at far higher rates than cold traffic from ads." },
+      { type: "heading", level: 2, content: "Channel 3: SEO Content" },
+      { type: "paragraph", content: "Long-term and slow to compound, but free. Write content targeting the exact questions your potential customers are asking in search. A single well-written piece that ranks for a relevant query can drive qualified traffic indefinitely — at zero ongoing cost after the initial writing investment." },
+      { type: "paragraph", content: "Start with long-tail queries where the ranking content is weak. 'How to [solve specific problem your product solves] for [specific niche]' type queries are often winnable within 3-6 months on a new domain if the content is genuinely better than what exists." },
+      { type: "heading", level: 2, content: "Channel 4: Product Hunt and Launch Platforms" },
+      { type: "paragraph", content: "A well-prepared Product Hunt launch drives 500-2,000 visitors in a day and earns relevant backlinks from coverage. It's not sustainable as an ongoing channel, but it's an excellent way to get your first 50-100 beta users and validate whether the broader market finds your positioning interesting." },
+      { type: "paragraph", content: "The keys to a good PH launch: build a maker following before you launch, prepare a compelling demo GIF that shows value in the first 10 seconds, have a specific ask in your intro (try the free tier, not buy the paid plan), and time your launch for Tuesday-Thursday." },
+      { type: "heading", level: 2, content: "Channel 5: Partnerships and Co-Marketing" },
+      { type: "paragraph", content: "Find non-competing tools that serve your exact customer and propose a simple co-marketing arrangement: a newsletter mention, a blog post, or a joint webinar. Your tool recommendation to their audience, their tool recommendation to yours. Neither party needs a large audience for this to work — what matters is that both audiences are the right people." },
+      { type: "list", content: "", items: [
+        "Look for tools in your customer's stack that you integrate with or complement",
+        "Offer to write a guest post for their blog that provides genuine value to their readers",
+        "Propose a joint webinar on a topic relevant to both audiences",
+        "Create an integration or API connection that makes both tools more valuable"
+      ]},
+      { type: "heading", level: 2, content: "Before You Consider Paid Channels" },
+      { type: "paragraph", content: "Paid advertising makes sense when you have a proven message (you know what converts), a measured CAC (you know what a customer costs), and an LTV that makes the unit economics work. Without those inputs, paid ads are an expensive way to discover what you could have learned for free." },
+      { type: "callout", calloutType: "cta", content: "Your brand name is part of your distribution. A memorable domain makes every channel more efficient.", ctaLink: "/generate", ctaText: "Find Your Domain with NamoLux →" }
+    ],
+    faqs: [
+      { question: "Which of these channels should I try first?", answer: "Direct outreach. It gives you the fastest feedback loop — real conversations with real potential customers reveal whether your positioning resonates, what objections exist, and whether the problem you're solving is painful enough. Every other channel is improved by what you learn from direct outreach. Start there." },
+      { question: "How long before community distribution pays off?", answer: "Expect 4-8 weeks of genuine contribution before seeing meaningful referral traffic from communities. Trying to shortcut this by dropping links before you've built reputation results in bans and wasted effort. The founders who do this well treat community participation as a long-term investment, not a promotional tactic." },
+      { question: "When should I add paid advertising to this mix?", answer: "When you have a conversion rate from your free channels that you understand, a CAC from those channels to benchmark against, and evidence that the constraint on growth is distribution volume rather than product or positioning quality. For most bootstrapped founders, this is around the £5k-£10k MRR mark." }
+    ]
+  } as BlogPost,
+
+  // ─── 3 × Tool Comparisons ──────────────────────────────────────────────────
+
+  {
+    slug: "namecheap-domain-search-vs-namolux",
+    title: "Namecheap Domain Search vs NamoLux: Finding Domains vs Finding Good Domains",
+    description: "Namecheap is a registrar with search tools. NamoLux is a naming tool with scoring. Both help you find domains — but at different stages and for different goals.",
+    seoTitle: "Namecheap vs NamoLux: Which Tool Helps You Find the Right Domain?",
+    metaDescription: "Comparing Namecheap domain search and NamoLux? One is a registrar, one is a naming tool. Here's which to use at which stage of your naming process.",
+    category: "Tool Comparisons",
+    readTime: 5,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Namecheap is one of the world's most popular domain registrars and includes a domain suggestion tool as part of its registration flow. NamoLux generates startup names from a creative brief and scores them with Founder Signal™. They overlap in that both involve finding domain names — but they sit at completely different stages of the naming process." },
+      { type: "heading", level: 2, content: "What Namecheap's Search Tool Does" },
+      { type: "paragraph", content: "Namecheap's 'Beast Mode' domain search allows you to check availability across dozens of TLDs simultaneously, filter by extension, price, and length, and register directly in the same flow. It also suggests variations of your search term across different TLD combinations. It's designed for people who already have a name in mind and want to check availability and register — the final step, not the creative step." },
+      { type: "heading", level: 2, content: "What NamoLux Does" },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief — keywords, industry, and the vibe you want the brand to evoke — checks availability across .com, .io, .ai, and .co in real-time, and applies Founder Signal™ scoring to every result. The focus is on the creative and evaluation phase: starting from nothing and arriving at a shortlist of quality-scored options, rather than checking whether a specific name is available." },
+      { type: "heading", level: 2, content: "The Key Difference: Discovery vs Confirmation" },
+      { type: "paragraph", content: "Namecheap answers 'is this name available?' NamoLux answers 'what names should I be considering?' These are different questions that arise at different moments in the naming process. Most founders who feel stuck on naming are stuck at the discovery phase — they need NamoLux. Founders who've already shortlisted candidates and are ready to register are in the right place for Namecheap." },
+      { type: "callout", calloutType: "tip", content: "The optimal workflow: use NamoLux to generate and score a shortlist of 5-10 strong candidates. Then use Namecheap (or your preferred registrar) to confirm final availability, check price, and register. These tools are sequential, not competing." },
+      { type: "heading", level: 2, content: "Namecheap Strengths" },
+      { type: "list", content: "", items: [
+        "Excellent multi-TLD availability checking with real-time data",
+        "Transparent pricing with no surprise renewal price increases",
+        "Free WHOIS privacy protection included",
+        "Strong DNS management and email forwarding",
+        "Integrated registration — zero friction from search to purchase"
+      ]},
+      { type: "heading", level: 2, content: "NamoLux Strengths" },
+      { type: "list", content: "", items: [
+        "AI-generated names from a brand brief — creative starting point when you have nothing",
+        "Founder Signal™ scoring to evaluate quality, not just availability",
+        "Real-time availability checking across core startup TLDs",
+        "Deep Search for .com — specifically finds available .com names within parameters",
+        "Startup-specific quality filters: pronounceability, memorability, brand risk"
+      ]},
+      { type: "heading", level: 2, content: "Which Should You Use?" },
+      { type: "paragraph", content: "If you're at the start of your naming process with no clear name yet: start with NamoLux. Generate options, score them, shortlist 3-5 strong candidates. If you already know your name and just need to confirm it's available and register it: go directly to Namecheap. For most startups, both tools get used — in sequence." },
+      { type: "callout", calloutType: "cta", content: "Start the creative phase of your naming process before you commit to registration.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "Can I register domains directly through NamoLux?", answer: "NamoLux checks availability in real-time and links to domain registration via partner registrars. You can register through whichever registrar you prefer — including Namecheap — after finding your name in NamoLux. There's no lock-in to a specific registrar." },
+      { question: "Is Namecheap's domain availability data accurate?", answer: "Very accurate. Namecheap is a major registrar with direct registry connections. Their availability data is real-time and reliable. For domains you're seriously considering, it's worth confirming availability in Namecheap directly before committing to the name, since even real-time tools can have occasional lag." },
+      { question: "Does Namecheap offer name generation for users with no starting point?", answer: "Namecheap's search requires a starting keyword or phrase. It generates variations on what you input rather than creative names from a brand brief. If you have no starting point, NamoLux's AI generation from keywords, industry, and vibe is the more appropriate starting tool." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "lean-domain-search-vs-namolux",
+    title: "Lean Domain Search vs NamoLux: Fast Availability vs Quality Scoring",
+    description: "Lean Domain Search finds available .com domains fast. NamoLux scores the quality of generated names. Here's how they compare and when to use each.",
+    seoTitle: "Lean Domain Search vs NamoLux: Which Domain Tool Is Right for Startups?",
+    metaDescription: "Lean Domain Search shows available .com variants of your keyword. NamoLux generates brand names and scores them with Founder Signal™. Compare both tools here.",
+    category: "Tool Comparisons",
+    readTime: 5,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Lean Domain Search is one of the most efficient tools for finding available .com domains — you type a word, and it instantly shows hundreds of available .com combinations using that word as a prefix, suffix, or embedded term. NamoLux takes a different approach: generate brand-quality names from a creative brief and score each one for brand strength. Here's how they actually compare for startup naming." },
+      { type: "heading", level: 2, content: "What Lean Domain Search Does" },
+      { type: "paragraph", content: "Lean Domain Search is a single-purpose tool built by Matt Mazur. You enter a keyword, and it returns all available .com domains containing that keyword. Results are filterable by position (prefix, suffix, or anywhere) and sortable by length or alphabetical. It's fast, free, and accurate. The entire value proposition is speed of availability checking — not name quality evaluation." },
+      { type: "heading", level: 2, content: "What NamoLux Does" },
+      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — keywords, industry, and desired vibe — rather than simply showing keyword combinations. Every generated name is scored with Founder Signal™ covering phonetics, memorability, brand risk, and domain quality. The output is a ranked shortlist of names worth considering, not an exhaustive list of technically available options." },
+      { type: "heading", level: 2, content: "The Output Quality Difference" },
+      { type: "paragraph", content: "This is the fundamental distinction. Lean Domain Search shows you everything available. NamoLux shows you what's actually good. For a keyword like 'track', Lean Domain Search returns hundreds of available .com options: trackpro.com, tracklab.com, trackbase.com, and so on — many of which are generic, unmemorable, or trademarked. NamoLux generates and then filters by quality, returning a shorter list of names that meet a brand-strength threshold." },
+      { type: "callout", calloutType: "tip", content: "Availability and quality are independent variables. A domain can be available because it's bad — generic, unmemorable, or already associated with a failed brand. Quality scoring is what separates the 2% of available names worth building on from the other 98%." },
+      { type: "heading", level: 2, content: "When Lean Domain Search Wins" },
+      { type: "paragraph", content: "When you have a specific keyword you're committed to including in your domain and you want to exhaustively survey what's available. If you're building an affiliate site or content site around a specific keyword, Lean Domain Search is the faster starting point — the exact-match nature of its results is a feature, not a bug." },
+      { type: "heading", level: 2, content: "When NamoLux Wins" },
+      { type: "paragraph", content: "When you're naming a startup or brand from scratch and you don't have a specific keyword locked in. When quality evaluation matters more than exhaustive availability surveys. When you want to compare options based on measurable brand-strength criteria rather than choosing between available options based on gut feel." },
+      { type: "heading", level: 2, content: "Combining Both Tools" },
+      { type: "paragraph", content: "A practical workflow: use NamoLux to generate quality-scored name candidates that you wouldn't have thought of from a single keyword. For any candidate with a strong Founder Signal™ score that you want to explore further (different prefix/suffix combinations, related words), run that name through Lean Domain Search to see the full landscape of available .com variants. The two tools work well together as sequential steps." },
+      { type: "callout", calloutType: "cta", content: "Start with brand quality, then check availability — the order that produces better naming decisions.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
+    ],
+    faqs: [
+      { question: "Does Lean Domain Search work for TLDs other than .com?", answer: "Lean Domain Search is primarily focused on .com domains. It's optimised specifically for finding available .com names that contain your keyword. NamoLux checks availability across .com, .io, .ai, and .co simultaneously, which is more useful for founders open to non-.com TLDs." },
+      { question: "Is Lean Domain Search still maintained?", answer: "As of 2026, Lean Domain Search operates but has received limited updates in recent years. Its core availability checking function still works reliably. For AI-generated name ideas and quality scoring, NamoLux provides a more modern toolset — but for pure .com availability mapping of keyword combinations, Lean Domain Search remains useful." },
+      { question: "Are keyword-combination domains from Lean Domain Search good for branding?", answer: "Occasionally, but rarely. Most keyword-combination .com domains (trackpro.com, quickinvoice.com, smartforms.com) are descriptive and generic rather than brandable. The best startup names don't describe the product — they evoke a feeling or create a distinctive brand identity. NamoLux's AI generation and quality scoring are specifically designed to find names that clear a brand-strength bar, not just a keyword-availability bar." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "wordoid-vs-namolux",
+    title: "Wordoid vs NamoLux: Coined Word Generators Compared",
+    description: "Both Wordoid and NamoLux can help you find invented brand names. Here's how their approaches differ and which produces better startup naming outcomes.",
+    seoTitle: "Wordoid vs NamoLux: Which Tool Generates Better Startup Brand Names?",
+    metaDescription: "Wordoid generates pronounceable invented words. NamoLux generates AI-powered brand names with quality scoring. Compare both to find the right tool for your naming project.",
+    category: "Tool Comparisons",
+    readTime: 5,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "If you want a made-up brand name — something like Spotify, Figma, or Notion — both Wordoid and NamoLux can help. But their approaches are quite different, and the outputs reflect that. Here's an honest comparison for founders choosing between them." },
+      { type: "heading", level: 2, content: "What Wordoid Does" },
+      { type: "paragraph", content: "Wordoid generates invented, pronounceable words based on your quality and language settings. You can specify whether names should start or end with a specific word fragment, set a quality threshold (how real-word-like the output is), and choose from English, Spanish, French, Italian, or Portuguese phonetic rules. The results are filtered for domain availability. It's a pure word-generation engine — simple, focused, and fast." },
+      { type: "heading", level: 2, content: "What NamoLux Does" },
+      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — your keywords, industry, and desired vibe — rather than from phonetic rules alone. It applies six remix strategies (compound words, evocative blends, abstract coinages, and others) informed by real brand examples from your industry. Every name is then scored with Founder Signal™ and checked for availability across .com, .io, .ai, and .co." },
+      { type: "heading", level: 2, content: "The Strategy vs Pattern Difference" },
+      { type: "paragraph", content: "Wordoid generates names that sound like words. NamoLux generates names that work as brands. The distinction is subtle but significant. A Wordoid result like 'Zovitex' might be pronounceable and available, but it carries no brand meaning and has no connection to your product category. NamoLux's AI is specifically trying to evoke the right associations for your industry and vibe — not just produce phonetically valid strings." },
+      { type: "callout", calloutType: "tip", content: "A brand name doesn't need to be a real word, but it does need to do a job: evoke an emotion, hint at a category, or create a distinctive identity. Phonetically valid random syllables rarely achieve any of those goals." },
+      { type: "heading", level: 2, content: "Output Volume vs Output Quality" },
+      { type: "paragraph", content: "Wordoid generates a large volume of options quickly. NamoLux generates fewer options but scores each one for quality. For founders who want maximum quantity to browse through, Wordoid's high-volume output is useful. For founders who want a shorter shortlist of quality-screened candidates, NamoLux's Founder Signal™ scoring saves significant evaluation time." },
+      { type: "heading", level: 2, content: "Availability Checking" },
+      { type: "paragraph", content: "Wordoid filters results by domain availability as part of its generation — you see only available domains. NamoLux checks availability in real-time across multiple TLDs and shows both available and taken options so you can see the full brand landscape for each name candidate. If a .com is taken but .io is available, NamoLux shows you both states — which is useful context when evaluating whether to pursue the name." },
+      { type: "heading", level: 2, content: "When Wordoid Is the Right Tool" },
+      { type: "paragraph", content: "When you want a large volume of pronounceable invented-word options to stimulate your own creative process. When you have strong phonetic preferences (you want the name to feel Latin, French, or English-influenced). When you're in the early exploration phase and want maximum variety before narrowing down." },
+      { type: "heading", level: 2, content: "When NamoLux Is the Right Tool" },
+      { type: "paragraph", content: "When you want names that are strategically connected to your brand brief — not just phonetically valid strings. When quality scoring matters and you want to compare candidates on objective criteria. When you need availability checked across multiple TLDs simultaneously. When you want the output to work as a starting point for a real naming decision rather than creative brainstorming." },
+      { type: "callout", calloutType: "cta", content: "Generate brand-brief-informed names with real quality scoring — not just available invented words.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" }
+    ],
+    faqs: [
+      { question: "Are made-up brand names harder to rank for in SEO?", answer: "Slightly, in the short term — invented words have no existing search volume. But invented names become highly rankable for branded searches once you build brand recognition, and they avoid the intense keyword competition that descriptive names face. The world's most valuable brands are almost all invented words: Google, Apple, Spotify, Slack, Figma. SEO adapts to the brand; the brand shouldn't be constrained by SEO." },
+      { question: "Does Wordoid check trademark availability?", answer: "No. Wordoid checks domain availability but does not screen for trademark conflicts. Neither does NamoLux — both tools check domain availability only. Before committing to any invented name, run a trademark search on USPTO.gov (US) or IPO.gov.uk (UK) regardless of which tool generated the name." },
+      { question: "Can I use both Wordoid and NamoLux together?", answer: "Yes, and the combination can work well. Use Wordoid for high-volume invented-word generation to populate an initial longlist. Use NamoLux's Founder Signal™ scoring to evaluate which of your shortlisted candidates has the strongest brand fundamentals. The tools serve different phases of the same naming process." }
+    ]
+  } as BlogPost,
+
 ]
 
 // Utility functions
