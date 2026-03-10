@@ -405,6 +405,9 @@ export function GenerateNames() {
   // Bulk check state
   const [isBulkMode, setIsBulkMode] = useState(false)
   const [bulkInput, setBulkInput] = useState("")
+  const [description, setDescription] = useState("")
+  const [isExtracting, setIsExtracting] = useState(false)
+  const [extractError, setExtractError] = useState<string | null>(null)
 
   // Mobile UI state
   const [isMobileShortlistOpen, setIsMobileShortlistOpen] = useState(false)
@@ -1037,6 +1040,32 @@ export function GenerateNames() {
     setTimeout(() => setCopiedName(null), 2000)
   }
 
+  // Extract keywords from description via AI
+  const handleExtractKeywords = async () => {
+    const text = description.trim()
+    if (text.length < 20 || isExtracting) return
+    setIsExtracting(true)
+    setExtractError(null)
+    try {
+      const res = await fetch("/api/analyze-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: text }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Analysis failed")
+      const a = data.analysis
+      setKeyword(a.keywords.join(" "))
+      setSelectedIndustry(a.industry)
+      setSelectedVibe(a.brandVibe)
+      setMaxLength(a.maxLength)
+    } catch (err: unknown) {
+      setExtractError(err instanceof Error ? err.message : "Could not analyze description")
+    } finally {
+      setIsExtracting(false)
+    }
+  }
+
   return (
     <div className="relative min-h-screen overflow-clip" style={{ background: "#050505" }}>
       {/* Luxury background – layered gold radial glows */}
@@ -1127,9 +1156,7 @@ export function GenerateNames() {
                       ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
                       : "text-white/60 hover:text-white/90"
                   )}
-                  style={!isBulkMode ? {
-                    background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
-                  } : {}}
+                  style={!isBulkMode ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
                 >
                   ✦ Generate Names
                 </button>
@@ -1141,9 +1168,7 @@ export function GenerateNames() {
                       ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
                       : "text-white/60 hover:text-white/90"
                   )}
-                  style={isBulkMode ? {
-                    background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
-                  } : {}}
+                  style={isBulkMode ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
                 >
                   📋 Bulk Check
                 </button>
@@ -1188,7 +1213,7 @@ export function GenerateNames() {
                 {/* Keyword Input */}
                 <div className="sm:col-span-2">
                   <label htmlFor="keyword" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
-                    Keyword or concept
+                    Keywords or concept
                   </label>
                   <input
                     id="keyword"
@@ -1237,6 +1262,58 @@ export function GenerateNames() {
                         <span className="ml-auto text-[11px] text-[#D4AF37]/70 animate-fade-up">{aiHint}</span>
                       )}
                     </div>
+                  )}
+                </div>
+
+                {/* Description input — extracts keywords via AI */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="description" className="mb-2 flex items-center justify-between text-xs font-medium text-white/70 sm:text-sm">
+                    <span>Or describe your startup <span className="font-normal text-white/35">(optional — AI extracts keywords)</span></span>
+                    {description.trim().length >= 20 && (
+                      <button
+                        type="button"
+                        onClick={handleExtractKeywords}
+                        disabled={isExtracting}
+                        className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold transition-all sm:text-xs disabled:opacity-50"
+                        style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}
+                      >
+                        {isExtracting ? (
+                          <><RefreshCw className="h-3 w-3 animate-spin" /> Extracting…</>
+                        ) : (
+                          <><Sparkles className="h-3 w-3" /> Extract Keywords</>
+                        )}
+                      </button>
+                    )}
+                  </label>
+                  <textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value.slice(0, 1000))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleExtractKeywords()
+                    }}
+                    placeholder="e.g., We're building an AI tool for restaurant owners to reduce food waste and automatically adjust menu pricing based on demand forecasts…"
+                    rows={3}
+                    className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none resize-none"
+                    style={{
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.4)"
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.12)"
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                      e.currentTarget.style.boxShadow = "none"
+                    }}
+                  />
+                  {extractError && (
+                    <p className="mt-1.5 text-[11px] text-red-400">{extractError}</p>
+                  )}
+                  {!extractError && description.trim().length > 0 && description.trim().length < 20 && (
+                    <p className="mt-1.5 text-[11px] text-white/30">{20 - description.trim().length} more characters to enable extraction</p>
                   )}
                 </div>
 
