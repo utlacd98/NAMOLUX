@@ -5058,6 +5058,162 @@ export const blogPosts: BlogPost[] = [
     ]
   } as BlogPost,
 
+  // ─── Namelix capture posts ────────────────────────────────────────────────
+
+  {
+    slug: "namolux-vs-namelix",
+    title: "NamoLux vs Namelix: Which AI Name Generator Is Better for Startups?",
+    description: "NamoLux vs Namelix — a direct comparison for startup founders. See which tool has deeper scoring, better .com search, and smarter brand explanations.",
+    seoTitle: "NamoLux vs Namelix: Which AI Name Generator Is Better for Startups in 2026?",
+    metaDescription: "Comparing NamoLux and Namelix for startup naming? See which tool has Founder Signal scoring, deep .com search, instant results, and brand explanation. Full feature breakdown inside.",
+    category: "Tool Comparisons",
+    readTime: 6,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    featured: true,
+    content: [
+      { type: "paragraph", content: "Both NamoLux and Namelix use AI to generate startup name ideas. Both check domain availability. But when founders who've used both describe the difference, they almost always say the same thing: Namelix gives you more options, NamoLux gives you a better answer. Here's the full comparison." },
+      { type: "heading", level: 2, content: "Feature Comparison" },
+      { type: "table", content: "", headers: ["Feature", "NamoLux", "Namelix"], rows: [
+        ["Founder Signal™ scoring (0–100)", "✅ Yes", "❌ No"],
+        ["Deep .com availability search", "✅ Yes — scans until available .coms found", "❌ Basic availability check only"],
+        ["Instant results (no multi-step setup)", "✅ Yes", "❌ Multi-step style/length onboarding"],
+        ["Brand explanation for each name", "✅ Yes — meaning + why it works", "❌ No"],
+        ["TLDs checked", ".com .io .co .ai simultaneously", ".com focus"],
+        ["Vibe / tone selector", "✅ Luxury, Futuristic, Playful, Trustworthy, Minimal", "Style categories (short, brandable, etc.)"],
+        ["Logo previews", "❌ Not included", "✅ Yes"],
+        ["Free tier", "2 generations/day, no account needed", "Unlimited, no account needed"],
+        ["Paid plan", "£15 one-time for unlimited", "Free (no paid tier)"],
+      ]},
+      { type: "heading", level: 2, content: "The Core Difference: Signal vs Volume" },
+      { type: "paragraph", content: "Namelix is optimised for volume. It returns a large catalogue of name ideas across multiple styles, which is useful when you're at the very start and want broad exploration. The problem is that it leaves all evaluation to you — there's no signal to tell you which of the 40+ results are worth your time." },
+      { type: "paragraph", content: "NamoLux is optimised for signal. Founder Signal™ scores every generated name from 0 to 100 based on phonetics, memorability, brand risk, and domain quality. Instead of browsing a long list, you start your session with a ranked shortlist. Names above 85 are strong candidates. Names below 70 are filtered out automatically." },
+      { type: "callout", calloutType: "tip", content: "Most founders spend far more time evaluating names than generating them. Scoring removes the bottleneck — which is why sessions on NamoLux typically end with a shortlist, while sessions on Namelix often end with more confusion than you started with." },
+      { type: "heading", level: 2, content: "Deep .com Search: NamoLux's Biggest Differentiator" },
+      { type: "paragraph", content: "Namelix shows whether a .com is available for each generated name. That's useful but passive — you see what happened to be available in that batch. NamoLux's Deep Search actively hunts for available .com domains, running multiple batches under your parameters until it finds names that meet quality thresholds AND are available on .com. For founders who specifically want a .com domain and don't want to compromise, this is a materially different experience." },
+      { type: "heading", level: 2, content: "Brand Explanation: Understanding Why a Name Works" },
+      { type: "paragraph", content: "NamoLux provides a brand explanation alongside each generated name — what the name evokes, where it comes from, and why it works as a brand for your specific brief. Namelix generates names but doesn't explain them. For founders who want to confidently present a name to a co-founder, investor, or partner, the explanation is often the difference between a name that lands and one that needs defending." },
+      { type: "heading", level: 2, content: "Where Namelix Still Wins" },
+      { type: "list", content: "", items: [
+        "Logo previews — Namelix's visual mockups show how each name looks as a brand identity",
+        "Fully unlimited free tier — no daily cap",
+        "High volume output — great for exploratory brainstorming at the start of a naming process",
+        "More style granularity — length and style filters give finer input control"
+      ]},
+      { type: "heading", level: 2, content: "The Verdict" },
+      { type: "paragraph", content: "If you're starting from zero and want to explore broadly before narrowing down: try Namelix first. If you've been generating names and can't identify which ones are actually good: NamoLux's Founder Signal™ scoring is what you need. For most startup founders, the optimal workflow is both — Namelix for initial exploration, NamoLux to evaluate and finalize." },
+      { type: "callout", calloutType: "cta", content: "Generate quality-scored startup names with instant .com availability and brand explanations.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" }
+    ],
+    faqs: [
+      { question: "Is NamoLux free like Namelix?", answer: "NamoLux has a free tier — 2 generations per day, no account required, with full Founder Signal™ scoring included. Namelix is fully unlimited free. If you need unlimited generations, NamoLux's one-time payment of £15 removes all limits permanently." },
+      { question: "Which tool generates better names?", answer: "'Better' depends on your definition. Namelix generates more names per session. NamoLux generates fewer but scores each one — so you spend less time evaluating. In terms of output quality, both use AI and both produce a mix of strong and weak results. The difference is that NamoLux tells you which is which." },
+      { question: "Does NamoLux generate logo previews like Namelix?", answer: "Not currently. NamoLux focuses on name quality scoring and domain availability rather than visual identity. If seeing how a name looks as a brand is important to your process, use Namelix or Looka for the visual exploration phase, after shortlisting with NamoLux." },
+      { question: "What is Founder Signal™?", answer: "Founder Signal™ is NamoLux's scoring system — a 0–100 rating for each generated name that measures phonetics, memorability, brand risk, and domain quality. It removes the guesswork from name evaluation by giving you an objective quality signal rather than requiring manual comparison of every option." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "10-best-namelix-alternatives-2026",
+    title: "10 Best Namelix Alternatives for Startup Founders (2026)",
+    description: "Looking for alternatives to Namelix? Here are the 10 best tools for generating startup names and available domains — with honest comparisons of what each one does best.",
+    seoTitle: "10 Best Namelix Alternatives for Startup Founders in 2026",
+    metaDescription: "The 10 best Namelix alternatives in 2026 — from NamoLux's Founder Signal scoring to Squadhelp's human namers and Looka's logo generation. Find the right tool for your naming project.",
+    category: "Tool Comparisons",
+    readTime: 9,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "Namelix is one of the most-used AI name generators online. But it's not the best fit for every naming project — and for founders who've already tried Namelix and haven't found a name they're confident in, the problem is usually that they need a tool with better evaluation, not just more generation. Here are the 10 best Namelix alternatives, starting with the one most designed for startup founders." },
+      { type: "heading", level: 2, content: "1. NamoLux — Best for Scored, Startup-Grade Naming" },
+      { type: "paragraph", content: "NamoLux is the most direct upgrade from Namelix for founders who need quality scoring alongside name generation. Every name NamoLux generates is evaluated by Founder Signal™ — a 0–100 score covering phonetics, memorability, brand risk, and domain quality. You see the strongest candidates immediately, without manually reviewing a list of 40+ options." },
+      { type: "paragraph", content: "NamoLux also includes Deep Search for .com — an active hunt across multiple generation batches to find names that are both high-scoring and available on .com. Brand explanations are included for every name. Free tier: 2 generations per day. Unlimited: £15 one-time." },
+      { type: "callout", calloutType: "cta", content: "Try NamoLux free — Founder Signal™ scoring, Deep .com Search, and brand explanations included.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "heading", level: 2, content: "2. Namify — Best for Social Handle Checking" },
+      { type: "paragraph", content: "Namify checks domain availability and social media handles (Instagram, Twitter, Facebook) simultaneously. For consumer brands and ecommerce businesses where consistent social handles matter from launch day, this is a standout feature. Fully free, no account required. No scoring system — you evaluate manually." },
+      { type: "heading", level: 2, content: "3. Looka — Best for Name + Logo Together" },
+      { type: "paragraph", content: "Looka is primarily a logo generator but includes name suggestions as part of its workflow. If you want to see how a name looks as a visual brand identity before committing, Looka lets you evaluate names and logo concepts simultaneously. Strong for non-technical founders who want an end-to-end brand starter kit. Paid for full logo downloads." },
+      { type: "heading", level: 2, content: "4. Squadhelp — Best for Human-Crafted Names" },
+      { type: "paragraph", content: "Squadhelp runs naming contests where professional namers submit ideas based on your brief. The quality ceiling is higher than any AI tool — the best contest submissions are genuinely creative. The tradeoff: contests cost $199–$999 and take several days. Squadhelp also has an AI generator for faster, cheaper exploration. Best for post-seed founders with naming budget and time." },
+      { type: "heading", level: 2, content: "5. Lean Domain Search — Best for .com Keyword Variations" },
+      { type: "paragraph", content: "Lean Domain Search is a single-purpose tool: you enter a keyword and it instantly returns all available .com domains containing that keyword, filterable by prefix, suffix, or anywhere. No AI generation, no scoring — pure .com availability mapping. Fast, free, and excellent for founders who have a specific keyword they want to build around." },
+      { type: "heading", level: 2, content: "6. Wordoid — Best for Invented Brandable Words" },
+      { type: "paragraph", content: "Wordoid generates invented, pronounceable words from phonetic rules — English, Spanish, French, Italian, or Portuguese. If you want a completely made-up name (like Spotify or Figma) with no real-word associations, Wordoid generates high volumes of phonetically valid coinages filtered for availability. No quality scoring — pairs well with NamoLux's Founder Signal™ for evaluation." },
+      { type: "heading", level: 2, content: "7. GoDaddy Business Name Generator — Best for Registrar Integration" },
+      { type: "paragraph", content: "GoDaddy's name generator shows available domain variations of your keyword and feeds directly into GoDaddy's registration flow. Best for founders who have a name in mind and want to confirm availability and register in a single workflow. Not designed for creative brainstorming — the output tends toward keyword combinations rather than distinctive brand names." },
+      { type: "heading", level: 2, content: "8. Shopify Business Name Generator — Best for Ecommerce Stores" },
+      { type: "paragraph", content: "Shopify's generator is tightly integrated with the Shopify ecosystem — it checks .myshopify subdomain availability alongside the domain name. Useful specifically for founders setting up a Shopify store who want to confirm store URL and domain simultaneously. Narrow focus, simple interface, free." },
+      { type: "heading", level: 2, content: "9. Oberlo Business Name Generator — Best for Dropshippers" },
+      { type: "paragraph", content: "Part of Shopify's suite, Oberlo's generator is designed specifically for ecommerce and dropshipping brand naming. It produces straightforward, commerce-friendly name suggestions based on keyword input. Very simple, very fast, fully free. Not suitable for SaaS or B2B startup naming." },
+      { type: "heading", level: 2, content: "10. Brand New Name — Best for Creative Brief Naming" },
+      { type: "paragraph", content: "Brand New Name allows more detailed brief inputs than most AI generators — you can specify brand personality traits, competitor names to avoid, and target audience characteristics. The output is tailored to the brief rather than keyword-driven. Good for founders with a clear brand strategy who want names that align with a detailed creative brief rather than a keyword." },
+      { type: "heading", level: 2, content: "How These Namelix Alternatives Compare at a Glance" },
+      { type: "table", content: "", headers: ["Tool", "Best For", "Scoring", "Free?"], rows: [
+        ["NamoLux", "Startup-grade scoring + .com deep search", "✅ Founder Signal™ 0–100", "2/day free"],
+        ["Namify", "Social handle + domain availability", "❌", "✅ Unlimited"],
+        ["Looka", "Name + logo together", "❌", "Browse free, download paid"],
+        ["Squadhelp", "Human-crafted names", "Community votes", "Limited AI, contests paid"],
+        ["Lean Domain Search", ".com keyword variations", "❌", "✅ Unlimited"],
+        ["Wordoid", "Invented brandable words", "❌", "✅ Unlimited"],
+        ["GoDaddy Generator", "Registrar-integrated domain search", "❌", "✅ Unlimited"],
+        ["Shopify Generator", "Ecommerce store naming", "❌", "✅ Unlimited"],
+        ["Oberlo Generator", "Dropshipping brand names", "❌", "✅ Unlimited"],
+        ["Brand New Name", "Detailed brief-driven naming", "❌", "✅ Unlimited"],
+      ]},
+      { type: "heading", level: 2, content: "Why NamoLux Is Different From All of These" },
+      { type: "paragraph", content: "Every tool on this list — including Namelix — generates names. The gap that NamoLux fills is evaluation. Founder Signal™ scoring answers the question every founder asks after a generation session: 'Which of these names is actually good?' Every other tool on this list leaves that question unanswered. NamoLux doesn't." },
+      { type: "callout", calloutType: "cta", content: "Find the names worth building on — scored, ranked, and with .com availability checked.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" }
+    ],
+    faqs: [
+      { question: "What's the biggest weakness of Namelix compared to alternatives?", answer: "No quality scoring. Namelix generates a high volume of name ideas but provides no signal to help you identify which ones are actually strong. This leads to naming fatigue — too many plausible options with no clear differentiator. NamoLux's Founder Signal™ scoring solves this directly." },
+      { question: "Which Namelix alternative is completely free?", answer: "Namify, Lean Domain Search, Wordoid, GoDaddy Generator, Shopify Generator, and Oberlo Generator are all fully free with no usage limits. NamoLux offers 2 free generations per day. Squadhelp and Looka require payment for full access to their premium features." },
+      { question: "Can I use NamoLux and Namelix together?", answer: "Yes — this is the most effective workflow. Use Namelix for high-volume exploration when you're at the start of the naming process and want broad coverage. Use NamoLux to score and evaluate your best candidates, and to run Deep .com Search when you need a .com domain specifically. The tools are complementary, not competing." },
+      { question: "What if none of these tools produce a name I'm happy with?", answer: "If AI tools aren't producing the right name after multiple sessions, consider Squadhelp's naming contest for human creative input, or work directly with a freelance brand strategist. AI tools are excellent for generating options quickly — they're not a replacement for expert human judgment when the naming project is high-stakes." }
+    ]
+  } as BlogPost,
+
+  {
+    slug: "namelix-alternative-namolux",
+    title: "Looking for a Namelix Alternative? Try NamoLux",
+    description: "If you like Namelix but want deeper startup-grade naming intelligence, NamoLux offers Founder Signal™ scoring, real-time .com availability, and brand explanation analysis.",
+    seoTitle: "Namelix Alternative: NamoLux | Founder Signal™ Scoring + Deep .com Search",
+    metaDescription: "Looking for a Namelix alternative? NamoLux generates startup names with Founder Signal™ scoring, real-time .com availability checking, and brand explanation — free to try.",
+    category: "Tool Comparisons",
+    readTime: 4,
+    publishedAt: "2026-03-10",
+    author: "Andrew Barrett",
+    content: [
+      { type: "paragraph", content: "If you've tried Namelix and liked the idea — AI-generated names, domain availability checked automatically — but found that you couldn't identify which names were actually worth using, NamoLux is the upgrade you're looking for." },
+      { type: "heading", level: 2, content: "What NamoLux Does Differently From Namelix" },
+      { type: "paragraph", content: "Namelix gives you a long list of name ideas. NamoLux gives you a scored shortlist. The difference sounds subtle but it changes the entire experience of a naming session." },
+      { type: "paragraph", content: "Every name NamoLux generates is evaluated by Founder Signal™ — a 0–100 score that measures phonetics, memorability, brand risk, and domain quality. You don't have to guess which names are good. The score tells you." },
+      { type: "table", content: "", headers: ["Feature", "NamoLux", "Namelix"], rows: [
+        ["Founder Signal™ scoring", "✅ Every name scored 0–100", "❌ No scoring"],
+        ["Deep .com availability search", "✅ Actively hunts available .coms", "❌ Basic check only"],
+        ["Instant results", "✅ Single input, immediate output", "❌ Multi-step setup"],
+        ["Brand explanation", "✅ Meaning + why it works", "❌ Not included"],
+        ["TLDs checked", ".com .io .co .ai", ".com primarily"],
+        ["Logo previews", "❌", "✅ Yes"],
+        ["Free tier", "2 generations/day", "Unlimited"],
+      ]},
+      { type: "heading", level: 2, content: "Founder Signal™ Scoring" },
+      { type: "paragraph", content: "Namelix generates names. NamoLux generates names and tells you which ones are good. Founder Signal™ is a proprietary scoring system that evaluates every result across four dimensions: phonetic strength (is it easy to say and hear?), memorability (will people remember it?), brand risk (does it conflict with existing marks?), and domain quality (is a clean .com or .io available?)." },
+      { type: "paragraph", content: "Names above 85 are strong candidates. Names below 70 are flagged automatically. Instead of spending 20 minutes manually evaluating which of 40 results are viable, you see the answer in seconds." },
+      { type: "heading", level: 2, content: "Deep .com Search" },
+      { type: "paragraph", content: "One of the most common frustrations with name generators: you find a name you like, and the .com is taken. NamoLux's Deep Search feature actively scans across multiple generation batches — running until it finds names that both score well on Founder Signal™ and have a .com domain available. For founders who need a .com specifically, this saves hours of manual checking." },
+      { type: "heading", level: 2, content: "Brand Explanation" },
+      { type: "paragraph", content: "For every generated name, NamoLux includes a brand explanation: what the name evokes, where the linguistic roots come from, and why it works as a brand for your specific brief. When you're presenting a name to a co-founder, investor, or branding partner, this context is often what makes the difference between a name that lands and one that gets questioned." },
+      { type: "heading", level: 2, content: "Try It Now" },
+      { type: "paragraph", content: "NamoLux is free to try — 2 generations per day, no account required, Founder Signal™ scoring included from the first session. Unlimited access is available for a one-time payment of £15." },
+      { type: "callout", calloutType: "cta", content: "Generate startup names with Founder Signal™ scoring, Deep .com Search, and brand explanations — free, no account needed.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" }
+    ],
+    faqs: [
+      { question: "Is NamoLux free like Namelix?", answer: "NamoLux has a free tier — 2 name generations per day, no account required, with full Founder Signal™ scoring on every result. Unlimited generations are available for a one-time payment of £15. Namelix is fully unlimited free with no payment option." },
+      { question: "Does NamoLux have logo previews like Namelix?", answer: "No. NamoLux focuses on name quality scoring and domain availability. For logo previews alongside name ideas, Namelix and Looka both offer visual mockups. The recommended workflow: use NamoLux to find and score your name, then use Looka or a designer for the visual identity." },
+      { question: "What if I like Namelix's style selectors?", answer: "NamoLux uses a vibe selector instead — Luxury, Futuristic, Playful, Trustworthy, or Minimal. This shapes the emotional tone of generated names rather than the grammatical style (short/long/brandable). Most founders find the vibe selector produces more tonally consistent results than style categories." },
+      { question: "Can I use Namelix and NamoLux on the same project?", answer: "Yes — and many founders do. Namelix is useful for high-volume exploration at the start. NamoLux is useful for evaluating and scoring your best candidates. Use them in sequence: Namelix first for breadth, NamoLux for evaluation and .com deep search." }
+    ]
+  } as BlogPost,
+
 ]
 
 // Utility functions
