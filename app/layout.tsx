@@ -80,6 +80,9 @@ export const metadata: Metadata = {
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
   },
+  other: {
+    "impact-site-verification": "20929c49-be60-4d7c-9e17-c535f8cc6213",
+  },
   category: "technology",
 }
 
