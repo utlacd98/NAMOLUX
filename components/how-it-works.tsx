@@ -10,7 +10,7 @@ const steps = [
     number: "02",
     title: "Generate & verify .com",
     description:
-      "Our AI generates dozens of unique names and instantly verifies .com domain availability in real-time.",
+      "Our AI generates dozens of unique names and live-checks availability across .com, .io, .ai, .co and more — usually ready in under a minute.",
   },
   {
     number: "03",

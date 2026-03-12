@@ -1,84 +1,13 @@
-﻿import { getCachedAvailability, setCachedAvailability } from "@/lib/domainGen/availability/cache"
+import { getCachedAvailability, setCachedAvailability } from "@/lib/domainGen/availability/cache"
+import { tieredCheck, mapToAvailabilityResult } from "@/lib/domainGen/availability/tieredChecker"
 import { dnsGoogleProvider } from "@/lib/domainGen/availability/providers/currentProvider"
+import { dnsCloudflareProvider } from "@/lib/domainGen/availability/providers/cloudflareProvider"
 import { rdapProvider } from "@/lib/domainGen/availability/providers/rdapProvider"
 import type { AvailabilityCheckResult, AvailabilityProvider } from "@/lib/domainGen/types"
 
+export { tieredCheck } from "@/lib/domainGen/availability/tieredChecker"
+
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-async function checkWithBackoff(
-  provider: AvailabilityProvider,
-  domain: string,
-  signal: AbortSignal | undefined,
-  maxRetries: number,
-  baseBackoffMs: number,
-): Promise<AvailabilityCheckResult | null> {
-  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
-    const result = await provider.check(domain, signal)
-    if (!result) return null
-
-    if (!result.error) {
-      return result
-    }
-
-    if (attempt < maxRetries) {
-      const jitter = Math.floor(Math.random() * 35)
-      await delay(baseBackoffMs * 2 ** attempt + jitter)
-    }
-  }
-
-  return null
-}
-
-export async function checkAvailability(
-  domain: string,
-  options?: {
-    signal?: AbortSignal
-    providers?: AvailabilityProvider[]
-    ttlMs?: number
-    maxRetries?: number
-    backoffMs?: number
-  },
-): Promise<AvailabilityCheckResult> {
-  const cached = getCachedAvailability(domain)
-  if (cached) {
-    return cached
-  }
-
-  const providers = options?.providers || [dnsGoogleProvider, rdapProvider]
-  const maxRetries = options?.maxRetries ?? 1
-  const backoffMs = options?.backoffMs ?? 120
-
-  let fallback: AvailabilityCheckResult | null = null
-
-  for (const provider of providers) {
-    const result = await checkWithBackoff(provider, domain, options?.signal, maxRetries, backoffMs)
-    if (!result) continue
-
-    if (!result.error) {
-      setCachedAvailability(domain, result, options?.ttlMs ?? DEFAULT_TTL_MS)
-      return result
-    }
-
-    fallback = fallback || result
-  }
-
-  const degraded: AvailabilityCheckResult =
-    fallback || {
-      domain,
-      available: false,
-      provider: "none",
-      latencyMs: 0,
-      confidence: "low",
-      error: "availability_unknown",
-    }
-
-  setCachedAvailability(domain, degraded, Math.min(options?.ttlMs ?? DEFAULT_TTL_MS, 60_000))
-  return degraded
-}
 
 async function mapWithConcurrency<T, R>(
   items: T[],
@@ -92,9 +21,7 @@ async function mapWithConcurrency<T, R>(
     while (true) {
       const current = index
       index += 1
-      if (current >= items.length) {
-        return
-      }
+      if (current >= items.length) return
       results[current] = await mapper(items[current], current)
     }
   })
@@ -103,32 +30,78 @@ async function mapWithConcurrency<T, R>(
   return results
 }
 
+export async function checkAvailability(
+  domain: string,
+  options?: {
+    signal?: AbortSignal
+    /** @deprecated providers override is ignored — tiered checker is always used */
+    providers?: AvailabilityProvider[]
+    ttlMs?: number
+    maxRetries?: number
+    backoffMs?: number
+    dnsTimeoutMs?: number
+    rdapTimeoutMs?: number
+  },
+): Promise<AvailabilityCheckResult> {
+  const cached = getCachedAvailability(domain)
+  if (cached) return cached
+
+  const started = Date.now()
+
+  try {
+    const result = await tieredCheck(domain, {
+      signal: options?.signal,
+      dnsTimeoutMs: options?.dnsTimeoutMs,
+      rdapTimeoutMs: options?.rdapTimeoutMs,
+    })
+
+    const mapped = mapToAvailabilityResult(result, Date.now() - started)
+    const ttl = result.status === "error" ? Math.min(options?.ttlMs ?? DEFAULT_TTL_MS, 60_000) : (options?.ttlMs ?? DEFAULT_TTL_MS)
+    setCachedAvailability(domain, mapped, ttl)
+    return mapped
+  } catch (err: any) {
+    const degraded: AvailabilityCheckResult = {
+      domain,
+      available: false,
+      provider: "none",
+      latencyMs: Date.now() - started,
+      confidence: "low",
+      error: err?.message || "availability_unknown",
+    }
+    setCachedAvailability(domain, degraded, 60_000)
+    return degraded
+  }
+}
+
 export async function checkAvailabilityBatch(
   domains: string[],
   options?: {
     signal?: AbortSignal
+    /** @deprecated providers override is ignored — tiered checker is always used */
     providers?: AvailabilityProvider[]
     ttlMs?: number
     maxRetries?: number
     backoffMs?: number
     concurrency?: number
+    dnsTimeoutMs?: number
+    rdapTimeoutMs?: number
   },
 ): Promise<AvailabilityCheckResult[]> {
-  const uniqueDomains = Array.from(new Set(domains.map((domain) => domain.toLowerCase())))
-  const concurrency = options?.concurrency ?? 6
+  const uniqueDomains = Array.from(new Set(domains.map((d) => d.toLowerCase())))
+  const concurrency = options?.concurrency ?? 5
 
-  return mapWithConcurrency(uniqueDomains, concurrency, async (domain) =>
+  return mapWithConcurrency(uniqueDomains, concurrency, (domain) =>
     checkAvailability(domain, {
       signal: options?.signal,
-      providers: options?.providers,
       ttlMs: options?.ttlMs,
-      maxRetries: options?.maxRetries,
-      backoffMs: options?.backoffMs,
+      dnsTimeoutMs: options?.dnsTimeoutMs,
+      rdapTimeoutMs: options?.rdapTimeoutMs,
     }),
   )
 }
 
 export const availabilityProviders = {
   dnsGoogleProvider,
+  dnsCloudflareProvider,
   rdapProvider,
 }

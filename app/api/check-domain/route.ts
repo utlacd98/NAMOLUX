@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
         // Pass TLD to scoring so extension strength is factored in
         const metrics = scoreDomain(domainName, tld)
 
+        const tiered = availability?.tieredDetails
         return {
           name: domainName,
           tld,
@@ -107,6 +108,15 @@ export async function POST(request: NextRequest) {
           availabilityProvider: availability?.provider || "unknown",
           availabilityLatencyMs: availability?.latencyMs || 0,
           availabilityCached: Boolean(availability?.cached),
+          availabilityConfidence: availability?.confidence || "low",
+          // Tiered check details — optional UI use for confidence indicators
+          checkStatus: tiered?.status ?? (availability?.available ? "available" : "taken"),
+          checkTiers: tiered
+            ? {
+                dns: { google: tiered.tier1.google, cloudflare: tiered.tier1.cloudflare },
+                rdap: tiered.tier2?.rdap ?? null,
+              }
+            : null,
           ...metrics,
         }
       }),

@@ -44,6 +44,7 @@ const NAV_ITEMS = [
   { id: "geo", label: "Geo & Devices", icon: Globe },
   { id: "events", label: "Events", icon: Activity },
   { id: "email-list", label: "Email List", icon: Mail },
+  { id: "signups", label: "Signups", icon: UserPlus },
   { id: "seo-intel", label: "SEO Intelligence", icon: Target },
   { id: "content-perf", label: "Content Performance", icon: LineChartIcon },
   { id: "competitor", label: "Competitor Monitor", icon: Crosshair },
@@ -492,7 +493,7 @@ export default function MetricsPage() {
   useEffect(() => { fetchData(); fetchEvents() }, [])
   useEffect(() => { if (activeTab === "events") fetchEvents(1) }, [activeTab, eventFilter, searchQuery, days])
   useEffect(() => { if (activeTab === "blog-analytics") fetchBlogAnalytics() }, [activeTab, days])
-  useEffect(() => { if (activeTab === "email-list") fetchEmailList() }, [activeTab])
+  useEffect(() => { if (activeTab === "email-list" || activeTab === "signups") fetchEmailList() }, [activeTab])
 
   const handleDaysChange = (d: 7 | 30 | 90) => { setDays(d); fetchData(d); if (activeTab === "events") fetchEvents(1) }
   const handleExport = () => { window.open(`/api/metrics/export?days=${days}`, "_blank") }
@@ -1250,6 +1251,104 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
               </div>
             </div>
           )}
+
+          {/* SIGNUPS TAB */}
+          {activeTab === "signups" && (() => {
+            const signupList = emailList.filter(e => e.source === "signup")
+            const todaySignups = signupList.filter(e => new Date(e.created_at).toDateString() === new Date().toDateString()).length
+            const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7)
+            const weekSignups = signupList.filter(e => new Date(e.created_at) > weekAgo).length
+            return (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    <UserPlus className="h-5 w-5 text-primary" />
+                    Account Signups
+                  </h2>
+                  <button onClick={fetchEmailList} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/40 text-sm text-muted-foreground hover:text-foreground">
+                    <RefreshCw className={`h-4 w-4 ${emailLoading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </button>
+                </div>
+
+                {/* Stats */}
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                    <div className="flex items-center gap-2 text-primary mb-1">
+                      <Users className="h-4 w-4" />
+                      <span className="text-xs">Total Signups</span>
+                    </div>
+                    <p className="text-2xl font-bold text-foreground">{signupList.length}</p>
+                  </div>
+                  <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+                    <div className="flex items-center gap-2 text-blue-400 mb-1">
+                      <UserPlus className="h-4 w-4" />
+                      <span className="text-xs">This Week</span>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-400">+{weekSignups}</p>
+                  </div>
+                  <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+                    <div className="flex items-center gap-2 text-green-400 mb-1">
+                      <Zap className="h-4 w-4" />
+                      <span className="text-xs">Today</span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-400">+{todaySignups}</p>
+                  </div>
+                </div>
+
+                {/* Signups Table */}
+                <div className="rounded-xl border border-border/40 bg-card/30 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/20">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
+                          <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Status</th>
+                          <th className="px-4 py-3 text-left font-medium text-muted-foreground">Signed Up</th>
+                          <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {signupList.map((subscriber) => (
+                          <tr key={subscriber.id} className="border-b border-border/20 last:border-0 hover:bg-muted/10">
+                            <td className="px-4 py-3 font-medium text-foreground">{subscriber.email}</td>
+                            <td className="px-4 py-3 hidden sm:table-cell">
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                subscriber.status === "subscribed" ? "bg-green-500/20 text-green-400" :
+                                subscriber.status === "unsubscribed" ? "bg-red-500/20 text-red-400" :
+                                "bg-amber-500/20 text-amber-400"
+                              }`}>
+                                {subscriber.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-muted-foreground text-xs">
+                              {new Date(subscriber.created_at).toLocaleDateString()} {new Date(subscriber.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <button
+                                onClick={() => unsubscribeEmail(subscriber.email, true)}
+                                className="p-1.5 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
+                                title="Delete permanently"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {signupList.length === 0 && (
+                          <tr>
+                            <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                              {emailLoading ? "Loading..." : "No signups yet. New account registrations will appear here automatically."}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* SEO INTELLIGENCE TAB */}
           {activeTab === "seo-intel" && (

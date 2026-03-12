@@ -60,7 +60,7 @@ export default function AboutPage() {
               </p>
               <p className="mt-4 text-muted-foreground leading-relaxed">
                 NamoLux was built to solve this problem. We combine AI-powered name generation with 
-                instant availability checking and our proprietary Founder Signal™ scoring system to 
+                live availability checking and our proprietary Founder Signal™ scoring system to
                 help you find domains that are not just available, but actually worth building on.
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function AboutPage() {
               Ready to find your perfect domain?
             </h2>
             <p className="mb-6 text-muted-foreground">
-              Generate brandable domain ideas with instant availability checks
+              Generate brandable domain ideas with live availability checks
               and Founder Signal™ scoring.
             </p>
             <Button asChild size="lg" className="gap-2">

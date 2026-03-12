@@ -174,7 +174,7 @@ export function Hero() {
               </Link>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/30">
-                {["No account required", "1 free generation/day", "Instant results"].map(t => (
+                {["No account required", "1 free generation/day", "Live-checked results"].map(t => (
                   <span key={t} className="flex items-center gap-1">
                     <Check className="h-3 w-3 text-emerald-500/70" /> {t}
                   </span>
@@ -217,7 +217,7 @@ export function Hero() {
                   },
                   {
                     icon: <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500/70" />,
-                    num: "Instant", sub: "Results",
+                    num: "~30s", sub: "AI + live DNS",
                   },
                   {
                     icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,
@@ -251,7 +251,7 @@ export function Hero() {
                   },
                   {
                     icon: <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500/70" />,
-                    num: "Instant", sub: "Results",
+                    num: "~30s", sub: "AI + live DNS",
                   },
                   {
                     icon: <Zap className="h-3.5 w-3.5 shrink-0 text-[#D4AF37]" />,

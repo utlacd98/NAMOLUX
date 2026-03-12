@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 const stats = [
   { value: "10,000+", label: "Names generated" },
   { value: "1,200+", label: "Shortlists created" },
-  { value: "<3s", label: "To verify domains" },
+  { value: "<60s", label: "AI + live domain check" },
 ]
 
 const fictionalLogos = [

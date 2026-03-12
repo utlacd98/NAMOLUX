@@ -56,6 +56,25 @@ export interface NearMissOption {
   availableTlds: string[]
 }
 
+export type DomainStatus = "available" | "taken" | "likely_available" | "needs_verification" | "error"
+
+export interface DomainCheckResult {
+  domain: string
+  status: DomainStatus
+  checkedAt: Date
+  tier1: {
+    google: "available" | "taken" | "error"
+    cloudflare: "available" | "taken" | "error"
+  }
+  tier2?: {
+    rdap: "registered" | "unregistered" | "error"
+  }
+  tier3?: {
+    price: number | null
+    registrar: string | null
+  }
+}
+
 export interface AvailabilityCheckResult {
   domain: string
   available: boolean
@@ -64,6 +83,8 @@ export interface AvailabilityCheckResult {
   cached?: boolean
   confidence: "high" | "medium" | "low"
   error?: string
+  /** Full tiered check details — present when the tiered checker ran */
+  tieredDetails?: DomainCheckResult
 }
 
 export interface AvailabilityProvider {

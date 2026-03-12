@@ -125,7 +125,7 @@ function ResultCard({
               )}
             </button>
             <a
-              href={`https://porkbun.com/checkout/search?q=${encodeURIComponent(result.fullDomain)}`}
+              href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(result.fullDomain)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-black transition-all hover:-translate-y-0.5"

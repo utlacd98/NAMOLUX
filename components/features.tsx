@@ -10,7 +10,7 @@ const features = [
   {
     icon: Zap,
     title: "Auto domain verification",
-    description: "Every suggested name is instantly checked via real-time DNS lookups—no manual verification needed.",
+    description: "Every suggested name is live-verified via 3-source DNS and RDAP — no manual checking needed. Results typically ready in under a minute.",
     highlight: false,
   },
   {

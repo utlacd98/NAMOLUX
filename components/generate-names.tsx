@@ -115,6 +115,10 @@ interface DomainResult {
   brandableScore?: number
   pronounceabilityScore?: number
   meaning?: string
+  /** From tiered checker — granular availability status */
+  checkStatus?: "available" | "taken" | "likely_available" | "needs_verification" | "error"
+  /** Confidence level from tiered checker */
+  availabilityConfidence?: "high" | "medium" | "low"
 }
 
 type AutoFindMustIncludeKeyword = "exact" | "partial" | "none"
@@ -1783,14 +1787,29 @@ export function GenerateNames() {
                                 ))}
                               </div>
                             </div>
-                            <span className={cn(
-                              "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                              isPremiumDomain
-                                ? "bg-amber-500/15 text-amber-400"
-                                : "bg-green-500/15 text-green-400"
-                            )}>
-                              {isPremiumDomain ? "Premium" : "Available"}
-                            </span>
+                            {isPremiumDomain ? (
+                              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                                Premium
+                              </span>
+                            ) : result.checkStatus === "available" ? (
+                              <span
+                                className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400"
+                                title="Confirmed unregistered via RDAP registry lookup"
+                              >
+                                Verified free
+                              </span>
+                            ) : result.checkStatus === "likely_available" ? (
+                              <span
+                                className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-500"
+                                title="DNS says available — no RDAP endpoint for this TLD"
+                              >
+                                Likely free
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-green-500/15 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                                Available
+                              </span>
+                            )}
                           </div>
                           <div className={cn("mt-2 flex items-center gap-1.5", isBlurred && "blur-sm pointer-events-none")}>
                             <button
@@ -1823,7 +1842,7 @@ export function GenerateNames() {
                               )}
                             </button>
                             <a
-                              href={`https://porkbun.com/checkout/search?q=${result.fullDomain}`}
+                              href={`https://www.namecheap.com/domains/registration/results/?domain=${result.fullDomain}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
@@ -1971,9 +1990,13 @@ export function GenerateNames() {
                       )}
                     </Button>
                     <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground sm:gap-2 sm:text-sm">
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1" title="Confirmed unregistered via RDAP">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-500 sm:h-2 sm:w-2" />
-                        Available
+                        Verified free
+                      </span>
+                      <span className="flex items-center gap-1" title="DNS says available — RDAP not available for this TLD">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 sm:h-2 sm:w-2" />
+                        Likely free
                       </span>
                       <span className="flex items-center gap-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground sm:h-2 sm:w-2" />
@@ -2096,24 +2119,32 @@ export function GenerateNames() {
                                 <span className="text-base font-bold text-white sm:text-lg">{name}</span>
                               </div>
 
-                              {/* TLD badges — green + clickable if available, gray + strikethrough if taken */}
+                              {/* TLD badges — green (verified) or emerald (likely free) if available, gray + strikethrough if taken */}
                               <div className="ml-11 flex flex-wrap gap-1.5">
                                 {tlds.map((r) =>
                                   r.available ? (
                                     <a
                                       key={r.tld}
-                                      href={`https://porkbun.com/checkout/search?q=${r.fullDomain}`}
+                                      href={`https://www.namecheap.com/domains/registration/results/?domain=${r.fullDomain}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5 sm:text-xs"
-                                      style={{
+                                      style={r.checkStatus === "likely_available" ? {
+                                        background: "rgba(16,185,129,0.08)",
+                                        color: "#6ee7b7",
+                                        border: "1px solid rgba(16,185,129,0.18)",
+                                      } : {
                                         background: "rgba(52,211,153,0.1)",
                                         color: "#34d399",
                                         border: "1px solid rgba(52,211,153,0.2)",
                                       }}
-                                      title={`Register ${r.fullDomain}`}
+                                      title={r.checkStatus === "available"
+                                        ? `Confirmed free via RDAP — register ${r.fullDomain}`
+                                        : r.checkStatus === "likely_available"
+                                        ? `DNS says available (RDAP not available for this TLD) — register ${r.fullDomain}`
+                                        : `Register ${r.fullDomain}`}
                                     >
-                                      .{r.tld} ✓
+                                      .{r.tld} {r.checkStatus === "likely_available" ? "~" : "✓"}
                                     </a>
                                   ) : (
                                     <span
@@ -2194,7 +2225,7 @@ export function GenerateNames() {
                               {availableTlds.map((r, i) => (
                                 <a
                                   key={r.tld}
-                                  href={`https://porkbun.com/checkout/search?q=${r.fullDomain}`}
+                                  href={`https://www.namecheap.com/domains/registration/results/?domain=${r.fullDomain}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
@@ -2425,7 +2456,7 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
+                          href={`https://www.namecheap.com/domains/registration/results/?domain=${fullDomain}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-all hover:-translate-y-0.5"
@@ -2523,7 +2554,7 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={`https://porkbun.com/checkout/search?q=${fullDomain}`}
+                          href={`https://www.namecheap.com/domains/registration/results/?domain=${fullDomain}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex min-h-[40px] items-center gap-1 rounded-lg px-3 text-xs font-semibold"

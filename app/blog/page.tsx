@@ -65,7 +65,7 @@ export default function BlogPage() {
               Ready to find your perfect domain?
             </h2>
             <p className="mb-6 text-muted-foreground">
-              Generate brandable domain ideas with instant availability checks
+              Generate brandable domain ideas with live availability checks
               and Founder Signal™ scoring.
             </p>
             <Button asChild size="lg" className="gap-2">

@@ -14,7 +14,7 @@ interface BlogCTAProps {
 export function BlogCTA({
   variant = "box",
   title = "Ready to find your perfect domain?",
-  description = "Generate brandable domain ideas with instant availability checks and Founder Signal™ scoring.",
+  description = "Generate brandable domain ideas with live availability checks and Founder Signal™ scoring.",
   ctaText = "Try NamoLux Free",
   ctaLink = "/generate",
 }: BlogCTAProps) {
