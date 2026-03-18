@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import { checkAvailability, checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
+import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -196,13 +197,15 @@ export async function GET(request: NextRequest) {
 
               found.push(domain)
 
-              // Check other TLDs in parallel (non-blocking — fire and stream result immediately,
-              // then patch with TLD data once resolved)
+              // Run other TLD checks + social handle checks in parallel
               const otherTldDomains = OTHER_TLDS.map((tld) => `${name}.${tld}`)
-              const otherTldResults = await checkAvailabilityBatch(otherTldDomains, {
-                signal: abortController.signal,
-                concurrency: 5,
-              }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>)
+              const [otherTldResults, socialResults] = await Promise.all([
+                checkAvailabilityBatch(otherTldDomains, {
+                  signal: abortController.signal,
+                  concurrency: 5,
+                }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>),
+                checkSocialHandles(name).catch(() => [] as SocialHandleResult[]),
+              ])
 
               const otherTlds: Record<string, boolean | null> = {}
               for (const tld of OTHER_TLDS) {
@@ -222,6 +225,7 @@ export async function GET(request: NextRequest) {
                   reasons: scored.reasons,
                   breakdown: scored.breakdown,
                   otherTlds,
+                  socials: socialResults,
                 },
               })
 
