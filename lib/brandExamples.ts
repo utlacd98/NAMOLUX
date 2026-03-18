@@ -317,6 +317,8 @@ function pickRandom<T>(arr: T[], n: number): T[] {
 //   "names-only"    → returns a JSON array of lowercase strings (Deep Search)
 //   "with-metadata" → returns a JSON array of {name, reasoning, meaning} (normal gen)
 // ---------------------------------------------------------------------------
+export type DeepSearchStrategy = "invented" | "compound" | "root+suffix" | "metaphor"
+
 export interface BuildPromptOptions {
   keywords: string
   industry: string
@@ -325,10 +327,25 @@ export interface BuildPromptOptions {
   batchSize: number
   outputFormat: "names-only" | "with-metadata"
   alreadySeen?: string[]
+  /** Deep Search: which naming strategy to emphasise this batch */
+  strategy?: DeepSearchStrategy
+  /** Deep Search: names confirmed taken — lets GPT learn which patterns to avoid */
+  takenNames?: string[]
+}
+
+const STRATEGY_INSTRUCTIONS: Record<DeepSearchStrategy, string> = {
+  invented:
+    "THIS BATCH: Focus on clean invented words only (Approach 4). Pure coined words following CVCV, CVCCV, or CVCVC patterns. No real English words, no compounds. Think Figma, Canva, Vercel, Zillow, Brex, Pendo. All names must be ≤7 characters.",
+  compound:
+    "THIS BATCH: Focus on short compound words only (Approach 3). Two short real English words merged into one. Think Dropbox, Webflow, Mailchimp, Basecamp, Hubspot. Both parts must be recognisable. Total length ≤10 characters.",
+  "root+suffix":
+    "THIS BATCH: Focus on roots with clean endings (Approach 2). Real word root + natural ending: -ly, -io, -era, -va, -ix, -ify, -ara, -ora, -ova. Think Shopify, Cloudera, Airtable. Root must be instantly recognisable. Do not repeat any suffix used in a previous name.",
+  metaphor:
+    "THIS BATCH: Focus on evocative real words from adjacent domains (Approach 1). Pick words from nature, physics, mythology, architecture, or craft that carry the right emotional weight for this industry. Think Notion, Slack, Plaid, Mercury, Titan, Arc. No made-up words this batch.",
 }
 
 export function buildGenerationPrompt(opts: BuildPromptOptions): { system: string; user: string } {
-  const { keywords, industry, brandVibe, maxLength, batchSize, outputFormat, alreadySeen = [] } = opts
+  const { keywords, industry, brandVibe, maxLength, batchSize, outputFormat, alreadySeen = [], strategy, takenNames = [] } = opts
 
   const resolved = resolveIndustry(industry)
   const examples = brandExamples[resolved] ?? brandExamples.default
@@ -342,9 +359,16 @@ export function buildGenerationPrompt(opts: BuildPromptOptions): { system: strin
       ? `\nDo NOT suggest any of these already-generated names: ${alreadySeen.slice(0, 50).join(", ")}`
       : ""
 
+  const strategyNote = strategy ? `\n\n${STRATEGY_INSTRUCTIONS[strategy]}` : ""
+
+  const takenNote =
+    takenNames.length > 0
+      ? `\n\nPATTERN FEEDBACK — these names were already checked and are TAKEN (avoid similar patterns): ${takenNames.slice(0, 20).join(", ")}`
+      : ""
+
   const deepSearchNote =
     outputFormat === "names-only"
-      ? "\nIMPORTANT: These names will be checked for .com availability. Lean toward invented words (Approaches 2 and 4) and less common compound words (Approach 3), as common real English words are almost always taken as .com domains. The names must still sound like real brands."
+      ? "\nIMPORTANT: These names will be checked for .com availability. Common real English words are almost always taken as .com domains — lean toward invented words and less common combinations. Names must still sound like real brands."
       : ""
 
   const outputInstruction =
@@ -408,7 +432,7 @@ QUALITY TEST — before including any name:
 3. Can someone hear it once and spell it correctly?
 4. Does it hint at something relevant to the keywords or industry?
 
-If any answer is no, discard and replace.${deepSearchNote}`
+If any answer is no, discard and replace.${deepSearchNote}${strategyNote}${takenNote}`
 
   const user = `Generate ${batchSize} unique, brandable startup names.
 

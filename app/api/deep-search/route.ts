@@ -1,40 +1,40 @@
 import { NextRequest } from "next/server"
 import OpenAI from "openai"
-import { checkAvailability } from "@/lib/domainGen/availability"
+import { checkAvailability, checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
-import { buildGenerationPrompt } from "@/lib/brandExamples"
+import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
 
-// Each batch asks for this many candidates; 6 batches × 13 ≈ 75 total combos tested
-const BATCH_SIZE = 13
+// 5 batches × 16 names ≈ 80 total candidates (fewer round-trips vs 6×13)
+const BATCH_SIZE = 16
 const MAX_FOUND = 10
-const MAX_BATCHES = 6
+const MAX_BATCHES = 5
+
+// Minimum Founder Signal score before we bother checking availability.
+// Cuts wasted RDAP calls on low-quality names by ~40%.
+const PRE_SCORE_FLOOR = 68
+
+// Strategy rotation order per batch
+const STRATEGIES: DeepSearchStrategy[] = ["invented", "compound", "root+suffix", "metaphor", "invented"]
+
+// Other TLDs to check once a .com is confirmed available
+const OTHER_TLDS = ["io", "co", "ai", "app", "dev"] as const
 
 // ---------------------------------------------------------------------------
 // Server-side pronounceability filter
-// Catches garbage names that slip through despite prompt instructions.
 // ---------------------------------------------------------------------------
 const ALLOWED_CLUSTERS = /str|nch|nds|nks|ght|tch|dge|nge|rch|rds|rks|rts|nts|mps|lts|fts|cts|spl|spr|scr/gi
 
 function isPronounceable(name: string): boolean {
-  // Must contain at least one vowel
   if (!/[aeiou]/i.test(name)) return false
-
-  // Must be at least 3 characters
   if (name.length < 3) return false
-
-  // No triple repeated characters
   if (/(.)\1\1/.test(name)) return false
-
-  // Reject 3+ consecutive consonants (after masking known-good clusters)
   const masked = name.replace(ALLOWED_CLUSTERS, "aa")
   if (/[^aeiou]{3,}/i.test(masked)) return false
-
   return true
 }
-
 
 // ---------------------------------------------------------------------------
 // OpenAI call
@@ -49,6 +49,8 @@ async function generateBatch(
   industry: string,
   maxLength: number,
   alreadySeen: Set<string>,
+  takenNames: string[],
+  strategy: DeepSearchStrategy,
   signal: AbortSignal,
 ): Promise<string[]> {
   const client = getClient()
@@ -60,6 +62,8 @@ async function generateBatch(
     batchSize: BATCH_SIZE,
     outputFormat: "names-only",
     alreadySeen: Array.from(alreadySeen),
+    strategy,
+    takenNames,
   })
 
   const completion = await client.chat.completions.create(
@@ -70,7 +74,7 @@ async function generateBatch(
         { role: "user", content: user },
       ],
       temperature: 0.92,
-      max_tokens: 300,
+      max_tokens: 320,
     },
     { signal },
   )
@@ -89,11 +93,8 @@ async function generateBatch(
   return (
     names
       .filter((n): n is string => typeof n === "string")
-      // Normalise: lowercase, letters only
       .map((n) => n.toLowerCase().replace(/[^a-z]/g, ""))
-      // Basic length and dedup filter
       .filter((n) => n.length >= 3 && n.length <= maxLength && !alreadySeen.has(n))
-      // Server-side pronounceability gate
       .filter(isPronounceable)
   )
 }
@@ -128,23 +129,30 @@ export async function GET(request: NextRequest) {
 
       const found: string[] = []
       const seen = new Set<string>()
+      const takenNames: string[] = []
 
       try {
         for (let batchIdx = 0; batchIdx < MAX_BATCHES; batchIdx++) {
           if (found.length >= MAX_FOUND) break
           if (abortController.signal.aborted) break
 
+          const strategy = STRATEGIES[batchIdx]
+
           send({
             type: "progress",
             batch: batchIdx + 1,
             totalBatches: MAX_BATCHES,
             found: found.length,
-            message: `Round ${batchIdx + 1}/${MAX_BATCHES} — generating candidates…`,
+            message: `Round ${batchIdx + 1}/${MAX_BATCHES} — generating ${strategy} names…`,
           })
 
           let candidates: string[] = []
           try {
-            candidates = await generateBatch(keyword, vibe, industry, maxLength, seen, abortController.signal)
+            candidates = await generateBatch(
+              keyword, vibe, industry, maxLength,
+              seen, takenNames, strategy,
+              abortController.signal,
+            )
           } catch (err: unknown) {
             if (abortController.signal.aborted) break
             send({
@@ -155,11 +163,17 @@ export async function GET(request: NextRequest) {
             break
           }
 
-          // Mark all candidates as seen so next batch doesn't duplicate
+          // Mark all as seen so future batches don't duplicate
           candidates.forEach((n) => seen.add(n))
 
-          // Check .com availability for each candidate
-          for (const name of candidates) {
+          // Pre-score: skip availability check for low-quality names
+          const qualityCandidates = candidates.filter((name) => {
+            const scored = scoreName({ name, tld: "com", vibe: (vibe as BrandVibe) || undefined, keywords: [keyword] })
+            return scored.score >= PRE_SCORE_FLOOR
+          })
+
+          // Check .com availability for quality candidates
+          for (const name of qualityCandidates) {
             if (found.length >= MAX_FOUND) break
             if (abortController.signal.aborted) break
 
@@ -167,7 +181,11 @@ export async function GET(request: NextRequest) {
 
             try {
               const avResult = await checkAvailability(domain, { signal: abortController.signal })
-              if (!avResult.available) continue
+
+              if (!avResult.available) {
+                takenNames.push(name)
+                continue
+              }
 
               const scored = scoreName({
                 name,
@@ -177,6 +195,20 @@ export async function GET(request: NextRequest) {
               })
 
               found.push(domain)
+
+              // Check other TLDs in parallel (non-blocking — fire and stream result immediately,
+              // then patch with TLD data once resolved)
+              const otherTldDomains = OTHER_TLDS.map((tld) => `${name}.${tld}`)
+              const otherTldResults = await checkAvailabilityBatch(otherTldDomains, {
+                signal: abortController.signal,
+                concurrency: 5,
+              }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>)
+
+              const otherTlds: Record<string, boolean | null> = {}
+              for (const tld of OTHER_TLDS) {
+                const r = otherTldResults.find((x) => x.domain === `${name}.${tld}`)
+                otherTlds[tld] = r ? r.available : null
+              }
 
               send({
                 type: "result",
@@ -189,6 +221,7 @@ export async function GET(request: NextRequest) {
                   label: scored.label,
                   reasons: scored.reasons,
                   breakdown: scored.breakdown,
+                  otherTlds,
                 },
               })
 

@@ -2,8 +2,10 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Check, X, Copy, CheckCircle, Search, RefreshCw, ExternalLink, Zap, ChevronDown, ChevronUp } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { FounderSignalPanel } from "@/components/founder-signal"
+
+const OTHER_TLDS = ["io", "co", "ai", "app", "dev"] as const
+type OtherTld = typeof OTHER_TLDS[number]
 
 interface DeepResult {
   name: string
@@ -14,6 +16,7 @@ interface DeepResult {
   label: string
   reasons: string[]
   breakdown: Record<string, number>
+  otherTlds?: Partial<Record<OtherTld, boolean | null>>
 }
 
 interface ProgressState {
@@ -42,6 +45,14 @@ const scoreBand = (score: number) => {
   if (score >= 65) return "Strong"
   if (score >= 50) return "Good"
   return "Fair"
+}
+
+function TldDot({ available }: { available: boolean | null | undefined }) {
+  if (available === true)
+    return <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" title="Available" />
+  if (available === false)
+    return <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500/70" title="Taken" />
+  return <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/20" title="Not checked" />
 }
 
 function ResultCard({
@@ -106,7 +117,7 @@ function ResultCard({
                   border: "1px solid rgba(52,211,153,0.2)",
                 }}
               >
-                .com
+                .com ✓
               </span>
             </div>
           </div>
@@ -150,6 +161,40 @@ function ResultCard({
           </span>
         </div>
 
+        {/* Other TLD availability row */}
+        {result.otherTlds && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {OTHER_TLDS.map((tld) => {
+              const av = result.otherTlds?.[tld]
+              const isAvail = av === true
+              const isTaken = av === false
+              return (
+                <div key={tld} className="flex items-center gap-1">
+                  <TldDot available={av} />
+                  {isAvail ? (
+                    <a
+                      href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(`${result.name}.${tld}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] font-medium transition-colors hover:text-green-400"
+                      style={{ color: "rgba(52,211,153,0.8)" }}
+                    >
+                      .{tld}
+                    </a>
+                  ) : (
+                    <span
+                      className="text-[10px]"
+                      style={{ color: isTaken ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.3)" }}
+                    >
+                      .{tld}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {/* Founder Signal */}
         <div className="mt-3">
           <FounderSignalPanel name={result.name} tld="com" />
@@ -168,6 +213,7 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
   const [error, setError] = useState<string | null>(null)
   const [hasPartial, setHasPartial] = useState(false)
   const [copiedName, setCopiedName] = useState<string | null>(null)
+  const [lastFoundName, setLastFoundName] = useState<string | null>(null)
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
 
@@ -189,9 +235,9 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
     setError(null)
     setHasPartial(false)
     setProgress(null)
+    setLastFoundName(null)
     setRunning(true)
 
-    // Scroll into view
     setTimeout(() => {
       sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     }, 100)
@@ -242,7 +288,9 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
           }
 
           if (event.type === "result") {
-            setResults((prev) => [...prev, event.result as DeepResult])
+            const r = event.result as DeepResult
+            setResults((prev) => [...prev, r])
+            setLastFoundName(r.name)
           } else if (event.type === "progress") {
             setProgress({
               batch: event.batch as number,
@@ -276,7 +324,6 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
     }
   }, [keyword, vibe, industry, maxLength, cancel, done])
 
-  // Cancel on unmount
   useEffect(() => () => cancel(), [cancel])
 
   function copyToClipboard(domain: string) {
@@ -289,43 +336,39 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
   const hasResults = results.length > 0
 
   return (
-    <div ref={sectionRef} className="mb-4">
-      {/* ── Trigger strip ── */}
-      <div
-        className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 cursor-pointer transition-all"
-        style={{
-          background: expanded
-            ? "rgba(212,175,55,0.08)"
-            : "rgba(212,175,55,0.04)",
-          border: expanded
-            ? "1px solid rgba(212,175,55,0.25)"
-            : "1px solid rgba(212,175,55,0.14)",
-        }}
-        onClick={() => !running && setExpanded((v) => !v)}
-      >
-        <div className="flex items-center gap-2.5">
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-            style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.2)" }}
-          >
-            <Zap className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
-          </div>
-          <div>
-            <span className="text-xs font-bold text-white">Deep Search for .com</span>
-            <span className="ml-2 text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-              {running
-                ? `Searching… ${results.length} found`
-                : done
-                ? `${results.length} available .com name${results.length !== 1 ? "s" : ""} found`
-                : "AI tests 6 remix strategies · checks live .com availability · up to 75 combos"}
+    <>
+      {/* ── Sticky progress bar (shown while search runs, fixed at bottom of viewport) ── */}
+      {running && progress && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6"
+          style={{
+            background: "rgba(10,10,15,0.95)",
+            borderTop: "1px solid rgba(212,175,55,0.2)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex gap-1 shrink-0">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-1.5 w-1.5 animate-pulse rounded-full"
+                  style={{ background: "#D4AF37", animationDelay: `${i * 0.2}s`, opacity: 0.8 }}
+                />
+              ))}
+            </div>
+            <span className="truncate text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+              {lastFoundName
+                ? <><span style={{ color: "#D4AF37" }}>{lastFoundName}.com</span> found</>
+                : <span style={{ color: "rgba(212,175,55,0.7)" }}>Searching…</span>}
             </span>
           </div>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          {running && (
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs tabular-nums font-semibold" style={{ color: "#D4AF37" }}>
+              {progress.found}/{MAX_FOUND}
+            </span>
             <button
-              onClick={(e) => { e.stopPropagation(); cancel() }}
+              onClick={cancel}
               className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-medium transition-all"
               style={{
                 background: "rgba(255,255,255,0.05)",
@@ -336,162 +379,210 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
               <X className="h-3 w-3" />
               Stop
             </button>
-          )}
-
-          <button
-            onClick={(e) => { e.stopPropagation(); startSearch() }}
-            disabled={running || !keyword.trim()}
-            className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[10px] font-bold text-black transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-            style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
-          >
-            {running ? (
-              <>
-                <RefreshCw className="h-3 w-3 animate-spin" />
-                Searching…
-              </>
-            ) : hasResults || done ? (
-              <>
-                <RefreshCw className="h-3 w-3" />
-                Search Again
-              </>
-            ) : (
-              <>
-                <Search className="h-3 w-3" />
-                Start Deep Search
-              </>
-            )}
-          </button>
-
-          {!running && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v) }}
-              className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
-              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ── Expanded body ── */}
-      {expanded && (
-        <div className="mt-3 space-y-3">
-          {/* Live progress */}
-          {running && progress && (
-            <div
-              className="rounded-2xl p-4"
-              style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.12)" }}
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {[0, 1, 2].map((i) => (
-                    <div
-                      key={i}
-                      className="h-1.5 w-1.5 animate-pulse rounded-full"
-                      style={{ background: "#D4AF37", animationDelay: `${i * 0.2}s`, opacity: 0.7 }}
-                    />
-                  ))}
-                  <span className="text-xs font-medium" style={{ color: "rgba(212,175,55,0.8)" }}>
-                    Searching…
-                  </span>
-                </div>
-                <span className="text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.3)" }}>
-                  {progress.found}/10 found · batch {progress.batch}/{progress.totalBatches}
-                </span>
-              </div>
-              <div className="h-1 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.max(progress.found * 10, progress.batch * 20)}%`,
-                    background: "linear-gradient(90deg, #D4AF37, #F6E27A)",
-                  }}
-                />
-              </div>
-              <p className="mt-2 text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>
-                {progress.message}
-              </p>
-            </div>
-          )}
-
-          {/* Idle (expanded but not started) */}
-          {!running && !done && !hasResults && !error && (
-            <div
-              className="flex flex-col items-center justify-center rounded-2xl px-6 py-8 text-center"
-              style={{ border: "1px dashed rgba(212,175,55,0.12)", background: "rgba(212,175,55,0.02)" }}
-            >
-              <Zap className="mb-3 h-6 w-6" style={{ color: "rgba(212,175,55,0.4)" }} />
-              <p className="text-sm font-semibold text-white">Find .com gems hiding in plain sight</p>
-              <p className="mt-1.5 max-w-xs text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-                Runs 6 AI remix strategies — blending, truncation, phonetic respelling, prefixes, letter swaps,
-                and cross-keyword mashups. Tests up to 75 combos. Streams live .com results as they&apos;re found.
-              </p>
-            </div>
-          )}
-
-          {/* Streaming / completed results */}
-          {hasResults && (
-            <div className="space-y-3">
-              {results.map((result, i) => (
-                <ResultCard
-                  key={result.fullDomain}
-                  result={result}
-                  index={i}
-                  copiedName={copiedName}
-                  onCopy={copyToClipboard}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div
-              className="flex items-start gap-3 rounded-2xl p-4"
-              style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}
-            >
-              <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-red-400">Search error</p>
-                <p className="mt-0.5 text-xs text-red-300/60">{error}</p>
-                {(hasPartial || hasResults) && (
-                  <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                    Showing {results.length} result{results.length !== 1 ? "s" : ""} found before the error.
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={startSearch}
-                className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
-                style={{
-                  background: "rgba(239,68,68,0.12)",
-                  border: "1px solid rgba(239,68,68,0.2)",
-                  color: "#f87171",
-                }}
-              >
-                <RefreshCw className="h-3 w-3" />
-                Retry
-              </button>
-            </div>
-          )}
-
-          {/* Completion */}
-          {done && !error && (
-            <div
-              className="flex items-center gap-3 rounded-2xl px-4 py-3"
-              style={{ background: "rgba(52,211,153,0.05)", border: "1px solid rgba(52,211,153,0.15)" }}
-            >
-              <Check className="h-4 w-4 shrink-0 text-green-400" />
-              <p className="text-xs text-green-300/70">
-                {results.length === 0
-                  ? "No available .com names found. Try 'Search Again' with a different keyword."
-                  : `Search complete — ${results.length} available .com name${results.length !== 1 ? "s" : ""} confirmed in real time.`}
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       )}
-    </div>
+
+      <div ref={sectionRef} className="mb-4">
+        {/* ── Trigger strip ── */}
+        <div
+          className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 cursor-pointer transition-all"
+          style={{
+            background: expanded ? "rgba(212,175,55,0.08)" : "rgba(212,175,55,0.04)",
+            border: expanded ? "1px solid rgba(212,175,55,0.25)" : "1px solid rgba(212,175,55,0.14)",
+          }}
+          onClick={() => !running && setExpanded((v) => !v)}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+              style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.2)" }}
+            >
+              <Zap className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-white">Deep Search for .com</span>
+              <span className="ml-2 text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                {running
+                  ? `Searching… ${results.length} found`
+                  : done
+                  ? `${results.length} available .com name${results.length !== 1 ? "s" : ""} found`
+                  : "AI tests 4 naming strategies · pre-scored for quality · up to 80 combos"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            {running && (
+              <button
+                onClick={(e) => { e.stopPropagation(); cancel() }}
+                className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-medium transition-all"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.4)",
+                }}
+              >
+                <X className="h-3 w-3" />
+                Stop
+              </button>
+            )}
+
+            <button
+              onClick={(e) => { e.stopPropagation(); startSearch() }}
+              disabled={running || !keyword.trim()}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[10px] font-bold text-black transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
+            >
+              {running ? (
+                <>
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  Searching…
+                </>
+              ) : hasResults || done ? (
+                <>
+                  <RefreshCw className="h-3 w-3" />
+                  Search Again
+                </>
+              ) : (
+                <>
+                  <Search className="h-3 w-3" />
+                  Start Deep Search
+                </>
+              )}
+            </button>
+
+            {!running && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v) }}
+                className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Expanded body ── */}
+        {expanded && (
+          <div className="mt-3 space-y-3">
+            {/* Live progress (in-panel) */}
+            {running && progress && (
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.12)" }}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="h-1.5 w-1.5 animate-pulse rounded-full"
+                        style={{ background: "#D4AF37", animationDelay: `${i * 0.2}s`, opacity: 0.7 }}
+                      />
+                    ))}
+                    <span className="text-xs font-medium" style={{ color: "rgba(212,175,55,0.8)" }}>
+                      {progress.message}
+                    </span>
+                  </div>
+                  <span className="text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    {progress.found}/10 · batch {progress.batch}/{progress.totalBatches}
+                  </span>
+                </div>
+                <div className="h-1 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.max(progress.found * 10, progress.batch * 20)}%`,
+                      background: "linear-gradient(90deg, #D4AF37, #F6E27A)",
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Idle (expanded but not started) */}
+            {!running && !done && !hasResults && !error && (
+              <div
+                className="flex flex-col items-center justify-center rounded-2xl px-6 py-8 text-center"
+                style={{ border: "1px dashed rgba(212,175,55,0.12)", background: "rgba(212,175,55,0.02)" }}
+              >
+                <Zap className="mb-3 h-6 w-6" style={{ color: "rgba(212,175,55,0.4)" }} />
+                <p className="text-sm font-semibold text-white">Find .com gems hiding in plain sight</p>
+                <p className="mt-1.5 max-w-xs text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  Rotates 4 naming strategies — invented words, compounds, root+suffix, metaphors. Pre-scores
+                  every candidate before checking availability. Also shows .io .co .ai .app .dev status for
+                  each name found. Streams live results as they&apos;re confirmed.
+                </p>
+              </div>
+            )}
+
+            {/* Results */}
+            {hasResults && (
+              <div className="space-y-3">
+                {results.map((result, i) => (
+                  <ResultCard
+                    key={result.fullDomain}
+                    result={result}
+                    index={i}
+                    copiedName={copiedName}
+                    onCopy={copyToClipboard}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div
+                className="flex items-start gap-3 rounded-2xl p-4"
+                style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}
+              >
+                <X className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-red-400">Search error</p>
+                  <p className="mt-0.5 text-xs text-red-300/60">{error}</p>
+                  {(hasPartial || hasResults) && (
+                    <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      Showing {results.length} result{results.length !== 1 ? "s" : ""} found before the error.
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={startSearch}
+                  className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
+                  style={{
+                    background: "rgba(239,68,68,0.12)",
+                    border: "1px solid rgba(239,68,68,0.2)",
+                    color: "#f87171",
+                  }}
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {/* Completion */}
+            {done && !error && (
+              <div
+                className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                style={{ background: "rgba(52,211,153,0.05)", border: "1px solid rgba(52,211,153,0.15)" }}
+              >
+                <Check className="h-4 w-4 shrink-0 text-green-400" />
+                <p className="text-xs text-green-300/70">
+                  {results.length === 0
+                    ? "No available .com names found. Try 'Search Again' with a different keyword."
+                    : `Search complete — ${results.length} available .com name${results.length !== 1 ? "s" : ""} confirmed. Green dots show other available TLDs.`}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   )
 }
+
+const MAX_FOUND = 10
