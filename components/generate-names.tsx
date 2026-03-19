@@ -1593,13 +1593,11 @@ export function GenerateNames() {
               </div>
               )}
               </>
-              )}
+              ) : null}
 
               {/* Generate / Bulk Check Button — hidden when AI Chat is active */}
               <button
                 onClick={isBulkMode ? handleBulkCheck : handleGenerate}
-                style={showAiChat ? { display: "none" } : {}}
-
                 disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : (!keyword.trim() || isGenerating)}
                 className={cn(
                   "mt-5 h-13 w-full rounded-xl text-sm font-bold tracking-wide transition-all duration-200 sm:mt-7 sm:h-14 sm:text-base",
@@ -1608,6 +1606,7 @@ export function GenerateNames() {
                   !isGenerating && "hover:-translate-y-0.5"
                 )}
                 style={{
+                  display: showAiChat ? "none" : undefined,
                   background: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
                   color: "#0a0800",
                   boxShadow: isGenerating
