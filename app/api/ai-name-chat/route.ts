@@ -104,34 +104,50 @@ export async function POST(req: NextRequest) {
       .sort((a, b) => b.score - a.score)
       .slice(0, 22)
 
-    // Check .com availability in batch
-    const domains = scoredCandidates.map((c) => `${c.name}.com`)
-    const availability = await checkAvailabilityBatch(domains, { concurrency: 5 })
+    const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"] as const
 
-    // Build final result list
+    // Check all 6 TLDs for every candidate in one batch
+    const allDomains = scoredCandidates.flatMap((c) => ALL_TLDS.map((tld) => `${c.name}.${tld}`))
+    const availability = await checkAvailabilityBatch(allDomains, { concurrency: 6 })
+
+    // Build final result list with per-TLD breakdown
     const results = scoredCandidates.map(({ name }) => {
-      const av = availability.find((a) => a.domain === `${name}.com`)
       const scored = scoreName({
         name,
         tld: "com",
         vibe: vibe as BrandVibe,
         keywords: [promptKeywords],
       })
+
+      const tlds: Record<string, boolean | null> = {}
+      for (const tld of ALL_TLDS) {
+        const r = availability.find((a) => a.domain === `${name}.${tld}`)
+        tlds[tld] = r ? r.available : null
+      }
+
+      const comAvailable = tlds["com"] === true
+      const anyAvailable = Object.values(tlds).some((v) => v === true)
+      // Best available TLD in priority order
+      const bestTld = ALL_TLDS.find((tld) => tlds[tld] === true) ?? null
+
       return {
         name,
         tld: "com",
         fullDomain: `${name}.com`,
-        available: av?.available ?? false,
-        confidence: av?.confidence ?? "low",
+        available: comAvailable,
+        anyAvailable,
+        bestTld,
+        tlds,
+        confidence: availability.find((a) => a.domain === `${name}.com`)?.confidence ?? "low",
         score: scored.score,
         label: scored.label,
         reasons: scored.reasons,
       }
     })
 
-    // Available first, then by score
+    // Names with ANY available TLD first, then by score
     results.sort((a, b) => {
-      if (a.available !== b.available) return a.available ? -1 : 1
+      if (a.anyAvailable !== b.anyAvailable) return a.anyAvailable ? -1 : 1
       return b.score - a.score
     })
 

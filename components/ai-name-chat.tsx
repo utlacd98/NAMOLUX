@@ -6,11 +6,17 @@ import { cn } from "@/lib/utils"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"] as const
+type Tld = typeof ALL_TLDS[number]
+
 interface ChatResult {
   name: string
   tld: string
   fullDomain: string
   available: boolean
+  anyAvailable: boolean
+  bestTld: string | null
+  tlds: Partial<Record<Tld, boolean | null>>
   confidence: string
   score: number
   label: string
@@ -76,9 +82,11 @@ const scoreBand = (s: number) =>
 function ResultCard({ r }: { r: ChatResult }) {
   const [copied, setCopied] = useState(false)
   const color = scoreColor(r.score)
+  const registerTld = r.bestTld
+  const registerDomain = registerTld ? `${r.name}.${registerTld}` : r.fullDomain
 
   function copy() {
-    navigator.clipboard.writeText(r.fullDomain).then(() => {
+    navigator.clipboard.writeText(registerDomain).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
@@ -88,39 +96,28 @@ function ResultCard({ r }: { r: ChatResult }) {
     <div
       className="rounded-xl p-3"
       style={{
-        background: r.available ? "rgba(52,211,153,0.05)" : "rgba(255,255,255,0.03)",
-        border: r.available ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.08)",
+        background: r.anyAvailable ? "rgba(52,211,153,0.04)" : "rgba(255,255,255,0.03)",
+        border: r.anyAvailable ? "1px solid rgba(52,211,153,0.18)" : "1px solid rgba(255,255,255,0.07)",
       }}
     >
+      {/* Name row */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
             style={{
-              background: r.available ? "rgba(52,211,153,0.15)" : "rgba(255,100,100,0.1)",
-              border: r.available ? "1px solid rgba(52,211,153,0.25)" : "1px solid rgba(255,100,100,0.15)",
+              background: r.anyAvailable ? "rgba(52,211,153,0.15)" : "rgba(255,80,80,0.08)",
+              border: r.anyAvailable ? "1px solid rgba(52,211,153,0.25)" : "1px solid rgba(255,80,80,0.12)",
             }}
           >
-            {r.available ? (
-              <Check className="h-3 w-3 text-green-400" />
-            ) : (
-              <span className="h-2 w-2 rounded-full bg-red-400/50" />
-            )}
+            {r.anyAvailable
+              ? <Check className="h-3 w-3 text-green-400" />
+              : <span className="h-1.5 w-1.5 rounded-full" style={{ background: "rgba(255,80,80,0.5)" }} />}
           </span>
           <span className="truncate text-sm font-bold text-white">{r.name}</span>
-          <span
-            className="shrink-0 rounded px-1 py-0.5 text-[9px] font-bold"
-            style={{
-              background: r.available ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-              color: r.available ? "#34d399" : "rgba(255,255,255,0.3)",
-            }}
-          >
-            .com
-          </span>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1">
-          {/* Score badge */}
+        <div className="flex shrink-0 items-center gap-1.5">
           <span className="text-[10px] font-semibold tabular-nums" style={{ color }}>
             {r.score}
           </span>
@@ -132,35 +129,65 @@ function ResultCard({ r }: { r: ChatResult }) {
           >
             {copied ? <CheckCircle className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3 text-white/40" />}
           </button>
-          {r.available && (
+          {r.anyAvailable && registerTld && (
             <a
-              href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(r.fullDomain)}`}
+              href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(registerDomain)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-bold text-black"
               style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
             >
               <ExternalLink className="h-2.5 w-2.5" />
-              Register
+              Register .{registerTld}
             </a>
           )}
         </div>
       </div>
 
+      {/* TLD availability grid */}
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {ALL_TLDS.map((tld) => {
+          const av = r.tlds[tld]
+          const isAvail = av === true
+          const isTaken = av === false
+          return (
+            <div key={tld} className="flex items-center gap-0.5">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{
+                  background: isAvail ? "#34d399" : isTaken ? "rgba(255,80,80,0.5)" : "rgba(255,255,255,0.15)",
+                }}
+              />
+              {isAvail ? (
+                <a
+                  href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(`${r.name}.${tld}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[9px] font-semibold"
+                  style={{ color: "#34d399" }}
+                >
+                  .{tld}
+                </a>
+              ) : (
+                <span
+                  className="text-[9px]"
+                  style={{ color: isTaken ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.3)" }}
+                >
+                  .{tld}
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
       {/* Score bar */}
-      <div className="mt-2 h-1 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
-        <div
-          className="h-full rounded-full"
-          style={{ width: `${r.score}%`, background: color, transition: "width 0.6s ease" }}
-        />
+      <div className="mt-2 h-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+        <div className="h-full rounded-full" style={{ width: `${r.score}%`, background: color }} />
       </div>
       <div className="mt-1 flex items-center justify-between">
-        <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>
-          Founder Signal™
-        </span>
-        <span className="text-[9px] font-semibold" style={{ color }}>
-          {scoreBand(r.score)}
-        </span>
+        <span className="text-[9px]" style={{ color: "rgba(255,255,255,0.2)" }}>Founder Signal™</span>
+        <span className="text-[9px] font-semibold" style={{ color }}>{scoreBand(r.score)}</span>
       </div>
     </div>
   )
