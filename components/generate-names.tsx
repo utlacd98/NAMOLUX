@@ -32,6 +32,7 @@ import { FounderSignalPanel } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
 import { DeepSearch } from "@/components/deep-search"
+import { AiNameChat } from "@/components/ai-name-chat"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -408,6 +409,7 @@ export function GenerateNames() {
 
   // Bulk check state
   const [isBulkMode, setIsBulkMode] = useState(false)
+  const [showAiChat, setShowAiChat] = useState(false)
   const [bulkInput, setBulkInput] = useState("")
   const [description, setDescription] = useState("")
   const [isExtracting, setIsExtracting] = useState(false)
@@ -1149,25 +1151,37 @@ export function GenerateNames() {
             >
               {/* Mode Toggle */}
               <div
-                className="mb-5 grid grid-cols-2 gap-1.5 rounded-xl p-1 sm:mb-7"
+                className="mb-5 grid grid-cols-3 gap-1 rounded-xl p-1 sm:mb-7"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
               >
                 <button
-                  onClick={() => setIsBulkMode(false)}
+                  onClick={() => { setIsBulkMode(false); setShowAiChat(false) }}
                   className={cn(
-                    "min-h-[42px] rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
-                    !isBulkMode
+                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                    !isBulkMode && !showAiChat
                       ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
                       : "text-white/60 hover:text-white/90"
                   )}
-                  style={!isBulkMode ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
+                  style={!isBulkMode && !showAiChat ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
                 >
-                  ✦ Generate Names
+                  ✦ Generate
                 </button>
                 <button
-                  onClick={() => setIsBulkMode(true)}
+                  onClick={() => { setIsBulkMode(false); setShowAiChat(true) }}
                   className={cn(
-                    "min-h-[42px] rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                    showAiChat
+                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
+                      : "text-white/60 hover:text-white/90"
+                  )}
+                  style={showAiChat ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
+                >
+                  ✦ AI Chat
+                </button>
+                <button
+                  onClick={() => { setIsBulkMode(true); setShowAiChat(false) }}
+                  className={cn(
+                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
                     isBulkMode
                       ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
                       : "text-white/60 hover:text-white/90"
@@ -1178,8 +1192,11 @@ export function GenerateNames() {
                 </button>
               </div>
 
+              {/* AI Chat Mode */}
+              {showAiChat && <AiNameChat />}
+
               {/* Bulk Mode */}
-              {isBulkMode ? (
+              {!showAiChat && isBulkMode ? (
                 <div className="space-y-3 sm:space-y-4">
                   <div>
                     <label htmlFor="bulk-input" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
@@ -1211,7 +1228,7 @@ export function GenerateNames() {
                     </p>
                   </div>
                 </div>
-              ) : (
+              ) : !showAiChat ? (
               <>
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
                 {/* Keyword Input */}
@@ -1578,9 +1595,11 @@ export function GenerateNames() {
               </>
               )}
 
-              {/* Generate / Bulk Check Button */}
+              {/* Generate / Bulk Check Button — hidden when AI Chat is active */}
               <button
                 onClick={isBulkMode ? handleBulkCheck : handleGenerate}
+                style={showAiChat ? { display: "none" } : {}}
+
                 disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : (!keyword.trim() || isGenerating)}
                 className={cn(
                   "mt-5 h-13 w-full rounded-xl text-sm font-bold tracking-wide transition-all duration-200 sm:mt-7 sm:h-14 sm:text-base",
