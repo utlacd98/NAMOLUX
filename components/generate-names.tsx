@@ -33,6 +33,7 @@ import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
 import { DeepSearch } from "@/components/deep-search"
 import { AiNameChat } from "@/components/ai-name-chat"
+import { useNamePreferences } from "@/hooks/useNamePreferences"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -422,6 +423,21 @@ export function GenerateNames() {
   const [aiHint, setAiHint] = useState<string | null>(null)
   const [loadingStep, setLoadingStep] = useState(0)
 
+  // Advanced result filters
+  const [minScore, setMinScore] = useState(0)
+  const [includeWord, setIncludeWord] = useState("")
+  const [excludeWord, setExcludeWord] = useState("")
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+
+  // Bulk sort state
+  const [bulkSortKey, setBulkSortKey] = useState<"score" | "length" | "availability">("score")
+
+  // Refs for UX scroll behaviour
+  const resultsRef = useRef<HTMLDivElement>(null)
+
+  // Preference memory hook
+  const { recordSearch, recordLike, recordUnlike } = useNamePreferences()
+
   // SEO Potential Check modal state
   const [seoCheckDomain, setSeoCheckDomain] = useState<{ name: string; tld: string } | null>(null)
   const generationAbortRef = useRef<AbortController | null>(null)
@@ -523,16 +539,36 @@ export function GenerateNames() {
 
   // Group all results by name — one card per name, all checked TLDs shown as badges
   const groupedResults = useMemo(() => {
+    const includeTerms = includeWord
+      .split(/[,\s]+/)
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean)
+    const excludeTerms = excludeWord
+      .split(/[,\s]+/)
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean)
+
     const map = new Map<string, DomainResult[]>()
     for (const r of results) {
       const existing = map.get(r.name) ?? []
       map.set(r.name, [...existing, r])
     }
     return Array.from(map.entries())
-      .filter(([, tldList]) => {
-        // TLD filter: show names where that TLD is available (not just checked)
+      .filter(([name, tldList]) => {
+        const lowerName = name.toLowerCase()
+        // TLD filter
         if (selectedTldFilter && !tldList.some((r) => r.tld === selectedTldFilter && r.available)) return false
+        // Availability filter
         if (showOnlyAvailable && !tldList.some((r) => r.available)) return false
+        // Min score filter
+        if (minScore > 0) {
+          const best = tldList.reduce((b, r) => (r.score > b.score ? r : b), tldList[0])
+          if (best.score < minScore) return false
+        }
+        // Include word filter
+        if (includeTerms.length > 0 && !includeTerms.some((t) => lowerName.includes(t))) return false
+        // Exclude word filter
+        if (excludeTerms.some((t) => lowerName.includes(t))) return false
         return true
       })
       .map(([name, tldList]) => {
@@ -548,7 +584,7 @@ export function GenerateNames() {
             : sorted[0]
         return { name, tlds: sorted, best, hasAvailable: available.length > 0 }
       })
-  }, [results, selectedTldFilter, showOnlyAvailable])
+  }, [results, selectedTldFilter, showOnlyAvailable, minScore, includeWord, excludeWord])
 
   // "Founder Favourite" — name with highest score among groups that have an available TLD
   const topPickName = useMemo(() => {
@@ -855,6 +891,7 @@ export function GenerateNames() {
       }
 
       setResults(data.results)
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
     } catch (error: any) {
       console.error("Error checking domains:", error)
       setError(error.message || "Failed to check domains")
@@ -881,9 +918,10 @@ export function GenerateNames() {
     setShowOnlyAvailable(false)
     setGenerationId((n) => n + 1) // Reset Deep Search on new generation
 
-    // Add to search history
+    // Add to search history and record preference signal
     const baseKeyword = keyword.trim()
     addToSearchHistory(baseKeyword)
+    recordSearch(selectedVibe, selectedIndustry, maxLength)
 
     try {
       const { names: initialNames, meanings: initialMeanings } = await requestGeneratedNames(baseKeyword, null, abortController.signal)
@@ -894,6 +932,8 @@ export function GenerateNames() {
       const initialResults = (await requestAvailability(initialNames, undefined, abortController.signal))
         .map(r => ({ ...r, meaning: initialMeanings[r.name] ?? r.meaning }))
       setResults(initialResults)
+      // Smooth-scroll to results after first batch arrives
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
 
       if (autoFindComMode) {
         if (AUTO_FIND_V2_ENABLED) {
@@ -984,7 +1024,10 @@ export function GenerateNames() {
   }
 
   const toggleShortlist = (fullDomain: string) => {
+    const isAdding = !shortlist.includes(fullDomain)
     setShortlist((prev) => (prev.includes(fullDomain) ? prev.filter((n) => n !== fullDomain) : [...prev, fullDomain]))
+    if (isAdding) recordLike(fullDomain)
+    else recordUnlike(fullDomain)
   }
 
   const copyToClipboard = (fullDomain: string) => {
@@ -1982,7 +2025,38 @@ export function GenerateNames() {
 
             {/* Results */}
             {results.length > 0 && (
-              <div className="min-w-0">
+              <div ref={resultsRef} className="min-w-0 scroll-mt-4">
+                {/* Results summary strip */}
+                {(() => {
+                  const allNames = Array.from(new Map(results.map(r => [r.name, r])).values())
+                  const comFreeCount = results.filter(r => r.tld === "com" && r.available).length
+                  const anyFreeCount = results.filter(r => r.available).length
+                  const topScore = results.reduce((m, r) => Math.max(m, r.score), 0)
+                  return (
+                    <div
+                      className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl px-4 py-2.5"
+                      style={{ background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.12)" }}
+                    >
+                      <span className="text-xs font-bold text-white/70">{allNames.length} names generated</span>
+                      {comFreeCount > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-green-400">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                          {comFreeCount} .com free
+                        </span>
+                      )}
+                      {anyFreeCount > comFreeCount && (
+                        <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(52,211,153,0.7)" }}>
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: "rgba(52,211,153,0.7)" }} />
+                          {anyFreeCount} any TLD free
+                        </span>
+                      )}
+                      <span className="ml-auto text-xs" style={{ color: "#D4AF37" }}>
+                        Top score: {topScore}
+                      </span>
+                    </div>
+                  )
+                })()}
+
                 <div className="mb-3 space-y-2 sm:mb-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:space-y-0">
                   <h2 className="text-sm font-semibold text-foreground sm:text-lg">
                     Results <span className="text-xs text-muted-foreground sm:text-base">({groupedResults.length} name{groupedResults.length !== 1 ? "s" : ""})</span>
@@ -2071,6 +2145,99 @@ export function GenerateNames() {
                   </button>
                 </div>
 
+                {/* Advanced filters — min score, include/exclude words */}
+                <div className="mb-3">
+                  <button
+                    onClick={() => setShowAdvancedFilters((p) => !p)}
+                    className="flex items-center gap-1.5 text-[10px] font-semibold transition-all hover:opacity-80 sm:text-xs"
+                    style={{ color: showAdvancedFilters ? "#D4AF37" : "rgba(255,255,255,0.3)" }}
+                  >
+                    <Filter className="h-3 w-3" />
+                    {showAdvancedFilters ? "Hide" : "More"} filters
+                    {(minScore > 0 || includeWord.trim() || excludeWord.trim()) && (
+                      <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold" style={{ background: "rgba(212,175,55,0.2)", color: "#D4AF37" }}>
+                        active
+                      </span>
+                    )}
+                  </button>
+
+                  {showAdvancedFilters && (
+                    <div
+                      className="mt-2 grid gap-3 rounded-xl p-3 sm:grid-cols-3"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                    >
+                      {/* Min Founder Signal score */}
+                      <div>
+                        <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(212,175,55,0.6)" }}>
+                          Min Score {minScore > 0 ? `(≥ ${minScore})` : "(off)"}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="range"
+                            min={0}
+                            max={90}
+                            step={5}
+                            value={minScore}
+                            onChange={(e) => setMinScore(Number(e.target.value))}
+                            className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
+                            style={{ background: "rgba(255,255,255,0.08)" }}
+                          />
+                          <span className="w-7 shrink-0 text-center text-[11px] font-bold" style={{ color: minScore > 0 ? "#D4AF37" : "rgba(255,255,255,0.3)" }}>
+                            {minScore || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Include word */}
+                      <div>
+                        <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>
+                          Include word
+                        </label>
+                        <input
+                          type="text"
+                          value={includeWord}
+                          onChange={(e) => setIncludeWord(e.target.value)}
+                          placeholder="e.g. flux, nova"
+                          className="h-8 w-full rounded-lg px-3 text-xs text-white/80 placeholder:text-white/20 focus:outline-none"
+                          style={{
+                            background: "rgba(255,255,255,0.07)",
+                            border: includeWord.trim() ? "1px solid rgba(212,175,55,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                          }}
+                        />
+                      </div>
+
+                      {/* Exclude word */}
+                      <div>
+                        <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>
+                          Exclude word
+                        </label>
+                        <input
+                          type="text"
+                          value={excludeWord}
+                          onChange={(e) => setExcludeWord(e.target.value)}
+                          placeholder="e.g. hub, zone"
+                          className="h-8 w-full rounded-lg px-3 text-xs text-white/80 placeholder:text-white/20 focus:outline-none"
+                          style={{
+                            background: "rgba(255,255,255,0.07)",
+                            border: excludeWord.trim() ? "1px solid rgba(239,68,68,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                          }}
+                        />
+                      </div>
+
+                      {/* Reset filters shortcut */}
+                      {(minScore > 0 || includeWord.trim() || excludeWord.trim()) && (
+                        <button
+                          onClick={() => { setMinScore(0); setIncludeWord(""); setExcludeWord("") }}
+                          className="col-span-full text-left text-[10px] underline"
+                          style={{ color: "rgba(255,255,255,0.3)" }}
+                        >
+                          Reset advanced filters
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {/* Deep Search for .com — sits between filter bar and results */}
                 <DeepSearch
                   key={generationId}
@@ -2080,8 +2247,42 @@ export function GenerateNames() {
                   maxLength={maxLength}
                 />
 
+                {/* Bulk sort controls — shown in bulk mode */}
+                {isBulkMode && groupedResults.length > 1 && (
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>Sort:</span>
+                    {(["score", "length", "availability"] as const).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => setBulkSortKey(key)}
+                        className="rounded-full px-2.5 py-1 text-[10px] font-semibold transition-all"
+                        style={bulkSortKey === key ? {
+                          background: "rgba(212,175,55,0.15)",
+                          border: "1px solid rgba(212,175,55,0.35)",
+                          color: "#D4AF37",
+                        } : {
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.07)",
+                          color: "rgba(255,255,255,0.35)",
+                        }}
+                      >
+                        {key === "score" ? "Founder Signal" : key === "length" ? "Shortest name" : "Availability"}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <div className="space-y-2.5">
-                  {groupedResults.map(({ name, tlds, best, hasAvailable }, index) => {
+                  {(isBulkMode
+                    ? [...groupedResults].sort((a, b) => {
+                        if (bulkSortKey === "score") return b.best.score - a.best.score
+                        if (bulkSortKey === "length") return a.name.length - b.name.length
+                        // availability: available first, then by score
+                        if (a.hasAvailable !== b.hasAvailable) return a.hasAvailable ? -1 : 1
+                        return b.best.score - a.best.score
+                      })
+                    : groupedResults
+                  ).map(({ name, tlds, best, hasAvailable }, index) => {
                     const isTopPick = name === topPickName
                     const availableTlds = tlds.filter((r) => r.available)
                     return (
@@ -2400,6 +2601,39 @@ export function GenerateNames() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Skeleton loading cards — shown while generating with no results yet */}
+            {isGenerating && results.length === 0 && (
+              <div className="space-y-2.5" aria-label="Loading results…">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl p-4 sm:p-5"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      opacity: 1 - i * 0.15,
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 shrink-0 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.07)" }} />
+                      <div className="h-5 w-32 animate-pulse rounded-lg" style={{ background: "rgba(255,255,255,0.07)" }} />
+                      <div className="ml-auto flex gap-1.5">
+                        {["w-10", "w-10", "w-12"].map((w, j) => (
+                          <div key={j} className={`h-5 ${w} animate-pulse rounded-md`} style={{ background: "rgba(255,255,255,0.05)", animationDelay: `${j * 0.1}s` }} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="ml-11 mt-2.5 flex gap-1.5">
+                      {[1, 2, 3].map((j) => (
+                        <div key={j} className="h-3 w-12 animate-pulse rounded" style={{ background: "rgba(212,175,55,0.08)", animationDelay: `${j * 0.08}s` }} />
+                      ))}
+                    </div>
+                    <div className="mt-3 h-1 animate-pulse rounded-full" style={{ background: "rgba(255,255,255,0.05)" }} />
+                  </div>
+                ))}
               </div>
             )}
 
