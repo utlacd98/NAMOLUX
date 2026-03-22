@@ -246,6 +246,15 @@ const LOADING_STEPS = [
 
 const SAMPLE_KEYWORDS = ["luxury brand", "fintech", "wellness app"]
 
+// Quick-start category pills shown below the CTA
+const QUICK_CATEGORIES = [
+  { label: "Inspire me", value: "inspire me" },
+  { label: "Neo-Bank", value: "neobank fintech" },
+  { label: "Eco-Luxe", value: "sustainable luxury" },
+  { label: "Mindfulness App", value: "mindfulness meditation wellness" },
+  { label: "Web3 Identity", value: "web3 crypto identity" },
+]
+
 const AUTO_FIND_TARGET_COM_COUNT = 5
 const AUTO_FIND_MAX_ATTEMPTS = 8
 const AUTO_FIND_TIME_CAP_MS = 20_000
@@ -901,11 +910,16 @@ export function GenerateNames() {
   }
 
   const handleGenerate = async () => {
-    if (!keyword.trim()) return
+    // Accept either keyword or description as the input
+    const resolvedKeyword = keyword.trim() || description.trim()
+    if (!resolvedKeyword) return
     generationAbortRef.current?.abort()
     const abortController = new AbortController()
     generationAbortRef.current = abortController
     generationStoppedRef.current = false
+
+    // Ensure keyword state reflects what we're generating with
+    if (!keyword.trim() && description.trim()) setKeyword(description.trim().slice(0, 60))
 
     setIsGenerating(true)
     setIsAutoFindingComs(false)
@@ -919,7 +933,7 @@ export function GenerateNames() {
     setGenerationId((n) => n + 1) // Reset Deep Search on new generation
 
     // Add to search history and record preference signal
-    const baseKeyword = keyword.trim()
+    const baseKeyword = resolvedKeyword
     addToSearchHistory(baseKeyword)
     recordSearch(selectedVibe, selectedIndustry, maxLength)
 
@@ -1273,134 +1287,119 @@ export function GenerateNames() {
                 </div>
               ) : !showAiChat ? (
               <>
-              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                {/* Keyword Input */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="keyword" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
-                    Keywords or concept
+              {/* ── STARTUP DESCRIPTION & KEYWORDS ── */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label
+                    htmlFor="description"
+                    className="text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: "rgba(212,175,55,0.55)" }}
+                  >
+                    Startup Description &amp; Keywords
                   </label>
-                  <input
-                    id="keyword"
-                    type="text"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-                    placeholder="e.g., fitness, finance, creative…"
-                    className="h-12 w-full rounded-xl px-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none sm:h-14 sm:text-base"
-                    style={{
-                      background: "rgba(255,255,255,0.09)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      transition: "border-color 0.2s, box-shadow 0.2s",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                      e.currentTarget.style.boxShadow = "none"
-                    }}
-                  />
-                  {/* AI analyzing hint */}
-                  {aiHint && !searchHistory.length && (
-                    <p className="mt-1.5 text-[11px] text-[#D4AF37]/70 animate-fade-up">{aiHint}</p>
-                  )}
-                  {/* Search History */}
-                  {searchHistory.length > 0 && (
-                    <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-                      <span className="flex shrink-0 items-center gap-1 text-[10px] text-white/30 sm:text-xs">
-                        <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        Recent:
-                      </span>
-                      {searchHistory.slice(0, 3).map((term) => (
-                        <button
-                          key={term}
-                          onClick={() => setKeyword(term)}
-                          className="max-w-[80px] truncate rounded-full px-2 py-0.5 text-[10px] text-white/40 transition-colors hover:text-white/80 sm:max-w-none sm:px-2.5 sm:py-1 sm:text-xs"
-                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
-                        >
-                          {term}
-                        </button>
-                      ))}
-                      {aiHint && (
-                        <span className="ml-auto text-[11px] text-[#D4AF37]/70 animate-fade-up">{aiHint}</span>
+                  {description.trim().length >= 20 && (
+                    <button
+                      type="button"
+                      onClick={handleExtractKeywords}
+                      disabled={isExtracting}
+                      className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide transition-all hover:-translate-y-0.5 disabled:opacity-50"
+                      style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}
+                    >
+                      {isExtracting ? (
+                        <><RefreshCw className="h-3 w-3 animate-spin" /> Refining…</>
+                      ) : (
+                        <><Sparkles className="h-3 w-3" /> Refine It</>
                       )}
-                    </div>
+                    </button>
                   )}
                 </div>
 
-                {/* Description input — extracts keywords via AI */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="description" className="mb-2 flex items-center justify-between text-xs font-medium text-white/70 sm:text-sm">
-                    <span>Or describe your startup <span className="font-normal text-white/35">(optional — AI extracts keywords)</span></span>
-                    {description.trim().length >= 20 && (
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => {
+                    const val = e.target.value.slice(0, 1000)
+                    setDescription(val)
+                    // Mirror short inputs directly into keyword so Generate works instantly
+                    if (val.trim().length < 80) setKeyword(val.trim())
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleExtractKeywords()
+                  }}
+                  placeholder="e.g. A sustainable skincare brand focusing on high-altitude botanical ingredients…"
+                  rows={4}
+                  className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none resize-none"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    transition: "border-color 0.2s, box-shadow 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(212,175,55,0.45)"
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.12)"
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"
+                    e.currentTarget.style.boxShadow = "none"
+                  }}
+                />
+
+                {extractError && (
+                  <p className="mt-1.5 text-[11px] text-red-400">{extractError}</p>
+                )}
+
+                {/* Search history pills */}
+                {searchHistory.length > 0 && (
+                  <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5">
+                    <span className="flex shrink-0 items-center gap-1 text-[10px] text-white/25">
+                      <Clock className="h-2.5 w-2.5" /> Recent:
+                    </span>
+                    {searchHistory.slice(0, 3).map((term) => (
                       <button
-                        type="button"
-                        onClick={handleExtractKeywords}
-                        disabled={isExtracting}
-                        className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold transition-all sm:text-xs disabled:opacity-50"
-                        style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: "#D4AF37" }}
+                        key={term}
+                        onClick={() => { setKeyword(term); setDescription(term) }}
+                        className="max-w-[100px] truncate rounded-full px-2 py-0.5 text-[10px] text-white/35 transition-colors hover:text-white/70"
+                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
                       >
-                        {isExtracting ? (
-                          <><RefreshCw className="h-3 w-3 animate-spin" /> Extracting…</>
-                        ) : (
-                          <><Sparkles className="h-3 w-3" /> Extract Keywords</>
-                        )}
+                        {term}
                       </button>
+                    ))}
+                    {aiHint && (
+                      <span className="ml-auto text-[11px] text-[#D4AF37]/60 animate-fade-up">{aiHint}</span>
                     )}
-                  </label>
-                  <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value.slice(0, 1000))}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleExtractKeywords()
-                    }}
-                    placeholder="e.g., We're building an AI tool for restaurant owners to reduce food waste and automatically adjust menu pricing based on demand forecasts…"
-                    rows={3}
-                    className="w-full rounded-xl p-4 text-sm text-white/90 placeholder:text-white/25 focus:outline-none resize-none"
-                    style={{
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      transition: "border-color 0.2s, box-shadow 0.2s",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.4)"
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.12)"
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
-                      e.currentTarget.style.boxShadow = "none"
-                    }}
-                  />
-                  {extractError && (
-                    <p className="mt-1.5 text-[11px] text-red-400">{extractError}</p>
-                  )}
-                  {!extractError && description.trim().length > 0 && description.trim().length < 20 && (
-                    <p className="mt-1.5 text-[11px] text-white/30">{20 - description.trim().length} more characters to enable extraction</p>
-                  )}
-                </div>
+                  </div>
+                )}
+                {!searchHistory.length && aiHint && (
+                  <p className="mt-1.5 text-[11px] text-[#D4AF37]/60 animate-fade-up">{aiHint}</p>
+                )}
+              </div>
 
-                {/* Industry Select */}
+              {/* ── INDUSTRY FOCUS  +  MAX NAME LENGTH ── */}
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="industry" className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">
-                    Industry (optional)
+                  <label
+                    htmlFor="industry"
+                    className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: "rgba(255,255,255,0.35)" }}
+                  >
+                    Industry Focus
                   </label>
                   <select
                     id="industry"
                     value={selectedIndustry}
                     onChange={(e) => setSelectedIndustry(e.target.value)}
-                    className="h-12 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#0d0b07] [&>option]:text-white"
+                    className="h-11 w-full rounded-xl px-4 text-sm text-white/80 focus:outline-none [&>option]:bg-[#0d0b07] [&>option]:text-white"
                     style={{
-                      background: "rgba(255,255,255,0.09)",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.09)",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)"
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.2)"
+                      e.currentTarget.style.borderColor = "rgba(212,175,55,0.45)"
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.1)"
                     }}
                     onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"
                       e.currentTarget.style.boxShadow = "none"
                     }}
                   >
@@ -1411,10 +1410,14 @@ export function GenerateNames() {
                   </select>
                 </div>
 
-                {/* Name Length */}
                 <div>
-                  <label className="mb-2 block text-xs font-medium text-white/70 sm:text-sm">Max name length</label>
-                  <div className="flex h-12 items-center gap-3">
+                  <label
+                    className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: "rgba(255,255,255,0.35)" }}
+                  >
+                    Max Name Length &mdash; <span style={{ color: "#D4AF37" }}>{maxLength} chars</span>
+                  </label>
+                  <div className="flex h-11 items-center gap-3 rounded-xl px-4" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.09)" }}>
                     <input
                       type="range"
                       min={5}
@@ -1424,30 +1427,35 @@ export function GenerateNames() {
                       className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
                       style={{ background: "rgba(255,255,255,0.08)" }}
                     />
-                    <span className="w-8 text-center text-sm font-semibold text-[#D4AF37]">{maxLength}</span>
+                    <span className="w-6 shrink-0 text-center text-sm font-bold" style={{ color: "#D4AF37" }}>{maxLength}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Vibe Selection */}
-              <div className="mt-4 sm:mt-6">
-                <label className="mb-2 block text-xs font-medium text-white/70 sm:mb-3 sm:text-sm">Brand vibe</label>
+              {/* ── BRAND VIBE ── */}
+              <div className="mt-4">
+                <label
+                  className="mb-2.5 block text-[10px] font-bold uppercase tracking-widest"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
+                  Brand Vibe
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {vibeOptions.map((vibe) => (
                     <button
                       key={vibe.id}
                       onClick={() => setSelectedVibe(vibe.id)}
                       className={cn(
-                        "min-h-[38px] rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
+                        "min-h-[34px] rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4",
                         selectedVibe === vibe.id
                           ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.3)] hover:-translate-y-0.5"
-                          : "text-white/50 hover:text-white/80 hover:-translate-y-0.5",
+                          : "text-white/45 hover:text-white/80 hover:-translate-y-0.5",
                       )}
                       style={selectedVibe === vibe.id ? {
                         background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
                       } : {
-                        background: "rgba(255,255,255,0.05)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.07)",
                       }}
                     >
                       {vibe.label}
@@ -1641,7 +1649,7 @@ export function GenerateNames() {
               {/* Generate / Bulk Check Button — hidden when AI Chat is active */}
               <button
                 onClick={isBulkMode ? handleBulkCheck : handleGenerate}
-                disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : (!keyword.trim() || isGenerating)}
+                disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : ((!keyword.trim() && !description.trim()) || isGenerating)}
                 className={cn(
                   "mt-5 h-13 w-full rounded-xl text-sm font-bold tracking-wide transition-all duration-200 sm:mt-7 sm:h-14 sm:text-base",
                   "flex items-center justify-center gap-2",
@@ -1670,7 +1678,7 @@ export function GenerateNames() {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Generate Names
+                    Discover Names
                   </>
                 )}
               </button>
@@ -1708,6 +1716,30 @@ export function GenerateNames() {
                   style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <p className="text-xs sm:text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Quick category pills — shown when no input yet and not generating */}
+              {!showAiChat && !isBulkMode && !description.trim() && !isGenerating && (
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] text-white/25">Try:</span>
+                  {QUICK_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.label}
+                      onClick={() => {
+                        setDescription(cat.value)
+                        setKeyword(cat.value)
+                      }}
+                      className="rounded-full px-3 py-1 text-[10px] font-medium transition-all hover:-translate-y-0.5 hover:opacity-90"
+                      style={{
+                        background: "rgba(212,175,55,0.07)",
+                        border: "1px solid rgba(212,175,55,0.18)",
+                        color: "rgba(212,175,55,0.7)",
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
