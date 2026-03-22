@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import OpenAI from "openai"
-import { checkAvailability, checkAvailabilityBatch } from "@/lib/domainGen/availability"
+import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
 import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker"
@@ -8,8 +8,8 @@ import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker
 export const runtime = "nodejs"
 export const maxDuration = 60
 
-// 5 batches × 16 names ≈ 80 total candidates (fewer round-trips vs 6×13)
-const BATCH_SIZE = 16
+// 5 batches × 18 names ≈ 90 total candidates
+const BATCH_SIZE = 18
 const MAX_FOUND = 10
 const MAX_BATCHES = 5
 
@@ -69,13 +69,13 @@ async function generateBatch(
 
   const completion = await client.chat.completions.create(
     {
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
       ],
-      temperature: 0.92,
-      max_tokens: 320,
+      temperature: 0.88,
+      max_tokens: 360,
     },
     { signal },
   )
@@ -173,73 +173,78 @@ export async function GET(request: NextRequest) {
             return scored.score >= PRE_SCORE_FLOOR
           })
 
-          // Check .com availability for quality candidates
-          for (const name of qualityCandidates) {
-            if (found.length >= MAX_FOUND) break
+          // Parallel .com availability checks for all quality candidates this batch.
+          // This is faster than sequential and allows gpt-4o latency to be absorbed.
+          const needed = MAX_FOUND - found.length
+          const toCheck = qualityCandidates.slice(0, needed + 5) // small buffer beyond what's needed
+          let comResults: Awaited<ReturnType<typeof checkAvailabilityBatch>> = []
+          try {
+            comResults = await checkAvailabilityBatch(
+              toCheck.map((n) => `${n}.com`),
+              { signal: abortController.signal, concurrency: 6 },
+            )
+          } catch {
             if (abortController.signal.aborted) break
+          }
 
-            const domain = `${name}.com`
+          for (const r of comResults) {
+            if (found.length >= MAX_FOUND || abortController.signal.aborted) break
 
-            try {
-              const avResult = await checkAvailability(domain, { signal: abortController.signal })
+            const name = r.domain.replace(/\.com$/, "")
 
-              if (!avResult.available) {
-                takenNames.push(name)
-                continue
-              }
+            if (!r.available) {
+              takenNames.push(name)
+              continue
+            }
 
-              const scored = scoreName({
+            const scored = scoreName({
+              name,
+              tld: "com",
+              vibe: (vibe as BrandVibe) || undefined,
+              keywords: [keyword],
+            })
+
+            found.push(r.domain)
+
+            // Run other TLD checks + social handle checks in parallel
+            const otherTldDomains = OTHER_TLDS.map((tld) => `${name}.${tld}`)
+            const [otherTldResults, socialResults] = await Promise.all([
+              checkAvailabilityBatch(otherTldDomains, {
+                signal: abortController.signal,
+                concurrency: 5,
+              }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>),
+              checkSocialHandles(name).catch(() => [] as SocialHandleResult[]),
+            ])
+
+            const otherTlds: Record<string, boolean | null> = {}
+            for (const tld of OTHER_TLDS) {
+              const res = otherTldResults.find((x) => x.domain === `${name}.${tld}`)
+              otherTlds[tld] = res ? res.available : null
+            }
+
+            send({
+              type: "result",
+              result: {
                 name,
                 tld: "com",
-                vibe: (vibe as BrandVibe) || undefined,
-                keywords: [keyword],
-              })
+                fullDomain: r.domain,
+                available: true,
+                score: scored.score,
+                label: scored.label,
+                reasons: scored.reasons,
+                breakdown: scored.breakdown,
+                otherTlds,
+                socials: socialResults,
+              },
+            })
 
-              found.push(domain)
-
-              // Run other TLD checks + social handle checks in parallel
-              const otherTldDomains = OTHER_TLDS.map((tld) => `${name}.${tld}`)
-              const [otherTldResults, socialResults] = await Promise.all([
-                checkAvailabilityBatch(otherTldDomains, {
-                  signal: abortController.signal,
-                  concurrency: 5,
-                }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>),
-                checkSocialHandles(name).catch(() => [] as SocialHandleResult[]),
-              ])
-
-              const otherTlds: Record<string, boolean | null> = {}
-              for (const tld of OTHER_TLDS) {
-                const r = otherTldResults.find((x) => x.domain === `${name}.${tld}`)
-                otherTlds[tld] = r ? r.available : null
-              }
-
-              send({
-                type: "result",
-                result: {
-                  name,
-                  tld: "com",
-                  fullDomain: domain,
-                  available: true,
-                  score: scored.score,
-                  label: scored.label,
-                  reasons: scored.reasons,
-                  breakdown: scored.breakdown,
-                  otherTlds,
-                  socials: socialResults,
-                },
-              })
-
-              send({
-                type: "progress",
-                batch: batchIdx + 1,
-                totalBatches: MAX_BATCHES,
-                found: found.length,
-                message: `Found ${found.length}/${MAX_FOUND} available .com names…`,
-              })
-            } catch (err: unknown) {
-              if (abortController.signal.aborted) break
-              console.error(`Deep search: availability check failed for ${domain}:`, err)
-            }
+            send({
+              type: "progress",
+              batch: batchIdx + 1,
+              totalBatches: MAX_BATCHES,
+              found: found.length,
+              message: `Found ${found.length}/${MAX_FOUND} available .com names…`,
+            })
           }
         }
 

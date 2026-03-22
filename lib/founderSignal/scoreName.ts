@@ -68,10 +68,11 @@ const DICTIONARY_WORDS = new Set([
 ])
 
 // Awkward consonant clusters that hurt pronounceability
+// Natural English blends (str, thr, sch, tch, ght, etc.) are intentionally excluded —
+// they appear in real brand names like Stripe, Three, Chrome, Watch, Night.
 const AWKWARD_CLUSTERS = [
   "fgr", "drm", "pxl", "xtr", "qz", "zx", "xz", "kx", "qk", "bz", "zb",
-  "pz", "zp", "ckx", "xck", "tch", "ght", "ngth", "btr", "dsk", "mpt",
-  "nxt", "str", "scr", "spr", "spl", "thr", "chr", "phr", "shr", "sch"
+  "pz", "zp", "ckx", "xck", "btr", "dsk",
 ]
 
 // Extension strength (0-100 scale)
@@ -267,9 +268,8 @@ function calculateCharacterQualityScore(name: string): number {
   const numbers = name.match(/\d/g)
   if (numbers) score -= numbers.length * 25
 
-  // Letter replacements (z for s, x for cks, k for c): -15 per occurrence
+  // Letter replacements (z for s, k for c at end): -15 per occurrence
   if (/z$/.test(name) && name.length > 3) score -= 15 // "boyz" style
-  if (/x/.test(name) && !/^ex|^ax/.test(name)) score -= 10 // "pixl" style
   if (/ck/.test(name)) score -= 5 // not as bad
 
   // All consonants / no vowels: -30

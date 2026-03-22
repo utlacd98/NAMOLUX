@@ -426,11 +426,29 @@ ABSOLUTE RULES:
 - Names must be between 4 and ${maxLength} characters
 - Names must be lowercase, single word, no spaces, hyphens, or numbers${seenClause}
 
+REJECT THESE AI-GENERATED NAME PATTERNS — they feel machine-made and will be rejected:
+- Fake-Latin: random consonants + -ora, -ova, -era, -ara, -ava (Vexora, Nexova, Zentara, Quantera) ✗
+- Sci-fi endings on invented roots: -ix, -rix, -trix, -nix, -vix (Quantrix, Vextrix, Zentrix) ✗
+- Meaningless tech-prefixes glued to anything: Nexo-, Zyro-, Axio-, Synq-, Velo-, Zeno- ✗
+- Generic tech compounds: DataSync, FlowPulse, SmartHub, TechNest, CodeFlow, CloudX ✗
+- Stacking uncommon letters without purpose: z, x, q used just to look unique (Zyxo, Qvelo, Xentra) ✗
+
+THE MEANING ANCHOR — apply to every name before including it:
+Every great brand name can complete this sentence: "[Name] comes from [word/concept] and signals [quality/feeling]."
+If you cannot complete the sentence, the name is not good enough. Replace it.
+✓ Stripe = stripe pattern → precision + clean lines
+✓ Notion = a notion/idea → intellectual + flexible
+✓ Figma = figure + figment → visual + creative
+✓ Loom = a weaving loom → crafting + connection
+✗ Zentro — no origin, no meaning → REJECTED
+✗ Vexora — fake Latin, no story → REJECTED
+✗ Nexio — random syllables → REJECTED
+
 QUALITY TEST — before including any name:
 1. Does it feel like it belongs alongside ${anchorExamples}?
 2. Would a founder proudly put this on their business card?
 3. Can someone hear it once and spell it correctly?
-4. Does it hint at something relevant to the keywords or industry?
+4. Does it have an origin story — a real word, root, or concept behind it?
 
 If any answer is no, discard and replace.${deepSearchNote}${strategyNote}${takenNote}`
 
