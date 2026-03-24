@@ -8,9 +8,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" })
 
 export const metadata: Metadata = {
-  title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
+  title: "NamoLux — AI Domain Name Generator",
   description:
-    "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on. Free to try.",
+    "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
   keywords: [
     "AI domain name generator",
     "domain name finder",
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     canonical: "https://www.namolux.com/",
   },
   openGraph: {
-    title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
+    title: "NamoLux — AI Domain Name Generator",
     description:
-      "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on.",
+      "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux — AI Domain Name Generator | Find Brandable Names Fast",
+    title: "NamoLux — AI Domain Name Generator",
     description:
-      "Find available domain names in seconds with AI. Check live .com availability, score every name 0–100 with Founder Signal, and launch a brand worth building on.",
+      "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
     images: ["/opengraph-image"],
     site: "@namolux",
     creator: "@namolux",
