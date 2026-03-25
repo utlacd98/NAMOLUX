@@ -19,10 +19,11 @@ export interface BlogPost {
 }
 
 export interface BlogSection {
-  type: "paragraph" | "heading" | "list" | "callout" | "code" | "quote" | "table" | "buttonCta" | "dualCta"
+  type: "paragraph" | "heading" | "list" | "callout" | "code" | "quote" | "table" | "buttonCta" | "dualCta" | "links"
   level?: 2 | 3 // for headings
   content: string
   items?: string[] // for lists
+  links?: { text: string; href: string }[] // for "links" type (further reading)
   headers?: string[] // for tables
   rows?: string[][] // for tables
   calloutType?: "tip" | "warning" | "cta" // for callouts
@@ -5245,6 +5246,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Literal product descriptions ('ProjectManagementTool.com')", "Made-up words with no phonetic logic ('Zyxvlo')", "Names already saturated in your category (there are 40 'Flow' products)", "Anything ending in -ify, -ly, or -hub (unless the root is exceptional)", "Names that sound like competitors when said quickly"] },
       { type: "heading", level: 2, content: "Domain Availability Matters More Than You Think" },
       { type: "paragraph", content: "Once you have 5-10 candidate names, check .com availability immediately. A name without a .com is a name you'll eventually have to change or compromise on. .io and .ai are viable but they require you to own the .com later — which gets expensive." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Know if a Domain Name Is Bad (Before You Buy It)", href: "/blog/domain-name-mistakes" },
+        { text: "Why Your Startup's .com Still Matters More Than You Think", href: "/blog/why-dot-com-matters-startups" },
+        { text: "How to Run a Domain Name Brainstorm: A Step-by-Step Process", href: "/blog/domain-name-brainstorm-process" },
+        { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Generate SaaS name ideas scored by Founder Signal™ — with live .com availability checked instantly.", ctaLink: "/generate", ctaText: "Find Your SaaS Name →" },
     ],
     faqs: [
@@ -5279,6 +5286,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Names that reference current technology ('Blockchain', 'GPT', 'Metaverse' in the name itself)", "Portmanteaus of two trend words ('CryptoFlux', 'AIStream')", "Suffixes that are already peaking: -ai, -gpt, -hub", "Names that only make sense in the current cultural context", "Anything with numbers substituted for letters ('4' for 'for', '8' for 'ate')"] },
       { type: "heading", level: 2, content: "Names That Will Still Feel Good in 2035" },
       { type: "paragraph", content: "Short real English words in new contexts. Invented words with natural phonetics. Names borrowed from mythology, geography, or science. These have been working for 50 years and will continue to. The underlying principle is timelessness through abstraction — the name means what you make it mean." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Name a SaaS Product: A Framework for Founders", href: "/blog/how-to-name-saas-product" },
+        { text: "Why Your Startup's .com Still Matters More Than You Think", href: "/blog/why-dot-com-matters-startups" },
+        { text: ".com vs .ai for Startups: Which Domain Extension Should You Choose?", href: "/blog/dot-com-vs-dot-ai-for-startups" },
+        { text: "The Domain Extension Guide 2026", href: "/blog/domain-extension-guide-2026" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Generate brandable domain names built to last — scored by Founder Signal™ for long-term brand strength.", ctaLink: "/generate", ctaText: "Find a Timeless Name →" },
     ],
     faqs: [
@@ -5311,6 +5324,12 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "The Right Strategy: Find a Name Where You Can Own the .com" },
       { type: "paragraph", content: "Rather than accepting a .io compromise, spend 30 more minutes finding a creative name where the .com is available. This is NamoLux's entire philosophy — Deep Search specifically hunts for names with available .com domains. The creative constraint of finding an available .com usually produces a better name anyway, because all the obvious names are taken." },
       { type: "list", content: "", items: ["Available .com = your name is distinctive enough to not be generic", "Good Founder Signal™ score + available .com = you've found a gem", "If the .com is taken, check: who owns it, is it in use, can you buy it at a reasonable price?"] },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Name a SaaS Product: A Framework for Founders", href: "/blog/how-to-name-saas-product" },
+        { text: ".com vs .ai for Startups: Which Domain Extension Should You Choose?", href: "/blog/dot-com-vs-dot-ai-for-startups" },
+        { text: "The Domain Extension Guide 2026", href: "/blog/domain-extension-guide-2026" },
+        { text: "What Makes a Domain Name Age Well?", href: "/blog/domain-names-that-age-well" },
+      ]},
       { type: "callout", calloutType: "cta", content: "NamoLux Deep Search actively hunts for names with available .com domains — and scores every result so you know which ones are worth registering.", ctaLink: "/generate", ctaText: "Find Your .com →" },
     ],
     faqs: [
@@ -5345,6 +5364,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Under 12 characters (10 ideal)", "Spellable after hearing once (the radio test)", "No trademark conflicts (quick Google + USPTO check)", "No embarrassing connotations in other languages (check Spanish, French, German at minimum)", "Not a close phonetic match to a major brand"] },
       { type: "heading", level: 3, content: "Step 6: Check Availability and Score" },
       { type: "paragraph", content: "Your surviving candidates go through availability checking. Check .com first — if it's taken, note who owns it. Then check .io, .ai, .co as fallbacks. Score each name objectively on brandability: length, pronounceability, memorability, and brand risk." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Name a SaaS Product: A Framework for Founders", href: "/blog/how-to-name-saas-product" },
+        { text: "How to Know if a Domain Name Is Bad (Before You Buy It)", href: "/blog/domain-name-mistakes" },
+        { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
+        { text: "What Makes a Domain Name Age Well?", href: "/blog/domain-names-that-age-well" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Skip the blank page. NamoLux runs the metaphor mapping, compound generation, and availability checking for you — with Founder Signal™ scoring on every result.", ctaLink: "/generate", ctaText: "Start Your Brainstorm →" },
       { type: "heading", level: 2, content: "How Many Candidates Should You Produce?" },
       { type: "paragraph", content: "Aim for 40-60 raw candidates before filtering. Most will be eliminated quickly. You want 5-8 strong finalists to evaluate properly. If you have fewer than 5 finalists, the raw pool was too small — expand one of your metaphor categories and regenerate." },
@@ -5398,6 +5423,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Next.js / React: Add a <script type='application/ld+json'> tag in your page <head>", "WordPress: Use Yoast SEO or Rank Math — both generate schema automatically", "Shopify: Most modern themes include basic schema; apps like JSON-LD for SEO add advanced types", "Manual: Generate valid JSON-LD at schema.org, paste into a script tag"] },
       { type: "heading", level: 2, content: "Testing Your Schema" },
       { type: "paragraph", content: "After adding schema, validate it with Google's Rich Results Test (search.google.com/test/rich-results). This shows you exactly what Google can parse and whether you qualify for any rich result types." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "E-E-A-T Explained: How Google Judges Your Site's Credibility", href: "/blog/eeat-google-credibility-guide" },
+        { text: "Technical SEO Checklist 2026", href: "/blog/technical-seo-checklist-2026" },
+        { text: "Your First 90 Days of SEO on a New Site", href: "/blog/seo-first-90-days-new-site" },
+        { text: "How to Write Title Tags and Meta Descriptions That Get Clicked", href: "/blog/title-tags-meta-descriptions-guide" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Want to check your site's overall SEO health including structured data?", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
     ],
     faqs: [
@@ -5432,6 +5463,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Letting Google auto-generate both — it often pulls irrelevant text from the page", "Writing the same title and description for multiple pages (duplicate metadata)", "Titles over 60 characters that get truncated mid-word", "Descriptions that just restate the title without adding context", "Missing the emotional hook — purely informational descriptions underperform"] },
       { type: "heading", level: 2, content: "Should You Include Your Brand Name in Every Title?" },
       { type: "paragraph", content: "For established brands with strong recognition: yes. '| YourBrand' at the end reassures users and builds recall. For new or unknown brands: prioritise the keyword and benefit over the brand name. Once you have recognition, add it back." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "The Complete On-Page SEO Guide", href: "/blog/on-page-seo-complete-guide" },
+        { text: "Schema Markup for Beginners", href: "/blog/schema-markup-beginners-guide" },
+        { text: "E-E-A-T Explained: How Google Judges Your Site's Credibility", href: "/blog/eeat-google-credibility-guide" },
+        { text: "Keyword Research Guide for New Sites", href: "/blog/keyword-research-guide" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Want a full audit of your site's title tags, meta descriptions, and SEO fundamentals?", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
     ],
     faqs: [
@@ -5469,6 +5506,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "The first 'E' — Experience — is the newest addition to the framework. Content that includes personal experience, original observations, or primary research ranks better than content that aggregates others' perspectives. Write from what you actually know." },
       { type: "heading", level: 2, content: "YMYL Pages: Where E-E-A-T Is Most Critical" },
       { type: "paragraph", content: "YMYL stands for 'Your Money or Your Life' — content that could significantly impact someone's health, finances, safety, or wellbeing. Medical, financial, legal, and investment content faces the strictest E-E-A-T evaluation. If your site covers any of these topics, E-E-A-T is non-negotiable." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Write Title Tags and Meta Descriptions That Get Clicked", href: "/blog/title-tags-meta-descriptions-guide" },
+        { text: "Link Building Strategies That Work for New Sites", href: "/blog/link-building-strategies-that-work" },
+        { text: "Content SEO Optimization Guide", href: "/blog/content-seo-optimization-guide" },
+        { text: "Schema Markup for Beginners", href: "/blog/schema-markup-beginners-guide" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Check your site's overall SEO foundation — technical health, content signals, and authority indicators.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
     ],
     faqs: [
@@ -5505,6 +5548,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Development code includes whitespace, comments, and long variable names that bloat file sizes. Fix: minify all CSS and JS before deploying. Modern build tools (Next.js, Vite, Webpack) do this automatically in production mode — verify your build pipeline is configured correctly." },
       { type: "heading", level: 2, content: "Quick Wins You Can Do Today" },
       { type: "list", content: "", items: ["Run PageSpeed Insights and fix the top 3 'Opportunities' listed", "Install Cloudflare (free) in front of your existing hosting for instant CDN + caching", "Compress every image on your homepage to WebP using Squoosh.app", "Defer all third-party scripts (Google Analytics, Intercom, etc.) to load after the page", "Remove unused CSS — tools like PurgeCSS identify it automatically"] },
+      { type: "links", content: "Further Reading", links: [
+        { text: "Core Web Vitals Explained: A Simple Guide for Founders", href: "/blog/core-web-vitals-explained-simple-guide" },
+        { text: "Technical SEO Checklist 2026", href: "/blog/technical-seo-checklist-2026" },
+        { text: "E-E-A-T Explained: How Google Judges Your Site's Credibility", href: "/blog/eeat-google-credibility-guide" },
+        { text: "Your First 90 Days of SEO on a New Site", href: "/blog/seo-first-90-days-new-site" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Get a full picture of your site's SEO health including performance indicators.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
     ],
     faqs: [
@@ -5544,6 +5593,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Writing about themselves instead of the user ('We built this because...' vs 'You can now...')", "Too many CTAs competing for attention (pick one primary action per page)", "No specific social proof — 'loved by customers' means nothing without names and numbers", "Hiding the price until checkout — if you have a clear price, show it", "A hero image that's decorative but doesn't reinforce the message"] },
       { type: "heading", level: 2, content: "A Note on Copy vs Design" },
       { type: "paragraph", content: "Bad copy on a beautiful design converts poorly. Good copy on an ugly design often converts surprisingly well. Fix your copy first. Then fix the design. Most founders do this backwards." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-founders" },
+        { text: "How to Validate a Startup Idea Before Building", href: "/blog/validate-startup-idea-before-building" },
+        { text: "Pre-Launch Waitlist Strategy for Founders", href: "/blog/pre-launch-waitlist-strategy" },
+        { text: "Cold Email for Founders: How to Get Replies", href: "/blog/cold-email-for-founders" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Every landing page needs a great domain name to anchor it. Find one that's available and scores well with Founder Signal™.", ctaLink: "/generate", ctaText: "Find Your Domain Name →" },
     ],
     faqs: [
@@ -5576,6 +5631,12 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "Do your first 5 interviews with people you don't know — friends and colleagues are too invested in being supportive. Reach out to strangers in communities, subreddits, or LinkedIn who match your target profile." },
       { type: "heading", level: 2, content: "After the Interview: What to Do with the Data" },
       { type: "paragraph", content: "Immediately after each interview, write down: the 3 most surprising things you heard, the exact phrases the user used to describe the problem, and any workarounds they mentioned. Don't summarise — quote. The specific language users use to describe problems becomes your copywriting." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Validate a Startup Idea Before Building", href: "/blog/validate-startup-idea-before-building" },
+        { text: "MVP vs Prototype: What's the Difference?", href: "/blog/mvp-vs-prototype-difference" },
+        { text: "How to Write a Landing Page That Converts", href: "/blog/landing-page-conversion-guide" },
+        { text: "From Side Project to SaaS: When and How to Make the Leap", href: "/blog/side-project-to-saas" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Before your interviews, make sure your brand is ready. Start with a domain name that'll last.", ctaLink: "/generate", ctaText: "Find a Domain Name →" },
     ],
     faqs: [
@@ -5611,6 +5672,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Quitting your job before you have revenue — do both for as long as humanly possible", "Over-building before charging — charge earlier than feels comfortable", "Treating free users as validation — free users validate interest, not willingness to pay. These are very different things."] },
       { type: "heading", level: 2, content: "A 90-Day Transition Plan" },
       { type: "paragraph", content: "Month 1: Set up payments (Stripe), write minimal legal pages, add basic monitoring. Month 2: Reach out to your most engaged free users and offer early access at a discounted rate. Month 3: Iterate based on paying user feedback, raise prices, and formally launch." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-founders" },
+        { text: "SaaS Pricing Strategy: How to Price Your First Product", href: "/blog/pricing-new-saas" },
+        { text: "Customer Discovery: The Right Way to Talk to Early Users", href: "/blog/customer-discovery-interviews" },
+        { text: "How to Launch on Product Hunt", href: "/blog/how-to-launch-on-product-hunt" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Every serious SaaS needs a domain name worth building a brand on. Find one with Founder Signal™ scoring.", ctaLink: "/generate", ctaText: "Find Your SaaS Domain →" },
     ],
     faqs: [
@@ -5648,6 +5715,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Rough math: if you do 20 genuine personal outreach messages per day, get a 10% response rate, and convert 30% of respondents, you'll get about 0.6 customers per day. That's 100 customers in about 6 months of consistent effort. Most founders underestimate the required volume and consistency." },
       { type: "heading", level: 2, content: "The Mindset Shift Required" },
       { type: "paragraph", content: "The first 100 customers is a sales job, not a marketing job. You are the sales team. Every customer conversation is manual. Every support email is answered by you. This is expensive in time but invaluable in learning — by customer 100, you'll know exactly who your real customer is, what they care about, and what language converts." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "How to Write a Landing Page That Converts Cold Traffic", href: "/blog/landing-page-conversion-guide" },
+        { text: "Cold Email for Founders: How to Get Replies", href: "/blog/cold-email-for-founders" },
+        { text: "From Side Project to SaaS: When to Make the Leap", href: "/blog/side-project-to-saas" },
+        { text: "How to Launch on Product Hunt", href: "/blog/how-to-launch-on-product-hunt" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Before you go to market, make sure your brand is built on a domain name that's worth sharing. Find one with Founder Signal™ scoring.", ctaLink: "/generate", ctaText: "Find Your Domain →" },
     ],
     faqs: [
@@ -5690,6 +5763,12 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["You already have a specific keyword in mind and want to see variations", "Quick availability check for a list of names you've brainstormed elsewhere", "You need app store availability alongside domain availability"] },
       { type: "heading", level: 2, content: "When to Use NamoLux" },
       { type: "list", content: "", items: ["You need creative name ideas generated from your concept, not just keyword combinations", "You want to know which available names are actually worth building a brand on", "You need a Founder Signal™ score to objectively compare candidates", "You want multi-strategy AI generation (invented, compound, metaphor, root+suffix)"] },
+      { type: "links", content: "Further Reading", links: [
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
+        { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
+        { text: "Bust a Name vs NamoLux", href: "/blog/bust-a-name-vs-namolux" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Generate AI-powered domain names with live availability and Founder Signal™ quality scoring.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
     ],
     faqs: [
@@ -5726,6 +5805,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Instead of combining your keywords, NamoLux uses them as a brief for AI generation. The AI applies naming frameworks (invented words, borrowed metaphors, root+suffix, compounds) informed by examples from successful companies in your industry. The output isn't a list of keyword combinations — it's a curated set of creative candidates, each scored for brand quality." },
       { type: "heading", level: 2, content: "The Right Tool for the Right Job" },
       { type: "paragraph", content: "Bust a Name is a volume tool: it helps you exhaust the possibility space for keyword combinations quickly. NamoLux is a quality tool: it helps you find a small number of genuinely strong name candidates. Most founders benefit from using volume tools early in brainstorming and quality tools when they're ready to choose." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
+        { text: "Panabee vs NamoLux: Quick Search vs AI Scoring", href: "/blog/panabee-vs-namolux" },
+        { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Move beyond keyword combinations. Get AI-generated name candidates scored by Founder Signal™.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
     ],
     faqs: [
@@ -5764,6 +5849,12 @@ export const blogPosts: BlogPost[] = [
       ]},
       { type: "heading", level: 2, content: "The Recommended Workflow" },
       { type: "paragraph", content: "Use ChatGPT for early-stage brainstorming when you want to explore unusual angles or have a creative back-and-forth conversation about naming directions. Use NamoLux when you're ready to generate scored, verified candidates with live availability. The two tools complement each other rather than compete directly." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
+        { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Skip the prompt engineering. Get AI-generated names with live availability and Founder Signal™ scoring in under 60 seconds.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
     ],
     faqs: [
@@ -5804,6 +5895,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "NamoLux makes sense when: you want names generated specifically for your concept, you want to evaluate quality objectively rather than rely on someone else's curation, you're pre-revenue and budget-conscious, or you want to explore many options before committing." },
       { type: "heading", level: 2, content: "The Combined Approach" },
       { type: "paragraph", content: "Some founders use NamoLux to identify the naming direction — which style, which emotional territory, which structural approach works best for their brand — then browse Novanym's inventory looking for names that match. This gives you the generative exploration of NamoLux with the curated quality assurance of Novanym for the final choice." },
+      { type: "links", content: "Further Reading", links: [
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "Brandable vs Descriptive Domains: Which Works Better?", href: "/blog/brandable-vs-descriptive-domains" },
+        { text: "Panabee vs NamoLux: Quick Search vs AI Scoring", href: "/blog/panabee-vs-namolux" },
+        { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
+      ]},
       { type: "callout", calloutType: "cta", content: "Generate custom AI names scored by Founder Signal™ — free, no account required, live availability checked instantly.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
     ],
     faqs: [

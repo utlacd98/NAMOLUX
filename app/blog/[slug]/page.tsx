@@ -280,12 +280,32 @@ function BlogSection({ section }: { section: BlogSectionType }) {
         </h3>
       )
 
-    case "paragraph":
+    case "paragraph": {
+      // Parse inline markdown links: [text](url)
+      const parts = section.content.split(/(\[[^\]]+\]\([^)]+\))/g)
+      const rendered = parts.map((part, i) => {
+        const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+        if (match) {
+          const [, text, href] = match
+          const isInternal = href.startsWith("/")
+          return isInternal ? (
+            <Link key={i} href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+              {text}
+            </Link>
+          ) : (
+            <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+              {text}
+            </a>
+          )
+        }
+        return <span key={i}>{part}</span>
+      })
       return (
         <p className="mb-4 text-base leading-relaxed text-muted-foreground">
-          {section.content}
+          {rendered}
         </p>
       )
+    }
 
     case "list":
       return (
@@ -379,6 +399,28 @@ function BlogSection({ section }: { section: BlogSectionType }) {
         >
           {section.content}
         </Callout>
+      )
+
+    case "links":
+      if (!section.links?.length) return null
+      return (
+        <div className="my-8 rounded-lg border border-border/40 bg-muted/20 p-5">
+          {section.content && (
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {section.content || "Further Reading"}
+            </p>
+          )}
+          <ul className="space-y-2">
+            {section.links.map((link) => (
+              <li key={link.href} className="flex items-start gap-2">
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <Link href={link.href} className="text-sm text-foreground hover:text-primary transition-colors underline-offset-2 hover:underline">
+                  {link.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )
 
     case "quote":
