@@ -47,4 +47,7 @@ REMAINING_SETUP.md
 QUICK_SETUP_CHECKLIST.md
 SECURITY_VERIFICATION.md
 
+# Internal blueprint — never commit
+BLUEPRINT.md
+
 .vercel
