@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react"
 import { Send, RefreshCw, ExternalLink, Copy, CheckCircle, Sparkles, Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { namecheapLink } from "@/lib/affiliateLink"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -162,9 +163,7 @@ function ResultCard({ r }: { r: ChatResult }) {
           </button>
           {r.anyAvailable && registerTld && (
             <a
-              href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(
-                registerDomain
-              )}`}
+              href={namecheapLink(registerDomain)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-bold text-black transition-all hover:-translate-y-0.5"
@@ -197,9 +196,7 @@ function ResultCard({ r }: { r: ChatResult }) {
               />
               {isAvail ? (
                 <a
-                  href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(
-                    `${r.name}.${tld}`
-                  )}`}
+                  href={namecheapLink(`${r.name}.${tld}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[9px] font-semibold transition-opacity hover:opacity-80"

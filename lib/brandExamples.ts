@@ -333,6 +333,84 @@ export interface BuildPromptOptions {
   takenNames?: string[]
 }
 
+// ── Vibe-specific naming guidance injected into every generation batch ───────
+const VIBE_GUIDANCE: Record<string, string> = {
+  playful: `VIBE: PLAYFUL — This is the most important section. Read it carefully.
+Playful names must feel alive, warm, and human. They should make someone smile or say "that's clever".
+
+DRAW FROM SENSORY + EMOTIONAL VOCABULARY:
+- Textures: fluffy, crisp, silky, bouncy, fizzy, snappy, gooey
+- Sounds: pop, snap, zip, whip, ping, buzz, jingle
+- Movement: flip, dash, spin, leap, burst, glide, roll
+- Warmth: sunny, cozy, golden, bright, glow, bloom
+- Delight: sweet, zesty, sparkle, charm, whimsy, joy
+
+PROVEN PLAYFUL NAMING PATTERNS:
+- Unexpected real word in a new context: Mailchimp (chimp = fun twist), Hootsuite (hoot = owl + joke)
+- Sensory compound: SyrupJoy, FluffyFlip, ButterStack, SunPop
+- Action + object: StackFlip, DashCrisp, SnapGlow
+- Friendly invented words following natural phonetics: Popsy, Fluffsy, Stackly, Zestify
+
+WHAT GREAT PLAYFUL NAMES FEEL LIKE:
+✓ Short vowel sounds (short 'a', 'o', 'u') — pop, snap, hop, fun, buzz
+✓ Plosive consonants (p, b, t, k) — crispy, punchy, memorable
+✓ Light endings (-sy, -ly, -pop, -snap, -flip, -joy)
+✓ They tell a mini-story or create a sensory image
+
+REJECT these "playful" patterns:
+✗ Names that are just random invented syllables with no feeling (Vulo, Plopper, Snacko)
+✗ Generic + random: "Whippy", "Snappy" with no product connection
+✗ Any name that could be mistaken for a tech SaaS brand
+
+MANDATE: Every playful name must have a clear sensory or emotional hook.
+The test: can you describe what it smells, tastes, feels, or sounds like?`,
+
+  luxury: `VIBE: LUXURY — Restraint is sophistication. Less is more.
+
+LUXURY NAMING PRINCIPLES:
+- Short and elegant: 1-2 syllables ideal (Arc, Prim, Vale, Lune, Sable, Cove)
+- French and Latin roots carry prestige: -ier, -eau, -mont, -aux, -ai, -ure
+- Nature and geography: Crest, Summit, Ridge, Maison, Villa, Grove, Strand
+- Timeless materials and crafts: Grain, Quill, Fold, Lath, Burl, Silk
+- Premium feeling words: Meridian, Aven, Crest, Haven, Verdant, Lumière
+
+PROVEN LUXURY PATTERNS: Aesop, Glossier, Kinfolk, Caspian, Maison, Verdant, Penrose, Balmain
+REJECT: -ify, -hub, tech compounds, numbers, anything that sounds like software`,
+
+  futuristic: `VIBE: FUTURISTIC — Should feel like it arrived from 10 years ahead, not just "tech".
+
+FUTURISTIC NAMING PRINCIPLES:
+- Clean invented CVCV words with forward-momentum feel: Vexa, Nuvra, Synq, Axon, Plex, Flux
+- Physics and systems vocabulary: Arc, Vector, Flux, Prism, Core, Node, Helix
+- Compound precision words: NexGen (only if both parts have meaning)
+- Hard consonants and crisp vowels give a precise, confident feel
+
+WHAT WORKS: Stripe, Linear, Vercel, Brex, Figma, Temporal, Modal, Scale
+REJECT: Sci-fi clichés (-tron, -ron, -nix used lazily), anything that feels like a spaceship name`,
+
+  trustworthy: `VIBE: TRUSTWORTHY — Should feel like an institution you already trust.
+
+TRUSTWORTHY NAMING PRINCIPLES:
+- Solid, grounded real English words: Anchor, Bedrock, Granite, Pillar, Keystone, Hearth
+- Professions and expertise: Charter, Guild, Bureau, Council, Forum, Foundation
+- Clear and direct: no wordplay, no puns — clarity signals confidence
+- Two-syllable steady names: Comet, Foster, Norton, Beacon, Shield, Harbor
+
+PROVEN PATTERNS: Intuit, Plaid, Stripe, Affirm, Guideline, Gusto, Mercury, Bench
+REJECT: Anything cute, pun-based, or that could be confused with a playful brand`,
+
+  minimal: `VIBE: MINIMAL — One idea. Zero noise. Maximum clarity.
+
+MINIMAL NAMING PRINCIPLES:
+- 4-6 characters maximum — shorter is stronger
+- Single clear concept words: Loop, Beam, Fold, Note, Form, Base, Line, Read
+- Geometric and structural: Arc, Cube, Grid, Node, Mesh, Point, Axis
+- Nothing decorative — every letter earns its place
+
+PROVEN MINIMAL PATTERNS: Notion, Linear, Loom, Arc, Fig, Pitch, Craft, Plain, Grain, Leaf
+REJECT: Compound names, suffixes (-ify, -ly), anything that needs explanation`,
+}
+
 const STRATEGY_INSTRUCTIONS: Record<DeepSearchStrategy, string> = {
   invented:
     "THIS BATCH: Focus on clean invented words only (Approach 4). Pure coined words following CVCV, CVCCV, or CVCVC patterns. No real English words, no compounds. Think Figma, Canva, Vercel, Zillow, Brex, Pendo. All names must be ≤7 characters.",
@@ -360,6 +438,9 @@ export function buildGenerationPrompt(opts: BuildPromptOptions): { system: strin
       : ""
 
   const strategyNote = strategy ? `\n\n${STRATEGY_INSTRUCTIONS[strategy]}` : ""
+  const vibeNote = brandVibe && VIBE_GUIDANCE[brandVibe]
+    ? `\n\n${VIBE_GUIDANCE[brandVibe]}`
+    : ""
 
   const takenNote =
     takenNames.length > 0
@@ -450,7 +531,7 @@ QUALITY TEST — before including any name:
 3. Can someone hear it once and spell it correctly?
 4. Does it have an origin story — a real word, root, or concept behind it?
 
-If any answer is no, discard and replace.${deepSearchNote}${strategyNote}${takenNote}`
+If any answer is no, discard and replace.${vibeNote}${deepSearchNote}${strategyNote}${takenNote}`
 
   const user = `Generate ${batchSize} unique, brandable startup names.
 

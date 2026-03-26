@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
+import { namecheapLink } from "@/lib/affiliateLink"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
@@ -25,6 +26,8 @@ import {
   Eye,
   Lock,
   Lightbulb,
+  Swords,
+  LayoutGrid,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -34,6 +37,13 @@ import { buildResultCardView } from "@/lib/domainGen/resultCard"
 import { DeepSearch } from "@/components/deep-search"
 import { AiNameChat } from "@/components/ai-name-chat"
 import { useNamePreferences } from "@/hooks/useNamePreferences"
+import { NamePronunciation } from "@/components/name-pronunciation"
+import { NameStressTest } from "@/components/name-stress-test"
+import { NameInsightsPanel } from "@/components/name-insights-panel"
+import { NameBattleDialog } from "@/components/name-battle-dialog"
+import { NamesLikeSearch } from "@/components/names-like-search"
+import { SavedNamesBoard } from "@/components/saved-names-board"
+import { getTrendAge } from "@/lib/nameCreativity"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -440,6 +450,12 @@ export function GenerateNames() {
 
   // Bulk sort state
   const [bulkSortKey, setBulkSortKey] = useState<"score" | "length" | "availability">("score")
+
+  // ── Creativity features state ────────────────────────────────────────────
+  const [battleQueue, setBattleQueue] = useState<{ name: string; tld?: string }[]>([])
+  const [showBattle, setShowBattle] = useState(false)
+  const [namesLikeTarget, setNamesLikeTarget] = useState<string | null>(null)
+  const [showSavedBoard, setShowSavedBoard] = useState(false)
 
   // Refs for UX scroll behaviour
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -1167,10 +1183,22 @@ export function GenerateNames() {
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             {shortlist.length > 0 && (
-              <Button variant="outline" size="sm" onClick={exportShortlist} className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm">
-                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Export</span> ({shortlist.length})
-              </Button>
+              <>
+                <Button variant="outline" size="sm" onClick={exportShortlist} className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm">
+                  <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Export</span> ({shortlist.length})
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSavedBoard(true)}
+                  className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm"
+                  style={{ borderColor: "rgba(212,175,55,0.25)", color: "#D4AF37" }}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Board</span>
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -1935,7 +1963,7 @@ export function GenerateNames() {
                               )}
                             </button>
                             <a
-                              href={`https://www.namecheap.com/domains/registration/results/?domain=${result.fullDomain}`}
+                              href={namecheapLink(result.fullDomain)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
@@ -2376,7 +2404,7 @@ export function GenerateNames() {
                                   r.available ? (
                                     <a
                                       key={r.tld}
-                                      href={`https://www.namecheap.com/domains/registration/results/?domain=${r.fullDomain}`}
+                                      href={namecheapLink(r.fullDomain)}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5 sm:text-xs"
@@ -2476,7 +2504,7 @@ export function GenerateNames() {
                               {availableTlds.map((r, i) => (
                                 <a
                                   key={r.tld}
-                                  href={`https://www.namecheap.com/domains/registration/results/?domain=${r.fullDomain}`}
+                                  href={namecheapLink(r.fullDomain)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
@@ -2517,7 +2545,7 @@ export function GenerateNames() {
                             )}
                           </div>
 
-                          {/* SEO Micro-Signal & Check Button */}
+                          {/* SEO Micro-Signal & Action Bar */}
                           <div className="mt-1.5 flex flex-wrap items-center gap-2">
                             {(() => {
                               const signal = getSeoMicroSignal(name)
@@ -2536,6 +2564,19 @@ export function GenerateNames() {
                                 </span>
                               ) : null
                             })()}
+                            {/* Trend Age badge */}
+                            {(() => {
+                              const ta = getTrendAge(name)
+                              return (
+                                <span
+                                  className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                  style={{ background: `${ta.color}18`, color: ta.color }}
+                                  title={ta.flags.length ? ta.flags.join(" · ") : "No dating patterns detected"}
+                                >
+                                  ⏳ {ta.label}
+                                </span>
+                              )
+                            })()}
                             <button
                               onClick={() => setSeoCheckDomain({ name: best.name, tld: best.tld })}
                               className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
@@ -2544,7 +2585,57 @@ export function GenerateNames() {
                               <Search className="h-2.5 w-2.5" />
                               SEO Potential
                             </button>
+                            {/* Pronunciation */}
+                            <NamePronunciation name={name} />
+                            {/* Names Like */}
+                            <button
+                              onClick={() => setNamesLikeTarget(name)}
+                              className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                              style={{ background: "rgba(96,165,250,0.1)", color: "#60a5fa" }}
+                              title="Find names with the same feel"
+                            >
+                              <Sparkles className="h-2.5 w-2.5" />
+                              Names Like
+                            </button>
+                            {/* Battle */}
+                            <button
+                              onClick={() => {
+                                const entry = { name, tld: best.tld }
+                                setBattleQueue((q) => {
+                                  // Toggle: remove if already queued
+                                  if (q.some((e) => e.name === name)) return q.filter((e) => e.name !== name)
+                                  const next = [...q.filter((e) => e.name !== name), entry].slice(-2)
+                                  if (next.length === 2) setShowBattle(true)
+                                  return next
+                                })
+                              }}
+                              className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                              style={{
+                                background: battleQueue.some((e) => e.name === name)
+                                  ? "rgba(248,113,113,0.15)"
+                                  : "rgba(255,255,255,0.06)",
+                                color: battleQueue.some((e) => e.name === name)
+                                  ? "#f87171"
+                                  : "rgba(255,255,255,0.35)",
+                              }}
+                              title={
+                                battleQueue.some((e) => e.name === name)
+                                  ? "Remove from battle"
+                                  : battleQueue.length === 0
+                                  ? "Select for battle (pick 2 names)"
+                                  : "Battle this name!"
+                              }
+                            >
+                              <Swords className="h-2.5 w-2.5" />
+                              {battleQueue.some((e) => e.name === name) ? "In Battle" : "Battle"}
+                            </button>
                           </div>
+
+                          {/* Brand Story + Taglines */}
+                          <NameInsightsPanel name={name} vibe={selectedVibe} />
+
+                          {/* Stress Test */}
+                          <NameStressTest name={name} founderScore={best.score} />
                         </div>
                       </div>
                     )
@@ -2740,7 +2831,7 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={`https://www.namecheap.com/domains/registration/results/?domain=${fullDomain}`}
+                          href={namecheapLink(fullDomain)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-all hover:-translate-y-0.5"
@@ -2838,7 +2929,7 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={`https://www.namecheap.com/domains/registration/results/?domain=${fullDomain}`}
+                          href={namecheapLink(fullDomain)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex min-h-[40px] items-center gap-1 rounded-lg px-3 text-xs font-semibold"
@@ -2882,6 +2973,36 @@ export function GenerateNames() {
           tld={seoCheckDomain.tld}
           industry={selectedIndustry}
           onClose={() => setSeoCheckDomain(null)}
+        />
+      )}
+
+      {/* ── Creativity Feature Modals ─────────────────────────────────── */}
+
+      {/* Name Battle */}
+      {showBattle && battleQueue.length === 2 && (
+        <NameBattleDialog
+          names={battleQueue}
+          onClose={() => { setShowBattle(false); setBattleQueue([]) }}
+        />
+      )}
+
+      {/* Names Like */}
+      {namesLikeTarget !== null && (
+        <NamesLikeSearch
+          defaultInspiration={namesLikeTarget}
+          onClose={() => setNamesLikeTarget(null)}
+          onCheckName={(name) => {
+            setKeyword(name)
+            setNamesLikeTarget(null)
+          }}
+        />
+      )}
+
+      {/* Saved Names Board */}
+      {showSavedBoard && (
+        <SavedNamesBoard
+          legacyShortlist={shortlist}
+          onClose={() => setShowSavedBoard(false)}
         />
       )}
     </div>

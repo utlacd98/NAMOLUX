@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react"
 import { Check, X, Copy, CheckCircle, Search, RefreshCw, ExternalLink, Zap, ChevronDown, ChevronUp } from "lucide-react"
 import { FounderSignalPanel } from "@/components/founder-signal"
+import { namecheapLink } from "@/lib/affiliateLink"
 
 const OTHER_TLDS = ["io", "co", "ai", "app", "dev"] as const
 type OtherTld = typeof OTHER_TLDS[number]
@@ -183,7 +184,7 @@ function ResultCard({
               )}
             </button>
             <a
-              href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(result.fullDomain)}`}
+              href={namecheapLink(result.fullDomain)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-black transition-all hover:-translate-y-0.5"
@@ -220,7 +221,7 @@ function ResultCard({
                   <TldDot available={av} />
                   {isAvail ? (
                     <a
-                      href={`https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(`${result.name}.${tld}`)}`}
+                      href={namecheapLink(`${result.name}.${tld}`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] font-medium transition-colors hover:text-green-400"
