@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = await request.json()
-    const { keyword, vibe, industry, maxLength, count, autoFindV2, generatorV2, nameStyle, meaningMode } = payload
+    const { keyword, vibe, industry, maxLength, count, autoFindV2, generatorV2, nameStyle, meaningMode, refinementInstruction, alreadySeen } = payload
     const hasCustomCount = typeof count === "number" && Number.isFinite(count)
     const safeCount = hasCustomCount ? Math.max(12, Math.min(Math.floor(count), 20)) : 10
 
@@ -248,12 +248,19 @@ export async function POST(request: NextRequest) {
       maxLength: maxLength || 10,
       batchSize: safeCount,
       outputFormat: "with-metadata",
+      alreadySeen: Array.isArray(alreadySeen) ? alreadySeen : [],
+      ...(refinementInstruction ? { strategy: undefined } : {}),
     })
+
+    // Append refinement instruction to system prompt if provided
+    const finalSystemPrompt = refinementInstruction
+      ? `${systemPrompt}\n\n${refinementInstruction}`
+      : systemPrompt
 
     const completion = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: finalSystemPrompt },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.92,

@@ -138,7 +138,7 @@ export function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
               </span>
-              Founder Signal™ Powered · AI Naming
+              Brandable Names · Available Domains · Zero Guesswork
             </div>
 
             {/* Headline */}
@@ -155,8 +155,8 @@ export function Hero() {
 
             {/* Sub */}
             <p className="animate-hero-fade-up hero-delay-2 mt-5 w-full text-sm leading-relaxed text-white/50 sm:max-w-lg sm:text-base">
-              AI-generated brandable names, live availability checking, and every result scored with{" "}
-              <span className="font-semibold text-white/80">Founder Signal™</span> — so you know it&apos;s worth building on, not just available.
+              Stop generating names you can&apos;t own. NamoLux gives you brandable names{" "}
+              <span className="font-semibold text-white/80">with available domains attached</span> — every result scored with Founder Signal™ so you know it&apos;s worth building on.
             </p>
 
             {/* CTA */}
@@ -174,7 +174,11 @@ export function Hero() {
               </Link>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/30">
-                {["No account required", "1 free generation/day", "Live-checked results"].map(t => (
+                {[
+                  "No account required",
+                  "Live .com availability — not just ideas",
+                  "Namelix gives names. We give names you can own.",
+                ].map(t => (
                   <span key={t} className="flex items-center gap-1">
                     <Check className="h-3 w-3 text-emerald-500/70" /> {t}
                   </span>

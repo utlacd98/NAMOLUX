@@ -44,6 +44,8 @@ import { NameBattleDialog } from "@/components/name-battle-dialog"
 import { NamesLikeSearch } from "@/components/names-like-search"
 import { SavedNamesBoard } from "@/components/saved-names-board"
 import { getTrendAge } from "@/lib/nameCreativity"
+import { getCached, setCachedBatch, clearExpired } from "@/lib/domainCache"
+import { RefineResults, getRefinementOverrides, type RefinementMode } from "@/components/refine-results"
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -457,6 +459,10 @@ export function GenerateNames() {
   const [namesLikeTarget, setNamesLikeTarget] = useState<string | null>(null)
   const [showSavedBoard, setShowSavedBoard] = useState(false)
 
+  // ── Refine Results state ─────────────────────────────────────────────────
+  const [activeRefinement, setActiveRefinement] = useState<RefinementMode | null>(null)
+  const [isRefining, setIsRefining] = useState(false)
+
   // Refs for UX scroll behaviour
   const resultsRef = useRef<HTMLDivElement>(null)
 
@@ -504,6 +510,9 @@ export function GenerateNames() {
           },
     )
   }, [selectedVibe, maxLength, hasCustomTwoWordPreference])
+
+  // Clean expired domain cache entries on mount
+  useEffect(() => { clearExpired() }, [])
 
   // Load shortlist and search history from localStorage on mount
   useEffect(() => {
@@ -737,28 +746,82 @@ export function GenerateNames() {
     tlds: string[] | undefined,
     signal: AbortSignal,
   ): Promise<DomainResult[]> => {
-    const response = await fetch("/api/check-domain", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      signal,
-      body: JSON.stringify({
-        domains: domainNames,
-        tlds,
-      }),
-    })
+    const effectiveTlds = tlds ?? ["com", "io", "co", "ai", "app", "dev"]
 
-    const responseData = await response.json()
-    if (!response.ok) {
-      if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
-        router.push("/pricing?reason=limit_exceeded")
-        throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+    // ── Cache check: build full domain list and separate hits from misses ──
+    const allDomains = domainNames.flatMap((n) => effectiveTlds.map((t) => `${n}.${t}`))
+    const cachedHits: Map<string, { available: boolean; checkStatus: string }> = new Map()
+    const uncachedDomains: string[] = []
+
+    for (const domain of allDomains) {
+      const hit = getCached(domain)
+      if (hit) {
+        cachedHits.set(domain, { available: hit.available, checkStatus: hit.status })
+      } else {
+        uncachedDomains.push(domain)
       }
-      throw new Error("Failed to check domain availability")
     }
 
-    return responseData.results || []
+    // Extract just the names that have at least one uncached TLD
+    const uncachedNames = Array.from(
+      new Set(uncachedDomains.map((d) => d.split(".")[0]))
+    )
+
+    let apiResults: DomainResult[] = []
+
+    if (uncachedNames.length > 0) {
+      const response = await fetch("/api/check-domain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal,
+        body: JSON.stringify({ domains: uncachedNames, tlds }),
+      })
+
+      const responseData = await response.json()
+      if (!response.ok) {
+        if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
+          router.push("/pricing?reason=limit_exceeded")
+          throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+        }
+        throw new Error("Failed to check domain availability")
+      }
+
+      apiResults = responseData.results || []
+
+      // ── Write fresh results to cache ──
+      setCachedBatch(
+        apiResults.map((r) => ({
+          domain: r.fullDomain,
+          status: (r.checkStatus ?? (r.available ? "available" : "taken")) as Parameters<typeof setCachedBatch>[0][number]["status"],
+          available: r.available,
+        }))
+      )
+    }
+
+    // ── Merge cache hits back into results for cached names ──
+    // For domains in cache but not re-fetched, reconstruct minimal DomainResult
+    const cachedResults: DomainResult[] = []
+    for (const [fullDomain, hit] of cachedHits) {
+      const parts = fullDomain.split(".")
+      const name = parts[0]
+      const tld = parts.slice(1).join(".")
+      // Only add if this name isn't already in apiResults
+      if (!apiResults.some((r) => r.fullDomain === fullDomain)) {
+        cachedResults.push({
+          name,
+          tld,
+          fullDomain,
+          available: hit.available,
+          score: 0,
+          pronounceable: true,
+          memorability: 7,
+          length: name.length,
+          checkStatus: hit.checkStatus as DomainResult["checkStatus"],
+        })
+      }
+    }
+
+    return [...apiResults, ...cachedResults]
   }
 
   const requestAutoFindV2 = async (
@@ -1064,6 +1127,58 @@ export function GenerateNames() {
     navigator.clipboard.writeText(fullDomain)
     setCopiedName(fullDomain)
     setTimeout(() => setCopiedName(null), 2000)
+  }
+
+  const handleRefine = async (mode: RefinementMode) => {
+    const resolvedKeyword = keyword.trim() || description.trim()
+    if (!resolvedKeyword || isRefining || isGenerating) return
+
+    setActiveRefinement(mode)
+    setIsRefining(true)
+    setError(null)
+
+    generationAbortRef.current?.abort()
+    const abortController = new AbortController()
+    generationAbortRef.current = abortController
+
+    const overrides = getRefinementOverrides(mode, maxLength)
+
+    try {
+      // Temporarily override payload with refinement parameters
+      const response = await fetch("/api/generate-domains", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
+        body: JSON.stringify({
+          keyword: resolvedKeyword,
+          vibe: overrides.vibe ?? selectedVibe,
+          industry: selectedIndustry,
+          maxLength: overrides.maxLength ?? maxLength,
+          refinementInstruction: overrides.extraInstruction,
+          alreadySeen: results.map((r) => r.name),
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error ?? "Failed to refine")
+
+      const names: string[] = data.names ?? []
+      if (names.length === 0) throw new Error("No names generated. Try a different refinement.")
+
+      const refined = await requestAvailability(names, undefined, abortController.signal)
+      // Merge: keep existing results, prepend refined ones that aren't duplicates
+      const existingNames = new Set(results.map((r) => r.name))
+      const newResults = refined.filter((r) => !existingNames.has(r.name))
+      setResults((prev) => [...newResults, ...prev])
+
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200)
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name !== "AbortError") {
+        setError(e.message)
+      }
+    } finally {
+      setIsRefining(false)
+    }
   }
 
   const exportShortlist = () => {
@@ -2498,42 +2613,78 @@ export function GenerateNames() {
                             vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
                           />
 
-                          {/* Register buttons — one per available TLD, best TLD most prominent */}
-                          {hasAvailable && (
-                            <div className="mt-3 flex flex-wrap items-center gap-2">
-                              {availableTlds.map((r, i) => (
-                                <a
-                                  key={r.tld}
-                                  href={namecheapLink(r.fullDomain)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
-                                  style={{
-                                    background:
-                                      i === 0 && isTopPick
-                                        ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
-                                        : i === 0
-                                        ? "rgba(212,175,55,0.12)"
-                                        : "rgba(255,255,255,0.05)",
-                                    color: i === 0 && isTopPick ? "#0a0800" : i === 0 ? "#D4AF37" : "rgba(255,255,255,0.45)",
-                                    border:
-                                      i === 0 && isTopPick
-                                        ? "none"
-                                        : i === 0
-                                        ? "1px solid rgba(212,175,55,0.25)"
-                                        : "1px solid rgba(255,255,255,0.08)",
-                                    boxShadow: i === 0 && isTopPick ? "0 4px 20px rgba(212,175,55,0.3)" : undefined,
-                                  }}
-                                >
-                                  <ExternalLink className="h-3.5 w-3.5" />
-                                  Register .{r.tld}
-                                </a>
-                              ))}
-                              {availableTlds.length === 1 && (
-                                <p className="text-[10px] text-white/20">Available now — short domains sell fast</p>
-                              )}
-                            </div>
-                          )}
+                          {/* Register buttons — curated fallback framing */}
+                          {hasAvailable && (() => {
+                            const comAvailable = availableTlds.some((r) => r.tld === "com")
+                            const bestTld = availableTlds[0]
+                            return (
+                              <div className="mt-3 space-y-2">
+                                {/* .com not available — curated alternative framing */}
+                                {!comAvailable && availableTlds.length > 0 && (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] text-white/25">
+                                      .com highly competitive —
+                                    </span>
+                                    <span className="text-[10px] font-semibold" style={{ color: "#60a5fa" }}>
+                                      Best available: {bestTld.fullDomain}
+                                    </span>
+                                    {bestTld.score > 0 && (
+                                      <span
+                                        className="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
+                                        style={{ background: "rgba(96,165,250,0.12)", color: "#60a5fa" }}
+                                      >
+                                        Score {bestTld.score}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {availableTlds.map((r, i) => (
+                                    <a
+                                      key={r.tld}
+                                      href={namecheapLink(r.fullDomain)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
+                                      style={{
+                                        background:
+                                          i === 0 && isTopPick
+                                            ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
+                                            : i === 0 && !comAvailable
+                                            ? "rgba(96,165,250,0.12)"
+                                            : i === 0
+                                            ? "rgba(212,175,55,0.12)"
+                                            : "rgba(255,255,255,0.05)",
+                                        color:
+                                          i === 0 && isTopPick
+                                            ? "#0a0800"
+                                            : i === 0 && !comAvailable
+                                            ? "#60a5fa"
+                                            : i === 0
+                                            ? "#D4AF37"
+                                            : "rgba(255,255,255,0.45)",
+                                        border:
+                                          i === 0 && isTopPick
+                                            ? "none"
+                                            : i === 0 && !comAvailable
+                                            ? "1px solid rgba(96,165,250,0.25)"
+                                            : i === 0
+                                            ? "1px solid rgba(212,175,55,0.25)"
+                                            : "1px solid rgba(255,255,255,0.08)",
+                                        boxShadow: i === 0 && isTopPick ? "0 4px 20px rgba(212,175,55,0.3)" : undefined,
+                                      }}
+                                    >
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      Register .{r.tld}
+                                    </a>
+                                  ))}
+                                  {availableTlds.length === 1 && comAvailable && (
+                                    <p className="text-[10px] text-white/20">Available now — domains sell fast</p>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })()}
 
                           {/* Metrics */}
                           <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
@@ -2642,6 +2793,15 @@ export function GenerateNames() {
                   })}
                 </div>
               </div>
+            )}
+
+            {/* ── Refine Results ── */}
+            {results.length > 0 && !isGenerating && (
+              <RefineResults
+                onRefine={handleRefine}
+                isRefining={isRefining}
+                activeMode={activeRefinement}
+              />
             )}
 
             {/* Social Handle Checker */}
