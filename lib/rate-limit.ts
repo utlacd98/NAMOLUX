@@ -125,8 +125,8 @@ export async function checkRateLimit(
   // Use the higher count (IP or user-based)
   const totalCount = Math.max(ipCount || 0, userCount)
 
-  // Free users get 2 uses per feature per 24 hours
-  const FREE_LIMIT = 2
+  // Free users get 3 uses per feature per 24 hours
+  const FREE_LIMIT = 3
   const allowed = totalCount < FREE_LIMIT
   const remaining = Math.max(0, FREE_LIMIT - totalCount)
 

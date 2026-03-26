@@ -167,6 +167,18 @@ function ResultCard({
               >
                 .com ✓
               </span>
+              {result.label && (
+                <span
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                  style={{
+                    background: "rgba(96,165,250,0.1)",
+                    color: "#60a5fa",
+                    border: "1px solid rgba(96,165,250,0.2)",
+                  }}
+                >
+                  {result.label}
+                </span>
+              )}
             </div>
           </div>
 
@@ -196,48 +208,64 @@ function ResultCard({
           </div>
         </div>
 
-        {/* Score bar */}
-        <div className="mt-3 flex items-center gap-3">
-          <div className="h-1.5 flex-1 rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${result.score}%`, background: color }}
-            />
+        {/* Quality signal pills — why this name scored well */}
+        {result.reasons && result.reasons.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {result.reasons.map((reason) => (
+              <span
+                key={reason}
+                className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                style={{
+                  background: "rgba(52,211,153,0.08)",
+                  color: "rgba(52,211,153,0.75)",
+                  border: "1px solid rgba(52,211,153,0.15)",
+                }}
+              >
+                {reason}
+              </span>
+            ))}
           </div>
-          <span className="shrink-0 text-xs font-semibold tabular-nums" style={{ color }}>
-            {result.score} — {scoreBand(result.score)}
-          </span>
-        </div>
+        )}
 
-        {/* Other TLD availability row */}
+        {/* Other TLD availability — proper chips */}
         {result.otherTlds && (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {OTHER_TLDS.map((tld) => {
               const av = result.otherTlds?.[tld]
               const isAvail = av === true
               const isTaken = av === false
+              if (isAvail) {
+                return (
+                  <a
+                    key={tld}
+                    href={namecheapLink(`${result.name}.${tld}`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all hover:-translate-y-0.5"
+                    style={{
+                      background: "rgba(52,211,153,0.1)",
+                      color: "#34d399",
+                      border: "1px solid rgba(52,211,153,0.2)",
+                    }}
+                  >
+                    <ExternalLink className="h-2.5 w-2.5" />
+                    .{tld}
+                  </a>
+                )
+              }
               return (
-                <div key={tld} className="flex items-center gap-1">
-                  <TldDot available={av} />
-                  {isAvail ? (
-                    <a
-                      href={namecheapLink(`${result.name}.${tld}`)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] font-medium transition-colors hover:text-green-400"
-                      style={{ color: "rgba(52,211,153,0.8)" }}
-                    >
-                      .{tld}
-                    </a>
-                  ) : (
-                    <span
-                      className="text-[10px]"
-                      style={{ color: isTaken ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.3)" }}
-                    >
-                      .{tld}
-                    </span>
-                  )}
-                </div>
+                <span
+                  key={tld}
+                  className="rounded-lg px-2.5 py-1 text-[11px]"
+                  style={{
+                    background: "rgba(255,255,255,0.02)",
+                    color: isTaken ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.28)",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                    textDecoration: isTaken ? "line-through" : "none",
+                  }}
+                >
+                  .{tld}
+                </span>
               )
             })}
           </div>
@@ -285,6 +313,80 @@ function ResultCard({
         {/* Founder Signal */}
         <div className="mt-3">
           <FounderSignalPanel name={result.name} tld="com" />
+        </div>
+
+        {/* What to do next */}
+        <div
+          className="mt-4 rounded-xl p-3"
+          style={{ background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.1)" }}
+        >
+          <p className="mb-2.5 text-[10px] font-bold uppercase tracking-wider" style={{ color: "rgba(212,175,55,0.6)" }}>
+            What to do next
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5">
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black"
+                style={{ background: "rgba(52,211,153,0.15)", color: "#34d399" }}
+              >
+                1
+              </span>
+              <a
+                href={namecheapLink(result.fullDomain)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-semibold transition-colors hover:text-white"
+                style={{ color: "#34d399" }}
+              >
+                Register {result.fullDomain} →
+              </a>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black"
+                style={{ background: "rgba(96,165,250,0.12)", color: "#60a5fa" }}
+              >
+                2
+              </span>
+              <a
+                href={`https://tmsearch.uspto.gov/search/search-information?query=${encodeURIComponent(result.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] transition-colors hover:text-white"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                Check trademark on USPTO →
+              </a>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black"
+                style={{ background: "rgba(244,114,182,0.12)", color: "#f472b6" }}
+              >
+                3
+              </span>
+              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Secure social handles (X, IG, TT shown above)
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black"
+                style={{ background: "rgba(167,139,250,0.12)", color: "#a78bfa" }}
+              >
+                4
+              </span>
+              <a
+                href={`https://workspace.google.com/landing/partners/referral/googleworkspace.html`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] transition-colors hover:text-white"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                Set up professional email (@{result.name}.com) →
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -488,14 +590,17 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
               <Zap className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
             </div>
             <div>
-              <span className="text-xs font-bold text-white">Deep Search for .com</span>
-              <span className="ml-2 text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <span className="text-sm font-bold text-white">Deep Search</span>
+              <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#D4AF37" }}>
+                .com confirmed
+              </span>
+              <div className="mt-0.5 text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
                 {running
-                  ? `Searching… ${results.length} found`
+                  ? `Scanning… ${results.length} names confirmed available`
                   : done
                   ? `${results.length} available .com name${results.length !== 1 ? "s" : ""} found`
-                  : "AI tests 4 naming strategies · pre-scored for quality · up to 80 combos"}
-              </span>
+                  : "Finds .com names your competitors haven't registered — 80+ candidates tested"}
+              </div>
             </div>
           </div>
 
@@ -596,11 +701,11 @@ export function DeepSearch({ keyword, vibe, industry, maxLength = 10 }: DeepSear
                 style={{ border: "1px dashed rgba(212,175,55,0.12)", background: "rgba(212,175,55,0.02)" }}
               >
                 <Zap className="mb-3 h-6 w-6" style={{ color: "rgba(212,175,55,0.4)" }} />
-                <p className="text-sm font-semibold text-white">Find .com gems hiding in plain sight</p>
+                <p className="text-sm font-semibold text-white">Find the .com you can actually own</p>
                 <p className="mt-1.5 max-w-xs text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-                  Rotates 4 naming strategies — invented words, compounds, root+suffix, metaphors. Pre-scores
-                  every candidate before checking availability. Also shows .io .co .ai .app .dev status for
-                  each name found. Streams live results as they&apos;re confirmed.
+                  Tests 80+ candidates across 4 naming strategies — invented words, compounds, metaphors, and root+suffix blends.
+                  Every candidate is quality-scored before availability is checked.
+                  Results stream live. Each confirmed name shows .io .co .ai .app .dev status too.
                 </p>
               </div>
             )}

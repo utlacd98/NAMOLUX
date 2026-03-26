@@ -298,12 +298,17 @@ export function FounderSignalPanel({ name, tld, vibe }: FounderSignalPanelProps)
         </div>
       </div>
 
+      {/* Verdict — always visible */}
+      <p className="mt-1.5 text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+        {signal.brutalVerdict}
+      </p>
+
       {/* Expand toggle */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-1.5 flex items-center gap-1 text-[10px] text-white/25 transition-colors hover:text-white/50"
+        className="mt-1 flex items-center gap-1 text-[10px] text-white/25 transition-colors hover:text-white/50"
       >
-        View analysis
+        View breakdown
         {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
       </button>
 
