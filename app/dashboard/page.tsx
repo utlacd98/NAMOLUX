@@ -44,7 +44,7 @@ export default function DashboardPage() {
   )
 }
 
-// ── Brand Journey ──────────────────────────────────────────────────────────────
+// ── Brand Journey tracker ──────────────────────────────────────────────────────
 
 const JOURNEY_STEPS = [
   {
@@ -97,58 +97,59 @@ function BrandJourney() {
         </p>
       </div>
 
-      <div className="px-6 py-2">
+      {/* On desktop, show steps horizontally */}
+      <div className="px-6 py-2 lg:flex lg:divide-x lg:py-0" style={{ "--tw-divide-opacity": "1" } as React.CSSProperties}>
         {JOURNEY_STEPS.map((s, i) => {
           const Icon = s.icon
           const isLast = i === JOURNEY_STEPS.length - 1
 
-          const inner = (
-            <div className="flex items-start gap-4 py-4">
-              {/* Step icon + connector */}
-              <div className="flex flex-col items-center">
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all"
-                  style={{
-                    background: s.done
-                      ? "rgba(212,175,55,0.15)"
-                      : s.locked
-                      ? "rgba(255,255,255,0.04)"
-                      : "rgba(255,255,255,0.07)",
-                    border: s.done
-                      ? "1px solid rgba(212,175,55,0.35)"
-                      : s.locked
-                      ? "1px solid rgba(255,255,255,0.05)"
-                      : "1px solid rgba(255,255,255,0.12)",
-                    boxShadow: s.done ? "0 0 18px rgba(212,175,55,0.15)" : "none",
-                  }}
-                >
-                  {s.done ? (
-                    <Check className="h-4 w-4" style={{ color: "#D4AF37" }} />
-                  ) : (
-                    <Icon
-                      className="h-4 w-4"
-                      style={{
-                        color: s.locked ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.55)",
-                      }}
-                    />
-                  )}
-                </div>
-                {/* Vertical connector line */}
-                {!isLast && (
-                  <div
-                    className="mt-1 w-px flex-1"
-                    style={{
-                      minHeight: 24,
-                      background: s.done
-                        ? "linear-gradient(to bottom, rgba(212,175,55,0.3), rgba(255,255,255,0.06))"
-                        : "rgba(255,255,255,0.05)",
-                    }}
+          const content = (
+            <div className="flex items-start gap-4 py-4 lg:flex-col lg:gap-3 lg:px-6 lg:py-5 lg:first:pl-0 lg:last:pr-0">
+              {/* Icon */}
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full lg:h-11 lg:w-11"
+                style={{
+                  background: s.done
+                    ? "rgba(212,175,55,0.15)"
+                    : s.locked
+                    ? "rgba(255,255,255,0.04)"
+                    : "rgba(255,255,255,0.07)",
+                  border: s.done
+                    ? "1px solid rgba(212,175,55,0.35)"
+                    : s.locked
+                    ? "1px solid rgba(255,255,255,0.05)"
+                    : "1px solid rgba(255,255,255,0.12)",
+                  boxShadow: s.done ? "0 0 18px rgba(212,175,55,0.15)" : "none",
+                }}
+              >
+                {s.done ? (
+                  <Check className="h-4 w-4" style={{ color: "#D4AF37" }} />
+                ) : (
+                  <Icon
+                    className="h-4 w-4"
+                    style={{ color: s.locked ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.55)" }}
                   />
                 )}
               </div>
 
-              {/* Step content */}
-              <div className="flex-1 pb-1 min-w-0">
+              {/* Mobile: vertical connector between steps */}
+              {!isLast && (
+                <div
+                  className="mt-1 w-px lg:hidden"
+                  style={{
+                    minHeight: 20,
+                    background: s.done
+                      ? "linear-gradient(to bottom, rgba(212,175,55,0.3), rgba(255,255,255,0.06))"
+                      : "rgba(255,255,255,0.05)",
+                    alignSelf: "stretch",
+                    position: "absolute",
+                    left: 43,
+                  }}
+                />
+              )}
+
+              {/* Step text */}
+              <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span
                     className="text-sm font-semibold"
@@ -189,19 +190,23 @@ function BrandJourney() {
             </div>
           )
 
-          if (s.locked || !s.href) return <div key={s.step}>{inner}</div>
-          if (s.href.startsWith("#")) {
+          const wrapper = (children: React.ReactNode) => {
+            if (s.locked || !s.href) return <div key={s.step} className="relative lg:flex-1">{children}</div>
+            if (s.href.startsWith("#")) {
+              return (
+                <a key={s.step} href={s.href} className="relative block transition-opacity hover:opacity-90 lg:flex-1" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  {children}
+                </a>
+              )
+            }
             return (
-              <a key={s.step} href={s.href} className="block group transition-opacity hover:opacity-90">
-                {inner}
-              </a>
+              <Link key={s.step} href={s.href} className="relative block transition-opacity hover:opacity-90 lg:flex-1" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                {children}
+              </Link>
             )
           }
-          return (
-            <Link key={s.step} href={s.href} className="block group transition-opacity hover:opacity-90">
-              {inner}
-            </Link>
-          )
+
+          return wrapper(content)
         })}
       </div>
     </div>
@@ -285,7 +290,11 @@ function DashboardContent() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3" style={{ background: "#050505" }}>
         <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#D4AF37" }} />
-        {verifying && <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>Activating your Pro access…</p>}
+        {verifying && (
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+            Activating your Pro access…
+          </p>
+        )}
       </div>
     )
   }
@@ -302,8 +311,8 @@ function DashboardContent() {
         className="pointer-events-none absolute inset-0"
         style={{
           background: [
-            "radial-gradient(ellipse 70% 50% at 10% 10%, rgba(212,175,55,0.13) 0%, transparent 60%)",
-            "radial-gradient(ellipse 50% 40% at 90% 80%, rgba(212,175,55,0.07) 0%, transparent 55%)",
+            "radial-gradient(ellipse 60% 50% at 5% 8%, rgba(212,175,55,0.12) 0%, transparent 55%)",
+            "radial-gradient(ellipse 40% 35% at 95% 85%, rgba(212,175,55,0.07) 0%, transparent 55%)",
           ].join(","),
         }}
         aria-hidden="true"
@@ -311,7 +320,7 @@ function DashboardContent() {
       <div
         className="pointer-events-none absolute inset-0 hidden sm:block"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(212,175,55,0.045) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgba(212,175,55,0.04) 1px, transparent 1px)",
           backgroundSize: "30px 30px",
           WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 12%, black 82%, transparent 100%)",
           maskImage: "linear-gradient(to bottom, transparent 0%, black 12%, black 82%, transparent 100%)",
@@ -321,11 +330,12 @@ function DashboardContent() {
 
       <Navbar />
 
-      <main className="relative flex-1 px-4 pb-24 pt-28 sm:pt-36">
-        <div className="mx-auto max-w-2xl">
+      <main className="relative flex-1 px-4 pb-24 pt-28 sm:pt-36 lg:px-8">
+        {/* ── Widened container — max-w-6xl on desktop ── */}
+        <div className="mx-auto max-w-2xl lg:max-w-6xl">
 
-          {/* ── Hero header ── */}
-          <div className="mb-10">
+          {/* ── Hero header — full width ── */}
+          <div className="mb-10 lg:mb-12">
             <div className="mb-3 flex items-center gap-2">
               <span
                 className="inline-block h-px w-8"
@@ -349,7 +359,10 @@ function DashboardContent() {
                   <br />
                   <span style={{ color: "#D4AF37" }}>layer by layer.</span>
                 </h1>
-                <p className="mt-3 max-w-sm text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.38)" }}>
+                <p
+                  className="mt-3 max-w-sm text-sm leading-relaxed lg:max-w-md"
+                  style={{ color: "rgba(255,255,255,0.38)" }}
+                >
                   Start with the name. Build the colours. Own the identity.
                 </p>
               </div>
@@ -393,7 +406,7 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* ── Upgrade success banner ── */}
+          {/* ── Upgrade success banner — full width ── */}
           {justUpgraded && (
             <div
               className="mb-8 flex items-center gap-3 rounded-2xl px-5 py-4"
@@ -406,148 +419,165 @@ function DashboardContent() {
             </div>
           )}
 
-          <div className="space-y-6">
+          {/* ═══════════════════════════════════════════════════════════════════
+              MAIN GRID
+              Mobile:  single column, stacked
+              Desktop: left (actions) | right (brand palette)
+          ═══════════════════════════════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.25fr_1fr] lg:items-start">
 
-            {/* ── Primary CTA — Generate Names ── */}
-            <Link
-              href="/generate"
-              className="group flex items-center justify-between gap-4 overflow-hidden rounded-2xl px-6 py-5 transition-all hover:-translate-y-1"
-              style={{
-                background: "linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.06) 60%, rgba(212,175,55,0.10) 100%)",
-                border: "1px solid rgba(212,175,55,0.28)",
-                boxShadow: "0 8px 32px rgba(212,175,55,0.08)",
-              }}
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-                  style={{
-                    background: "rgba(212,175,55,0.18)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    boxShadow: "0 0 20px rgba(212,175,55,0.15)",
-                  }}
-                >
-                  <Sparkles className="h-5 w-5" style={{ color: "#D4AF37" }} />
+            {/* ── LEFT COLUMN — primary actions ── */}
+            <div className="space-y-4">
+
+              {/* Generate Brand Names — primary CTA */}
+              <Link
+                href="/generate"
+                className="group flex items-center justify-between gap-4 overflow-hidden rounded-2xl px-6 py-5 transition-all hover:-translate-y-1"
+                style={{
+                  background: "linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(212,175,55,0.06) 60%, rgba(212,175,55,0.10) 100%)",
+                  border: "1px solid rgba(212,175,55,0.28)",
+                  boxShadow: "0 8px 32px rgba(212,175,55,0.08)",
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      background: "rgba(212,175,55,0.18)",
+                      border: "1px solid rgba(212,175,55,0.3)",
+                      boxShadow: "0 0 20px rgba(212,175,55,0.15)",
+                    }}
+                  >
+                    <Sparkles className="h-5 w-5" style={{ color: "#D4AF37" }} />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-white">Generate Brand Names</p>
+                    <p className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                      AI naming · live domain availability · Founder Signal™ scoring
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-bold text-white">Generate Brand Names</p>
-                  <p className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                    AI naming · live domain availability · Founder Signal™ scoring
+                <ArrowRight
+                  className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1"
+                  style={{ color: "rgba(212,175,55,0.6)" }}
+                />
+              </Link>
+
+              {/* Deep Search — secondary CTA */}
+              <Link
+                href="/generate"
+                className="group flex items-center justify-between gap-4 rounded-2xl px-6 py-4 transition-all hover:-translate-y-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                    style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.15)" }}
+                  >
+                    <Search className="h-4 w-4" style={{ color: "#60a5fa" }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">Deep Search</p>
+                    <p className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                      Find available .com names — 80+ candidates tested per search
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight
+                  className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1"
+                  style={{ color: "rgba(255,255,255,0.18)" }}
+                />
+              </Link>
+
+              {/* ── Account & plan — stays in left col on desktop ── */}
+              <div
+                className="rounded-2xl px-6 py-5"
+                style={{
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: "rgba(255,255,255,0.2)" }}
+                  >
+                    Account
                   </p>
+                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+                    {username}
+                  </span>
                 </div>
+
+                {isPro ? (
+                  <div
+                    className="flex items-center justify-between rounded-xl px-4 py-3"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.03) 100%)",
+                      border: "1px solid rgba(212,175,55,0.18)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Crown className="h-4 w-4" style={{ color: "#D4AF37" }} />
+                      <div>
+                        <span className="text-sm font-semibold text-white">NamoLux Pro</span>
+                        <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          Lifetime access · unlimited generations
+                        </p>
+                      </div>
+                    </div>
+                    <Infinity className="h-4 w-4" style={{ color: "rgba(212,175,55,0.5)" }} strokeWidth={2.5} />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.2)" }} />
+                        <span className="text-sm font-medium text-white">Free Plan</span>
+                      </div>
+                      <span className="text-xs" style={{ color: "rgba(255,255,255,0.28)" }}>
+                        3 generations / day
+                      </span>
+                    </div>
+                    <a
+                      href="/api/stripe/checkout"
+                      className="group flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-black transition-all hover:-translate-y-0.5"
+                      style={{
+                        background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                        boxShadow: "0 4px 20px rgba(212,175,55,0.28)",
+                      }}
+                    >
+                      Unlock Pro — £15 one-time
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </a>
+                    <div className="pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                      <RestorePurchase />
+                    </div>
+                  </div>
+                )}
               </div>
-              <ArrowRight
-                className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1"
-                style={{ color: "rgba(212,175,55,0.6)" }}
-              />
-            </Link>
 
-            {/* ── Secondary CTA — Deep Search ── */}
-            <Link
-              href="/generate"
-              className="group flex items-center justify-between gap-4 rounded-2xl px-6 py-4 transition-all hover:-translate-y-0.5"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.15)" }}
-                >
-                  <Search className="h-4 w-4" style={{ color: "#60a5fa" }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">Deep Search</p>
-                  <p className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-                    Find available .com names — 80+ candidates tested per search
-                  </p>
-                </div>
-              </div>
-              <ArrowRight
-                className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1"
-                style={{ color: "rgba(255,255,255,0.18)" }}
-              />
-            </Link>
+            </div>
+            {/* END left column */}
 
-            {/* ── Brand Journey ── */}
-            <BrandJourney />
-
-            {/* ── Brand Colour Identity ── */}
-            <div id="palette">
+            {/* ── RIGHT COLUMN — brand identity ── */}
+            <div id="palette" className="lg:sticky lg:top-28">
               <BrandPalette initialName={paletteNameParam} initialVibe={paletteVibeParam} />
             </div>
 
-            {/* ── Account & plan ── (lowest hierarchy) */}
-            <div
-              className="rounded-2xl px-6 py-5"
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <p
-                  className="text-[10px] font-bold uppercase tracking-widest"
-                  style={{ color: "rgba(255,255,255,0.2)" }}
-                >
-                  Account
-                </p>
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-                  {username}
-                </span>
-              </div>
-
-              {isPro ? (
-                <div
-                  className="flex items-center justify-between rounded-xl px-4 py-3"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.03) 100%)",
-                    border: "1px solid rgba(212,175,55,0.18)",
-                  }}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Crown className="h-4 w-4" style={{ color: "#D4AF37" }} />
-                    <div>
-                      <span className="text-sm font-semibold text-white">NamoLux Pro</span>
-                      <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                        Lifetime access · unlimited generations
-                      </p>
-                    </div>
-                  </div>
-                  <Infinity className="h-4 w-4" style={{ color: "rgba(212,175,55,0.5)" }} strokeWidth={2.5} />
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.2)" }} />
-                      <span className="text-sm font-medium text-white">Free Plan</span>
-                    </div>
-                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.28)" }}>
-                      3 generations / day
-                    </span>
-                  </div>
-                  <a
-                    href="/api/stripe/checkout"
-                    className="group flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-black transition-all hover:-translate-y-0.5"
-                    style={{
-                      background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
-                      boxShadow: "0 4px 20px rgba(212,175,55,0.28)",
-                    }}
-                  >
-                    Unlock Pro — £15 one-time
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </a>
-                  <div className="pt-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                    <RestorePurchase />
-                  </div>
-                </div>
-              )}
-            </div>
-
           </div>
+          {/* END main grid */}
+
+          {/* ═══════════════════════════════════════════════════════════════════
+              FULL-WIDTH SECTIONS (below the grid on all breakpoints)
+          ═══════════════════════════════════════════════════════════════════ */}
+          <div className="mt-6 space-y-6">
+            <BrandJourney />
+          </div>
+
         </div>
       </main>
 
