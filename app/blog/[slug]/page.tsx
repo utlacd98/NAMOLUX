@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
@@ -435,6 +436,27 @@ function BlogSection({ section }: { section: BlogSectionType }) {
         <pre className="my-6 overflow-x-auto rounded-lg bg-muted/50 p-4 text-sm">
           <code>{section.content}</code>
         </pre>
+      )
+
+    case "image":
+      if (!section.src) return null
+      return (
+        <figure className="my-8">
+          <div className="overflow-hidden rounded-2xl border border-border/30">
+            <Image
+              src={section.src}
+              alt={section.alt || section.caption || ""}
+              width={800}
+              height={500}
+              className="w-full object-cover"
+            />
+          </div>
+          {section.caption && (
+            <figcaption className="mt-2 text-center text-xs text-muted-foreground">
+              {section.caption}
+            </figcaption>
+          )}
+        </figure>
       )
 
     default:
