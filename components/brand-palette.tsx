@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { RefreshCw, Copy, CheckCircle, Palette, ChevronDown, Sparkles } from "lucide-react"
+import { StitchPrompt } from "@/components/stitch-prompt"
 
 interface PaletteColour {
   hex: string
@@ -561,6 +562,14 @@ export function BrandPalette({
               )
             })}
           </div>
+
+          {/* Landing page template via Stitch */}
+          <StitchPrompt
+            brandName={brandName}
+            keywords={keywords}
+            vibe={vibe}
+            palette={palette.palette}
+          />
         </div>
       )}
     </div>
