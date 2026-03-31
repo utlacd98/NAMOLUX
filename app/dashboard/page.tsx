@@ -104,7 +104,7 @@ function BrandJourney() {
           const isLast = i === JOURNEY_STEPS.length - 1
 
           const content = (
-            <div className="flex items-start gap-4 py-4 lg:flex-col lg:gap-3 lg:px-6 lg:py-5 lg:first:pl-0 lg:last:pr-0">
+            <div className="flex items-start gap-4 py-4 lg:flex-col lg:items-center lg:gap-3 lg:px-6 lg:py-5 lg:text-center lg:first:pl-0 lg:last:pr-0">
               {/* Icon */}
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full lg:h-11 lg:w-11"
@@ -149,8 +149,8 @@ function BrandJourney() {
               )}
 
               {/* Step text */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="flex-1 min-w-0 lg:flex-none">
+                <div className="flex flex-wrap items-center gap-2 lg:justify-center">
                   <span
                     className="text-sm font-semibold"
                     style={{
