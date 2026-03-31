@@ -28,6 +28,7 @@ import {
   Lightbulb,
   Swords,
   LayoutGrid,
+  Palette,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -2780,6 +2781,16 @@ export function GenerateNames() {
                               <Swords className="h-2.5 w-2.5" />
                               {battleQueue.some((e) => e.name === name) ? "In Battle" : "Battle"}
                             </button>
+                            {/* Brand Palette — link to Brand Studio */}
+                            <a
+                              href={`/dashboard?palette=${encodeURIComponent(name)}&vibe=${encodeURIComponent(selectedVibe || "modern")}`}
+                              className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                              style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
+                              title="Generate a brand colour palette for this name"
+                            >
+                              <Palette className="h-2.5 w-2.5" />
+                              Palette
+                            </a>
                           </div>
 
                           {/* Brand Story + Taglines */}
