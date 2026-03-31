@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { RefreshCw, Copy, CheckCircle, Palette, ChevronDown } from "lucide-react"
+import { RefreshCw, Copy, CheckCircle, Palette, ChevronDown, Sparkles } from "lucide-react"
 
 interface PaletteColour {
   hex: string
@@ -36,31 +36,99 @@ const VIBES = [
   { value: "minimal",     label: "Minimal" },
 ]
 
-// Perceived brightness — used to decide whether to show dark or light label text on the swatch
 function swatchTextColor(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-  return luminance > 0.55 ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.85)"
+  return luminance > 0.55 ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)"
 }
 
 function isValidHex(hex: string): boolean {
   return /^#[0-9A-Fa-f]{6}$/.test(hex)
 }
 
-function ColourSwatch({
-  colour,
-  role,
-}: {
-  colour: PaletteColour
-  role: string
-}) {
+// ── Brand Preview Bar ──────────────────────────────────────────────────────────
+// Shows a mini composition of how the colours work together
+function BrandPreviewBar({ palette }: { palette: PaletteResult["palette"] }) {
+  const bg = isValidHex(palette.background.hex) ? palette.background.hex : "#111"
+  const primary = isValidHex(palette.primary.hex) ? palette.primary.hex : "#D4AF37"
+  const accent = isValidHex(palette.accent.hex) ? palette.accent.hex : "#888"
+  const text = isValidHex(palette.text.hex) ? palette.text.hex : "#fff"
+  const secondary = isValidHex(palette.secondary.hex) ? palette.secondary.hex : "#555"
+
+  return (
+    <div
+      className="overflow-hidden rounded-xl"
+      style={{ background: bg, border: `1px solid ${secondary}30` }}
+    >
+      {/* Top accent line */}
+      <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${accent})` }} />
+
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+        {/* Mock brand name */}
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-block h-6 w-6 rounded-md"
+            style={{ background: primary }}
+          />
+          <span className="text-sm font-bold" style={{ color: text }}>
+            YourBrand
+          </span>
+        </div>
+
+        {/* Mock nav dots */}
+        <div className="hidden items-center gap-3 sm:flex">
+          {[1, 2, 3].map((i) => (
+            <span
+              key={i}
+              className="h-1 rounded-full"
+              style={{ width: 24 + i * 8, background: `${text}28` }}
+            />
+          ))}
+        </div>
+
+        {/* Mock CTA button */}
+        <span
+          className="rounded-lg px-3 py-1.5 text-[11px] font-bold"
+          style={{ background: primary, color: swatchTextColor(primary) }}
+        >
+          Get Started
+        </span>
+      </div>
+
+      {/* Body preview */}
+      <div className="px-4 pb-4 pt-2">
+        <div className="mb-2 h-2 w-2/3 rounded-full" style={{ background: `${text}18` }} />
+        <div className="mb-3 h-1.5 w-1/2 rounded-full" style={{ background: `${text}10` }} />
+        <div className="flex gap-2">
+          <span
+            className="rounded-lg px-3 py-1.5 text-[10px] font-semibold"
+            style={{ background: accent, color: swatchTextColor(accent) }}
+          >
+            Accent
+          </span>
+          <span
+            className="rounded-lg px-3 py-1.5 text-[10px]"
+            style={{ background: `${text}10`, color: `${text}60` }}
+          >
+            Secondary
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Colour Swatch Card ──────────────────────────────────────────────────────────
+function ColourSwatch({ colour, role }: { colour: PaletteColour; role: string }) {
   const [copied, setCopied] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const safe = isValidHex(colour.hex) ? colour.hex : "#888888"
   const labelColor = swatchTextColor(safe)
 
-  function copy() {
+  function copy(e: React.MouseEvent) {
+    e.stopPropagation()
     navigator.clipboard.writeText(safe).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
@@ -68,64 +136,88 @@ function ColourSwatch({
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-      {/* Swatch block */}
+    <div
+      className="flex flex-col overflow-hidden rounded-2xl"
+      style={{
+        border: hovered ? `1px solid ${safe}50` : "1px solid rgba(255,255,255,0.07)",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered ? `0 16px 40px ${safe}35, 0 4px 12px rgba(0,0,0,0.4)` : "0 2px 8px rgba(0,0,0,0.15)",
+        transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+        cursor: "pointer",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={copy}
+      title={`Copy ${safe.toUpperCase()}`}
+    >
+      {/* Swatch colour block */}
       <div
-        className="relative flex flex-col justify-end p-3 transition-all"
-        style={{ background: safe, minHeight: 96 }}
+        className="relative flex flex-col justify-between p-3"
+        style={{ background: safe, minHeight: 120 }}
       >
-        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: labelColor }}>
+        {/* Role label top-left */}
+        <span
+          className="text-[9px] font-black uppercase tracking-widest"
+          style={{ color: `${labelColor}` }}
+        >
           {role}
         </span>
+
+        {/* Copy overlay on hover */}
+        {hovered && (
+          <div
+            className="absolute inset-0 flex items-center justify-center transition-all"
+            style={{ background: "rgba(0,0,0,0.22)" }}
+          >
+            <span
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold backdrop-blur-sm"
+              style={{ background: "rgba(0,0,0,0.45)", color: "rgba(255,255,255,0.95)" }}
+            >
+              {copied ? (
+                <><CheckCircle className="h-3 w-3 text-green-400" /> Copied!</>
+              ) : (
+                <><Copy className="h-3 w-3" /> {safe.toUpperCase()}</>
+              )}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Info block */}
       <div
-        className="flex flex-col gap-1 p-3"
+        className="flex flex-col gap-0.5 p-3"
         style={{ background: "rgba(255,255,255,0.03)" }}
       >
-        <span className="text-xs font-semibold text-white">{colour.name}</span>
+        <span className="text-xs font-semibold text-white leading-tight">{colour.name}</span>
         <span
-          className="font-mono text-[11px] font-medium tracking-wider"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          className="font-mono text-[10px] font-medium tracking-wider"
+          style={{ color: "rgba(255,255,255,0.35)" }}
         >
           {safe.toUpperCase()}
         </span>
-        <span className="mt-0.5 text-[10px] leading-relaxed" style={{ color: "rgba(255,255,255,0.28)" }}>
+        <span
+          className="mt-1 text-[10px] leading-relaxed"
+          style={{ color: "rgba(255,255,255,0.25)" }}
+        >
           {colour.usage}
         </span>
-
-        {/* Copy button */}
-        <button
-          onClick={copy}
-          className="mt-2 flex items-center gap-1.5 self-start rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5"
-          style={{
-            background: copied ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-            border: copied ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.08)",
-            color: copied ? "#34d399" : "rgba(255,255,255,0.5)",
-          }}
-        >
-          {copied ? (
-            <><CheckCircle className="h-3 w-3" /> Copied</>
-          ) : (
-            <><Copy className="h-3 w-3" /> Copy hex</>
-          )}
-        </button>
       </div>
     </div>
   )
 }
 
+// ── Main Component ──────────────────────────────────────────────────────────────
 interface BrandPaletteProps {
-  /** Pre-fill the brand name input (e.g. from generate results) */
   initialName?: string
-  /** Pre-fill keywords */
   initialKeywords?: string
-  /** Pre-fill vibe */
   initialVibe?: string
 }
 
-export function BrandPalette({ initialName = "", initialKeywords = "", initialVibe = "modern" }: BrandPaletteProps) {
+export function BrandPalette({
+  initialName = "",
+  initialKeywords = "",
+  initialVibe = "modern",
+}: BrandPaletteProps) {
   const [brandName, setBrandName] = useState(initialName)
   const [keywords, setKeywords] = useState(initialKeywords)
   const [vibe, setVibe] = useState(initialVibe)
@@ -163,28 +255,44 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
 
   return (
     <div
-      className="rounded-2xl overflow-hidden"
-      style={{ border: "1px solid rgba(212,175,55,0.2)", background: "rgba(255,255,255,0.03)" }}
+      className="overflow-hidden rounded-2xl"
+      style={{
+        border: "1px solid rgba(212,175,55,0.22)",
+        background: "rgba(255,255,255,0.025)",
+        boxShadow: "0 0 60px rgba(212,175,55,0.04) inset",
+      }}
     >
-      {/* Header */}
+      {/* ── Header ── */}
       <div
-        className="flex items-center justify-between gap-3 px-5 py-4"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(212,175,55,0.04)" }}
+        className="flex items-center justify-between gap-3 px-6 py-5"
+        style={{
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          background: "linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(212,175,55,0.02) 100%)",
+        }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.22)" }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{
+              background: "rgba(212,175,55,0.14)",
+              border: "1px solid rgba(212,175,55,0.28)",
+              boxShadow: "0 0 20px rgba(212,175,55,0.12)",
+            }}
           >
-            <Palette className="h-4 w-4" style={{ color: "#D4AF37" }} />
+            <Palette className="h-5 w-5" style={{ color: "#D4AF37" }} />
           </div>
           <div>
-            <span className="text-sm font-bold text-white">Brand Colour Palette</span>
-            {hasPalette && (
-              <span className="ml-2 text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>
-                for <span style={{ color: "#D4AF37" }}>{brandName}</span>
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold text-white">Your Brand Identity</span>
+            </div>
+            <p className="mt-0.5 text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+              {hasPalette
+                ? `Colour identity for `
+                : "AI-crafted colour palette for your brand"}
+              {hasPalette && (
+                <span style={{ color: "#D4AF37" }}>{brandName}</span>
+              )}
+            </p>
           </div>
         </div>
 
@@ -193,45 +301,52 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
             <button
               onClick={generate}
               disabled={loading}
-              title="Regenerate palette"
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
               style={{
                 background: "rgba(212,175,55,0.1)",
-                border: "1px solid rgba(212,175,55,0.2)",
+                border: "1px solid rgba(212,175,55,0.25)",
                 color: "#D4AF37",
+                boxShadow: "0 0 0 rgba(212,175,55,0)",
               }}
+              title="Generate a new palette"
             >
-              <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
-              Regenerate
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              New palette
             </button>
           )}
           <button
             onClick={() => setShowInputs((v) => !v)}
-            className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-all hover:bg-white/5"
             style={{ color: "rgba(255,255,255,0.3)" }}
-            title={showInputs ? "Collapse" : "Change inputs"}
+            title={showInputs ? "Collapse" : "Edit inputs"}
           >
             <ChevronDown
-              className="h-4 w-4 transition-transform"
+              className="h-4 w-4 transition-transform duration-200"
               style={{ transform: showInputs ? "rotate(180deg)" : "rotate(0deg)" }}
             />
           </button>
         </div>
       </div>
 
-      {/* Input form */}
+      {/* ── Input form ── */}
       {showInputs && (
-        <div className="px-5 py-4 space-y-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div
+          className="space-y-4 px-6 py-5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        >
           <div>
-            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(212,175,55,0.6)" }}>
-              Brand name
+            <label
+              className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "rgba(212,175,55,0.65)" }}
+            >
+              Your brand name
             </label>
             <input
               type="text"
               value={brandName}
               onChange={(e) => setBrandName(e.target.value)}
               placeholder="e.g. indulgo, vexora, bloom"
-              className="w-full rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-white/20"
+              className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -241,15 +356,21 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
-              Context <span className="font-normal normal-case" style={{ color: "rgba(255,255,255,0.2)" }}>— optional</span>
+            <label
+              className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "rgba(255,255,255,0.28)" }}
+            >
+              Context{" "}
+              <span className="font-normal normal-case tracking-normal" style={{ color: "rgba(255,255,255,0.18)" }}>
+                — optional
+              </span>
             </label>
             <input
               type="text"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               placeholder="e.g. premium skincare, wellness app, B2B SaaS"
-              className="w-full rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-white/20"
+              className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -259,19 +380,31 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <label
+              className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "rgba(255,255,255,0.28)" }}
+            >
               Brand vibe
             </label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {VIBES.map((v) => (
                 <button
                   key={v.value}
                   onClick={() => setVibe(v.value)}
-                  className="rounded-full px-3 py-1 text-[11px] font-medium transition-all"
+                  className="rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-all hover:-translate-y-0.5"
                   style={
                     vibe === v.value
-                      ? { background: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.35)", color: "#D4AF37" }
-                      : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }
+                      ? {
+                          background: "rgba(212,175,55,0.16)",
+                          border: "1px solid rgba(212,175,55,0.38)",
+                          color: "#D4AF37",
+                          boxShadow: "0 0 12px rgba(212,175,55,0.12)",
+                        }
+                      : {
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          color: "rgba(255,255,255,0.4)",
+                        }
                   }
                 >
                   {v.label}
@@ -280,79 +413,134 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
             </div>
           </div>
 
+          {/* Generate CTA */}
           <button
             onClick={generate}
             disabled={loading || !brandName.trim()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-black transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-            style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
+            className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl py-3.5 text-sm font-bold text-black transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            style={{
+              background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+              backgroundSize: "200% 100%",
+              boxShadow: loading ? "none" : "0 6px 28px rgba(212,175,55,0.35)",
+            }}
           >
             {loading ? (
-              <><RefreshCw className="h-4 w-4 animate-spin" /> Generating palette…</>
+              <>
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                Generating your palette…
+              </>
             ) : (
-              <><Palette className="h-4 w-4" /> Generate Palette</>
+              <>
+                <Sparkles className="h-4 w-4" />
+                Create Brand Colours
+              </>
             )}
           </button>
         </div>
       )}
 
-      {/* Error */}
+      {/* ── Error ── */}
       {error && (
-        <div className="px-5 py-3 text-sm" style={{ color: "#f87171" }}>
+        <div className="px-6 py-3 text-sm" style={{ color: "#f87171" }}>
           {error}
         </div>
       )}
 
-      {/* Idle state — no palette yet, inputs collapsed */}
+      {/* ── Idle state ── */}
       {!hasPalette && !showInputs && !loading && (
-        <div
-          className="flex flex-col items-center justify-center px-6 py-10 text-center"
-          style={{ border: "1px dashed rgba(212,175,55,0.1)" }}
-        >
-          <Palette className="mb-3 h-7 w-7" style={{ color: "rgba(212,175,55,0.3)" }} />
-          <p className="text-sm font-semibold text-white">Generate your brand palette</p>
-          <p className="mt-1.5 max-w-xs text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-            AI builds a distinctive 5-colour identity based on your brand name, context, and vibe.
+        <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+          {/* Decorative colour preview blobs */}
+          <div className="mb-6 flex items-center gap-1.5">
+            {["#C9A227", "#8B4513", "#2D6A4F", "#1A1A2E", "#F8F0E3"].map((c, i) => (
+              <span
+                key={i}
+                className="rounded-full"
+                style={{
+                  background: c,
+                  width: 12 + i * 4,
+                  height: 12 + i * 4,
+                  opacity: 0.7 + i * 0.06,
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-base font-bold text-white">Create your colour identity</p>
+          <p className="mt-2 max-w-xs text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
+            AI builds a distinctive 5-colour palette tailored to your brand name, context, and vibe.
+            No generic results — every palette is unique.
           </p>
           <button
             onClick={() => setShowInputs(true)}
-            className="mt-4 rounded-xl px-4 py-2 text-xs font-semibold transition-all hover:-translate-y-0.5"
-            style={{ background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.2)", color: "#D4AF37" }}
+            className="mt-6 flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-0.5"
+            style={{
+              background: "rgba(212,175,55,0.12)",
+              border: "1px solid rgba(212,175,55,0.25)",
+              color: "#D4AF37",
+              boxShadow: "0 4px 16px rgba(212,175,55,0.1)",
+            }}
           >
-            Get started
+            <Palette className="h-4 w-4" />
+            Start building
           </button>
         </div>
       )}
 
-      {/* Palette display */}
+      {/* ── Palette results ── */}
       {hasPalette && palette && (
-        <div className="p-5">
-          {/* 5-swatch grid */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-            {COLOUR_ROLES.map(({ key, label }) => {
-              const colour = palette.palette[key]
-              return colour ? (
-                <ColourSwatch key={key} colour={colour} role={label} />
-              ) : null
-            })}
+        <div className="p-6 space-y-5">
+          {/* Brand Preview */}
+          <div>
+            <p
+              className="mb-2.5 text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "rgba(255,255,255,0.2)" }}
+            >
+              Brand Preview
+            </p>
+            <BrandPreviewBar palette={palette.palette} />
+          </div>
+
+          {/* Swatch grid */}
+          <div>
+            <p
+              className="mb-2.5 text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "rgba(255,255,255,0.2)" }}
+            >
+              Colour Palette — click any swatch to copy
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+              {COLOUR_ROLES.map(({ key, label }) => {
+                const colour = palette.palette[key]
+                return colour ? (
+                  <ColourSwatch key={key} colour={colour} role={label} />
+                ) : null
+              })}
+            </div>
           </div>
 
           {/* Rationale */}
           {palette.rationale && (
             <div
-              className="mt-4 rounded-xl px-4 py-3 text-xs leading-relaxed"
+              className="rounded-xl px-5 py-4 text-xs leading-relaxed"
               style={{
                 background: "rgba(212,175,55,0.04)",
-                border: "1px solid rgba(212,175,55,0.1)",
-                color: "rgba(255,255,255,0.45)",
+                border: "1px solid rgba(212,175,55,0.12)",
               }}
             >
-              <span className="font-semibold" style={{ color: "rgba(212,175,55,0.6)" }}>Why this palette: </span>
-              {palette.rationale}
+              <span
+                className="mr-1.5 text-[10px] font-bold uppercase tracking-widest"
+                style={{ color: "rgba(212,175,55,0.55)" }}
+              >
+                Designer's note
+              </span>
+              <span style={{ color: "rgba(255,255,255,0.45)" }}>{palette.rationale}</span>
             </div>
           )}
 
-          {/* Combined hex strip — useful for quickly copying all */}
-          <div className="mt-3 flex items-center gap-2 flex-wrap">
+          {/* Hex quick-copy strip */}
+          <div
+            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-4 py-3"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
+          >
             {COLOUR_ROLES.map(({ key, label }) => {
               const c = palette.palette[key]
               if (!c) return null
@@ -360,10 +548,13 @@ export function BrandPalette({ initialName = "", initialKeywords = "", initialVi
               return (
                 <div key={key} className="flex items-center gap-1.5">
                   <span
-                    className="inline-block h-4 w-4 rounded-full border"
-                    style={{ background: safe, borderColor: "rgba(255,255,255,0.12)" }}
+                    className="inline-block h-3.5 w-3.5 rounded-full"
+                    style={{ background: safe, border: "1px solid rgba(255,255,255,0.1)" }}
                   />
-                  <span className="font-mono text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: "rgba(255,255,255,0.28)" }}
+                  >
                     {safe.toUpperCase()}
                   </span>
                 </div>
