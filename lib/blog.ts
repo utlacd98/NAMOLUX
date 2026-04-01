@@ -6556,6 +6556,711 @@ export const blogPosts: BlogPost[] = [
     ],
   },
 
+  // ── NEW POSTS — 2026-03-31 ───────────────────────────────────────────────────
+
+  // Domain Strategy
+  {
+    slug: "how-to-name-a-brand-when-everything-is-taken",
+    title: "How to Name a Brand When Everything Good Is Already Taken",
+    description: "Every obvious domain is registered. Here's how to find a great brand name that's still available — without settling for something mediocre.",
+    seoTitle: "How to Name a Brand When Every Domain Is Taken | NamoLux",
+    metaDescription: "Think every good domain is gone? Here's a practical framework for finding available, memorable brand names in 2026 — even when the obvious options are taken.",
+    category: "Domain Strategy",
+    readTime: 7,
+    publishedAt: "2026-03-31",
+    author: "Andrew Barrett",
+    featured: true,
+    content: [
+      {
+        type: "paragraph",
+        content: "You have an idea. You think of the perfect name. You go to check availability — and of course, it's taken. Registered in 2008 by someone who never built anything. This is the modern founder's curse.",
+      },
+      {
+        type: "paragraph",
+        content: "But here's the truth: the perfect name was never the obvious one. The best brand names in history — Stripe, Figma, Notion, Duolingo — weren't sitting there waiting on a dictionary page. They were invented. And invention is something you can do deliberately.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Why the Obvious Names Are Always Gone",
+      },
+      {
+        type: "paragraph",
+        content: "Domain squatters have owned every single-word noun since the mid-1990s. Anything that describes what your product does — task.com, flow.com, brief.com — was snapped up decades ago and now trades for five to seven figures. Chasing those names is a dead end unless you have real budget.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "If your first-choice domain is parked with no website, it's almost certainly held by a speculator. You can make an offer, but expect to pay a premium. Most early-stage founders should redirect that energy toward invention.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Four Naming Moves That Actually Work",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "1. Invent a Word That Sounds Real",
+      },
+      {
+        type: "paragraph",
+        content: "Spotify sounds like it could be a word. So does Figma, Canva, Airtable, and Vercel. They follow the phonetic patterns of English well enough that your brain accepts them as real — but they weren't real before the brand made them real. This is the move: invent something pronounceable, short, and distinctive.",
+      },
+      {
+        type: "paragraph",
+        content: "The formula: take a root word relevant to your domain, trim or twist it, add a natural-sounding suffix. 'Notify' becomes 'Notifi'. 'Compose' becomes 'Composo'. 'Relate' becomes 'Relatix'. Test each against the radio test — can someone spell it after hearing it once?",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "2. Blend Two Short Words",
+      },
+      {
+        type: "paragraph",
+        content: "Instagram blended 'instant camera' and 'telegram'. Pinterest fused 'pin' and 'interest'. Microsoft came from 'microcomputer software'. The technique is ancient, and it still works because the brain enjoys the satisfaction of recognising two familiar things in one new word.",
+      },
+      {
+        type: "paragraph",
+        content: "To do this well: pick two short words (2-3 syllables each), find the overlap or drop the obvious ending of the first word, and combine. 'Flow' + 'Desk' = 'Flowdesk'. 'Launch' + 'Kit' = 'Launchkit'. Check availability immediately — blend names have a high hit rate.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "3. Borrow From Another Language or Field",
+      },
+      {
+        type: "paragraph",
+        content: "Volvo means 'I roll' in Latin. Audi is the Latin imperative of 'hören' — 'listen'. Lego comes from the Danish 'leg godt', meaning 'play well'. Words from Latin, Greek, French, or Japanese often sit unclaimed as .com domains because squatters focus on English.",
+      },
+      {
+        type: "paragraph",
+        content: "Look for short, positive words in other languages that relate to what you do. A mindfulness app could take a Sanskrit word for breath or stillness. A finance tool could borrow from Latin roots around value or precision. The key test: is it easy for an English speaker to say and remember?",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "4. Use a Metaphor",
+      },
+      {
+        type: "paragraph",
+        content: "Stripe doesn't literally mean anything in payments. Neither does Slack in workplace communication. But both words carry an emotional texture — Stripe feels clean and precise, Slack feels relaxed and open. Metaphorical names work because they create feeling without being literal.",
+      },
+      {
+        type: "paragraph",
+        content: "Think about the emotional experience of your product. What does it feel like to use it? Fast? Clear? Safe? Playful? Find a word that carries that feeling — even if it has nothing to do with the category. Those domains are often still available.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux generates invented, blended, and metaphorical brand names with live .com availability checks.",
+        ctaLink: "/generate",
+        ctaText: "Find Your Name →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "When to Consider Alternative TLDs",
+      },
+      {
+        type: "paragraph",
+        content: "The .com is still the gold standard. But .io, .co, and .ai are credible alternatives for tech products — especially early-stage. The calculus is simple: a great name on .io beats a mediocre name on .com. But if you can get the .com of a great name, always do.",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          ".io — Strong for developer tools and SaaS (Linear.app, Railway.app)",
+          ".co — Clean alternative, widely recognised",
+          ".ai — Appropriate for AI-native products (feels current, not gimmicky)",
+          ".app — Works well for consumer mobile products",
+          "Avoid: .xyz, .info, .biz — low trust signals in most markets",
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Quality Filter You Need",
+      },
+      {
+        type: "paragraph",
+        content: "Available doesn't mean good. There are millions of available domains that are terrible brand names. Before registering anything, run your candidate through these five questions:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Can someone spell it correctly after hearing it once? (radio test)",
+          "Is it under 12 characters?",
+          "Does it avoid hyphens and numbers?",
+          "Is there no obvious existing brand it could be confused with?",
+          "Does it feel like a real company, not a side project?",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "Say your shortlisted name to three different people. Don't spell it — just say it. Then ask them to write it down. If more than one person gets it wrong, the name fails the test.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Stop Waiting for Perfect",
+      },
+      {
+        type: "paragraph",
+        content: "The founders who succeed aren't the ones with the best name — they're the ones who shipped earliest. Pick a name that passes the quality bar, register it, and move. The name becomes great because you make it great. No one knew what Stripe meant before Patrick Collison made it mean payments.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Generate available brand names that pass the quality bar — with Founder Signal™ scoring built in.",
+        ctaLink: "/generate",
+        ctaText: "Try NamoLux Free →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is it worth paying for a premium domain if I can't find a good available one?",
+        answer: "Only if you have product-market fit and the domain aligns with your long-term brand. For early-stage founders, the effort is better spent inventing a great available name. You can always upgrade later.",
+      },
+      {
+        question: "Should I use my own name as the domain?",
+        answer: "Only if you are the brand — consultants, personal coaches, speakers. If you're building a product company, a personal-name domain limits how the brand can grow and makes it harder to sell or scale.",
+      },
+      {
+        question: "How do I know if a name is too similar to an existing brand?",
+        answer: "Run a trademark search through your country's official registry (USPTO in the US, IPO in the UK). Also Google the name and check social media handles. Similarity in the same industry is the main risk — identical names in unrelated industries are usually fine.",
+      },
+    ],
+  },
+
+  // SEO Foundations
+  {
+    slug: "ai-overviews-seo-strategy-2026",
+    title: "What Google's AI Overviews Mean for Your SEO Strategy in 2026",
+    description: "Google's AI Overviews are changing how traffic reaches websites. Here's what it actually means for your SEO strategy — and what to do about it.",
+    seoTitle: "Google AI Overviews & SEO Strategy 2026 | NamoLux Blog",
+    metaDescription: "Google AI Overviews are reducing click-through rates for informational queries. Here's how to adapt your SEO strategy and what types of content still drive traffic.",
+    category: "SEO Foundations",
+    readTime: 8,
+    publishedAt: "2026-03-31",
+    author: "Andrew Barrett",
+    content: [
+      {
+        type: "paragraph",
+        content: "Google's AI Overviews — the AI-generated summaries that appear above organic results — have reshuffled the SEO landscape. For some queries, click-through rates have dropped significantly. For others, nothing has changed. Understanding which is which determines whether your strategy survives.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What AI Overviews Actually Do",
+      },
+      {
+        type: "paragraph",
+        content: "When you search a factual or informational question — 'how long does it take to form a habit' or 'what is a DNS record' — Google now surfaces a synthesised AI answer above the organic results. The answer cites sources, but most users don't click through. They read the summary and move on.",
+      },
+      {
+        type: "paragraph",
+        content: "This is a fundamental shift: Google is no longer purely a directory pointing you to pages. For certain query types, it has become the answer itself. The pages it cites get a visibility signal, but not necessarily traffic.",
+      },
+      {
+        type: "callout",
+        calloutType: "warning",
+        content: "If your business depends on high volumes of informational traffic — 'what is X' or 'how does Y work' — that traffic is genuinely at risk. Auditing which of your pages target these query types is now urgent.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Which Query Types Are Most Affected",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "High Risk: Informational Queries",
+      },
+      {
+        type: "paragraph",
+        content: "Simple factual questions, definitions, how-to explainers, and general advice articles. These are the queries where AI Overviews appear most often. If your SEO strategy depended on ranking for 'what is a landing page' or 'how to write a cold email', the traffic from those pages will decline.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Lower Risk: Navigational and Commercial Queries",
+      },
+      {
+        type: "paragraph",
+        content: "When someone searches for a brand name, a specific product, or uses comparison language ('best X for Y', 'X vs Y'), AI Overviews appear far less frequently. These queries have commercial intent — the user wants to evaluate and decide, not just learn. That intent still drives clicks.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Mostly Unaffected: Transactional Queries",
+      },
+      {
+        type: "paragraph",
+        content: "Searches like 'buy [product]', 'sign up for [service]', '[brand] pricing' — these remain heavily driven by organic results and paid ads. AI Overviews rarely appear here. If you rank well for transactional queries, your traffic is relatively protected.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What to Do: Adapting Your Strategy",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "1. Audit Your Traffic by Query Intent",
+      },
+      {
+        type: "paragraph",
+        content: "Open Google Search Console and filter your top 50 pages by impressions. For each, identify whether the primary query is informational, navigational, or transactional. Pages primarily driven by informational queries are your exposure — prioritise them for strategy shifts.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "2. Shift Toward Original Analysis and Opinion",
+      },
+      {
+        type: "paragraph",
+        content: "AI Overviews synthesise commonly available information. What they cannot synthesise is your original data, your genuine point of view, your unique experience, or analysis no one else has published. This type of content is harder to summarise because it can't be found elsewhere.",
+      },
+      {
+        type: "paragraph",
+        content: "Run your own surveys. Publish your own data. Take a contrarian stance and back it with evidence. Write from direct experience in your industry. These signals — Experience, Expertise, Authoritativeness, Trustworthiness — are what Google's quality guidelines explicitly value, and what AI Overviews struggle to replicate.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "Ask yourself: could an AI have written this from publicly available information? If yes, it probably won't survive long as a traffic driver. If no — because it's based on real experience or original research — it has a strong future.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "3. Target Bottom-Funnel Keywords More Aggressively",
+      },
+      {
+        type: "paragraph",
+        content: "Your category — 'domain name generator comparison' — is safer than 'what makes a good domain name'. Comparison posts, alternative pages, review content, and use-case-specific landing pages sit closer to purchase intent and are less vulnerable to AI summarisation.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "4. Build Brand Search Volume",
+      },
+      {
+        type: "paragraph",
+        content: "The one query type Google will never summarise away is branded search. When someone searches your company name, they get your site. Building brand awareness through content, social media, and community means more of your traffic comes from searches that are completely immune to AI Overviews.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "A strong, memorable brand name drives brand search. Start with the right name.",
+        ctaLink: "/generate",
+        ctaText: "Generate Brand Names →",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "5. Optimise for AI Overview Citations",
+      },
+      {
+        type: "paragraph",
+        content: "Getting cited in an AI Overview still has value — it's brand exposure even without a click. To increase your chances of being cited: structure content with clear, direct answers to specific questions. Use concise paragraphs that state the answer first, then explain. Add FAQ schema markup. Write with the clarity of someone who knows the answer, not someone padding word count.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Bigger Picture",
+      },
+      {
+        type: "paragraph",
+        content: "AI Overviews accelerate a trend that was already underway: generic, commodity content is becoming worthless. The SEO playbook of publishing 2,000-word articles stuffed with keywords and covering what every other site already covers is dying faster than ever.",
+      },
+      {
+        type: "paragraph",
+        content: "What survives is content with a genuine point of view, built on real expertise, targeting people who are ready to make a decision. That has always been good SEO. It's now essential SEO.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Check where your site stands technically and structurally.",
+        ctaLink: "/seo-audit",
+        ctaText: "Run a Free SEO Audit →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Will AI Overviews kill SEO?",
+        answer: "No — but they are killing certain types of SEO. Informational traffic for generic queries will decline for many sites. However, commercial intent, branded search, and original expert content remain strong SEO opportunities. The strategy needs to adapt, not disappear.",
+      },
+      {
+        question: "Can I get my content cited in a Google AI Overview?",
+        answer: "Yes. Clear, authoritative, well-structured content that directly answers specific questions is more likely to be cited. Schema markup (especially FAQ schema) helps Google understand your content structure. There's no guaranteed method, but writing for clarity and expertise improves your chances.",
+      },
+      {
+        question: "Should I stop writing informational blog posts?",
+        answer: "Not entirely — but informational posts need to be based on original analysis, personal experience, or proprietary data to hold their value. Generic explainer content with no unique angle is increasingly vulnerable. Aim for content that an AI could not have written from publicly available sources.",
+      },
+    ],
+  },
+
+  // Builder Insights
+  {
+    slug: "validate-business-idea-without-code",
+    title: "How to Validate a Business Idea Without Writing a Line of Code",
+    description: "Most founders build first and validate later — then wonder why no one cares. Here's how to know if your idea has legs before you write a single line of code.",
+    seoTitle: "How to Validate a Business Idea Without Coding | NamoLux",
+    metaDescription: "Validate your startup idea before you build. This guide walks through practical, fast validation techniques that founders can run in days — not months.",
+    category: "Builder Insights",
+    readTime: 9,
+    publishedAt: "2026-03-31",
+    author: "Andrew Barrett",
+    content: [
+      {
+        type: "paragraph",
+        content: "The most expensive mistake in startups isn't a bad hire or a wrong pivot. It's building a product nobody wanted — spending months and thousands in the wrong direction. Validation is the discipline of finding out before you build.",
+      },
+      {
+        type: "paragraph",
+        content: "The good news: you can validate most business ideas in a week. No code required.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What You're Actually Validating",
+      },
+      {
+        type: "paragraph",
+        content: "Validation isn't about whether people say they like your idea. People will always say they like your idea to avoid conflict. What you're validating is whether people will change their behaviour — specifically, whether they will spend money, time, or attention on your solution.",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Is the problem real? (Do people actually experience it?)",
+          "Is it painful enough to pay for a solution? (Or just mildly annoying?)",
+          "Will they choose your solution over existing alternatives?",
+          "Is the market large enough to build a business on?",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "'Would you use this?' is the wrong question. 'Would you pay £20/month for this today?' is the right question. The friction of a real purchase commitment is what reveals real intent.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 1: Problem Interview (Days 1–2)",
+      },
+      {
+        type: "paragraph",
+        content: "Talk to 10 people in your target market. Not your friends — people who actually face the problem you're solving. Your goal is not to pitch your solution. Your goal is to understand their life.",
+      },
+      {
+        type: "paragraph",
+        content: "Ask: What's the hardest part of [the area you're building in]? How are you handling it today? How much is that costing you (time, money, frustration)? What have you already tried?",
+      },
+      {
+        type: "paragraph",
+        content: "If you hear the same frustrations from 7 of 10 people, the problem is real. If you hear 10 different problems, you don't yet understand your niche.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 2: Competitive Research (Day 2)",
+      },
+      {
+        type: "paragraph",
+        content: "Every market worth entering already has competition. The question isn't whether competition exists — it's whether you can find a wedge. Search for your top competitors and look at their one-star reviews. That's where your opportunity lives.",
+      },
+      {
+        type: "paragraph",
+        content: "What do customers consistently complain about? What's missing? What's overpriced? What's confusing? The gap between what existing tools offer and what customers actually want is the space your product occupies.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 3: The Smoke Test Landing Page (Days 3–4)",
+      },
+      {
+        type: "paragraph",
+        content: "Build a landing page — not a product. One page that describes the problem, explains your solution, and has a call to action. The CTA can be an email signup ('Join the waitlist'), a pre-order form, or even a Calendly link to book a demo.",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Carrd or Framer for a fast, professional-looking page",
+          "A domain name that communicates the product clearly",
+          "One headline that states the outcome, not the feature",
+          "Three bullet points of benefits",
+          "A single CTA button",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "A smoke test page needs a credible domain. Find an available one in minutes.",
+        ctaLink: "/generate",
+        ctaText: "Generate Domain Names →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 4: Drive Traffic to Your Page (Days 4–5)",
+      },
+      {
+        type: "paragraph",
+        content: "Post in communities where your target users live. Reddit is underrated for this — find the subreddits where your ideal customer hangs out and post something genuinely useful, then mention what you're building. LinkedIn works if your product is B2B. Twitter/𝕏 works if your audience is founders or technical people.",
+      },
+      {
+        type: "paragraph",
+        content: "You can also run a small paid campaign — £50–100 on Google or Meta, targeted precisely at your audience. This isn't marketing spend. It's research spend. The conversion rate on that spend tells you more about product-market fit than a hundred conversations.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 5: Read the Signal (Day 6–7)",
+      },
+      {
+        type: "paragraph",
+        content: "What you're looking for is not a number — it's a ratio. If 100 people visited your page and 30 signed up for the waitlist, that's an extraordinary signal. If 100 visited and 1 signed up, the messaging is off or the problem isn't felt strongly enough.",
+      },
+      {
+        type: "paragraph",
+        content: "Email everyone who signed up. Tell them you're building this and ask: what made you sign up? What problem were you hoping it would solve? These answers will shape the entire product.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "A good conversion rate on a cold traffic smoke test is 5–15%. Anything over 15% is exceptional. Under 3% means something is wrong — usually the messaging, occasionally the problem.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What Validated Looks Like",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "At least 10 strangers confirmed the problem in interviews",
+          "You found a clear gap in what existing tools offer",
+          "Your landing page converted at 5%+ from relevant traffic",
+          "At least 5 people said 'how soon can I use this?'",
+          "At least 2 people tried to pay you, even before it existed",
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "If you hit three or more of those, you have enough signal to start building. Not forever — just enough to start. Validation is a continuous process, not a one-time gate.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What Invalidated Looks Like",
+      },
+      {
+        type: "paragraph",
+        content: "Interviews where people say 'that's a good idea' but can't name an instance where the problem actually cost them anything. Landing pages where everyone who visits is a friend or family member. Communities that discuss the problem theoretically but wouldn't switch from their current solution.",
+      },
+      {
+        type: "paragraph",
+        content: "Invalidation is not failure — it's information. The goal is to get that information as cheaply as possible. That's the whole point of validating before building.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "When you're ready to build, start with the right brand foundation.",
+        ctaLink: "/generate",
+        ctaText: "Find Your Brand Name →",
+      },
+    ],
+    faqs: [
+      {
+        question: "How many customer interviews do I need to validate an idea?",
+        answer: "Ten is a good minimum for pattern recognition. You're listening for consistent themes — if 7 of 10 people mention the same frustration, that's a signal. More interviews are better, but ten conducted properly is enough to start drawing conclusions.",
+      },
+      {
+        question: "What if my landing page converts terribly?",
+        answer: "First, check the traffic quality — are these people actually in your target market? Second, review your headline — does it state a clear outcome, not a feature? Third, consider whether the problem is painful enough. Low conversion can mean weak messaging or a weak problem. Both are valuable to learn early.",
+      },
+      {
+        question: "Can I validate with a free offer instead of a paid one?",
+        answer: "You can, but be careful. Free signups validate interest, not intent to pay. If your business requires revenue, try to get people to exchange something with real value — money, or at minimum a detailed interview commitment. The friction of that exchange reveals whether they care enough.",
+      },
+    ],
+  },
+
+  // Tool Comparisons
+  {
+    slug: "namecheap-business-name-generator-vs-namolux",
+    title: "Namecheap Business Name Generator vs NamoLux: An Honest Comparison",
+    description: "Namecheap built a name generator. NamoLux built an AI brand engine. Here's what actually separates them — and which one is right for founders who need a real brand.",
+    seoTitle: "Namecheap Business Name Generator vs NamoLux 2026 | Comparison",
+    metaDescription: "Comparing Namecheap's domain name generator with NamoLux. We cover name quality, availability accuracy, scoring, and which tool actually helps founders build a brand.",
+    category: "Tool Comparisons",
+    readTime: 7,
+    publishedAt: "2026-03-31",
+    author: "Andrew Barrett",
+    content: [
+      {
+        type: "paragraph",
+        content: "Namecheap is one of the most trusted domain registrars in the world. Their business name generator is a natural extension of that — a tool built to help you find and register a name in one place. NamoLux was built for a different reason: to help founders find names that are actually worth building a brand on.",
+      },
+      {
+        type: "paragraph",
+        content: "These are genuinely different goals, and they produce genuinely different tools. Here's a clear-eyed look at what each one does well — and where each one falls short.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Namecheap Business Name Generator: What It Does",
+      },
+      {
+        type: "paragraph",
+        content: "Namecheap's generator is a keyword-based tool. You enter a word or phrase, and it combines that input with prefixes, suffixes, and alternative spellings to surface available domains. The output is then tied directly to Namecheap's registration flow, making it easy to buy whatever you find.",
+      },
+      {
+        type: "paragraph",
+        content: "The main value is convenience. If you already know Namecheap and you want to find something available quickly, the tool reduces friction in the buying process. Availability data is accurate because it's pulling directly from their own registrar infrastructure.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Where Namecheap's Generator Falls Short",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "No quality scoring — all results are presented equally, regardless of brandability",
+          "Primarily keyword-based — the AI is largely pattern matching, not brand thinking",
+          "High volume of generic suggestions — results like 'YourBrandHub' or 'GetBrandPro' are common",
+          "No vibe or style controls — you can't specify whether you want luxury, minimal, or futuristic",
+          "No phonetic analysis — doesn't distinguish pronounceable names from awkward ones",
+          "No brand context — doesn't factor in your industry, audience, or brand personality",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "Namecheap's generator is excellent for finding available domains cheaply. It's less suited for founders who want a name that stands out and builds a brand identity over time.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "NamoLux: What It Does Differently",
+      },
+      {
+        type: "paragraph",
+        content: "NamoLux starts from a different premise: that most founders don't just need an available domain — they need a brand-quality name that will still feel right in five years. The generation engine is built around that goal.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Founder Signal™ Scoring",
+      },
+      {
+        type: "paragraph",
+        content: "Every name NamoLux generates is scored from 0–100 across six dimensions: length, pronounceability, memorability, extension strength, character quality, and brand risk. You don't just see a list of available names — you see which ones are actually worth your attention.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Vibe and Style Controls",
+      },
+      {
+        type: "paragraph",
+        content: "NamoLux lets you specify the brand vibe you're going for — luxury, futuristic, playful, trustworthy, or minimal. This shapes the generation toward names that feel right for your context, not just names that are technically available.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "AutoFind V2",
+      },
+      {
+        type: "paragraph",
+        content: "The AutoFind V2 engine targets the top five .com names by Founder Signal score across up to eight generation rounds. It's designed to find the best available name, not just the first available name.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Brand Colour Palette",
+      },
+      {
+        type: "paragraph",
+        content: "After generating a name, NamoLux can generate a brand colour palette — primary, secondary, accent, background, and text colours — based on your brand name and vibe. This extends the tool from domain generator into early brand builder.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Generate quality-scored brand names with live .com availability — and build your colour palette in the same session.",
+        ctaLink: "/generate",
+        ctaText: "Try NamoLux Free →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Side-by-Side Comparison",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Feature", "Namecheap Generator", "NamoLux"],
+        rows: [
+          ["Name quality scoring", "None", "Founder Signal™ (0–100)"],
+          ["Brand vibe controls", "None", "5 vibe options"],
+          ["Availability accuracy", "High (own registrar)", "High (tiered checker)"],
+          ["Phonetic quality analysis", "None", "Built in"],
+          ["Industry / niche targeting", "Basic keyword", "Full context input"],
+          ["Name styles (invented, blend, metaphor)", "None", "4 style modes"],
+          ["Brand colour palette", "None", "Yes"],
+          ["Pricing", "Free", "Free + Pro"],
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Which One Should You Use?",
+      },
+      {
+        type: "paragraph",
+        content: "Use Namecheap's generator if: you have a name in mind and mainly need to check availability and register quickly. It's fast, reliable for availability, and ties directly into a registrar you probably already trust.",
+      },
+      {
+        type: "paragraph",
+        content: "Use NamoLux if: you're in the name discovery phase and need help finding a genuinely strong brand name. The quality scoring, style controls, and phonetic analysis produce materially better names than keyword-pattern tools — especially for founders who care about brand strength, not just availability.",
+      },
+      {
+        type: "paragraph",
+        content: "The two tools can also complement each other. Use NamoLux to discover and evaluate the best names, then use Namecheap (or any registrar) to complete the registration.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Start the name discovery process with quality scoring built in.",
+        ctaLink: "/generate",
+        ctaText: "Generate Names with NamoLux →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is Namecheap's business name generator free?",
+        answer: "Yes, the generator itself is free. You pay only when you register a domain. NamoLux is also free for basic use, with a Pro plan for unlimited generations.",
+      },
+      {
+        question: "Does NamoLux register domains directly?",
+        answer: "NamoLux focuses on name discovery and brand quality scoring. Once you've found your name, you register it through a registrar of your choice — Namecheap, GoDaddy, Cloudflare, or others. NamoLux links to Namecheap for registration where relevant.",
+      },
+      {
+        question: "Can I trust domain availability results from these tools?",
+        answer: "Both tools check availability in real-time. Namecheap's results are particularly reliable since they operate their own registrar infrastructure. NamoLux uses a tiered availability checker that cross-references multiple sources. For any name you're seriously considering, it's worth verifying directly at your chosen registrar before purchasing.",
+      },
+    ],
+  },
+
 ]
 
 // Utility functions
