@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { RefreshCw, Copy, CheckCircle, Palette, ChevronDown, Sparkles } from "lucide-react"
+import { LandingPreview } from "@/components/landing-preview"
 import { StitchPrompt } from "@/components/stitch-prompt"
 
 interface PaletteColour {
@@ -563,7 +564,15 @@ export function BrandPalette({
             })}
           </div>
 
-          {/* Landing page template via Stitch */}
+          {/* Live landing page mockup */}
+          <LandingPreview
+            brandName={brandName}
+            keywords={keywords}
+            vibe={vibe}
+            palette={palette.palette}
+          />
+
+          {/* Stitch export — collapsible secondary option */}
           <StitchPrompt
             brandName={brandName}
             keywords={keywords}
