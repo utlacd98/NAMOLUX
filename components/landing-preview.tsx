@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect, useCallback } from "react"
+import { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react"
 import { Monitor, Smartphone, Download, Loader2 } from "lucide-react"
 
 interface PaletteColour { hex: string }
@@ -632,8 +632,10 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
   const mockRef    = useRef<HTMLDivElement>(null)
   const [wrapperWidth, setWrapperWidth] = useState(0)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!wrapperRef.current) return
+    // Read initial width synchronously before first paint to avoid overflow flash
+    setWrapperWidth(wrapperRef.current.clientWidth)
     const ro = new ResizeObserver(e => setWrapperWidth(e[0].contentRect.width))
     ro.observe(wrapperRef.current)
     return () => ro.disconnect()
