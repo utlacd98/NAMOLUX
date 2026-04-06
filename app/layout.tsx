@@ -84,7 +84,7 @@ export const metadata: Metadata = {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
   },
   other: {
-    "impact-site-verification": "20929c49-be60-4d7c-9e17-c535f8cc6213",
+    "impact-site-verification": "e84ff675-1176-4ecf-a95f-37c5a6d05a69",
   },
   category: "technology",
 }
