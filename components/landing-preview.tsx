@@ -639,7 +639,10 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
     return () => ro.disconnect()
   }, [])
 
-  const MOB_DISPLAY_W = 290
+  // Dynamic mobile display width — fits inside the container with p-4 (32px) + 12px phone border
+  const MOB_DISPLAY_W = wrapperWidth > 0
+    ? Math.min(290, wrapperWidth - 32 - 12)
+    : 290
   const mobScale  = MOB_DISPLAY_W / MOBILE_W
   const deskScale = wrapperWidth > 0 ? (wrapperWidth - 32) / DESKTOP_W : 1
   const scale     = device === "mobile" ? mobScale : deskScale
