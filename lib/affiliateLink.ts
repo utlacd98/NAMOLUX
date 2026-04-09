@@ -1,15 +1,11 @@
 /**
  * Namecheap affiliate link builder
- * Publisher ID: affiliate_id  |  Campaign: 1632743  |  Creative: 5618
+ * Affiliate link: https://namecheap.pxf.io/2RK07Q
  *
- * To update your affiliate ID, change PUBLISHER_ID below.
- * All register buttons across the app pull from this single source.
- */
-/**
- * Returns a direct Namecheap domain registration link.
- * TODO: restore affiliate tracking once Publisher ID is confirmed.
- * @param domain  Full domain including TLD — e.g. "flux.com"
+ * Appends the destination URL as ?u= so impact.com tracks the referral
+ * and credits the commission when a user registers a domain.
  */
 export function namecheapLink(domain: string): string {
-  return `https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(domain)}`
+  const destination = `https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(domain)}`
+  return `https://namecheap.pxf.io/2RK07Q?u=${encodeURIComponent(destination)}`
 }
