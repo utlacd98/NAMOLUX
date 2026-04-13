@@ -7261,6 +7261,1563 @@ export const blogPosts: BlogPost[] = [
     ],
   },
 
+  // ── Domain Strategy (April 2026) ──────────────────────────────────
+  {
+    slug: "domain-name-mistakes-that-kill-startups",
+    title: "7 Domain Name Mistakes That Kill Startups Before They Launch",
+    description: "Most founders rush their domain choice and pay for it later. Here are 7 costly domain mistakes — and how to avoid every one of them before you commit.",
+    seoTitle: "7 Domain Name Mistakes That Kill Startups | NamoLux",
+    metaDescription: "Avoid the 7 most common domain name mistakes that destroy startups before launch. Learn what kills brandability, SEO, and trust — and how to pick a name that works.",
+    category: "Domain Strategy",
+    readTime: 9,
+    publishedAt: "2026-04-13",
+    author: "NamoLux Team",
+    featured: true,
+    content: [
+      {
+        type: "paragraph",
+        content: "Your domain name is the first thing investors Google, the first thing customers type, and the first thing competitors judge. It is your brand compressed into a single line of text. And yet most founders spend more time choosing a desk chair than choosing their domain.",
+      },
+      {
+        type: "paragraph",
+        content: "That carelessness is expensive. A bad domain name creates friction at every stage — from pitch decks to paid ads to word-of-mouth referrals. Here are seven mistakes that quietly kill startups before they ever get traction, and how to sidestep each one.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "1. Choosing a Name Nobody Can Spell",
+      },
+      {
+        type: "paragraph",
+        content: "If you tell someone your domain over the phone and they can't type it correctly on the first try, you have a problem. Every misspelling is a lost visitor — and potentially a customer landing on someone else's site. Names with unusual letter combinations, double letters that look like typos, or creative respellings (like 'Lyft' without the context of a billion-dollar brand) are risky for early-stage companies.",
+      },
+      {
+        type: "paragraph",
+        content: "The test is simple: say your domain name out loud to five people who have never seen it written down. If more than one of them spells it wrong, that's a real cost you'll pay on every podcast appearance, every conference introduction, and every radio ad you ever run.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "2. Going Too Long",
+      },
+      {
+        type: "paragraph",
+        content: "Every character in your domain is friction. Research consistently shows that domains between 6 and 10 characters perform best for recall, typing speed, and brand perception. Once you pass 15 characters, you are actively working against yourself.",
+      },
+      {
+        type: "paragraph",
+        content: "Long domains get truncated in search results, clipped in social media previews, and butchered in text messages. They also look unprofessional on business cards and email signatures. If your name needs a hyphen to be readable, it's too long or too complex.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "The sweet spot for brandable domains is 6–8 characters. Short enough to remember, long enough to be meaningful. NamoLux's Founder Signal scoring automatically flags names that fall outside the ideal length range.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "3. Ignoring the .com Question",
+      },
+      {
+        type: "paragraph",
+        content: "Alternative extensions like .io, .co, and .ai have their place — but if you're building a consumer-facing brand and the .com is owned by someone else, you will spend years explaining the difference. Customers will type .com by reflex. Email filters are more forgiving of .com addresses. And acquirers value .com domains significantly higher during exits.",
+      },
+      {
+        type: "paragraph",
+        content: "This doesn't mean you must have a .com at all costs. It means you should know what you're giving up if you don't. And if there's a .com available that scores well on brandability, you should take it seriously.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "4. Picking a Name That Boxes You In",
+      },
+      {
+        type: "paragraph",
+        content: "Naming your company 'BostonLegalSaaS.com' works until you expand to New York, add accounting features, or pivot to an API product. Descriptive names feel safe because they tell people what you do right now. But brands that scale need room to grow.",
+      },
+      {
+        type: "paragraph",
+        content: "Amazon didn't call itself 'OnlineBookstore.com.' Stripe didn't call itself 'PaymentProcessing.io.' The best startup names are abstract enough to grow with the company but specific enough to feel intentional. That's the balance to aim for.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "5. Skipping the Trademark Check",
+      },
+      {
+        type: "paragraph",
+        content: "A domain being available does not mean the name is legally clear. Founders regularly buy domains, build brands, print merchandise, and then receive cease-and-desist letters from companies that trademarked the same or a confusingly similar name years ago.",
+      },
+      {
+        type: "paragraph",
+        content: "Before you commit to any name, search the USPTO trademark database (or your country's equivalent), check state-level business registrations, and do a thorough Google search. The $30 you spend on a trademark screening now could save you $30,000 in rebranding costs later.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "6. Choosing Based on Availability Alone",
+      },
+      {
+        type: "paragraph",
+        content: "The most dangerous domain name mistake is also the most common: settling for whatever is available instead of finding something that is both available and genuinely good. Most domain generators flood you with hundreds of technically available names, and the cognitive overload leads founders to just pick one and move on.",
+      },
+      {
+        type: "paragraph",
+        content: "Availability is a filter, not a goal. A name needs to be available AND pronounceable, memorable, appropriate for your industry, and free of negative associations. If the only thing going for your domain is that nobody else wanted it, that should give you pause.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux scores every generated name on pronounceability, memorability, length, and brand risk — so you're not just picking from what's available, you're picking from what's actually good.",
+        ctaLink: "/generate",
+        ctaText: "Generate Scored Brand Names →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "7. Not Testing the Name With Real People",
+      },
+      {
+        type: "paragraph",
+        content: "Founders fall in love with names in isolation. They brainstorm alone, check availability alone, and register alone. By the time anyone else hears the name, money has already been spent and emotional attachment has set in.",
+      },
+      {
+        type: "paragraph",
+        content: "Before you register, share your top three candidates with at least ten people outside your immediate circle. Ask them what the company does (based on the name alone), how they'd spell it, and what feelings it evokes. If the answers surprise you, better to find out now than after your launch.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Cost of Getting It Wrong",
+      },
+      {
+        type: "paragraph",
+        content: "Rebranding a startup costs between $5,000 and $50,000 depending on the stage — and that's just the direct costs. The indirect costs are worse: lost SEO authority, broken backlinks, confused customers, reprinted materials, and the psychological toll of starting your brand story over.",
+      },
+      {
+        type: "paragraph",
+        content: "The founders who avoid these seven mistakes aren't luckier or more creative. They're just more deliberate. They treat domain selection as a strategic decision, not a checkbox. And they use tools that help them evaluate quality, not just availability.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Stop guessing. Generate brand names with quality scores, live .com availability, and phonetic analysis — all in one tool.",
+        ctaLink: "/generate",
+        ctaText: "Try NamoLux Free →",
+      },
+    ],
+    faqs: [
+      {
+        question: "How much does it cost to rebrand a startup?",
+        answer: "Direct costs range from $5,000 to $50,000+ depending on your stage. This includes new domain registration, legal fees for trademark changes, redesigning assets, updating marketing materials, and notifying customers. Indirect costs — lost SEO equity, broken backlinks, and brand confusion — often exceed the direct costs.",
+      },
+      {
+        question: "Is a .com domain really necessary for a startup?",
+        answer: "Not strictly necessary, but strongly recommended for consumer-facing brands. Users type .com by reflex, email deliverability is better, and .com domains carry higher resale and acquisition value. If you're building a developer tool, .io or .dev can work. For everything else, try to secure the .com.",
+      },
+      {
+        question: "How do I check if a domain name is trademarked?",
+        answer: "Start with the USPTO's TESS database (tess2.uspto.gov) for US trademarks. Also check your state's business registration database, the EU's EUIPO if you plan to operate in Europe, and do a plain Google search for the name. If you're serious about the name, consult a trademark attorney for a professional clearance search.",
+      },
+      {
+        question: "What makes a domain name 'brandable'?",
+        answer: "A brandable domain is short (6–10 characters), easy to pronounce and spell, memorable after one hearing, not easily confused with existing brands, and flexible enough to grow with your company. NamoLux's Founder Signal score evaluates all of these factors automatically.",
+      },
+    ],
+  },
+  {
+    slug: "find-available-com-domain-2026",
+    title: "How to Actually Find a .com Domain That's Available in 2026",
+    description: "Every good .com feels taken. Here's the exact process experienced founders use to find brandable, available .com domains — without spending thousands on the aftermarket.",
+    seoTitle: "How to Find Available .com Domains in 2026 | Step-by-Step Guide",
+    metaDescription: "Think every good .com is taken? This step-by-step guide shows you how founders find brandable, available .com domains in 2026 — without paying aftermarket prices.",
+    category: "Domain Strategy",
+    readTime: 10,
+    publishedAt: "2026-04-12",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "There are over 160 million registered .com domains. Every common English word, most two-word combinations, and nearly every dictionary term has been claimed. If you've spent an afternoon typing names into a registrar search bar and seeing 'taken' over and over, you're not alone.",
+      },
+      {
+        type: "paragraph",
+        content: "But here's what the aftermarket brokers don't want you to know: thousands of excellent, brandable .com domains are available right now at standard registration price. You just can't find them by typing random words into GoDaddy. You need a different approach.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Why the Old Approach Doesn't Work",
+      },
+      {
+        type: "paragraph",
+        content: "Most people search for domains the same way they search for usernames — they think of a word they like, type it in, and get rejected. Then they add numbers, hyphens, or awkward prefixes until something sticks. This is how you end up with 'GetMyBrandHQ2026.com' and wonder why your business feels unserious.",
+      },
+      {
+        type: "paragraph",
+        content: "The dictionary approach to domain names is dead. Every common word is taken. But the invented-name approach is thriving — and that's where the opportunity is.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Invented Name Advantage",
+      },
+      {
+        type: "paragraph",
+        content: "The strongest brands in tech don't use dictionary words. Spotify, Zillow, Hulu, Venmo, Canva — none of these are real words. They're invented names that sound natural, are easy to pronounce, and were available as .com domains when their founders registered them.",
+      },
+      {
+        type: "paragraph",
+        content: "Invented names work because the supply is effectively infinite. There are roughly 12 billion possible 6-letter combinations using the English alphabet. Even after filtering for pronounceability and removing awkward letter pairings, millions of strong candidates remain. The .com for your future brand likely exists right now — you just haven't generated it yet.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "Invented names aren't random strings of letters. The best ones follow phonetic patterns that make them feel like they could be real words. Think 'Rivian' or 'Figma' — they roll off the tongue despite being completely made up.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 1: Define Your Brand Parameters",
+      },
+      {
+        type: "paragraph",
+        content: "Before generating a single name, answer three questions: What industry are you in? What vibe does your brand need (luxury, playful, technical, trustworthy)? And what length range works for you? These parameters dramatically narrow the search space and improve the quality of what you find.",
+      },
+      {
+        type: "paragraph",
+        content: "A fintech startup targeting enterprise clients needs a completely different name than a consumer wellness app. Define the target before you start shooting.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 2: Generate at Scale, Then Filter Ruthlessly",
+      },
+      {
+        type: "paragraph",
+        content: "The single biggest mistake founders make is evaluating names one at a time. You need volume first, then quality filtering. Generate 50–100 candidates using AI tools that understand brand linguistics, then apply your criteria to the batch.",
+      },
+      {
+        type: "paragraph",
+        content: "What to filter for: pronounceability (can you say it in a noisy room?), memorability (will someone remember it after hearing it once?), length (6–10 characters is the sweet spot), and emotional fit (does it match your brand's personality?).",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux generates names with instant Founder Signal scoring — pronounceability, memorability, length, and brand risk are evaluated automatically so you can focus on the top candidates.",
+        ctaLink: "/generate",
+        ctaText: "Generate Scored Names Now →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 3: Check Availability in Batches",
+      },
+      {
+        type: "paragraph",
+        content: "Checking domains one at a time is painfully slow and leads to decision fatigue. Use a tool that checks availability in bulk — ideally one that checks live, not from a cached database. Cached results often show names as available when they were actually registered hours or days ago.",
+      },
+      {
+        type: "paragraph",
+        content: "When you find available .com candidates, don't stop at availability. Check for existing trademarks, active social media handles, and whether the name returns any concerning Google results. A domain can be available and still be a bad choice if the name is associated with something you don't want tied to your brand.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 4: Use Blend and Metaphor Techniques",
+      },
+      {
+        type: "paragraph",
+        content: "Beyond pure invention, two naming techniques consistently produce available .com domains. Blending takes parts of two real words and combines them into something new. 'Pinterest' blends 'pin' and 'interest.' 'Instagram' blends 'instant' and 'telegram.' These names carry meaning while remaining unique and registrable.",
+      },
+      {
+        type: "paragraph",
+        content: "Metaphor names borrow a word from one domain and apply it to another. 'Amazon' is a river. 'Apple' is a fruit. 'Slack' means loose or relaxed. The metaphorical distance creates intrigue while keeping the name short and memorable.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Step 5: Validate Before You Buy",
+      },
+      {
+        type: "paragraph",
+        content: "You've found a .com that's available, scores well on brandability, and feels right. Before you register, run these final checks:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Say the name out loud 20 times. Does it still feel good or does it start to sound strange?",
+          "Text the name to five friends with no context. Ask what they think it means.",
+          "Search the name on Google, Twitter/X, Instagram, and TikTok. Is the space clean?",
+          "Check USPTO TESS for trademark conflicts in your class of goods/services.",
+          "Verify the name works internationally — does it mean something unfortunate in another language?",
+          "Type the domain into a browser. Make sure it doesn't redirect to a parked page or active site.",
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What About Premium Domains?",
+      },
+      {
+        type: "paragraph",
+        content: "Premium domains (aftermarket names priced from $500 to $500,000+) can be worth it for established companies with revenue. But for pre-launch startups, the math rarely works. A $5,000 premium domain is $5,000 that could go toward product development, marketing, or runway.",
+      },
+      {
+        type: "paragraph",
+        content: "The irony is that an invented name registered for $10 can become more valuable than a premium dictionary-word domain — if the company behind it succeeds. Nobody knew what 'Google' meant in 1997. The brand creates the value, not the other way around.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Bottom Line",
+      },
+      {
+        type: "paragraph",
+        content: "Finding an available .com in 2026 isn't about luck — it's about strategy. Stop searching for dictionary words. Start generating invented names that follow phonetic patterns, check them in bulk, and score them on the metrics that actually matter: pronounceability, memorability, length, and brand fit.",
+      },
+      {
+        type: "paragraph",
+        content: "The .com that becomes your brand is out there right now, unregistered and waiting. You just need the right process to find it.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Generate brandable .com domains with AI — scored, checked, and ready to register. No aftermarket prices required.",
+        ctaLink: "/generate",
+        ctaText: "Find Your .com Domain →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Are there any good .com domains left?",
+        answer: "Yes — millions of them. The dictionary-word .coms are largely taken, but invented brandable names (like Spotify, Canva, or Figma-style names) are available in virtually unlimited supply. The key is using AI generation tools that create pronounceable, brand-quality names rather than searching for existing words.",
+      },
+      {
+        question: "How much does a .com domain cost in 2026?",
+        answer: "Standard registration for an available .com is $9–15 per year. Premium or aftermarket domains range from $500 to $500,000+. For most startups, standard-priced invented names are the best value — spend the savings on building your product.",
+      },
+      {
+        question: "Should I buy multiple domain extensions for my brand?",
+        answer: "At minimum, secure the .com. If budget allows, also grab the .net, .org, and any country-specific extension where you plan to operate. This prevents competitors or squatters from registering confusingly similar domains. You can redirect all of them to your primary .com.",
+      },
+      {
+        question: "How long should my domain name be?",
+        answer: "Research and real-world data point to 6–10 characters as the sweet spot. This range balances memorability, typing speed, and visual appeal. Under 6 characters is premium territory (most are taken). Over 12 characters creates usability friction across platforms.",
+      },
+    ],
+  },
+
+  // ── SEO Foundations (April 2026) ──────────────────────────────────
+  {
+    slug: "why-competitor-outranks-you",
+    title: "Why Your Competitor Outranks You (And How to Fix It This Week)",
+    description: "They have fewer features, worse design, and less experience — but they rank higher than you. Here's exactly why, and what to do about it starting today.",
+    seoTitle: "Why Your Competitor Outranks You on Google | Fix It This Week",
+    metaDescription: "Your competitor ranks higher despite worse product? This guide breaks down the real reasons — and gives you a concrete action plan to start outranking them this week.",
+    category: "SEO Foundations",
+    readTime: 9,
+    publishedAt: "2026-04-11",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "You've built a better product. Your site looks cleaner. Your content is more accurate. And yet when you Google your target keyword, your competitor sits comfortably on page one while you're buried on page three. It's maddening — and it's more common than you think.",
+      },
+      {
+        type: "paragraph",
+        content: "The good news: in almost every case, the reason is identifiable, and the fix is achievable. SEO isn't magic. It's a set of signals that Google uses to determine ranking, and your competitor is sending stronger signals than you on the ones that matter most. Let's find out which ones.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Reason 1: They Have More (and Better) Backlinks",
+      },
+      {
+        type: "paragraph",
+        content: "Links from other websites remain the single strongest ranking factor. If your competitor has 200 referring domains and you have 15, no amount of on-page optimization will close that gap. Google treats backlinks as votes of confidence — the more high-quality sites link to your competitor, the more authoritative Google considers them.",
+      },
+      {
+        type: "paragraph",
+        content: "The fix: Check your competitor's backlink profile using Ahrefs, Semrush, or even free tools like Ahrefs' free backlink checker. Identify the sources — are they from guest posts, press mentions, directory listings, or resource pages? Many of these same sources will link to you if you reach out. Start with the easiest wins: directories, resource pages, and unlinked brand mentions.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Reason 2: Your Site Has Technical Problems You Can't See",
+      },
+      {
+        type: "paragraph",
+        content: "Technical SEO issues are invisible to most founders because your site looks fine in a browser. But Google's crawler sees something different. Slow page speed, missing meta tags, broken internal links, duplicate content, no sitemap, incorrect canonical tags — any of these can tank your rankings without giving you any visible warning.",
+      },
+      {
+        type: "paragraph",
+        content: "The fix: Run a proper technical audit. Google Search Console is free and will surface indexing issues, mobile usability problems, and Core Web Vitals failures. For a deeper analysis, use a dedicated audit tool that checks all the technical signals Google cares about.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux's free SEO Audit tool scans your site for technical issues, meta tag problems, performance bottlenecks, and mobile usability — the same signals Google uses to rank your pages.",
+        ctaLink: "/seo-audit",
+        ctaText: "Run a Free SEO Audit →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Reason 3: Their Content Matches Search Intent Better",
+      },
+      {
+        type: "paragraph",
+        content: "Google doesn't rank the best content. It ranks the content that best matches what the searcher is looking for. If someone searches 'best CRM for startups' and your competitor has a comparison article with pricing tables and you have a product landing page, they'll rank higher — even if your product is the actual best CRM for startups.",
+      },
+      {
+        type: "paragraph",
+        content: "The fix: Search your target keyword in an incognito window and study the top five results. What format are they? (Listicle, guide, comparison, tutorial?) What questions do they answer? What headers do they use? Your content needs to match this intent pattern while being genuinely more useful. Don't copy — outperform.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Reason 4: They've Been Around Longer",
+      },
+      {
+        type: "paragraph",
+        content: "Domain age isn't a direct ranking factor, but its effects are. An older site has had more time to accumulate backlinks, build topical authority, get indexed deeply, and develop user behavior signals. If your competitor registered their domain three years before you, they have a compound advantage that takes deliberate effort to overcome.",
+      },
+      {
+        type: "paragraph",
+        content: "The fix: You can't accelerate time, but you can accelerate the signals that time provides. Publish more consistently. Build links more aggressively. Cover your topic cluster more thoroughly. A newer site that publishes four quality articles per week will overtake an older site that publishes one per month — usually within 6–12 months.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Reason 5: Your Domain Name Is Hurting You",
+      },
+      {
+        type: "paragraph",
+        content: "This one stings because it's hard to fix after launch. If your domain is long, hard to spell, uses an unfamiliar extension, or doesn't inspire trust, it affects click-through rates in search results. Google measures click-through rate as a ranking signal — if people see your listing but don't click because the domain looks sketchy or forgettable, your rankings will quietly decline.",
+      },
+      {
+        type: "paragraph",
+        content: "Additionally, a brandable domain generates more organic brand searches over time. People who remember your name search for it directly, which sends strong trust signals to Google. If your domain is forgettable, you miss out on this entire flywheel.",
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "If you suspect your domain name is holding you back, it's worth considering a rebrand while the cost is still low. The earlier you make the switch, the less SEO equity you lose in the transition.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Your Action Plan for This Week",
+      },
+      {
+        type: "paragraph",
+        content: "You don't need to fix everything at once. Here's a prioritized list you can start today:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Day 1: Run a technical SEO audit and fix critical issues (broken links, missing meta tags, slow pages)",
+          "Day 2: Analyze top-ranking competitor content for your primary keyword — note format, length, headers, and intent",
+          "Day 3: Rewrite or create one piece of content that matches search intent better than the current #1 result",
+          "Day 4: Identify 10 sites that link to your competitor but not to you — draft outreach emails",
+          "Day 5: Set up Google Search Console if you haven't, and submit your updated sitemap",
+          "Weekend: Review your domain name objectively — is it helping or hurting your brand perception?",
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Start With What You Can Measure",
+      },
+      {
+        type: "paragraph",
+        content: "The difference between founders who improve their rankings and those who don't isn't talent or budget — it's whether they diagnose the problem before trying to fix it. A proper audit tells you exactly where you're losing and what to prioritize. Everything else is guessing.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Find out exactly what's holding your site back. NamoLux's SEO Audit checks technical health, content quality, and performance metrics in seconds.",
+        ctaLink: "/seo-audit",
+        ctaText: "Audit Your Site Free →",
+      },
+    ],
+    faqs: [
+      {
+        question: "How long does it take to outrank a competitor?",
+        answer: "It depends on the gap. If the issue is technical (broken tags, slow pages), fixes can show results in 2–4 weeks. If the gap is authority (backlinks, domain age), expect 3–12 months of consistent effort. Content improvements typically show movement within 4–8 weeks after Google recrawls your pages.",
+      },
+      {
+        question: "Can I outrank competitors with a smaller budget?",
+        answer: "Yes. SEO rewards consistency and quality over budget. A founder publishing one excellent, well-optimized article per week will outperform a company spending thousands on mediocre content. Free tools like Google Search Console, and affordable tools like NamoLux's SEO Audit, give you most of what the expensive tools provide.",
+      },
+      {
+        question: "Should I focus on more content or better content?",
+        answer: "Better content first, more content second. One comprehensive article that perfectly matches search intent will outrank ten thin articles. Once your core pages are strong, expand your topic cluster with supporting content that builds topical authority.",
+      },
+      {
+        question: "Does my domain name really affect SEO?",
+        answer: "Indirectly but significantly. Your domain affects click-through rates in search results, brand recall (which drives branded searches), and trust perception. A short, brandable .com domain creates a virtuous cycle: people remember it, search for it directly, click on it more in results, and link to it more naturally. All of these feed back into stronger rankings.",
+      },
+    ],
+  },
+  {
+    slug: "seo-mistakes-new-websites-make",
+    title: "12 SEO Mistakes New Websites Make in Their First 90 Days",
+    description: "Most new sites tank their SEO before they have a chance to rank. Here are 12 mistakes made in the first 90 days — and the fixes that actually move the needle.",
+    seoTitle: "12 SEO Mistakes New Websites Make (First 90 Days) | NamoLux",
+    metaDescription: "New website? Avoid the 12 most common SEO mistakes that kill rankings in the first 90 days. From indexing errors to content gaps, learn what to fix and when.",
+    category: "SEO Foundations",
+    readTime: 11,
+    publishedAt: "2026-04-10",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "The first 90 days of a website's life are disproportionately important for SEO. The technical foundation you set, the content you publish, and the signals you send during this window shape how Google categorizes and ranks your site for months — sometimes years — to come.",
+      },
+      {
+        type: "paragraph",
+        content: "And most founders get it wrong. Not because SEO is impossibly complex, but because the mistakes are invisible. Your site looks fine. Your content reads well. But under the hood, a dozen small errors are silently telling Google your site isn't worth ranking.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Technical Mistakes",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "1. Not Submitting a Sitemap to Google Search Console",
+      },
+      {
+        type: "paragraph",
+        content: "Google will eventually find your pages through links and crawling. But 'eventually' could mean weeks. Submitting a sitemap tells Google exactly which pages exist and how they're structured. It's a five-minute task that accelerates indexing from weeks to days.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "2. Blocking Pages With robots.txt or Noindex Tags",
+      },
+      {
+        type: "paragraph",
+        content: "Frameworks and CMS platforms sometimes ship with robots.txt rules or noindex meta tags that block pages from being indexed — often on staging configurations that accidentally make it to production. One misplaced noindex tag on your homepage can make your entire site invisible to Google.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "3. Ignoring Core Web Vitals",
+      },
+      {
+        type: "paragraph",
+        content: "Page speed isn't just a nice-to-have — it's a ranking factor. If your Largest Contentful Paint (LCP) is over 2.5 seconds, your Interaction to Next Paint (INP) is over 200ms, or your Cumulative Layout Shift (CLS) is over 0.1, Google will deprioritize your pages. Check these metrics in Google Search Console or PageSpeed Insights before you launch.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "4. Missing or Duplicate Meta Tags",
+      },
+      {
+        type: "paragraph",
+        content: "Every page needs a unique title tag and meta description. When pages share the same title or have no description, Google either generates its own (often poorly) or struggles to differentiate between pages. This is especially common on sites with template-based pages where the same default title gets applied everywhere.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Not sure if your site has technical SEO issues? NamoLux's free audit catches meta tag problems, speed issues, indexing errors, and more.",
+        ctaLink: "/seo-audit",
+        ctaText: "Run Your Free Audit →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Content Mistakes",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "5. Publishing Thin Content",
+      },
+      {
+        type: "paragraph",
+        content: "A 300-word page about 'What Is Project Management' won't rank against a 3,000-word comprehensive guide. Google rewards thoroughness — not length for its own sake, but content that genuinely answers the searcher's question better than alternatives. If your page doesn't add something the top results don't have, it won't compete.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "6. No Keyword Strategy",
+      },
+      {
+        type: "paragraph",
+        content: "Many founders write content based on what they think is interesting rather than what people actually search for. The result is articles that are well-written but target keywords with zero search volume, or compete for terms they'll never rank for. Start with keyword research, then create content that matches real search demand.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "7. Ignoring Search Intent",
+      },
+      {
+        type: "paragraph",
+        content: "If someone searches 'best email marketing tools,' they want a comparison list — not your homepage explaining why your tool is great. Mismatching content format to search intent is the fastest way to ensure Google never ranks your page, regardless of how good the content is.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "8. No Internal Linking Strategy",
+      },
+      {
+        type: "paragraph",
+        content: "Internal links tell Google which pages are important and how topics relate to each other. New sites often have isolated pages with no links between them — each page is an island. Build topic clusters: a pillar page linked to supporting articles, all linking back to each other. This distributes authority and helps Google understand your site's structure.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Authority Mistakes",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "9. Not Building Any Backlinks",
+      },
+      {
+        type: "paragraph",
+        content: "Many founders believe 'if I build great content, links will come naturally.' They won't — at least not fast enough. In the first 90 days, you need to actively build links through guest posts, resource page outreach, HARO/Connectively responses, and industry directories. Even 10–20 quality backlinks in the first three months can dramatically accelerate your ranking trajectory.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "10. No Google Business Profile (For Local Businesses)",
+      },
+      {
+        type: "paragraph",
+        content: "If you serve a local area, a Google Business Profile is arguably more important than your website for the first six months. It puts you in Google Maps results, provides a review platform, and sends strong local relevance signals. Claim and optimize it on day one.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "11. Choosing a Weak Domain Name",
+      },
+      {
+        type: "paragraph",
+        content: "Your domain name affects click-through rates in search results, brand memorability, and the likelihood of earning natural backlinks. A long, hyphenated, or hard-to-spell domain creates friction at every stage of SEO. The best time to get this right is before you launch — the second best time is now, before you've accumulated significant domain authority.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Building a new brand? Start with a domain that helps your SEO instead of hurting it. NamoLux generates short, brandable names scored for quality.",
+        ctaLink: "/generate",
+        ctaText: "Generate Brand Names →",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "12. Expecting Results Too Fast",
+      },
+      {
+        type: "paragraph",
+        content: "This might be the most damaging mistake because it leads to quitting. SEO is a compounding channel — the first three months often show minimal visible results, and founders conclude it doesn't work. In reality, this is the period where you're building the foundation. Months 4–12 are where the compound effects kick in. The founders who win at SEO are the ones who kept publishing and building links when it felt like nothing was happening.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Your First 90 Days SEO Checklist",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Week", "Priority Actions"],
+        rows: [
+          ["Week 1", "Set up Google Search Console, submit sitemap, verify indexing, check robots.txt"],
+          ["Week 2", "Run technical audit, fix critical issues, optimize Core Web Vitals"],
+          ["Week 3–4", "Keyword research, create content calendar, publish first 3–5 articles"],
+          ["Month 2", "Build internal linking structure, start backlink outreach, publish weekly"],
+          ["Month 3", "Audit progress in Search Console, refresh underperforming content, continue link building"],
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Start With a Diagnosis",
+      },
+      {
+        type: "paragraph",
+        content: "You can't fix what you can't see. Before implementing any SEO strategy, run an audit to understand where your site stands today. Know your technical health, identify content gaps, and measure your baseline performance. Then prioritize fixes by impact — technical foundations first, content second, authority third.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Get a clear picture of your site's SEO health in seconds. NamoLux's free audit identifies exactly what to fix and in what order.",
+        ctaLink: "/seo-audit",
+        ctaText: "Audit Your Site Now →",
+      },
+    ],
+    faqs: [
+      {
+        question: "How long does it take for a new website to rank on Google?",
+        answer: "Most new websites begin seeing meaningful organic traffic within 4–8 months, assuming consistent content publication and basic link building. High-competition keywords can take 12–18 months. Low-competition long-tail keywords can rank within 2–4 weeks if the technical foundation is solid.",
+      },
+      {
+        question: "Do I need to hire an SEO expert for a new site?",
+        answer: "Not necessarily. The fundamentals — technical setup, keyword research, content creation, and basic link building — can be learned and executed by founders. Tools like Google Search Console (free) and NamoLux's SEO Audit make technical diagnosis accessible. Consider hiring an expert once you've exhausted the DIY basics and need to compete for high-value keywords.",
+      },
+      {
+        question: "What's the most important thing to get right first?",
+        answer: "Technical foundation. No amount of great content matters if Google can't properly crawl, index, and render your pages. Fix technical issues first (indexing, speed, meta tags), then focus on content quality and keyword targeting, then build authority through links.",
+      },
+      {
+        question: "Should I focus on blog content or product pages first?",
+        answer: "Product and service pages first — they convert visitors into customers. Optimize these for your primary commercial keywords. Then build a blog strategy targeting informational keywords that feed into your product pages. The blog drives traffic; the product pages convert it.",
+      },
+    ],
+  },
+
+  // ── Builder Insights (April 2026) ──────────────────────────────────
+  {
+    slug: "zero-dollar-brand-launch-48-hours",
+    title: "The $0 Brand Launch: From Idea to Live Website in 48 Hours",
+    description: "No budget? No problem. Here's the exact playbook for going from startup idea to a branded, live website in one weekend — using only free tools.",
+    seoTitle: "Launch a Brand in 48 Hours for $0 | Free Startup Playbook 2026",
+    metaDescription: "Go from startup idea to live branded website in 48 hours with zero budget. This step-by-step playbook covers naming, domain, design, and launch using free tools.",
+    category: "Builder Insights",
+    readTime: 10,
+    publishedAt: "2026-04-09",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "The biggest lie in startup culture is that you need money to start. You don't need $5,000 for branding. You don't need $2,000 for a website. You don't need $500 for a logo. What you need is a weekend, a laptop, and a clear process.",
+      },
+      {
+        type: "paragraph",
+        content: "This isn't theoretical. Thousands of founders launch real, professional-looking brands every month using free tools. The gap between a polished brand and an amateur one isn't budget — it's knowing which steps matter and in what order. Here's the exact playbook.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Saturday Morning: Name and Domain (2 Hours)",
+      },
+      {
+        type: "paragraph",
+        content: "Everything starts with the name. A strong brand name does three things: it's easy to say and spell, it's unique enough to own in search results, and it feels appropriate for your industry. Don't overthink this step — but don't underthink it either.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "The Process",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Write down 5 keywords related to your product, industry, or the feeling you want to convey",
+          "Use an AI name generator to produce 50+ candidates based on those keywords",
+          "Filter for names with available .com domains",
+          "Score finalists on pronounceability, memorability, and length",
+          "Pick one. Register the .com. Budget: $9–12 per year.",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux generates brandable names with live .com availability and automatic quality scoring. Get from keywords to registered domain in minutes, not hours.",
+        ctaLink: "/generate",
+        ctaText: "Generate Your Brand Name Free →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Saturday Afternoon: Visual Identity (2 Hours)",
+      },
+      {
+        type: "paragraph",
+        content: "You don't need a professional designer to create a solid visual identity. You need three things: a colour palette, a wordmark (text-based logo), and consistent typography. That's it. The fancy logo can come later when you have revenue.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Colour Palette",
+      },
+      {
+        type: "paragraph",
+        content: "Choose 3–5 colours that match your brand's personality. A fintech brand needs different colours than a wellness brand. AI tools can generate palettes based on your brand name and vibe — use them. The key is consistency: once you pick your colours, use them everywhere.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Wordmark Logo",
+      },
+      {
+        type: "paragraph",
+        content: "For a $0 budget, a clean wordmark beats a complex logo every time. Choose a distinctive font from Google Fonts, type your brand name, and export it. Canva (free tier) lets you do this in minutes. Make sure it works in both dark and light backgrounds.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Typography",
+      },
+      {
+        type: "paragraph",
+        content: "Pick two fonts from Google Fonts: one for headings (something with character) and one for body text (something highly readable). Inter, Plus Jakarta Sans, and DM Sans are excellent free body fonts. Stick with these two fonts everywhere — website, social media, presentations.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Saturday Evening: Landing Page (3 Hours)",
+      },
+      {
+        type: "paragraph",
+        content: "Your landing page has one job: convert visitors into the next step. That step might be signing up for a waitlist, booking a demo, or trying a free tool. Everything on the page should drive toward that single action.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "The Minimum Viable Landing Page",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Headline: What you do and who it's for (max 10 words)",
+          "Subheadline: The key benefit or pain point you solve (1–2 sentences)",
+          "Primary CTA button: The one action you want visitors to take",
+          "Social proof: Even 'Built by a team from [Company X]' counts",
+          "3 feature bullets: What makes you different, not what you do",
+          "Footer: Legal links, contact info",
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "Build this with any free website builder: Carrd ($0 for a single page), Framer (free tier), or a Next.js template deployed on Vercel (free). Point your domain to whichever platform you choose. Total cost: still $0 beyond the domain.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Sunday Morning: SEO Foundation (1 Hour)",
+      },
+      {
+        type: "paragraph",
+        content: "Even a single-page site needs basic SEO. These steps take less than an hour and set you up for organic traffic down the line:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Write a unique title tag and meta description for your page",
+          "Add Open Graph and Twitter Card meta tags for social sharing",
+          "Set up Google Search Console and submit your sitemap",
+          "Add structured data (Organization schema at minimum)",
+          "Ensure your page loads in under 2 seconds on mobile",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "After launching, run a quick SEO audit to catch any technical issues before Google first crawls your site. First impressions matter for search engines too.",
+        ctaLink: "/seo-audit",
+        ctaText: "Run a Free SEO Audit →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Sunday Afternoon: Social Presence (1 Hour)",
+      },
+      {
+        type: "paragraph",
+        content: "Claim your brand name on the platforms where your audience lives. At minimum: X/Twitter, LinkedIn, and one platform specific to your industry (Product Hunt for tech, Instagram for consumer, GitHub for developer tools). Use your brand colours and wordmark as profile images for instant visual consistency.",
+      },
+      {
+        type: "paragraph",
+        content: "Write a one-line bio that matches your landing page headline. Link to your website. Post one announcement: 'We're building [what you do] for [who]. Sign up for early access: [link].' That's enough to start.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Sunday Evening: Launch Announcement (1 Hour)",
+      },
+      {
+        type: "paragraph",
+        content: "Draft a launch post for your primary social platform. The formula that works: Problem (what sucks about the status quo) → Solution (what you're building) → Proof (even a screenshot counts) → Ask (what you want people to do). Keep it under 280 characters for X/Twitter, or write a longer LinkedIn post if that's your platform.",
+      },
+      {
+        type: "paragraph",
+        content: "Also submit to free directories and launch platforms: Product Hunt (upcoming), Indie Hackers, BetaList, and relevant subreddits. These generate initial traffic and backlinks that help with SEO.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The 48-Hour Brand Checklist",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Deliverable", "Tool", "Cost"],
+        rows: [
+          ["Brand name + .com domain", "NamoLux + Namecheap", "$9–12/year"],
+          ["Colour palette", "NamoLux Brand Palette / Coolors", "Free"],
+          ["Wordmark logo", "Canva Free", "Free"],
+          ["Landing page", "Carrd / Framer / Vercel", "Free"],
+          ["SEO setup", "Google Search Console + NamoLux Audit", "Free"],
+          ["Social profiles", "X, LinkedIn, Product Hunt", "Free"],
+          ["Launch post", "Your keyboard", "Free"],
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What Happens After 48 Hours",
+      },
+      {
+        type: "paragraph",
+        content: "You now have a branded online presence that looks professional, is findable on Google, and has a clear call to action. That puts you ahead of 90% of startup ideas that never make it past the notebook stage. The next step isn't perfecting the brand — it's talking to potential customers and validating the idea. The brand can evolve. The momentum can't be paused.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Start your 48-hour brand launch right now. Generate a brandable name, check .com availability, and build your colour palette — all in one place.",
+        ctaLink: "/generate",
+        ctaText: "Start Your Brand →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Can a $0 brand really compete with funded startups?",
+        answer: "In the early stages, absolutely. Most customers can't tell the difference between a $0 brand and a $10,000 brand if the fundamentals are right — clean design, professional domain, consistent colours, and clear messaging. What customers care about is whether you solve their problem, not how much you spent on your logo.",
+      },
+      {
+        question: "Should I use my personal name or a brand name?",
+        answer: "If you're building a service business (consulting, freelancing), your personal name can work well. For a product or SaaS, use a brand name — it's easier to sell, license, or hand off later. A brand name also lets you build equity in something separate from your personal identity.",
+      },
+      {
+        question: "When should I invest in professional branding?",
+        answer: "After you have paying customers and product-market fit. Until then, a clean DIY brand is not just acceptable — it's the smart move. Professional branding is most valuable when you know exactly who your customer is and what your positioning should be. Spending money on branding before that understanding exists usually means paying twice.",
+      },
+      {
+        question: "What's the single most important branding element?",
+        answer: "Your domain name. It's the one thing that's hardest to change later and affects everything else — email addresses, SEO, brand recall, and credibility. Invest your time (not necessarily money) here. Get a short, memorable .com that you'll still be proud of in five years.",
+      },
+    ],
+  },
+  {
+    slug: "founders-guide-choosing-startup-name",
+    title: "Why 90% of Founders Pick the Wrong Name (And the Framework That Fixes It)",
+    description: "Most startup names fail because founders rely on brainstorming instead of a systematic framework. Here's the 5-step process used by founders who get naming right.",
+    seoTitle: "How to Choose a Startup Name | The 5-Step Framework for Founders",
+    metaDescription: "90% of founders pick the wrong startup name. This 5-step naming framework helps you find a brandable, available name that scales — without second-guessing yourself.",
+    category: "Builder Insights",
+    readTime: 9,
+    publishedAt: "2026-04-08",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "Naming a startup feels creative. It feels like a brainstorming exercise — grab some sticky notes, play word association games, and hope something brilliant emerges. That's how 90% of founders approach it. It's also why 90% of founders end up with names they want to change within a year.",
+      },
+      {
+        type: "paragraph",
+        content: "The founders who get naming right don't rely on inspiration. They use a framework — a systematic process that separates good names from bad ones before emotional attachment sets in. Here's the framework.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Why Brainstorming Fails",
+      },
+      {
+        type: "paragraph",
+        content: "Brainstorming optimizes for one thing: ideas that sound exciting in the moment. It does not optimize for pronounceability, memorability, domain availability, trademark clearance, or long-term brand fit. The name that gets the most energy in a brainstorming session is usually the cleverest name in the room — and cleverness is the enemy of clarity.",
+      },
+      {
+        type: "paragraph",
+        content: "Think about the strongest brand names: Apple, Nike, Stripe, Notion, Canva. None of them are clever. They're simple, clear, and distinctive. They wouldn't survive a brainstorming session because someone would say 'that's too simple' or 'that doesn't describe what we do.' And they'd be wrong.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The 5-Step Naming Framework",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Step 1: Define Your Brand Constraints",
+      },
+      {
+        type: "paragraph",
+        content: "Before generating a single name, define the boundaries. What industry are you in? Who is your customer (consumer, SMB, enterprise)? What brand personality do you need (trustworthy, playful, premium, technical)? What length range works (6–8 characters is ideal, 10 is the max)?",
+      },
+      {
+        type: "paragraph",
+        content: "These constraints aren't limitations — they're filters that prevent you from wasting time evaluating names that would never work. A children's education app needs a fundamentally different name than an enterprise security platform. Define this before you start.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Step 2: Generate at Volume",
+      },
+      {
+        type: "paragraph",
+        content: "The quality of your final name is directly proportional to the quantity of your initial candidates. You need at least 50 candidates to have a meaningful selection — and ideally 100+. This is where AI tools earn their keep. A human brainstorm produces 10–20 ideas with rapidly declining quality. An AI generator produces 50–100 ideas with consistent quality across the batch.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux generates dozens of brand names per session with live availability checking and quality scoring. Build your candidate list in minutes instead of days.",
+        ctaLink: "/generate",
+        ctaText: "Generate Name Candidates →",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Step 3: Score Objectively",
+      },
+      {
+        type: "paragraph",
+        content: "This is where most founders fail. They look at a list of 50 names and pick the one that 'feels' best. Feeling is important — but it should be the tiebreaker, not the primary criterion. Score each candidate on these six dimensions:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Pronounceability: Can someone say it correctly after hearing it once?",
+          "Spellability: Can someone type it correctly after hearing it once?",
+          "Memorability: Will someone remember it tomorrow without a reminder?",
+          "Length: Is it between 6–10 characters?",
+          "Distinctiveness: Does it stand out from competitors in your space?",
+          "Domain availability: Is the .com available at standard price?",
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "A name that scores 4/5 on all six dimensions will outperform a name that scores 5/5 on two and 2/5 on the rest. Consistency across all dimensions beats excellence in one.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Step 4: Stress Test Your Finalists",
+      },
+      {
+        type: "paragraph",
+        content: "Take your top 3–5 names and put them through real-world stress tests. These tests catch problems that scoring alone misses:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "The phone test: Call a friend and say 'check out my new company [name].com.' Did they hear it correctly?",
+          "The crowded room test: Say the name in a sentence at normal volume. Does it cut through noise?",
+          "The global test: Google the name in other languages. Does it mean something offensive or confusing?",
+          "The email test: Write out '[name]@[name].com.' Does it look professional?",
+          "The memory test: Tell someone the name, then text them 24 hours later and ask if they remember it.",
+        ],
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Step 5: Validate and Register",
+      },
+      {
+        type: "paragraph",
+        content: "Your finalist has passed all the tests. Before you register, run three final checks: search the USPTO trademark database for conflicts, verify the .com is still available (domains get registered fast), and check major social media platforms for handle availability. Then register immediately — not tomorrow, not after the weekend. Available domains disappear.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Common Naming Traps to Avoid",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "The Description Trap",
+      },
+      {
+        type: "paragraph",
+        content: "Naming your project management tool 'ProjectFlow' or your AI writing assistant 'WriteBot' feels safe because it describes what you do. But descriptive names create a ceiling. They're forgettable, they limit your ability to expand, and they make you sound like a feature rather than a brand. The best companies transcend their original category — and their name needs room to grow with them.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "The Founder Ego Trap",
+      },
+      {
+        type: "paragraph",
+        content: "Sometimes founders pick a name because it's meaningful to them — an inside joke, a reference to their hometown, a mashup of their kids' names. The problem is that meaning is private. If the name doesn't communicate anything to your customers, that personal significance is invisible and the name is just noise.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "The Overthinking Trap",
+      },
+      {
+        type: "paragraph",
+        content: "Some founders spend months trying to find the 'perfect' name. Perfect names don't exist. There are strong names and weak names, and the difference between a strong name and a slightly stronger name is negligible compared to the difference between a launched product and one that's stuck in naming purgatory. Set a deadline — 48 hours maximum — and commit.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Framework in Action",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Step", "Time", "Output"],
+        rows: [
+          ["Define constraints", "30 min", "Brand brief: industry, audience, personality, length"],
+          ["Generate at volume", "1 hour", "50–100 name candidates with availability data"],
+          ["Score objectively", "1 hour", "Top 10 ranked by 6-dimension scoring"],
+          ["Stress test", "2 hours", "Top 3 validated through real-world tests"],
+          ["Validate and register", "30 min", "Final name with .com registered"],
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "Total time: 5 hours of focused work. Compare that to the typical founder experience of two weeks of on-and-off brainstorming that ends with a compromised choice.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Start the framework now. NamoLux handles steps 2 and 3 automatically — generating quality-scored names with live .com availability in seconds.",
+        ctaLink: "/generate",
+        ctaText: "Start the Naming Framework →",
+      },
+    ],
+    faqs: [
+      {
+        question: "How important is the startup name really?",
+        answer: "It's one of the few decisions that touches every part of your business: marketing, sales, recruiting, fundraising, and customer perception. A weak name creates friction everywhere; a strong name creates leverage. It's not the most important startup decision, but it's the most permanent one — everything else is easier to change later.",
+      },
+      {
+        question: "Should I name my startup before or after validating the idea?",
+        answer: "After you have a validated concept but before you launch publicly. You need enough clarity about what you're building to define brand constraints (Step 1), but you don't need a finished product. Many founders successfully name their startup during the same week they build their MVP.",
+      },
+      {
+        question: "What if I can't find a .com I like?",
+        answer: "Expand your generation volume — the more candidates you produce, the more likely you'll find one that works. Also consider name styles you haven't tried: blended names (Pinterest = pin + interest), metaphor names (Slack, Amazon), or invented names (Spotify, Zillow). The .com availability issue is almost always a creativity constraint, not a supply constraint.",
+      },
+      {
+        question: "Can I change my startup name later?",
+        answer: "Technically yes, but the cost increases over time. In the first month, a name change costs essentially nothing. After six months, you've accumulated SEO equity, brand recognition, and printed materials. After two years, a rebrand can cost $20,000+ and months of momentum. Get it right early using a framework rather than settling and hoping to fix it later.",
+      },
+    ],
+  },
+
+  // ── Tool Comparisons (April 2026) ──────────────────────────────────
+  {
+    slug: "tested-7-ai-name-generators",
+    title: "I Tested 7 AI Name Generators So You Don't Have To (2026 Results)",
+    description: "We put 7 popular AI name generators through the same test: one keyword, 10 minutes each. Here's what they actually produced — and which one was worth using.",
+    seoTitle: "7 AI Name Generators Tested and Compared | 2026 Honest Review",
+    metaDescription: "We tested 7 AI name generators with the same keyword. See real results, actual availability rates, and which tool produced the best brandable names in 2026.",
+    category: "Tool Comparisons",
+    readTime: 11,
+    publishedAt: "2026-04-07",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "Every founder has the same experience: you need a name, you Google 'AI name generator,' and you're hit with a dozen options that all claim to use artificial intelligence to generate the perfect brand name. But which ones actually work?",
+      },
+      {
+        type: "paragraph",
+        content: "We tested seven popular AI name generators using the same keyword ('fintech'), the same time limit (10 minutes per tool), and the same evaluation criteria. Here's what actually happened.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Test Setup",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Keyword: 'fintech' (competitive space, high bar for quality)",
+          "Time per tool: 10 minutes of active use",
+          "What we measured: number of names generated, .com availability rate, brandability quality, and unique features",
+          "What we looked for: names you'd actually build a company on — not just names that are technically available",
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "1. Namelix",
+      },
+      {
+        type: "paragraph",
+        content: "Namelix is the most recognizable name generator on the market. It generates names using AI, shows logo mockups alongside each name, and lets you filter by name length and style. The interface is polished and the volume of output is high — we got 100+ names in our 10-minute window.",
+      },
+      {
+        type: "paragraph",
+        content: "The issue: quantity over quality. Most results were generic keyword combinations (FinoHub, PayEdge, MoneyVault) that you'd find in any random name generator from 2015. The AI generates names quickly but doesn't evaluate them — there's no scoring, no phonetic analysis, and no indication of which names are actually good versus merely available. The logo mockups, while visually appealing, can bias you toward a mediocre name that looks good in a specific font.",
+      },
+      {
+        type: "paragraph",
+        content: "Availability rate: Roughly 40% of the names had .com domains available. But most of the available ones were the generic, low-quality suggestions — the better-sounding names were almost always taken.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "2. Squadhelp",
+      },
+      {
+        type: "paragraph",
+        content: "Squadhelp takes a different approach — it combines an AI generator with a marketplace of pre-vetted premium names and a community naming contest option. The AI generator itself is basic, but the curated marketplace has genuinely strong names (at premium prices ranging from $1,000 to $50,000+).",
+      },
+      {
+        type: "paragraph",
+        content: "For founders on a budget, the AI generator alone doesn't justify the visit. The marketplace is where the real value lives, but it's not a free solution — it's a premium name broker with AI generation as a side feature.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "3. Looka (Business Name Generator)",
+      },
+      {
+        type: "paragraph",
+        content: "Looka is primarily a logo design platform that added a name generator. The naming tool feels exactly like what it is — an afterthought. Results were mostly keyword + suffix patterns (FinoTech, PayaFi, CashLynk) with no quality differentiation. The real pitch is that you can immediately design a logo for any name you pick, which locks you into Looka's paid logo service.",
+      },
+      {
+        type: "paragraph",
+        content: "If you need a logo, Looka is worth exploring for that specific purpose. For naming alone, it's not competitive.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "4. Shopify Business Name Generator",
+      },
+      {
+        type: "paragraph",
+        content: "Shopify's generator is free and fast, but it's clearly designed to funnel users into Shopify's e-commerce platform. The names are heavily oriented toward retail and e-commerce patterns, and availability checking routes you directly to Shopify's domain registration. For a fintech startup, the results felt off-target — lots of 'shop' and 'store' patterns that don't fit the industry.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "5. Lean Domain Search",
+      },
+      {
+        type: "paragraph",
+        content: "Lean Domain Search (acquired by Automattic) takes a purely keyword-combination approach. Type 'fintech' and get hundreds of two-word combinations: FintechPeak, FintechForge, PrimFintech, and so on. Every result has a .com available — because the tool only shows what's available.",
+      },
+      {
+        type: "paragraph",
+        content: "The advantage: you'll always find something available. The disadvantage: all the names feel like the same template with different words plugged in. There's no AI, no quality scoring, and no attempt to generate genuinely brandable invented names. It's a keyword combiner, not a brand builder.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "6. Panabee",
+      },
+      {
+        type: "paragraph",
+        content: "Panabee generates names based on syllable patterns derived from your input words. It also checks social media handle availability alongside domain availability, which is a nice touch. The output quality is inconsistent — some genuinely interesting phonetic combinations mixed in with a lot of random-looking strings. No scoring or quality filtering means you're doing all the evaluation work yourself.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "7. NamoLux",
+      },
+      {
+        type: "paragraph",
+        content: "Full disclosure: we built NamoLux, so we're obviously biased. But here's what the tool actually produced in the same 10-minute test, using the same 'fintech' keyword.",
+      },
+      {
+        type: "paragraph",
+        content: "NamoLux generated 40+ names across four style modes (invented, blended, metaphor, and real-word). Each name came with a Founder Signal score (0–100) evaluating pronounceability, memorability, length, extension strength, character quality, and brand risk. The tool checked .com availability in real-time and flagged the top-scoring names with available domains.",
+      },
+      {
+        type: "paragraph",
+        content: "The key difference: instead of scrolling through 100+ unranked names hoping something catches your eye, you start from the top-scored names and work down. The scoring eliminates the paradox of choice that makes other generators exhausting to use.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "See the difference for yourself. Enter a keyword and get quality-scored brand names with live .com availability.",
+        ctaLink: "/generate",
+        ctaText: "Try NamoLux Free →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Side-by-Side Results",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Tool", "Names Generated", "Quality Scoring", "Availability Check", "Best For"],
+        rows: [
+          ["Namelix", "100+", "None", "Basic", "High volume browsing"],
+          ["Squadhelp", "30+", "None (AI), Curated (marketplace)", "Yes", "Premium name purchases"],
+          ["Looka", "50+", "None", "Basic", "Logo design (not naming)"],
+          ["Shopify", "100+", "None", "Shopify only", "E-commerce brands"],
+          ["Lean Domain Search", "200+", "None", "100% available", "Finding any available .com"],
+          ["Panabee", "40+", "None", "Domain + social", "Social handle checking"],
+          ["NamoLux", "40+", "Founder Signal (0–100)", "Real-time .com", "Brand-quality names with scoring"],
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What We Learned",
+      },
+      {
+        type: "paragraph",
+        content: "The biggest problem with most name generators isn't the names they produce — it's the lack of evaluation. When a tool gives you 200 names with no way to distinguish good from bad, you're not closer to a decision. You're just overwhelmed. The tools that performed best were the ones that helped you evaluate, not just generate.",
+      },
+      {
+        type: "paragraph",
+        content: "The second insight: 'AI-powered' is meaningless as a differentiator. Nearly every tool claims AI, but most are doing basic keyword combination with a language model veneer. The question isn't whether a tool uses AI — it's whether the AI is trained or tuned for brand naming specifically, and whether the output is evaluated on brand-relevant criteria.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Our Recommendation",
+      },
+      {
+        type: "paragraph",
+        content: "If you want high-volume keyword combinations with guaranteed availability, use Lean Domain Search. It's free and does exactly what it promises. If you have budget for a premium pre-made name, explore Squadhelp's marketplace. If you want AI-generated names that are actually scored for brand quality — and you want to make a confident decision instead of scrolling endlessly — NamoLux is what we'd recommend (and obviously, what we built it for).",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Stop scrolling through hundreds of unscored names. Generate brand names ranked by quality, with live .com availability, in seconds.",
+        ctaLink: "/generate",
+        ctaText: "Generate Scored Names →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Which AI name generator is the best overall?",
+        answer: "It depends on your goal. For pure volume of available domains, Lean Domain Search can't be beat. For premium curated names, Squadhelp's marketplace is strong. For brand-quality names with objective scoring and live availability checking, NamoLux offers the most complete evaluation experience. The 'best' tool is the one that matches how you make decisions.",
+      },
+      {
+        question: "Are AI name generators better than brainstorming?",
+        answer: "For most founders, yes. AI generators produce higher volume, check availability in real-time, and remove the bias that makes brainstorming sessions converge on clever-but-impractical names. The best approach combines AI generation (for volume and variety) with human judgment (for final selection and stress testing).",
+      },
+      {
+        question: "Do I have to pay for a good name generator?",
+        answer: "No. Several quality generators including NamoLux offer free tiers that are sufficient for finding a strong brand name. Paid tiers typically offer unlimited generations, additional features like brand palette generation, and premium support — but you can find an excellent name without spending anything beyond the domain registration fee.",
+      },
+      {
+        question: "How many names should I generate before picking one?",
+        answer: "Aim for at least 50 candidates before narrowing down. This gives you enough variety to compare meaningfully. Generate across different style modes (invented, blended, metaphor) and then score your top 10 on pronounceability, memorability, length, and domain availability. From those 10, stress-test your top 3 with real people before making a final decision.",
+      },
+    ],
+  },
+  {
+    slug: "free-vs-paid-domain-name-generators",
+    title: "Free vs Paid Domain Name Generators: What You Actually Get",
+    description: "Are paid name generators worth the upgrade? We break down exactly what free tools include, what paid plans unlock, and when the upgrade actually makes sense.",
+    seoTitle: "Free vs Paid Domain Name Generators | What's Worth Paying For?",
+    metaDescription: "Free or paid domain name generator? This comparison breaks down what free tools include, what paid upgrades unlock, and when it's actually worth paying more.",
+    category: "Tool Comparisons",
+    readTime: 8,
+    publishedAt: "2026-04-06",
+    author: "NamoLux Team",
+    content: [
+      {
+        type: "paragraph",
+        content: "You've been using a free name generator, it's producing decent results, and now you're staring at a 'Go Pro' button wondering if the upgrade is worth it. Or maybe you're starting fresh and want to know whether the free tier is good enough before you invest any time. Either way, you need clarity on what you're actually paying for.",
+      },
+      {
+        type: "paragraph",
+        content: "We'll break this down by what free generators typically include, what paid plans add, and — most importantly — who actually benefits from upgrading.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What Free Name Generators Give You",
+      },
+      {
+        type: "paragraph",
+        content: "Most free name generators (Namelix, Lean Domain Search, Shopify, Panabee, NamoLux's free tier) provide the core functionality: you enter a keyword, and you get a list of generated names. The quality and approach varies — some do pure keyword combination, others use AI — but the basic exchange is the same: input a word, receive names.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "What's Usually Included Free",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "Basic name generation from keywords",
+          "Some form of domain availability checking",
+          "Limited number of generations per day or per session",
+          "Basic filtering (by length, extension, or style)",
+          "Results displayed in a list or grid format",
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "For many founders — especially those in the early exploration phase — this is enough. If you're just starting to think about names and want to see what's possible, a free generator is the right starting point. You should never pay for a tool before you know you need it.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "NamoLux's free tier includes AI name generation, Founder Signal quality scoring, live .com availability checking, and brand colour palette generation. Start here.",
+        ctaLink: "/generate",
+        ctaText: "Try NamoLux Free →",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "What Paid Plans Typically Add",
+      },
+      {
+        type: "paragraph",
+        content: "Paid name generator plans range from $5/month to $50+/month (or one-time fees of $29–$199). Here's what you typically get at each tier and whether it's worth the premium.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Unlimited Generations",
+      },
+      {
+        type: "paragraph",
+        content: "Free tiers cap your generations — often at 5–10 per day or 50–100 total. Paid plans remove this cap. This matters if you're naming multiple projects, testing different keyword angles, or running through the naming framework we described in our founder's naming guide. If you hit the free limit and felt like you hadn't found the right name yet, this is the most valuable upgrade.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Advanced Filtering and Customization",
+      },
+      {
+        type: "paragraph",
+        content: "Paid plans often unlock more granular controls: specific character count ranges, industry targeting, brand personality settings, phonetic pattern preferences, and multiple style modes (invented, blended, metaphor, real-word). These controls dramatically improve output quality by narrowing the generation to exactly what you need.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Quality Scoring and Analytics",
+      },
+      {
+        type: "paragraph",
+        content: "Some paid tools (including NamoLux Pro) provide deeper scoring analysis — detailed breakdowns of why a name scored high or low, competitive analysis against existing brands in your space, and phonetic quality reports. This is most valuable for founders who are comparing a shortlist and need objective data to make a final decision.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Brand Building Features",
+      },
+      {
+        type: "paragraph",
+        content: "Premium plans may include brand-adjacent features: colour palette generation, logo suggestions, typography recommendations, and brand voice guidelines. These features save time by bundling brand identity tasks into the naming workflow. Instead of using five separate tools, you build the foundation of your brand in one session.",
+      },
+      {
+        type: "heading",
+        level: 3,
+        content: "Bulk Operations",
+      },
+      {
+        type: "paragraph",
+        content: "Agencies, serial entrepreneurs, and naming consultants need to generate and check names at scale. Paid plans often include bulk domain checking, export to CSV, saved name lists, and team collaboration features. If you're naming one startup, you probably don't need this. If you're naming your fifth, you do.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "When Free Is Enough",
+      },
+      {
+        type: "paragraph",
+        content: "Free generators are sufficient when:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "You're exploring ideas and not ready to commit to a name",
+          "You're naming a side project, not a funded startup",
+          "You find a name you love within the free generation limit",
+          "You're comfortable evaluating name quality yourself (you don't need scoring)",
+          "Your budget is genuinely zero and every dollar matters",
+        ],
+      },
+      {
+        type: "paragraph",
+        content: "There's no shame in using a free tool. Some of the best brand names in history were created without any tool at all. The tool is there to expand your options and accelerate the process — not to replace judgment.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "When the Upgrade Makes Sense",
+      },
+      {
+        type: "paragraph",
+        content: "The paid upgrade delivers real value when:",
+      },
+      {
+        type: "list",
+        content: "",
+        items: [
+          "You've used up free generations and haven't found the right name yet",
+          "You're naming a company you plan to run for 5+ years",
+          "You need quality scoring to make a confident decision from a shortlist",
+          "You're naming multiple products or projects within the same brand",
+          "You want brand identity features (colour palette, vibe matching) alongside naming",
+          "Decision paralysis is costing you more time than the tool costs in money",
+        ],
+      },
+      {
+        type: "callout",
+        calloutType: "tip",
+        content: "A good heuristic: if you've spent more than 3 hours trying to name your startup using free tools and you're still not confident, the paid upgrade will almost certainly save you time and produce a better result.",
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "Price Comparison: What Tools Charge",
+      },
+      {
+        type: "table",
+        content: "",
+        headers: ["Tool", "Free Tier", "Paid Price", "Key Paid Feature"],
+        rows: [
+          ["NamoLux", "10 generations with scoring", "Pro plan", "Unlimited generations + full brand tools"],
+          ["Namelix", "Unlimited (ad-supported)", "From $15/mo", "Premium name purchases"],
+          ["Squadhelp", "Basic AI generator", "Contest from $199", "Expert naming contests + marketplace"],
+          ["Looka", "Name generation free", "From $20 one-time", "Logo design (main product)"],
+          ["Lean Domain Search", "Fully free", "N/A", "No paid tier"],
+          ["Panabee", "Fully free", "N/A", "No paid tier"],
+        ],
+      },
+      {
+        type: "heading",
+        level: 2,
+        content: "The Real Cost of a Bad Name",
+      },
+      {
+        type: "paragraph",
+        content: "Here's the perspective that changes the calculation: a bad name costs you far more than any tool subscription. Lost customers who can't remember your URL, lower click-through rates in search results, a rebrand that costs $10,000+ at Series A — these are the real costs of settling for a mediocre name because you didn't want to invest in a better process.",
+      },
+      {
+        type: "paragraph",
+        content: "The best name generator investment isn't the most expensive one — it's the one that gives you enough quality candidates, with enough evaluation data, to make a decision you're confident in. For many founders, a free tier does exactly that. For others, the upgrade is one of the best $20–50 they'll spend in the entire startup journey.",
+      },
+      {
+        type: "callout",
+        calloutType: "cta",
+        content: "Start with NamoLux's free tier — get AI name generation, quality scoring, and .com availability checking at no cost. Upgrade only if you need more.",
+        ctaLink: "/generate",
+        ctaText: "Start Generating Names Free →",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is a free name generator good enough for a real business?",
+        answer: "Yes. The name itself doesn't know what tool created it. A great name from a free generator is just as valuable as a great name from a paid tool. The paid tools mainly help you find that great name faster and with more confidence through features like quality scoring, unlimited generations, and advanced filtering.",
+      },
+      {
+        question: "What's the best free AI name generator?",
+        answer: "For pure volume of available domains, Lean Domain Search is excellent and completely free. For AI-generated names with quality scoring on a free tier, NamoLux provides the most evaluation data at no cost. Namelix offers unlimited free generations with logo mockups. The best choice depends on whether you value quantity, quality scoring, or visual presentation.",
+      },
+      {
+        question: "Should I pay for a premium domain instead of a generator?",
+        answer: "Different problems, different solutions. A premium domain ($500–$50,000+) gives you a specific pre-existing name. A generator ($0–$50/month) helps you create a new name that nobody has thought of. For most startups, generating a new brandable name is far more cost-effective than buying a premium domain — and the resulting name can be just as strong.",
+      },
+      {
+        question: "How many free generations do most tools offer?",
+        answer: "It varies widely. NamoLux offers 10 free tokens across all features. Namelix and Lean Domain Search are effectively unlimited on the free tier. Shopify's generator is unlimited but basic. Most tools with meaningful AI behind them (not just keyword combination) cap free usage at 5–20 generations per day or session.",
+      },
+    ],
+  },
 ]
 
 // Utility functions
