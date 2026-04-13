@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import { buildGenerationPrompt } from "@/lib/brandExamples"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const maxDuration = 45
@@ -20,6 +21,14 @@ function isPronounceable(name: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkRateLimit(req, "ai-chat")
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
+      { status: 429 }
+    )
+  }
+
   let body: Record<string, unknown>
   try {
     body = await req.json()
@@ -150,6 +159,10 @@ export async function POST(req: NextRequest) {
       if (a.anyAvailable !== b.anyAvailable) return a.anyAvailable ? -1 : 1
       return b.score - a.score
     })
+
+    if (!rateLimit.isPro) {
+      logGeneration(req, rateLimit.userId, "ai-chat", description.slice(0, 80)).catch(() => {})
+    }
 
     return NextResponse.json({ success: true, results: results.slice(0, 15) })
   } catch (err) {

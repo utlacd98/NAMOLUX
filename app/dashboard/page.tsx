@@ -229,6 +229,7 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true)
   const [verifying, setVerifying] = useState(false)
   const [justUpgraded, setJustUpgraded] = useState(false)
+  const [tokens, setTokens] = useState({ used: 0, total: 10, remaining: 10 })
 
   const paletteNameParam = searchParams.get("palette") || ""
   const paletteVibeParam = searchParams.get("vibe") || "modern"
@@ -279,6 +280,14 @@ function DashboardContent() {
       } catch (error) {
         console.error("Error fetching subscription:", error)
       }
+
+      try {
+        const tokenRes = await fetch("/api/tokens")
+        if (tokenRes.ok) {
+          const t = await tokenRes.json()
+          setTokens({ used: t.used ?? 0, total: t.total ?? 10, remaining: t.remaining ?? 10 })
+        }
+      } catch {}
 
       setLoading(false)
     }
@@ -538,9 +547,18 @@ function DashboardContent() {
                         <Zap className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.2)" }} />
                         <span className="text-sm font-medium text-white">Free Plan</span>
                       </div>
-                      <span className="text-xs" style={{ color: "rgba(255,255,255,0.28)" }}>
-                        3 generations / day
+                      <span className="text-xs font-semibold" style={{ color: tokens.remaining > 0 ? "rgba(255,255,255,0.45)" : "#f87171" }}>
+                        {tokens.remaining} / {tokens.total} tokens left
                       </span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${(tokens.remaining / tokens.total) * 100}%`,
+                          background: tokens.remaining > 3 ? "rgba(212,175,55,0.6)" : tokens.remaining > 0 ? "#f59e0b" : "#ef4444",
+                        }}
+                      />
                     </div>
                     <a
                       href="/api/stripe/checkout"

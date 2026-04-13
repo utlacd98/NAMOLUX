@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -7,6 +8,14 @@ export const maxDuration = 30
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkRateLimit(req, "name-tools")
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
+      { status: 429 }
+    )
+  }
+
   try {
     const { action, name, keyword, vibe } = await req.json()
 
@@ -14,18 +23,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "name is required" }, { status: 400 })
     }
 
-    const cleanName = name.trim().toLowerCase().replace(/\.[a-z]+$/, "") // strip TLD if present
+    const cleanName = name.trim().toLowerCase().replace(/\.[a-z]+$/, "")
 
+    let response: NextResponse
     switch (action) {
       case "narrative":
-        return handleNarrative(cleanName)
+        response = await handleNarrative(cleanName)
+        break
       case "taglines":
-        return handleTaglines(cleanName, vibe)
+        response = await handleTaglines(cleanName, vibe)
+        break
       case "names-like":
-        return handleNamesLike(cleanName, keyword)
+        response = await handleNamesLike(cleanName, keyword)
+        break
       default:
         return NextResponse.json({ error: "invalid action" }, { status: 400 })
     }
+
+    if (!rateLimit.isPro) {
+      logGeneration(req, rateLimit.userId, "name-tools", cleanName).catch(() => {})
+    }
+
+    return response
   } catch {
     return NextResponse.json({ error: "internal error" }, { status: 500 })
   }

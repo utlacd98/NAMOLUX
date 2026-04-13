@@ -219,7 +219,7 @@ export function SeoAudit() {
       const data = await response.json()
 
       if (!response.ok) {
-        if (response.status === 429 && data.error === "rate_limit_exceeded") {
+        if (response.status === 429 && (data.error === "rate_limit_exceeded" || data.error === "token_limit_reached")) {
           router.push("/pricing?reason=limit_exceeded")
           return
         }

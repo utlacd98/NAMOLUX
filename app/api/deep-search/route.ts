@@ -4,6 +4,7 @@ import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
 import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -104,6 +105,14 @@ async function generateBatch(
 // SSE route
 // ---------------------------------------------------------------------------
 export async function GET(request: NextRequest) {
+  const rateLimit = await checkRateLimit(request, "deep-search")
+  if (!rateLimit.allowed) {
+    return new Response(
+      JSON.stringify({ error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" }),
+      { status: 429, headers: { "Content-Type": "application/json" } }
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const keyword = (searchParams.get("keyword") || "").trim()
   const vibe = searchParams.get("vibe") || "luxury"
@@ -112,6 +121,11 @@ export async function GET(request: NextRequest) {
 
   if (!keyword) {
     return new Response(JSON.stringify({ error: "keyword is required" }), { status: 400 })
+  }
+
+  // Log token spend upfront (deep search is expensive)
+  if (!rateLimit.isPro) {
+    logGeneration(request, rateLimit.userId, "deep-search", keyword).catch(() => {})
   }
 
   const encoder = new TextEncoder()

@@ -61,30 +61,13 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit(request, "domain")
 
     if (!rateLimitResult.allowed) {
-      const resetAt = rateLimitResult.resetAt
-      const now = new Date()
-      const diffMs = resetAt ? resetAt.getTime() - now.getTime() : 0
-      const hoursRemaining = Math.floor(diffMs / (1000 * 60 * 60))
-      const minutesRemaining = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-
       return NextResponse.json(
         {
-          error: "rate_limit_exceeded",
-          message: "You've used your free generation for today",
-          resetAt: resetAt?.toISOString(),
-          hoursRemaining,
-          minutesRemaining,
+          error: "token_limit_reached",
+          message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.",
           upgradeUrl: "/pricing",
         },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(Math.ceil(diffMs / 1000)),
-            "X-RateLimit-Limit": "1",
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": resetAt?.toISOString() || "",
-          },
-        }
+        { status: 429 }
       )
     }
 

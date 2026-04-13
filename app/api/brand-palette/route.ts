@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 
@@ -39,6 +40,14 @@ Rules:
 Respond ONLY with valid JSON. No markdown. No explanation outside the JSON.`
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await checkRateLimit(req, "palette")
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
+      { status: 429 }
+    )
+  }
+
   let body: { brandName?: string; keywords?: string; vibe?: string }
   try {
     body = await req.json()
@@ -91,6 +100,11 @@ Then return exactly this JSON:
     }
 
     const parsed: BrandPaletteResult = JSON.parse(content)
+
+    if (!rateLimit.isPro) {
+      logGeneration(req, rateLimit.userId, "palette", brandName.trim()).catch(() => {})
+    }
+
     return NextResponse.json(parsed)
   } catch (err) {
     console.error("Brand palette generation error:", err)

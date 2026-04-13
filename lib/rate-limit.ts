@@ -1,42 +1,36 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { NextRequest } from "next/server"
 
-export type FeatureType = "domain" | "bulk" | "seo"
+export type FeatureType =
+  | "domain"
+  | "bulk"
+  | "seo"
+  | "palette"
+  | "deep-search"
+  | "analyze"
+  | "name-tools"
+  | "ai-chat"
+
+const FREE_TOKEN_LIMIT = 10
 
 export interface RateLimitResult {
   allowed: boolean
   isPro: boolean
   userId: string | null
+  tokensUsed: number
+  tokensTotal: number
   remaining: number
-  resetAt: Date | null
   plan: "free" | "pro"
-  subscriptionStatus: "active" | "inactive" | "cancelled" | "past_due" | null
-  featureType?: FeatureType
 }
 
-/**
- * Extract the client IP address from request headers.
- * On Vercel, x-forwarded-for contains the client IP as the first entry.
- */
 export function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for")
-  if (forwarded) {
-    // Take the first IP in the chain (original client)
-    const firstIP = forwarded.split(",")[0].trim()
-    return firstIP
-  }
-  
-  // Fallback headers
+  if (forwarded) return forwarded.split(",")[0].trim()
   const realIP = request.headers.get("x-real-ip")
   if (realIP) return realIP.trim()
-  
-  // Final fallback
   return "127.0.0.1"
 }
 
-/**
- * Check if a user has Pro access by querying Supabase profile directly.
- */
 async function checkProAccess(userId: string): Promise<boolean> {
   try {
     const serviceClient = createServiceClient()
@@ -46,134 +40,83 @@ async function checkProAccess(userId: string): Promise<boolean> {
       .eq("id", userId)
       .single()
     return profile?.plan === "pro"
-  } catch (error) {
-    console.error("Error checking pro access:", error)
+  } catch {
     return false
   }
 }
 
 /**
- * Check rate limit for a generation request.
- *
- * Logic:
- * 1. Get user's IP address
- * 2. Check if user is authenticated
- * 3. If authenticated, check Stripe for active subscription
- * 4. If has active subscription -> ALLOW unlimited
- * 5. If no subscription OR not authenticated:
- *    a. Query generation_logs for this IP in the last 24 hours, filtered by feature type
- *    b. Also query by user_id if authenticated
- *    c. If count >= 2 -> BLOCK
- *    d. If count < 2 -> ALLOW
- *
- * @param request - The incoming request
- * @param featureType - The type of feature being used (domain, bulk, seo). Each feature has its own 2/day limit.
+ * Check if the user has tokens remaining.
+ * Free users get 10 tokens total across ALL features.
+ * Pro users get unlimited.
  */
 export async function checkRateLimit(
   request: NextRequest,
-  featureType: FeatureType = "domain"
+  _featureType: FeatureType = "domain"
 ): Promise<RateLimitResult> {
-  const ip = getClientIP(request)
   const supabase = await createClient()
-
-  // Check if user is authenticated
   const { data: { user } } = await supabase.auth.getUser()
 
-  let isPro = false
-
-  if (user) {
-    isPro = await checkProAccess(user.id)
+  if (!user) {
+    return {
+      allowed: false,
+      isPro: false,
+      userId: null,
+      tokensUsed: 0,
+      tokensTotal: FREE_TOKEN_LIMIT,
+      remaining: 0,
+      plan: "free",
+    }
   }
 
-  // Pro users with active subscription get unlimited access
+  const isPro = await checkProAccess(user.id)
+
   if (isPro) {
     return {
       allowed: true,
       isPro: true,
-      userId: user?.id || null,
-      remaining: -1, // Unlimited
-      resetAt: null,
+      userId: user.id,
+      tokensUsed: 0,
+      tokensTotal: -1,
+      remaining: -1,
       plan: "pro",
-      subscriptionStatus: "active",
-      featureType,
     }
   }
 
-  // For free users or unauthenticated users, check rate limit PER FEATURE
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-
-  // Check IP-based rate limit for this specific feature
-  const { count: ipCount } = await supabase
+  // Count ALL token usage for this user (no time window, no per-feature split)
+  const { count } = await supabase
     .from("generation_logs")
     .select("*", { count: "exact", head: true })
-    .eq("ip_address", ip)
-    .eq("generation_type", featureType)
-    .gte("created_at", twentyFourHoursAgo)
+    .eq("user_id", user.id)
 
-  // Also check user-based rate limit if authenticated (prevents IP rotation abuse)
-  let userCount = 0
-  if (user) {
-    const { count } = await supabase
-      .from("generation_logs")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .eq("generation_type", featureType)
-      .gte("created_at", twentyFourHoursAgo)
-    userCount = count || 0
-  }
-
-  // Use the higher count (IP or user-based)
-  const totalCount = Math.max(ipCount || 0, userCount)
-
-  // Free users get 3 uses per feature per 24 hours
-  const FREE_LIMIT = 3
-  const allowed = totalCount < FREE_LIMIT
-  const remaining = Math.max(0, FREE_LIMIT - totalCount)
-
-  // Get the reset time (when the oldest generation in the window expires)
-  let resetAt: Date | null = null
-  if (!allowed) {
-    const { data: oldestLog } = await supabase
-      .from("generation_logs")
-      .select("created_at")
-      .eq("generation_type", featureType)
-      .or(`ip_address.eq.${ip}${user ? `,user_id.eq.${user.id}` : ""}`)
-      .gte("created_at", twentyFourHoursAgo)
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .single()
-
-    if (oldestLog) {
-      resetAt = new Date(new Date(oldestLog.created_at).getTime() + 24 * 60 * 60 * 1000)
-    }
-  }
+  const tokensUsed = count || 0
+  const remaining = Math.max(0, FREE_TOKEN_LIMIT - tokensUsed)
 
   return {
-    allowed,
+    allowed: remaining > 0,
     isPro: false,
-    userId: user?.id || null,
+    userId: user.id,
+    tokensUsed,
+    tokensTotal: FREE_TOKEN_LIMIT,
     remaining,
-    resetAt,
     plan: "free",
-    subscriptionStatus: null,
-    featureType,
   }
 }
 
 /**
- * Log a generation request for rate limiting purposes.
+ * Log a token spend for rate limiting purposes.
  */
 export async function logGeneration(
   request: NextRequest,
   userId: string | null,
-  generationType: "domain" | "bulk" | "seo" = "domain",
+  generationType: FeatureType = "domain",
   keyword?: string,
   resultsCount: number = 0
 ): Promise<void> {
   const ip = getClientIP(request)
   const userAgent = request.headers.get("user-agent") || null
   const supabase = await createClient()
-  
+
   await supabase.from("generation_logs").insert({
     user_id: userId,
     ip_address: ip,
@@ -183,4 +126,3 @@ export async function logGeneration(
     results_count: resultsCount,
   })
 }
-

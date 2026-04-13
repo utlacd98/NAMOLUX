@@ -59,8 +59,8 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         {
-          error: "rate_limit_exceeded",
-          message: "You've used your free bulk checks for today",
+          error: "token_limit_reached",
+          message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.",
           upgradeUrl: "/pricing",
         },
         { status: 429 }

@@ -732,7 +732,7 @@ export function GenerateNames() {
 
     const responseData = await response.json()
     if (!response.ok) {
-      if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
+      if (response.status === 429 && (responseData.error === "rate_limit_exceeded" || responseData.error === "token_limit_reached")) {
         router.push("/pricing?reason=limit_exceeded")
         throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
       }
@@ -780,7 +780,7 @@ export function GenerateNames() {
 
       const responseData = await response.json()
       if (!response.ok) {
-        if (response.status === 429 && responseData.error === "rate_limit_exceeded") {
+        if (response.status === 429 && (responseData.error === "rate_limit_exceeded" || responseData.error === "token_limit_reached")) {
           router.push("/pricing?reason=limit_exceeded")
           throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
         }
@@ -972,7 +972,7 @@ export function GenerateNames() {
       const data = await response.json()
 
       if (!response.ok) {
-        if (response.status === 429 && data.error === "rate_limit_exceeded") {
+        if (response.status === 429 && (data.error === "rate_limit_exceeded" || data.error === "token_limit_reached")) {
           router.push("/pricing?reason=limit_exceeded")
           return
         }

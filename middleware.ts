@@ -21,6 +21,13 @@ const PROTECTED_ROUTES = new Set([
 // API routes that require authentication
 const PROTECTED_API_ROUTES = [
   "/api/generate-domains",
+  "/api/check-domain",
+  "/api/deep-search",
+  "/api/brand-palette",
+  "/api/analyze-description",
+  "/api/name-tools",
+  "/api/ai-name-chat",
+  "/api/seo-audit",
 ]
 
 // Public routes (no auth check needed)

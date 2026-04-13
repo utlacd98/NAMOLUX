@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 let openaiInstance: OpenAI | null = null
 function getOpenAI(): OpenAI {
@@ -22,6 +23,14 @@ const VALID_INDUSTRIES = [
 const VALID_VIBES = ["luxury", "futuristic", "playful", "trustworthy", "minimal"]
 
 export async function POST(request: NextRequest) {
+  const rateLimit = await checkRateLimit(request, "analyze")
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
+      { status: 429 }
+    )
+  }
+
   try {
     const body = await request.json()
     const description = (body?.description || "").trim()
@@ -107,6 +116,10 @@ Return ONLY valid JSON, no markdown, no backticks.`
 
     const rawVibe = (raw.brandVibe || "playful").toLowerCase()
     const brandVibe = VALID_VIBES.includes(rawVibe) ? rawVibe : "playful"
+
+    if (!rateLimit.isPro) {
+      logGeneration(request, rateLimit.userId, "analyze").catch(() => {})
+    }
 
     return NextResponse.json({
       success: true,
