@@ -479,6 +479,9 @@ export function GenerateNames() {
   const [isPro, setIsPro] = useState(false)
   const [revealedPremiumDomain, setRevealedPremiumDomain] = useState<string | null>(null)
 
+  // Token tracking
+  const [tokens, setTokens] = useState({ used: 0, total: 10, remaining: 10 })
+
   // Score threshold for premium domains (75+)
   const PREMIUM_SCORE_THRESHOLD = 75
 
@@ -514,6 +517,16 @@ export function GenerateNames() {
 
   // Clean expired domain cache entries on mount
   useEffect(() => { clearExpired() }, [])
+
+  // Fetch token count on mount and after generations finish
+  const refreshTokens = () => {
+    fetch("/api/tokens").then(r => r.json()).then(t => {
+      setTokens({ used: t.used ?? 0, total: t.total ?? 10, remaining: t.remaining ?? 10 })
+      if (t.isPro) setIsPro(true)
+    }).catch(() => {})
+  }
+  useEffect(() => { refreshTokens() }, [])
+  useEffect(() => { if (!isGenerating) refreshTokens() }, [isGenerating])
 
   // Load shortlist and search history from localStorage on mount
   useEffect(() => {
@@ -1298,6 +1311,19 @@ export function GenerateNames() {
             Back
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
+            {!isPro && (
+              <div
+                className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:px-3 sm:text-xs"
+                style={{
+                  background: tokens.remaining > 3 ? "rgba(212,175,55,0.1)" : tokens.remaining > 0 ? "rgba(245,158,11,0.12)" : "rgba(239,68,68,0.12)",
+                  border: `1px solid ${tokens.remaining > 3 ? "rgba(212,175,55,0.25)" : tokens.remaining > 0 ? "rgba(245,158,11,0.3)" : "rgba(239,68,68,0.3)"}`,
+                  color: tokens.remaining > 3 ? "#D4AF37" : tokens.remaining > 0 ? "#f59e0b" : "#ef4444",
+                }}
+              >
+                <Zap className="h-3 w-3" />
+                {tokens.remaining} / {tokens.total} tokens
+              </div>
+            )}
             {shortlist.length > 0 && (
               <>
                 <Button variant="outline" size="sm" onClick={exportShortlist} className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm">

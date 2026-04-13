@@ -51,12 +51,16 @@ async function checkProAccess(userId: string): Promise<boolean> {
  * - Pro users → unlimited
  * - Signed-in free users → 10 total, tracked by user_id AND IP (max of both to prevent abuse)
  * - Anonymous visitors → 10 total, tracked by IP
+ *
+ * Uses the service client to bypass RLS so anonymous token tracking works.
  */
 export async function checkRateLimit(
   request: NextRequest,
   _featureType: FeatureType = "domain"
 ): Promise<RateLimitResult> {
   const ip = getClientIP(request)
+
+  // Use regular client just for auth check
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -76,15 +80,18 @@ export async function checkRateLimit(
     }
   }
 
+  // Use service client for generation_logs queries (bypasses RLS)
+  const service = createServiceClient()
+
   // Count IP-based usage (always, to prevent abuse across accounts)
-  const { count: ipCount } = await supabase
+  const { count: ipCount } = await service
     .from("generation_logs")
     .select("*", { count: "exact", head: true })
     .eq("ip_address", ip)
 
   let userCount = 0
   if (user) {
-    const { count } = await supabase
+    const { count } = await service
       .from("generation_logs")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
@@ -109,6 +116,7 @@ export async function checkRateLimit(
 
 /**
  * Log a token spend for rate limiting purposes.
+ * Uses the service client to bypass RLS so anonymous logging works.
  */
 export async function logGeneration(
   request: NextRequest,
@@ -119,9 +127,9 @@ export async function logGeneration(
 ): Promise<void> {
   const ip = getClientIP(request)
   const userAgent = request.headers.get("user-agent") || null
-  const supabase = await createClient()
+  const service = createServiceClient()
 
-  await supabase.from("generation_logs").insert({
+  await service.from("generation_logs").insert({
     user_id: userId,
     ip_address: ip,
     user_agent: userAgent,

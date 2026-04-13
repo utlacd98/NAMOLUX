@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
 
     // Pro check
     if (user) {
-      const serviceClient = createServiceClient()
-      const { data: profile } = await serviceClient
+      const service = createServiceClient()
+      const { data: profile } = await service
         .from("profiles")
         .select("plan")
         .eq("id", user.id)
@@ -24,8 +24,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Use service client to bypass RLS
+    const service = createServiceClient()
+
     // Count by IP (always)
-    const { count: ipCount } = await supabase
+    const { count: ipCount } = await service
       .from("generation_logs")
       .select("*", { count: "exact", head: true })
       .eq("ip_address", ip)
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Count by user_id if signed in
     let userCount = 0
     if (user) {
-      const { count } = await supabase
+      const { count } = await service
         .from("generation_logs")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
