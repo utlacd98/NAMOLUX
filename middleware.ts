@@ -13,22 +13,12 @@ const BLOCKED_EXACT_PATHS = new Set([
 
 // Routes that require authentication
 const PROTECTED_ROUTES = new Set([
-  "/generate",
   "/dashboard",
   "/account",
 ])
 
 // API routes that require authentication
-const PROTECTED_API_ROUTES = [
-  "/api/generate-domains",
-  "/api/check-domain",
-  "/api/deep-search",
-  "/api/brand-palette",
-  "/api/analyze-description",
-  "/api/name-tools",
-  "/api/ai-name-chat",
-  "/api/seo-audit",
-]
+const PROTECTED_API_ROUTES: string[] = []
 
 // Public routes (no auth check needed)
 const PUBLIC_ROUTES = new Set([

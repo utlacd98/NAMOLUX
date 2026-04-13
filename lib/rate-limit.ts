@@ -46,56 +46,60 @@ async function checkProAccess(userId: string): Promise<boolean> {
 }
 
 /**
- * Check if the user has tokens remaining.
- * Free users get 10 tokens total across ALL features.
- * Pro users get unlimited.
+ * Check if the user/visitor has tokens remaining.
+ *
+ * - Pro users → unlimited
+ * - Signed-in free users → 10 total, tracked by user_id AND IP (max of both to prevent abuse)
+ * - Anonymous visitors → 10 total, tracked by IP
  */
 export async function checkRateLimit(
   request: NextRequest,
   _featureType: FeatureType = "domain"
 ): Promise<RateLimitResult> {
+  const ip = getClientIP(request)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    return {
-      allowed: false,
-      isPro: false,
-      userId: null,
-      tokensUsed: 0,
-      tokensTotal: FREE_TOKEN_LIMIT,
-      remaining: 0,
-      plan: "free",
+  // Pro users → unlimited
+  if (user) {
+    const isPro = await checkProAccess(user.id)
+    if (isPro) {
+      return {
+        allowed: true,
+        isPro: true,
+        userId: user.id,
+        tokensUsed: 0,
+        tokensTotal: -1,
+        remaining: -1,
+        plan: "pro",
+      }
     }
   }
 
-  const isPro = await checkProAccess(user.id)
-
-  if (isPro) {
-    return {
-      allowed: true,
-      isPro: true,
-      userId: user.id,
-      tokensUsed: 0,
-      tokensTotal: -1,
-      remaining: -1,
-      plan: "pro",
-    }
-  }
-
-  // Count ALL token usage for this user (no time window, no per-feature split)
-  const { count } = await supabase
+  // Count IP-based usage (always, to prevent abuse across accounts)
+  const { count: ipCount } = await supabase
     .from("generation_logs")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
+    .eq("ip_address", ip)
 
-  const tokensUsed = count || 0
+  let userCount = 0
+  if (user) {
+    const { count } = await supabase
+      .from("generation_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+    userCount = count || 0
+  }
+
+  // Use the higher count — if someone used 8 tokens anonymously then signs up,
+  // they don't get another 10 tokens. IP tracks the device, user_id tracks the account.
+  const tokensUsed = Math.max(ipCount || 0, userCount)
   const remaining = Math.max(0, FREE_TOKEN_LIMIT - tokensUsed)
 
   return {
     allowed: remaining > 0,
     isPro: false,
-    userId: user.id,
+    userId: user?.id || null,
     tokensUsed,
     tokensTotal: FREE_TOKEN_LIMIT,
     remaining,
