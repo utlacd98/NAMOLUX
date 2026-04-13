@@ -38,19 +38,23 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
       if (error) {
         setError(error.message)
+        return
+      }
+
+      if (data.session) {
+        router.push("/generate")
         return
       }
 
