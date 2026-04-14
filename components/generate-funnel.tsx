@@ -623,8 +623,12 @@ function LockedOverlay({
 }) {
   return (
     <div className="relative rounded-xl border border-[#1f1f1f] bg-[#0d0d0d] overflow-hidden mt-2">
-      {/* Blurred locked preview rows */}
-      <div className="pointer-events-none select-none space-y-1.5 p-4 opacity-60" aria-hidden>
+      {/* Blurred preview rows — absolutely positioned decoration behind the CTA,
+          so the CTA can grow naturally on tall mobile viewports without clipping. */}
+      <div
+        className="pointer-events-none select-none absolute inset-x-0 top-0 space-y-1.5 p-4 opacity-40"
+        aria-hidden
+      >
         {lockedResults.slice(0, 4).map((r, i) => (
           <div
             key={`locked-${i}`}
@@ -640,12 +644,14 @@ function LockedOverlay({
         ))}
       </div>
 
-      {/* Foreground CTA */}
+      {/* Foreground CTA — flows naturally so nothing gets cut off on mobile.
+          A stronger bottom-weighted gradient keeps the blurred rows visible
+          up top while ensuring the CTA text sits on a solid background. */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
+        className="relative flex flex-col items-center justify-center text-center px-5 sm:px-6 py-10 sm:py-14"
         style={{
           background:
-            "linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.94) 45%, rgba(10,10,10,0.98) 100%)",
+            "linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.92) 35%, rgba(10,10,10,1) 70%)",
         }}
       >
         <div
@@ -656,21 +662,23 @@ function LockedOverlay({
           {lockedCount} more elite names locked
         </div>
 
-        <h3 className="text-2xl sm:text-3xl font-semibold text-white max-w-lg">
+        <h3 className="text-2xl sm:text-3xl font-semibold text-white max-w-lg leading-tight">
           Unlock your full shortlist
         </h3>
-        <p className="mt-2 text-sm text-[#a5a5a5] max-w-md">
+        <p className="mt-2 text-sm text-[#a5a5a5] max-w-md leading-relaxed">
           Lifetime access to unlimited generation, brand stories, taglines, and colour palettes. No subscription.
         </p>
 
         <button
           onClick={onUnlock}
           disabled={pending}
-          className="mt-6 px-6 py-3.5 rounded-lg font-medium text-black transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2 shadow-lg"
+          className="mt-6 w-full sm:w-auto max-w-sm px-5 sm:px-6 py-3.5 rounded-lg font-medium text-black transition disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 shadow-lg text-sm sm:text-base"
           style={{ background: GOLD }}
         >
-          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
-          {pending ? "Redirecting to checkout..." : "Unlock full results — £15 lifetime access"}
+          {pending ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Lock className="h-4 w-4 shrink-0" />}
+          <span className="whitespace-normal sm:whitespace-nowrap">
+            {pending ? "Redirecting to checkout..." : "Unlock full results — £15 lifetime"}
+          </span>
         </button>
 
         <div
@@ -678,13 +686,15 @@ function LockedOverlay({
           style={{ borderColor: `${GOLD}33`, color: GOLD, background: `${GOLD}0a` }}
         >
           <span
-            className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+            className="inline-block h-1.5 w-1.5 rounded-full animate-pulse shrink-0"
             style={{ background: GOLD }}
           />
           {spotsRemaining}/50 lifetime spots remaining
         </div>
 
-        <p className="mt-3 text-[11px] text-[#555]">One-time payment • instant access • no recurring charges</p>
+        <p className="mt-3 text-[11px] text-[#555] px-2">
+          One-time payment • instant access • no recurring charges
+        </p>
       </div>
     </div>
   )
