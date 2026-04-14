@@ -15,7 +15,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
-import { Loader2, Copy, Check, Lock, Sparkles, ExternalLink, Rocket, Landmark, Gem, Cpu } from "lucide-react"
+import { Loader2, Copy, Check, Lock, Sparkles, Rocket, Landmark, Gem, Cpu } from "lucide-react"
 
 // ─────────────────────────────────────────────────────────────────────────
 // Types
@@ -89,6 +89,7 @@ export function GenerateFunnel() {
   const [isPro, setIsPro] = useState(false)
   const [tokens, setTokens] = useState<{ used: number; total: number; remaining: number } | null>(null)
   const [checkoutPending, setCheckoutPending] = useState(false)
+  const [tokensExhausted, setTokensExhausted] = useState(false)
 
   const [brandExtras, setBrandExtras] = useState<Record<string, BrandExtras>>({})
   const [extrasLoading, setExtrasLoading] = useState<string | null>(null)
@@ -105,11 +106,18 @@ export function GenerateFunnel() {
       .then((data) => {
         if (cancelled) return
         if (data.isPro) setIsPro(true)
-        setTokens({
+        const t = {
           used: Number(data.used ?? 0),
           total: Number(data.total ?? 10),
           remaining: Number(data.remaining ?? 10),
-        })
+        }
+        setTokens(t)
+        // Tokens already exhausted before they generate? Prime the paywall state.
+        if (!data.isPro && t.remaining <= 0) {
+          setTokensExhausted(true)
+          setResults(synthFillers("brand", 12))
+          setIsPreview(false)
+        }
       })
       .catch(() => {})
     return () => {
@@ -127,6 +135,11 @@ export function GenerateFunnel() {
   const generate = useCallback(
     async (opts: { keyword: string; vibe: string; industry?: string }) => {
       if (!opts.keyword.trim() || generating) return
+      // If the user is already out of tokens, don't even hit the API — route them to the paywall
+      if (tokensExhausted && !isPro) {
+        scrollToResults()
+        return
+      }
       setGenerating(true)
       setError(null)
 
@@ -147,7 +160,16 @@ export function GenerateFunnel() {
         const data = await res.json()
 
         if (res.status === 429) {
-          setError(data?.message || "You've used all 10 free tokens. Unlock lifetime access below.")
+          // Token limit hit — flip to exhausted state, render gate with fillers,
+          // and scroll to the unlock CTA so the user sees it immediately.
+          setTokensExhausted(true)
+          setError(null)
+          setTokens((prev) => (prev ? { ...prev, remaining: 0, used: prev.total } : prev))
+          // Use a filler set so the LockedOverlay has something to blur over
+          const fillers = synthFillers(opts.keyword || "brand", 12)
+          setResults(fillers)
+          setIsPreview(false)
+          scrollToResults()
           return
         }
 
@@ -192,7 +214,7 @@ export function GenerateFunnel() {
         setGenerating(false)
       }
     },
-    [generating, scrollToResults]
+    [generating, scrollToResults, tokensExhausted, isPro]
   )
 
   const handlePreset = useCallback(
@@ -264,14 +286,27 @@ export function GenerateFunnel() {
     [brandExtras, extrasLoading, vibe, industry]
   )
 
-  const visibleCount = 3
+  // When the user has exhausted their free tokens, every result goes behind the gate.
+  // Otherwise, the first 3 are visible and the rest are locked.
+  const visibleCount = tokensExhausted && !isPro ? 0 : 3
   const hasMoreLocked = !isPro && !isPreview && results.length > visibleCount
   const lockedCount = hasMoreLocked ? results.length - visibleCount : 0
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Top utility bar — always-visible Advanced mode link */}
+      <div className="max-w-5xl mx-auto px-4 pt-5 flex items-center justify-end gap-3">
+        <Link
+          href="/generate/advanced"
+          className="text-xs text-[#888] hover:text-white transition inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1f1f1f] bg-[#0d0d0d] hover:border-[#2a2a2a]"
+        >
+          <Sparkles className="h-3 w-3" />
+          Advanced mode
+        </Link>
+      </div>
+
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-4 pt-12 pb-8 sm:pt-20">
+      <section className="max-w-5xl mx-auto px-4 pt-6 pb-8 sm:pt-12">
         <div className="text-center">
           <div
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs mb-6 border"
@@ -344,9 +379,14 @@ export function GenerateFunnel() {
           </button>
         </form>
 
-        {tokens && !isPro && (
+        {tokens && !isPro && !tokensExhausted && (
           <p className="mt-3 text-xs text-[#666] text-center">
             {tokens.remaining} of {tokens.total} free generations remaining
+          </p>
+        )}
+        {tokensExhausted && !isPro && (
+          <p className="mt-3 text-xs text-center" style={{ color: GOLD }}>
+            You've used all {tokens?.total ?? 10} free generations — unlock lifetime access below ↓
           </p>
         )}
         {error && (
@@ -424,14 +464,6 @@ export function GenerateFunnel() {
           <TrustTile title="Fresh every session" body="New names generated on demand — never recycled." />
         </div>
 
-        {!isPro && (
-          <div className="mt-10 text-center">
-            <Link href="/generate/advanced" className="text-xs text-[#666] hover:text-white transition inline-flex items-center gap-1">
-              Need more control? Switch to advanced mode
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          </div>
-        )}
       </section>
     </div>
   )
