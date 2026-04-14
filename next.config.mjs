@@ -11,6 +11,33 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7,
   },
   async redirects() {
+    const blogConsolidation = [
+      // Namelix cluster → consolidated 2026 guide
+      ["namelix-vs-namolux", "best-namelix-alternatives-2026"],
+      ["namelix-alternatives", "best-namelix-alternatives-2026"],
+      ["namolux-vs-namelix", "best-namelix-alternatives-2026"],
+      ["10-best-namelix-alternatives-2026", "best-namelix-alternatives-2026"],
+      ["namelix-alternative-namolux", "best-namelix-alternatives-2026"],
+      ["namelix-vs-namolux-2026", "best-namelix-alternatives-2026"],
+      ["why-namelix-fails-brandable-names", "best-namelix-alternatives-2026"],
+      ["best-namelix-alternatives-domain-availability", "best-namelix-alternatives-2026"],
+      ["hidden-problem-ai-name-generators-namelix", "best-namelix-alternatives-2026"],
+      ["namelix-gave-me-100-names-none-usable", "best-namelix-alternatives-2026"],
+      ["stop-using-namelix-smarter-way-business-names", "best-namelix-alternatives-2026"],
+      // Name generator cluster → startup-name-ideas canonical
+      ["business-name-generator-guide", "startup-name-ideas"],
+      ["brand-name-generator", "startup-name-ideas"],
+      ["ai-business-name-generator-startup-guide", "startup-name-ideas"],
+      ["company-name-ideas-generator", "startup-name-ideas"],
+      // .com availability cluster → domain-name-availability-checker-com-guide canonical
+      ["domain-name-availability-strategy", "domain-name-availability-checker-com-guide"],
+      ["free-domain-name-search", "domain-name-availability-checker-com-guide"],
+      ["how-to-get-business-name-available-com", "domain-name-availability-checker-com-guide"],
+      ["find-available-com-domain-2026", "domain-name-availability-checker-com-guide"],
+      // Earlier consolidations (exact-duplicate slug + accidental ChatGPT duplicate)
+      ["chatgpt-for-domain-names-vs-namolux", "namolux-vs-chatgpt-domain-name-generator"],
+    ]
+
     return [
       {
         source: "/:path*",
@@ -18,6 +45,11 @@ const nextConfig = {
         destination: "https://www.namolux.com/:path*",
         permanent: true,
       },
+      ...blogConsolidation.map(([from, to]) => ({
+        source: `/blog/${from}`,
+        destination: `/blog/${to}`,
+        permanent: true,
+      })),
     ]
   },
   async headers() {
