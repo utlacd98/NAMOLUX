@@ -2,50 +2,98 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
 
-const BLOCKED_EXACT_PATHS = new Set([
-  "/wp-login.php",
-  "/wp-admin/setup-config.php",
-  "/wordpress",
-  "/xmlrpc.php",
-  "/index.php",
-  "/administrator",
-  "/administrator/index.php",
-  "/joomla",
-  "/magento",
-  "/phpmyadmin",
-  "/pma",
-  "/myadmin",
-  "/.env",
-  "/.git/config",
-  "/.aws/credentials",
-  "/config.php",
-  "/shell.php",
-  "/wso.php",
-  "/.vscode/sftp.json",
-])
+/**
+ * NamoLux Edge Security Middleware
+ *
+ * Responsibilities (in order):
+ *  1. Drop requests to sensitive file patterns and known attack paths (hard 404).
+ *  2. Gate /admin/* and /api/admin/* behind ADMIN_SECRET (fail closed).
+ *  3. Refresh Supabase auth session.
+ *  4. Enforce auth on user-protected routes.
+ *  5. Apply baseline security headers to every successful response.
+ *
+ * Designed to run on the Vercel Edge runtime — no async I/O in the hot path,
+ * regexes compiled once at module load, early returns on probe traffic.
+ */
 
-// Path prefixes that should always 404 (bot probes)
-const BLOCKED_PREFIXES = [
-  "/wp-admin",
-  "/wp-content",
-  "/wp-includes",
-  "/phpmyadmin",
-  "/wordpress",
-  "/old",
-  "/backup",
-  "/test",
-  "/tmp",
-  "/.well-known/acme-challenge/wp",
+// ─────────────────────────────────────────────────────────────────────────
+// 1. Blocked path patterns — compiled once, evaluated in order
+// ─────────────────────────────────────────────────────────────────────────
+
+const BLOCKED_PATH_PATTERNS: RegExp[] = [
+  // Sensitive file extensions anywhere in the URL
+  /\.(env|sql|log|bak|backup|old|swp|swo|orig|save|dist|cache)(\.|$|\?)/i,
+  /\.(yml|yaml|ini|conf|config|cfg|htaccess|htpasswd)(\.|$|\?)/i,
+  /\.(pem|key|crt|cert|p12|pfx|asc|gpg)(\.|$|\?)/i,
+  /\.(sqlite|sqlite3|db|mdb|accdb)(\.|$|\?)/i,
+  /\.(tar|tgz|gz|zip|rar|7z|iso|dmg)(\.|$|\?)/i,
+  /\.(php|phtml|php3|php4|php5|asp|aspx|jsp|jspx|cgi|pl|sh|bash|py|rb)(\.|$|\?)/i,
+
+  // Hidden/dot files and directories
+  /^\/\.(env|git|aws|ssh|docker|vscode|idea|npmrc|htaccess|DS_Store)/i,
+
+  // WordPress / CMS probes
+  /^\/wp[-_](admin|content|includes|login|config|json)/i,
+  /^\/xmlrpc/i,
+  /^\/wordpress(\/|$)/i,
+  /^\/(joomla|magento|drupal|typo3|prestashop)(\/|$)/i,
+
+  // DB admin tools
+  /^\/(phpmyadmin|pma|myadmin|adminer|dbadmin|mysql|mssql|pgadmin)(\/|$)/i,
+
+  // Shell / backdoor probes
+  /^\/(shell|c99|r57|webshell|eval|cmdshell|filemanager)\./i,
+
+  // Setup / installer probes
+  /^\/(install|setup|upgrade|migrate)(\/|\.php|\.html?)/i,
+
+  // Common backup/staging prefixes bots enumerate
+  /^\/(old|new|tmp|temp|test|beta|dev|staging|backup|backups|archive|\.well-known\/acme-challenge\/wp)(\/|$)/i,
+
+  // Sensitive filename probes (no extension constraint)
+  /^\/(users?|customers?|members?|database|db|dump|export|data|sendgrid|smtp|credentials?|secrets?|config|passwords?)(\.|$)/i,
 ]
 
-// Routes that require user authentication
-const PROTECTED_ROUTES = new Set([
-  "/dashboard",
-  "/account",
+// Exact path blocklist — highest priority, O(1) lookup
+const BLOCKED_EXACT_PATHS = new Set<string>([
+  "/xmlrpc.php",
+  "/wp-login.php",
+  "/wp-admin",
+  "/wordpress",
+  "/administrator",
+  "/.env",
+  "/.env.local",
+  "/.env.production",
+  "/.env.development",
+  "/sendgrid.env",
+  "/users.sql",
+  "/sql.sql",
+  "/dump.sql",
+  "/backup.sql",
+  "/.git/config",
+  "/.git/HEAD",
+  "/.aws/credentials",
+  "/.ssh/id_rsa",
+  "/composer.json",
+  "/composer.lock",
+  "/config.php",
+  "/config.json",
+  "/credentials.json",
+  "/robots.php",
+  "/shell.php",
+  "/wso.php",
+  "/index.php",
 ])
 
-// API routes that require authentication
-const PROTECTED_API_ROUTES: string[] = []
+// ─────────────────────────────────────────────────────────────────────────
+// 2. App routing config
+// ─────────────────────────────────────────────────────────────────────────
+
+const PROTECTED_USER_ROUTES = new Set<string>(["/dashboard", "/account"])
+
+// ─────────────────────────────────────────────────────────────────────────
+// 3. Helpers
+// ─────────────────────────────────────────────────────────────────────────
 
 function normalisePath(pathname: string): string {
   const lowered = pathname.toLowerCase()
@@ -53,115 +101,131 @@ function normalisePath(pathname: string): string {
   return lowered
 }
 
-function isProtectedRoute(path: string): boolean {
-  if (PROTECTED_ROUTES.has(path)) return true
-  for (const apiRoute of PROTECTED_API_ROUTES) {
-    if (path.startsWith(apiRoute)) return true
+function isBlockedPath(path: string): boolean {
+  if (BLOCKED_EXACT_PATHS.has(path)) return true
+  for (const pattern of BLOCKED_PATH_PATTERNS) {
+    if (pattern.test(path)) return true
   }
   return false
 }
 
-// Admin routes (both page and API) require ADMIN_SECRET token
 function isAdminPath(path: string): boolean {
-  return path === "/admin" ||
-         path.startsWith("/admin/") ||
-         path === "/api/admin" ||
-         path.startsWith("/api/admin/")
+  return (
+    path === "/admin" ||
+    path.startsWith("/admin/") ||
+    path === "/api/admin" ||
+    path.startsWith("/api/admin/")
+  )
 }
 
 function hasValidAdminToken(request: NextRequest): boolean {
-  const adminSecret = process.env.ADMIN_SECRET
-  // Fail closed: if ADMIN_SECRET is not set, deny all admin access
-  if (!adminSecret) return false
-
+  const secret = process.env.ADMIN_SECRET
+  if (!secret) return false // fail closed — no env, no access
   const token =
     request.headers.get("x-admin-token") ||
     request.cookies.get("admin_token")?.value ||
     request.nextUrl.searchParams.get("token")
-
-  return token === adminSecret
+  return token === secret
 }
+
+/**
+ * Hard 404 — terminates the request in middleware so Vercel never reaches
+ * any asset handler that could return 206 (partial content) or 304.
+ * `Accept-Ranges: none` + `Cache-Control: no-store` prevents range / caching.
+ */
+function hardNotFound(extraHeaders: Record<string, string> = {}): NextResponse {
+  return new NextResponse("Not Found", {
+    status: 404,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "Accept-Ranges": "none",
+      "X-Content-Type-Options": "nosniff",
+      "X-Robots-Tag": "noindex, nofollow, noarchive",
+      ...extraHeaders,
+    },
+  })
+}
+
+function unauthorizedJson(): NextResponse {
+  return NextResponse.json(
+    { error: "unauthorized" },
+    {
+      status: 401,
+      headers: {
+        "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
+    }
+  )
+}
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("X-Frame-Options", "SAMEORIGIN")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  )
+  response.headers.set("X-DNS-Prefetch-Control", "on")
+
+  // Keep preview deployments out of search indexes
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow")
+  }
+
+  return response
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 4. Middleware entry point
+// ─────────────────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
   const path = normalisePath(request.nextUrl.pathname)
 
-  // Block common WordPress/CMS probe traffic (prefixes)
-  for (const prefix of BLOCKED_PREFIXES) {
-    if (path === prefix || path.startsWith(prefix + "/")) {
-      return new NextResponse("Not Found", { status: 404 })
-    }
+  // (1) Kill probe traffic immediately — no session, no DB, nothing else runs
+  if (isBlockedPath(path)) {
+    return hardNotFound()
   }
 
-  // Block exact-match probes
-  if (BLOCKED_EXACT_PATHS.has(path)) {
-    return new NextResponse("Not Found", { status: 404 })
-  }
-
-  // Block .php, .asp, .jsp, .cgi requests entirely — we're Next.js, nothing legitimate ends in these
-  if (/\.(php|asp|aspx|jsp|cgi)$/i.test(path)) {
-    return new NextResponse("Not Found", { status: 404 })
-  }
-
-  // Admin gate — runs before auth-session update to short-circuit bots
+  // (2) Admin gate (before Supabase session work to short-circuit scanners)
   if (isAdminPath(path)) {
     if (!hasValidAdminToken(request)) {
-      // For API routes, return 401 JSON
-      if (path.startsWith("/api/")) {
-        return NextResponse.json(
-          { error: "unauthorized" },
-          { status: 401, headers: { "X-Robots-Tag": "noindex, nofollow" } }
-        )
-      }
-      // For page routes, return 404 to hide the existence of the admin panel
-      return new NextResponse("Not Found", {
-        status: 404,
-        headers: { "X-Robots-Tag": "noindex, nofollow" },
-      })
+      return path.startsWith("/api/")
+        ? unauthorizedJson()
+        : hardNotFound({ "X-Robots-Tag": "noindex, nofollow" })
     }
   }
 
-  // Update Supabase session (refreshes tokens if needed)
+  // (3) Refresh Supabase auth session and get user
   const { user, supabaseResponse } = await updateSession(request)
 
-  // Check if route requires user authentication
-  if (isProtectedRoute(path)) {
+  // (4) User-auth gate on protected routes
+  if (PROTECTED_USER_ROUTES.has(path)) {
     if (!user) {
-      if (path.startsWith("/api/")) {
-        return NextResponse.json(
-          { error: "unauthorized", message: "Please sign in to continue" },
-          { status: 401 }
-        )
-      }
       const redirectUrl = new URL("/sign-in", request.url)
       redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
       return NextResponse.redirect(redirectUrl)
     }
   }
 
-  // If user is signed in and trying to access auth pages, redirect to generate
+  // (5) Signed-in users shouldn't see auth pages
   if (user && (path === "/sign-in" || path === "/sign-up")) {
     return NextResponse.redirect(new URL("/generate", request.url))
   }
 
-  // On Vercel preview deployments, tell search engines not to index anything.
-  // This prevents bots from crawling preview URLs like *-vercel.app.
-  if (process.env.VERCEL_ENV === "preview") {
-    supabaseResponse.headers.set("X-Robots-Tag", "noindex, nofollow")
-  }
-
-  return supabaseResponse
+  // (6) Apply baseline security headers and return
+  return applySecurityHeaders(supabaseResponse)
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// 5. Matcher — skip genuinely static files so middleware runs only where it matters
+// ─────────────────────────────────────────────────────────────────────────
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - robots.txt, sitemap.xml (SEO files)
-     * - public folder assets
-     */
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|otf|mp4|webm)$).*)",
   ],
 }
