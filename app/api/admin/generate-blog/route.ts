@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 
+// Admin auth — fail closed if ADMIN_SECRET is not set
+function isAdmin(request: NextRequest): boolean {
+  const adminToken = process.env.ADMIN_SECRET
+  if (!adminToken) return false
+  const token = request.headers.get("x-admin-token") ||
+                request.cookies.get("admin_token")?.value ||
+                request.nextUrl.searchParams.get("token")
+  return token === adminToken
+}
+
 let openaiInstance: OpenAI | null = null
 
 function getOpenAI(): OpenAI {
@@ -16,6 +26,10 @@ function getOpenAI(): OpenAI {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isAdmin(request)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+  }
+
   try {
     const { topic, category } = await request.json()
 

@@ -13,10 +13,12 @@ import {
   type GenerateContentRequest 
 } from "@/lib/marketing-agent-engine"
 
-// Admin authentication check
+// Admin authentication check — fail closed if ADMIN_SECRET is not set
 function isAdmin(request: NextRequest): boolean {
-  const adminToken = process.env.ADMIN_SECRET || "namolux-admin-2026"
+  const adminToken = process.env.ADMIN_SECRET
+  if (!adminToken) return false
   const token = request.headers.get("x-admin-token") ||
+                request.cookies.get("admin_token")?.value ||
                 request.nextUrl.searchParams.get("token")
   return token === adminToken
 }
@@ -31,12 +33,11 @@ interface ContentLogEntry {
 const contentLog: ContentLogEntry[] = []
 
 export async function POST(request: NextRequest) {
-  try {
-    // Admin check (optional during development)
-    // if (!isAdmin(request)) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    // }
+  if (!isAdmin(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
 
+  try {
     const body = await request.json()
     const { action, platform, postType, context, commentToReply } = body
 
@@ -153,10 +154,9 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint for fetching content log
 export async function GET(request: NextRequest) {
-  // Optional admin check
-  // if (!isAdmin(request)) {
-  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  // }
+  if (!isAdmin(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
 
   return NextResponse.json({
     success: true,
