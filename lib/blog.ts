@@ -1105,35 +1105,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
   {
-    slug: "building-in-public-guide",
-    title: "Building in Public: How to Grow Your Startup with Transparency",
-    description: "Building in public can accelerate growth, attract customers, and build a loyal community. Here's how to do it without oversharing.",
-    category: "Builder Insights",
-    readTime: 8,
-    publishedAt: "2026-02-25",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Building in public means sharing your startup journey openly — the wins, the losses, the revenue numbers, the lessons. Done right, it's a powerful growth strategy." },
-      { type: "heading", level: 2, content: "Why Build in Public?" },
-      { type: "list", content: "", items: ["Builds trust through transparency", "Creates accountability (you'll ship more)", "Attracts early adopters who root for you", "Generates content without extra effort", "Opens doors to partnerships and press"] },
-      { type: "heading", level: 2, content: "What to Share" },
-      { type: "heading", level: 3, content: "Safe to Share" },
-      { type: "list", content: "", items: ["Revenue milestones (MRR, ARR)", "User growth numbers", "Feature launches and roadmap", "Lessons learned from failures", "Behind-the-scenes of building", "Tech stack and tool choices"] },
-      { type: "heading", level: 3, content: "Be Careful With" },
-      { type: "list", content: "", items: ["Specific customer details (get permission)", "Competitive advantages (don't give away secrets)", "Team conflicts or internal issues", "Unvalidated ideas (competitors might copy)", "Financial struggles (can hurt trust)"] },
-      { type: "callout", calloutType: "warning", content: "Building in public isn't therapy. Share strategically, not emotionally." },
-      { type: "heading", level: 2, content: "Where to Build in Public" },
-      { type: "list", content: "", items: ["Twitter/X — Best for tech and startup audiences", "LinkedIn — Better for B2B and enterprise", "Indie Hackers — Community of builders", "Your own blog — Owned platform, SEO benefits", "YouTube — For longer-form content"] },
-      { type: "heading", level: 2, content: "Content Ideas for Building in Public" },
-      { type: "list", content: "", items: ["Weekly/monthly revenue updates", "Feature launch announcements", "Lessons from customer conversations", "Mistakes and what you learned", "Tool and process recommendations", "Hiring and team updates"] },
-      { type: "heading", level: 2, content: "Building in Public Mistakes" },
-      { type: "list", content: "", items: ["Oversharing personal struggles", "Being negative about competitors", "Sharing so much you don't build", "Inconsistency (start strong, fade out)", "Focusing on vanity metrics"] },
-      { type: "heading", level: 2, content: "Getting Started" },
-      { type: "paragraph", content: "Start small. Share one update per week. As you get comfortable, increase frequency. The key is consistency over intensity." },
-      { type: "callout", calloutType: "cta", content: "Start your public journey with a memorable brand.", ctaLink: "/generate", ctaText: "Generate Your Brand Name →" }
-    ]
-  },
-  {
     slug: "when-to-quit-your-startup",
     title: "When to Quit Your Startup: Signs It's Time to Move On",
     description: "Knowing when to quit is as important as knowing when to persist. Here are the signs that it might be time to shut down or pivot.",
@@ -5819,51 +5790,6 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "Is Bust a Name still worth using?", answer: "For quick availability checks on specific word combinations you've already thought of, yes. For creative name generation when you don't know what you're looking for, NamoLux or a dedicated AI naming tool will produce better results faster." },
       { question: "What if I want compound names specifically?", answer: "NamoLux's 'compound' strategy batch specifically generates two-word compound names. Unlike Bust a Name's exhaustive combination approach, NamoLux selects compounds based on emotional resonance and brand quality — not just what happens to be available." }
-    ]
-  },
-
-  {
-    slug: "chatgpt-for-domain-names-vs-namolux",
-    title: "ChatGPT for Domain Names vs NamoLux: Can Prompting Beat a Dedicated Tool?",
-    description: "Many founders try ChatGPT for startup naming. It's creative — but it can't check availability, score quality, or apply naming frameworks automatically. Here's the real comparison.",
-    category: "Tool Comparisons",
-    readTime: 5,
-    publishedAt: "2026-03-20",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "ChatGPT is genuinely useful for startup naming. It can brainstorm creatively, apply constraints, iterate on feedback, and explain the reasoning behind name suggestions. Many founders have found good names using it. But there's a significant gap between 'ChatGPT suggested this name' and 'this name is actually available and worth using'." },
-      { type: "heading", level: 2, content: "What ChatGPT Gets Right" },
-      { type: "list", content: "", items: ["Creative flexibility: it can apply unusual constraints and angles on demand", "Explanation: it tells you why each name might work", "Iteration speed: you can refine and redirect in real-time conversation", "Range: from serious to playful, technical to consumer, depending on your prompt", "Cost: free (or $20/month for GPT-4 access)"] },
-      { type: "heading", level: 2, content: "What ChatGPT Can't Do" },
-      { type: "paragraph", content: "This is where the gap becomes significant for founders who need a result, not just a brainstorm:" },
-      { type: "list", content: "", items: ["No live domain availability checking — it has no internet access to WHOIS or RDAP in base form", "No Founder Signal™ scoring — it can assess names qualitatively but not score them objectively", "No structured multi-strategy generation — it defaults to whatever pattern feels right without rotation", "No industry example grounding — it doesn't know which naming conventions work in your specific sector", "Prompt engineering overhead — you need to know what to ask to get good output"] },
-      { type: "heading", level: 2, content: "The Prompt Engineering Problem" },
-      { type: "paragraph", content: "Getting great startup names from ChatGPT requires a sophisticated prompt. You need to specify: naming strategy, industry context, vibe, length constraints, anti-patterns to avoid, and quality criteria. A naive prompt ('give me startup names for a productivity app') produces generic output. A well-crafted prompt takes 10-15 minutes to write — and even then, you'll still need to check every suggestion for availability manually." },
-      { type: "callout", calloutType: "tip", content: "NamoLux is essentially the prompt infrastructure already built. The GPT-4o prompts include anti-pattern lists, industry example libraries, naming strategy rotation, and meaning-anchor requirements — all the work of a sophisticated naming prompt, automated." },
-      { type: "table", content: "", headers: ["Feature", "ChatGPT", "NamoLux"], rows: [
-        ["Live domain availability", "❌ No internet access", "✅ RDAP checked in real-time"],
-        ["Quality scoring", "Qualitative only", "✅ Founder Signal™ 0–100"],
-        ["Strategy rotation", "❌ Manual via prompting", "✅ Invented, compound, metaphor, root+suffix"],
-        ["Industry examples", "❌ General knowledge only", "✅ 13 curated industry libraries"],
-        ["Anti-pattern filtering", "❌ Only if prompted explicitly", "✅ Built into every generation"],
-        ["Social handle checking", "❌", "✅ Twitter, IG, TikTok"],
-        ["Time to first result", "2-5 minutes (prompt + iterate)", "Under 60 seconds"],
-        ["Cost", "Free / $20 per month", "Free tier + £15 Pro"],
-      ]},
-      { type: "heading", level: 2, content: "The Recommended Workflow" },
-      { type: "paragraph", content: "Use ChatGPT for early-stage brainstorming when you want to explore unusual angles or have a creative back-and-forth conversation about naming directions. Use NamoLux when you're ready to generate scored, verified candidates with live availability. The two tools complement each other rather than compete directly." },
-      { type: "links", content: "Further Reading", links: [
-        { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
-        { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
-        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
-        { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
-      ]},
-      { type: "callout", calloutType: "cta", content: "Skip the prompt engineering. Get AI-generated names with live availability and Founder Signal™ scoring in under 60 seconds.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
-    ],
-    faqs: [
-      { question: "Can I use ChatGPT plugins or GPT-4 browsing to check availability?", answer: "GPT-4's browsing can check some domain information, but it's inconsistent and not real-time RDAP data. Domain availability changes by the second — you need a live RDAP check, not a cached web page. NamoLux checks availability at the moment of generation." },
-      { question: "Is Claude or Gemini better than ChatGPT for domain naming?", answer: "All frontier models can generate creative names. The differentiator isn't which LLM — it's the prompt infrastructure around it. NamoLux uses GPT-4o with a highly tuned system prompt that includes industry examples, anti-pattern rules, and meaning-anchor requirements. The model matters less than the prompt." },
-      { question: "What if I prefer ChatGPT's name suggestions to NamoLux's?", answer: "Use NamoLux's availability checker on names ChatGPT suggests. This gives you the creative flexibility of open-ended prompting with the accuracy of RDAP availability checking and Founder Signal™ scoring on your chosen candidates." }
     ]
   },
 
