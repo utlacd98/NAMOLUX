@@ -104,39 +104,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
   {
-    slug: "what-real-seo-audit-shows",
-    title: "What a Real SEO Audit Should Show (Most Tools Miss This)",
-    description: "Most SEO audits focus on the wrong things. Here's what actually matters and what to look for in a comprehensive audit.",
-    category: "SEO Foundations",
-    readTime: 8,
-    publishedAt: "2026-01-22",
-    author: "NamoLux Team",
-    featured: true,
-    content: [
-      { type: "paragraph", content: "You've probably run an SEO audit before. Maybe you got a score, a list of errors, and some vague recommendations. But did it actually help you rank better? Most SEO audits miss the things that matter most." },
-      { type: "heading", level: 2, content: "The Problem with Most SEO Audits" },
-      { type: "paragraph", content: "Traditional SEO tools focus on technical issues that sound scary but often don't impact rankings. Missing alt tags? Minor. Duplicate meta descriptions? Usually fine. Meanwhile, they ignore the factors that actually determine whether you rank." },
-      { type: "heading", level: 2, content: "What a Real SEO Audit Should Cover" },
-      { type: "heading", level: 3, content: "1. Content Quality and Relevance" },
-      { type: "paragraph", content: "Is your content actually answering what searchers want? Do you have thin pages that should be consolidated? Are you targeting the right keywords with the right intent?" },
-      { type: "heading", level: 3, content: "2. Technical Foundation" },
-      { type: "list", content: "", items: ["Core Web Vitals (LCP, FID, CLS)", "Mobile usability", "Crawlability and indexation", "Site architecture and internal linking", "HTTPS and security headers"] },
-      { type: "heading", level: 3, content: "3. Authority Signals" },
-      { type: "paragraph", content: "Backlink quality matters more than quantity. A real audit should analyze your link profile, identify toxic links, and compare you to competitors." },
-      { type: "heading", level: 3, content: "4. User Experience" },
-      { type: "paragraph", content: "Google measures how users interact with your site. High bounce rates, low time on page, and poor engagement all signal that your content isn't meeting expectations." },
-      { type: "callout", calloutType: "cta", content: "Get a comprehensive SEO audit that covers what actually matters.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit →" },
-      { type: "heading", level: 2, content: "Red Flags Most Tools Miss" },
-      { type: "list", content: "", items: ["Keyword cannibalization (multiple pages competing for the same term)", "Content decay (old posts losing rankings)", "Orphan pages (no internal links pointing to them)", "Over-optimization (too many exact-match anchors)", "Poor E-E-A-T signals (no author bios, no credentials)"] },
-      { type: "heading", level: 2, content: "How to Use Audit Results" },
-      { type: "paragraph", content: "An audit is only useful if you act on it. Prioritize fixes by impact: focus on issues affecting your most important pages first. Don't chase a perfect score — chase better rankings." },
-      { type: "callout", calloutType: "tip", content: "Start with your top 10 pages by traffic. Fix issues there first, then work down the list." },
-      { type: "heading", level: 2, content: "The NamoLux Approach" },
-      { type: "paragraph", content: "Our SEO audit tool focuses on actionable insights, not vanity metrics. We check security headers, content quality signals, and the technical factors that actually impact rankings." },
-      { type: "callout", calloutType: "cta", content: "See what your site is really missing.", ctaLink: "/seo-audit", ctaText: "Try the NamoLux SEO Audit →" }
-    ]
-  },
-  {
     slug: "why-website-not-ranking",
     title: "Why Your Website Isn't Ranking — Even With Good Content",
     description: "You've written great content but still can't rank. Here are the hidden reasons your site isn't showing up in search.",
@@ -405,40 +372,6 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "Your Technical SEO Action Plan" },
       { type: "paragraph", content: "Start with the basics: Core Web Vitals, mobile experience, and crawlability. Once those are solid, layer in schema markup and security enhancements." },
       { type: "callout", calloutType: "cta", content: "See where your site stands technically.", ctaLink: "/seo-audit", ctaText: "Get Your Free Audit →" }
-    ]
-  },
-  {
-    slug: "keyword-research-for-new-websites",
-    title: "Keyword Research for New Websites: How to Find Winnable Terms",
-    description: "New sites can't compete for high-volume keywords. Here's how to find low-competition terms you can actually rank for.",
-    category: "SEO Foundations",
-    readTime: 8,
-    publishedAt: "2026-02-10",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "You've built a great website, but it's new and has no authority. Targeting 'best CRM software' means competing against Salesforce and HubSpot. You'll lose. Here's a smarter approach." },
-      { type: "heading", level: 2, content: "The New Site Reality" },
-      { type: "paragraph", content: "Domain authority matters. A new site with DA 5 won't outrank established sites with DA 80 for competitive terms — no matter how good your content is. Accept this reality and work with it." },
-      { type: "heading", level: 2, content: "Finding Low-Competition Keywords" },
-      { type: "heading", level: 3, content: "1. Go Long-Tail" },
-      { type: "paragraph", content: "Instead of 'CRM software', target 'CRM software for real estate agents in Texas'. Longer queries have lower volume but much lower competition." },
-      { type: "callout", calloutType: "tip", content: "A keyword with 100 monthly searches that you rank #1 for beats a 10,000-search keyword where you're on page 5." },
-      { type: "heading", level: 3, content: "2. Target Question Keywords" },
-      { type: "paragraph", content: "People ask specific questions. 'How to export contacts from Gmail to Mailchimp' has clear intent and lower competition than 'email marketing'." },
-      { type: "heading", level: 3, content: "3. Find Underserved Niches" },
-      { type: "paragraph", content: "Look for topics where existing content is outdated, thin, or missing. Forums like Reddit are gold mines for finding questions without good answers." },
-      { type: "heading", level: 3, content: "4. Analyze Competitor Gaps" },
-      { type: "paragraph", content: "Use Ahrefs or Semrush to find keywords competitors rank for between positions 11-30. These are terms they haven't prioritized — your opportunity." },
-      { type: "heading", level: 2, content: "Tools for Keyword Research" },
-      { type: "list", content: "", items: ["Google Search Console (what you already rank for)", "Ahrefs/Semrush (competitor analysis, keyword difficulty)", "Answer The Public (question-based keywords)", "Google Autocomplete (real user queries)", "Reddit/Quora (unmet user needs)"] },
-      { type: "heading", level: 2, content: "Evaluating Keyword Opportunity" },
-      { type: "paragraph", content: "For each potential keyword, check:" },
-      { type: "list", content: "", items: ["Search volume (even 50-100/month is worthwhile)", "Keyword difficulty score (aim for KD under 30)", "SERP analysis (can you beat the top 5 results?)", "Business relevance (will this traffic convert?)", "Content gap (can you add unique value?)"] },
-      { type: "heading", level: 2, content: "The Cluster Strategy" },
-      { type: "paragraph", content: "Don't target random keywords. Build topical clusters: a pillar page on a broad topic surrounded by detailed articles on subtopics. This establishes authority and helps all pages rank better." },
-      { type: "callout", calloutType: "cta", content: "Your domain name is part of your SEO strategy.", ctaLink: "/generate", ctaText: "Find a Brandable Domain →" },
-      { type: "heading", level: 2, content: "Patience and Consistency" },
-      { type: "paragraph", content: "SEO for new sites takes 6-12 months to show results. Keep publishing quality content targeting winnable keywords, and authority will compound over time." }
     ]
   },
   {
@@ -822,49 +755,6 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "cta", content: "See how your site scores across all SEO factors.", ctaLink: "/seo-audit", ctaText: "Free SEO Audit →" }
     ]
   },
-  {
-    slug: "validate-startup-idea-before-building",
-    title: "How to Validate Your Startup Idea Before Writing Any Code",
-    description: "Don't build something nobody wants. Here's a step-by-step framework to validate your startup idea before investing time and money.",
-    category: "Builder Insights",
-    readTime: 9,
-    publishedAt: "2026-02-02",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "The startup graveyard is full of products nobody asked for. Before you spend months building, spend days validating. Here's exactly how to do it." },
-      { type: "heading", level: 2, content: "Why Validation Matters" },
-      { type: "paragraph", content: "42% of startups fail because there's no market need. Not because of bad execution, funding, or competition — simply because nobody wanted what they built." },
-      { type: "callout", calloutType: "warning", content: "Building without validation is the most expensive way to learn nobody wants your product." },
-      { type: "heading", level: 2, content: "The Validation Framework" },
-      { type: "paragraph", content: "Follow these steps in order. Each one builds on the last." },
-      { type: "heading", level: 3, content: "Step 1: Define the Problem (Not the Solution)" },
-      { type: "paragraph", content: "Start with the problem, not your idea. Can you articulate the problem in one sentence? Who has this problem? How painful is it?" },
-      { type: "list", content: "", items: ["Write the problem in one clear sentence", "Identify who experiences this problem", "Rate the pain level (annoying vs. urgent)", "Understand how they currently solve it", "Ask: Would they pay to solve this?"] },
-      { type: "heading", level: 3, content: "Step 2: Find Your Target Audience" },
-      { type: "paragraph", content: "You need to talk to real people who have this problem. Not friends and family — actual potential customers." },
-      { type: "list", content: "", items: ["Reddit communities related to the problem", "LinkedIn groups in your target industry", "Twitter/X conversations about the pain point", "Slack and Discord communities", "Local meetups and industry events"] },
-      { type: "heading", level: 3, content: "Step 3: Conduct Problem Interviews" },
-      { type: "paragraph", content: "Talk to 10-20 people who might have this problem. Don't pitch your solution — just understand their pain." },
-      { type: "list", content: "", items: ["Ask about their current workflow", "Understand what frustrates them", "Learn what solutions they've tried", "Find out what they'd pay for a solution", "Listen more than you talk (80/20 rule)"] },
-      { type: "callout", calloutType: "tip", content: "The Mom Test: Ask questions that even your mom couldn't lie to you about. Focus on their past behavior, not future promises." },
-      { type: "heading", level: 3, content: "Step 4: Validate Demand with a Landing Page" },
-      { type: "paragraph", content: "Create a simple landing page that describes your solution. Drive traffic to it and measure interest." },
-      { type: "list", content: "", items: ["Clear headline stating the value proposition", "Brief description of how it works", "Email signup or waitlist form", "Optional: Pre-order or 'notify me' button", "Track signups, not just visits"] },
-      { type: "heading", level: 3, content: "Step 5: Get Pre-Commitments" },
-      { type: "paragraph", content: "The ultimate validation: Will someone pay before you build? This doesn't mean taking money — it means getting commitment." },
-      { type: "list", content: "", items: ["Offer early-bird pricing for waitlist signups", "Ask for a letter of intent from businesses", "Run a crowdfunding campaign", "Sell consulting first, then productize", "Get verbal commitments with specific amounts"] },
-      { type: "heading", level: 2, content: "Red Flags During Validation" },
-      { type: "paragraph", content: "Watch for these warning signs:" },
-      { type: "list", content: "", items: ["'That's interesting' (polite disinterest)", "People won't give you their email", "No one shares your landing page", "Interviews reveal the problem isn't painful", "Everyone loves it but no one will pay"] },
-      { type: "heading", level: 2, content: "Green Flags That Say 'Build It'" },
-      { type: "list", content: "", items: ["People ask when they can buy it", "They share it with others unprompted", "They offer to pay before it exists", "They describe the problem with emotion", "They've already tried (and failed) to solve it"] },
-      { type: "heading", level: 2, content: "Tools for Validation" },
-      { type: "list", content: "", items: ["Landing pages: Carrd, Framer, Webflow", "Email collection: ConvertKit, Buttondown", "Surveys: Typeform, Google Forms", "User interviews: Calendly + Zoom", "Analytics: Plausible, Simple Analytics"] },
-      { type: "heading", level: 2, content: "How Long Should Validation Take?" },
-      { type: "paragraph", content: "Aim for 2-4 weeks of focused validation. If you can't validate in a month, either the problem isn't clear or the audience is too hard to reach." },
-      { type: "callout", calloutType: "cta", content: "Ready to build? Start with a name that scales.", ctaLink: "/generate", ctaText: "Generate Domain Ideas →" }
-    ]
-  },
   // NEW DOMAIN STRATEGY POSTS - BATCH 2
   {
     slug: "international-domain-strategy",
@@ -1071,40 +961,6 @@ export const blogPosts: BlogPost[] = [
   },
   // NEW BUILDER INSIGHTS POSTS - BATCH 2
   {
-    slug: "pricing-your-saas-product",
-    title: "How to Price Your SaaS Product: A Founder's Guide",
-    description: "Pricing is the most important decision you'll make. Here's how to set prices that maximize revenue without leaving money on the table.",
-    category: "Builder Insights",
-    readTime: 9,
-    publishedAt: "2026-02-24",
-    author: "NamoLux Team",
-    featured: true,
-    content: [
-      { type: "paragraph", content: "Most founders underprice their products. They're afraid of charging too much, so they leave money on the table. Here's how to price with confidence." },
-      { type: "heading", level: 2, content: "The Psychology of Pricing" },
-      { type: "paragraph", content: "Price signals value. A $9/month tool feels like a toy. A $99/month tool feels like a serious solution. Often, raising prices increases conversions." },
-      { type: "callout", calloutType: "tip", content: "If no one complains about your pricing, you're probably too cheap." },
-      { type: "heading", level: 2, content: "Pricing Models for SaaS" },
-      { type: "heading", level: 3, content: "Per-Seat Pricing" },
-      { type: "paragraph", content: "Charge per user. Works well when value scales with team size. Examples: Slack, Notion, Figma." },
-      { type: "list", content: "", items: ["Predictable revenue growth", "Easy to understand", "Can limit adoption in large orgs", "Works for collaboration tools"] },
-      { type: "heading", level: 3, content: "Usage-Based Pricing" },
-      { type: "paragraph", content: "Charge based on consumption. Works when usage correlates with value. Examples: AWS, Twilio, Stripe." },
-      { type: "list", content: "", items: ["Aligns cost with value", "Low barrier to start", "Revenue can be unpredictable", "Works for infrastructure and APIs"] },
-      { type: "heading", level: 3, content: "Flat-Rate Pricing" },
-      { type: "paragraph", content: "One price for everything. Simple but leaves money on the table from power users." },
-      { type: "heading", level: 3, content: "Tiered Pricing" },
-      { type: "paragraph", content: "Multiple plans at different price points. Most common model. Captures different customer segments." },
-      { type: "heading", level: 2, content: "How to Set Your Price" },
-      { type: "list", content: "", items: ["Research competitor pricing (but don't copy)", "Calculate your costs and desired margins", "Interview customers about willingness to pay", "Start higher than you think (you can always discount)", "Test different prices with different segments"] },
-      { type: "heading", level: 2, content: "The 10x Rule" },
-      { type: "paragraph", content: "Your product should deliver at least 10x the value of its price. If you charge $100/month, customers should feel they're getting $1,000+ in value." },
-      { type: "heading", level: 2, content: "Common Pricing Mistakes" },
-      { type: "list", content: "", items: ["Pricing based on costs instead of value", "Too many tiers (3-4 is ideal)", "Hiding pricing (reduces trust)", "Not raising prices as you add features", "Offering too-generous free tiers"] },
-      { type: "callout", calloutType: "cta", content: "Start with a name that commands premium pricing.", ctaLink: "/generate", ctaText: "Generate Premium Names →" }
-    ]
-  },
-  {
     slug: "when-to-quit-your-startup",
     title: "When to Quit Your Startup: Signs It's Time to Move On",
     description: "Knowing when to quit is as important as knowing when to persist. Here are the signs that it might be time to shut down or pivot.",
@@ -1143,75 +999,193 @@ export const blogPosts: BlogPost[] = [
   // SERP STACKING - DOMAIN STRATEGY BATCH 3
   {
     slug: "startup-name-ideas",
-    title: "Startup Name Ideas: 50+ Examples and How to Create Your Own",
-    description: "Need startup name ideas? Explore naming patterns from successful startups and learn how to create a memorable name for your new venture.",
+    title: "Startup Name Ideas 2026: 100+ Examples, Naming Patterns & How to Find an Available .com",
+    description: "The definitive guide to startup name ideas in 2026. Proven naming patterns from successful startups, 100+ industry examples, a brainstorming framework, and how to land an available .com without wasting a week.",
+    seoTitle: "100+ Startup Name Ideas 2026 | Naming Patterns & Available .com Guide",
+    metaDescription: "Need startup name ideas? 100+ examples across tech, fintech, SaaS, and ecommerce, plus the naming patterns behind Stripe, Notion, and Linear — and how to find a registrable .com in minutes.",
     category: "Domain Strategy",
-    readTime: 9,
+    readTime: 13,
     publishedAt: "2026-02-28",
     author: "NamoLux Team",
     content: [
-      { type: "paragraph", content: "Every successful startup started with a name. From Google to Stripe to Notion, the right name can become synonymous with an entire category. Here's how to find startup name ideas that stick." },
-      { type: "heading", level: 2, content: "Startup Naming Patterns That Work" },
+      { type: "paragraph", content: "Every successful startup began with a name, and most of them went through dozens of bad ones before arriving at the one that stuck. Stripe was called /dev/payments. Twitter started as twttr. Google was BackRub. If you are staring at a blank document looking for startup name ideas right now, you are in exactly the same place every great founder has been. This guide gives you the patterns, examples, and a practical framework to move from blank page to registered domain in an afternoon." },
+      { type: "paragraph", content: "We cover the four naming patterns that account for most modern startup names, more than a hundred real examples organised by industry, the brainstorming workflow that produces usable shortlists, and the specific problem every 2026 founder hits: finding a name that is actually registrable as a .com. Skim the sections that apply to you, skip the ones that do not." },
+
+      { type: "heading", level: 2, content: "The Four Naming Patterns That Actually Work" },
+      { type: "paragraph", content: "Almost every successful startup name falls into one of four structural patterns. Before brainstorming, pick the one or two that fit your brand. Mixing patterns within a shortlist is fine; mixing them inside a single name almost never is." },
+
       { type: "heading", level: 3, content: "1. Invented Words" },
-      { type: "paragraph", content: "Made-up words that sound natural and are easy to trademark." },
-      { type: "list", content: "", items: ["Spotify — Spot + identify", "Skype — Sky + peer-to-peer", "Zillow — Zillion + pillow", "Hulu — Chinese for 'gourd'", "Etsy — Invented, no meaning"] },
-      { type: "heading", level: 3, content: "2. Real Words, New Context" },
-      { type: "paragraph", content: "Common words used in unexpected ways." },
-      { type: "list", content: "", items: ["Apple — Fruit → Tech company", "Slack — Lazy → Productivity tool", "Discord — Conflict → Community platform", "Notion — Idea → Workspace tool", "Linear — Straight → Project management"] },
+      { type: "paragraph", content: "Made up words that sound natural, are easy to trademark, and carry no prior meaning. This is the most defensible pattern in 2026 because the .com space for real words is saturated and invented names still have headroom." },
+      { type: "list", content: "", items: [
+        "Spotify — Spot + identify",
+        "Skype — Sky + peer to peer",
+        "Zillow — Zillion + pillow",
+        "Hulu — Mandarin for 'gourd'",
+        "Etsy — Invented, no meaning",
+        "Kodak — George Eastman wanted a word starting and ending with K",
+        "Xerox — From 'xerography', the dry copy process",
+        "Venmo — Latin 'vendere' (to sell) shortened",
+        "Twilio — Twil + io, sounds like 'twilight'",
+        "Stripe — Invented, suggests both a credit card stripe and a clean line"
+      ]},
+
+      { type: "heading", level: 3, content: "2. Real Words in New Context" },
+      { type: "paragraph", content: "Common words used in a context no one expected. Works best when there is a subtle thematic link between the literal meaning and the product, but equally well when the word is so unexpected it becomes memorable on its own." },
+      { type: "list", content: "", items: [
+        "Apple — Fruit → computers",
+        "Slack — Lazy → productivity tool",
+        "Discord — Conflict → community platform",
+        "Notion — Idea → workspace",
+        "Linear — Straight line → issue tracker",
+        "Figma — Italian slang for 'cool' → design tool",
+        "Amazon — River → online store",
+        "Square — Shape → payments",
+        "Oracle — Prophet → databases",
+        "Shopify — 'Shop' plus the suffix 'ify'"
+      ]},
+
       { type: "heading", level: 3, content: "3. Compound Words" },
-      { type: "paragraph", content: "Two words combined into one." },
-      { type: "list", content: "", items: ["Facebook — Face + book", "Snapchat — Snap + chat", "Mailchimp — Mail + chimp", "Dropbox — Drop + box", "Coinbase — Coin + base"] },
-      { type: "heading", level: 3, content: "4. Modified Spellings" },
-      { type: "paragraph", content: "Real words with creative spelling changes." },
-      { type: "list", content: "", items: ["Lyft — Lift", "Fiverr — Fiver", "Tumblr — Tumbler", "Flickr — Flicker", "Dribbble — Dribble"] },
+      { type: "paragraph", content: "Two complete words fused into one. The clearest naming pattern when you want the name to telegraph what the product does, but the hardest pattern to find an available .com for in 2026." },
+      { type: "list", content: "", items: [
+        "Facebook — Face + book",
+        "Snapchat — Snap + chat",
+        "Mailchimp — Mail + chimp",
+        "Dropbox — Drop + box",
+        "Coinbase — Coin + base",
+        "YouTube — You + tube",
+        "Instagram — Instant + telegram",
+        "PayPal — Pay + pal",
+        "Airbnb — Air + bed + breakfast",
+        "LinkedIn — Linked + in"
+      ]},
+
+      { type: "heading", level: 3, content: "4. Modified Real Words" },
+      { type: "paragraph", content: "A real word with a small spelling change — usually a dropped vowel or a doubled consonant. Popular in the 2010s, harder to pull off in 2026 without feeling dated." },
+      { type: "list", content: "", items: [
+        "Lyft — Lift",
+        "Fiverr — Fiver",
+        "Tumblr — Tumbler",
+        "Flickr — Flicker",
+        "Dribbble — Dribble",
+        "Grindr — Grinder",
+        "Scribd — Scribed",
+        "Razr — Razor",
+        "Uber — German 'über' (over/above)"
+      ]},
+
       { type: "heading", level: 2, content: "Startup Name Ideas by Industry" },
-      { type: "heading", level: 3, content: "Tech/SaaS Names" },
-      { type: "list", content: "", items: ["Short, punchy names work best", "Consider .io or .ai extensions", "Avoid overly technical terms", "Examples: Vercel, Supabase, Prisma"] },
-      { type: "heading", level: 3, content: "E-commerce Names" },
-      { type: "list", content: "", items: ["Memorable and easy to spell", "Consider the product category", ".com is essential for trust", "Examples: Warby Parker, Allbirds, Glossier"] },
+      { type: "paragraph", content: "Naming conventions differ meaningfully by sector. What works for a consumer app misfires in fintech; what reads as trustworthy in fintech sounds stuffy in a creator tool. Use the section that fits your category." },
+
+      { type: "heading", level: 3, content: "Tech & SaaS Names" },
+      { type: "paragraph", content: "Short, punchy, often invented. Two syllables is the sweet spot. The .com is preferred but .io and .dev are acceptable for developer tools." },
+      { type: "list", content: "", items: [
+        "Notion, Linear, Figma, Stripe, Vercel",
+        "Supabase, Prisma, Retool, Airtable, Superhuman",
+        "Patterns: invented two syllable words; real words in new context; short compounds",
+        "Avoid: overly technical jargon; initialisms; anything containing 'tech' or 'software'"
+      ]},
+
       { type: "heading", level: 3, content: "Fintech Names" },
-      { type: "list", content: "", items: ["Balance trust with innovation", "Avoid overly playful names", "Consider international expansion", "Examples: Stripe, Plaid, Brex"] },
-      { type: "heading", level: 2, content: "How to Brainstorm Startup Names" },
-      { type: "list", content: "", items: ["Write down 50+ keywords related to your business", "Combine words in unexpected ways", "Try removing or adding letters", "Use a thesaurus for alternatives", "Test names with potential customers", "Check domain and trademark availability"] },
-      { type: "callout", calloutType: "cta", content: "Generate unique startup name ideas with AI.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" }
-    ]
+      { type: "paragraph", content: "Balance trust with innovation. Names should sound credible to a regulator and approachable to a consumer. The .com is not optional in this category." },
+      { type: "list", content: "", items: [
+        "Stripe, Plaid, Brex, Ramp, Mercury",
+        "Revolut, Klarna, Chime, Wise, Robinhood",
+        "Patterns: invented words with solid consonants; real word metaphors (Mercury, Ramp); Latin or mythological roots",
+        "Avoid: cryptic Web3 style names; anything playful enough to undermine trust; terms that read as unregulated"
+      ]},
+
+      { type: "heading", level: 3, content: "Ecommerce & Consumer Names" },
+      { type: "paragraph", content: "Memorable, pronounceable on first hearing, and easy to spell after hearing it once. The .com is essential for trust and for direct navigation from podcast and TV ads." },
+      { type: "list", content: "", items: [
+        "Warby Parker, Allbirds, Glossier, Casper, Away",
+        "Bombas, Rothy's, Outdoor Voices, Brooklinen, Parade",
+        "Patterns: two word founder style names; invented soft sounding words; single real words with lifestyle connotations",
+        "Avoid: spellings people will mistype; jokes that require explanation; names that pin you to one product category if you plan to expand"
+      ]},
+
+      { type: "heading", level: 3, content: "AI & Developer Tool Names" },
+      { type: "paragraph", content: "Short invented words, often with classical roots. The .ai extension is widely accepted in this category but the .com still commands more trust for anything aimed at enterprise buyers." },
+      { type: "list", content: "", items: [
+        "Anthropic, Perplexity, Cursor, Replit, Hugging Face",
+        "Cohere, Mistral, Pinecone, Weaviate, Modal",
+        "Patterns: Latin or Greek roots; concrete nouns with scientific connotation; invented words that sound like they could be research terms",
+        "Avoid: generic 'AI' prefixes and suffixes; anything that will date in two years"
+      ]},
+
+      { type: "heading", level: 3, content: "Creator & Community Names" },
+      { type: "paragraph", content: "Warmer, softer, often human sounding. The name should feel welcoming rather than enterprise. Short is still better but two word names work more often here than in pure SaaS." },
+      { type: "list", content: "", items: [
+        "Substack, Beehiiv, Gumroad, Patreon, Ko-fi",
+        "Discord, Circle, Mighty Networks, Geneva, Polywork",
+        "Patterns: concrete nouns with social connotation; compound words; short invented words with soft consonants",
+        "Avoid: anything that sounds like a B2B SaaS product; overly clever spellings"
+      ]},
+
+      { type: "heading", level: 2, content: "A Brainstorming Framework That Produces Usable Lists" },
+      { type: "paragraph", content: "Most founders sit down to brainstorm startup name ideas and produce a list of thirty names, twenty eight of which are unusable and two of which are already registered. The workflow below fixes that. It is deliberately structured because unstructured brainstorming converges too fast and too narrowly." },
+      { type: "list", content: "", items: [
+        "Step 1 — Write a one sentence positioning. What the product does, who it is for, and what it is competing with. Every naming decision ladders back to this sentence.",
+        "Step 2 — Generate 50 root keywords across three categories: what the product does, what the customer feels when using it, and the metaphor it evokes. Do not filter yet.",
+        "Step 3 — Apply the four naming patterns to each root. Invent, compound, borrow, modify. You will have 150 plus candidates at this stage. That is correct.",
+        "Step 4 — Score for pronounceability, memorability, length (aim for 5 to 9 characters), and whether it reads cleanly in lowercase URL form. Drop anything that fails on any axis.",
+        "Step 5 — Check the .com on your top 30. Most will be taken. That is also correct.",
+        "Step 6 — Take the 10 strongest surviving candidates to three people who resemble your target customer. Ask what they think the company does. Two out of three agreeing is a pass.",
+        "Step 7 — Register the same day. Good names are registered by other people within hours."
+      ]},
+
+      { type: "callout", calloutType: "cta", content: "Skip steps 2 through 5. Generate scored, availability checked startup name ideas in seconds with NamoLux.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+
+      { type: "heading", level: 2, content: "The 2026 Problem: Finding a Name That Is Actually Registrable" },
+      { type: "paragraph", content: "The hard part of startup naming in 2026 is not creativity. It is verification. You can brainstorm a hundred names in an hour; finding one with an available .com takes most founders a full day of clicking between a registrar and a thesaurus. The .com market is more saturated than ever, squatters have automated the most obvious invented words, and AI name generators have trained an entire cohort of founders to converge on the same narrow phonetic zones." },
+      { type: "paragraph", content: "The practical answer is to generate and verify in a single pass. A scored generator that checks .com availability on every result collapses the brainstorm and verification steps into one ten minute session, and because it scores each name you skip the exhausting work of evaluating fifty unranked candidates. Tools that only produce unranked walls of suggestions are increasingly a step backwards in a market this saturated." },
+
+      { type: "heading", level: 2, content: "Compare the Patterns Side by Side" },
+      { type: "table", content: "", headers: ["Pattern", "Best for", "Typical length", ".com difficulty in 2026", "Trademark defensibility"], rows: [
+        ["Invented words", "Tech, SaaS, AI, fintech", "5–8 characters", "Moderate — best remaining headroom", "High"],
+        ["Real words, new context", "Consumer, creator tools, design", "4–7 characters", "Hard — most short real words are registered", "Moderate"],
+        ["Compound words", "B2B tools where clarity matters", "7–12 characters", "Very hard — few good pairs left free", "Moderate"],
+        ["Modified real words", "Legacy/established categories", "4–7 characters", "Hard and feels dated", "Low to moderate"],
+      ]},
+
+      { type: "heading", level: 2, content: "Common Mistakes Founders Make" },
+      { type: "list", content: "", items: [
+        "Falling in love with a name before checking the .com. Emotional attachment to a taken name costs you days of wishful rework.",
+        "Picking a name that pins you to a single product category. If you might expand, avoid names that read as one specific thing.",
+        "Overweighting the feedback of co founders who were in the brainstorm. They are too close. External testers are the signal.",
+        "Choosing clever spellings that require explanation. If you have to spell it twice on a podcast, it is the wrong name.",
+        "Settling for a .io or .ai because the .com is taken, when a small shift in the name would get you a clean .com. The extension almost always outweighs the exact word.",
+        "Picking a name that is hard to say out loud. Podcasts, YouTube, and word of mouth are your distribution — if the name does not survive a spoken introduction, it will hurt you for years."
+      ]},
+
+      { type: "heading", level: 2, content: "A Quick Checklist Before You Register" },
+      { type: "list", content: "", items: [
+        "The .com is available right now and you can register it today",
+        "Under 10 characters, ideally 5 to 8",
+        "Pronounceable on first hearing by someone who has not seen it written",
+        "Readable in plain lowercase URL form without ambiguity",
+        "No trademark collision in your category (quick USPTO and EUIPO search)",
+        "Primary social handles at least workable, even if not identical",
+        "Does not pin you to a single product category unless you are certain that is your focus",
+        "Two out of three external testers correctly guess what the company does"
+      ]},
+
+      { type: "heading", level: 2, content: "The Bottom Line" },
+      { type: "paragraph", content: "Great startup name ideas are not found by sitting down and waiting for inspiration. They come from working through the four patterns against a clear positioning brief, generating volume, scoring hard, verifying availability at the point of generation, and testing the survivors with real people. The founders who finish this workflow in an afternoon are not more creative than the ones who take a week. They just refuse to separate the brainstorm from the verification." },
+      { type: "paragraph", content: "If you want the fastest version of that workflow, use a scored generator that produces names across all four patterns and verifies the .com live on every result. If you want to do it by hand, the framework above works — it is just slower. Either way, do not settle, do not pin yourself to a category, and do not fall for a name you cannot register." },
+
+      { type: "callout", calloutType: "cta", content: "Stop scrolling unranked name lists. Generate scored, availability checked startup name ideas in seconds.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+    ],
+    faqs: [
+      { question: "What makes a good startup name in 2026?", answer: "A good startup name in 2026 is short (five to nine characters), pronounceable on first hearing, registrable as a .com, and broad enough to survive a product pivot. The strongest pattern today is invented words with clear phonetics, because real words and obvious compounds are mostly taken. Trademark defensibility and clean URL form in lowercase matter more than cleverness." },
+      { question: "Where can I find startup name ideas for free?", answer: "Use a scored AI generator that checks .com availability live. NamoLux's free tier generates brandable names across invented, compound, metaphor, and real word patterns, scores each one with a Founder Signal rating, and confirms .com availability at the moment of generation — all at no cost. This collapses the brainstorm and verification steps into a single ten minute session instead of a full day." },
+      { question: "How do I come up with a unique name for my startup?", answer: "Work through a structured brainstorm: write a one sentence positioning, generate fifty root keywords across three themes (what the product does, what the customer feels, and the metaphor), then apply the four naming patterns (invented, real word in new context, compound, modified) to each root. You will have 150 plus candidates — score them for pronounceability, length, and URL form, then verify the .com on your top 30. Unique names come from volume plus structured scoring, not from waiting for inspiration." },
+      { question: "Should my startup name describe what I do?", answer: "Usually no. Descriptive names box you into a category and are almost always taken as .coms in 2026. Google is not a searchable verb; Apple is not a fruit seller; Stripe does not describe payments. A slightly abstract name gives you room to expand the product and more chance of finding an available .com. Descriptive names work for local services and some ecommerce niches — not for software." },
+      { question: "How long should a startup name be?", answer: "Five to nine characters is the sweet spot. Shorter names are more memorable but almost impossible to register as .coms in 2026. Longer names work if they are easy to type and pronounce, but each extra character increases the chance someone will mistype the URL. If you go past ten characters, the name needs a very good reason — typically a clear compound that reads unambiguously." },
+      { question: "What is the best startup name generator?", answer: "The best generator depends on what you need. For AI generated brandable names with live .com availability and quality scoring, NamoLux is the default recommendation in 2026. For descriptive two word domains with guaranteed availability, Lean Domain Search is useful. For curated premium names you can buy outright, Squadhelp or Novanym. Most founders use a scored generator first and fall back to a marketplace only if no generated name resonates." },
+      { question: "How do I know if my startup name idea is already taken?", answer: "Check three things: the .com (via a live registry checker, not guess work), trademark databases (USPTO for the United States, EUIPO for Europe, and your target market's equivalent), and the primary social handles you care about. If the .com is taken but the name is not a registered trademark, you can sometimes negotiate — but for most founders it is faster to pick a different name than to buy a taken domain. Scored generators that check .com availability live save the most time here." },
+    ],
   },
   // SERP STACKING - SEO FOUNDATIONS BATCH 3
-  {
-    slug: "website-seo-checker",
-    title: "Website SEO Checker: How to Audit Your Site for Free",
-    description: "Use a website SEO checker to find issues hurting your rankings. Learn what to look for and how to fix common SEO problems.",
-    category: "SEO Foundations",
-    readTime: 8,
-    publishedAt: "2026-02-27",
-    author: "NamoLux Team",
-    featured: true,
-    content: [
-      { type: "paragraph", content: "A website SEO checker analyzes your site for issues that could be hurting your search rankings. Regular SEO audits help you catch problems before they tank your traffic." },
-      { type: "heading", level: 2, content: "What Does a Website SEO Checker Analyze?" },
-      { type: "paragraph", content: "A comprehensive SEO checker looks at multiple factors that affect your rankings:" },
-      { type: "list", content: "", items: ["Technical SEO: Crawlability, indexing, site speed", "On-page SEO: Title tags, meta descriptions, headings", "Content quality: Thin content, duplicate content, keyword usage", "Mobile-friendliness: Responsive design, mobile usability", "Security: HTTPS, security headers", "Core Web Vitals: LCP, INP, CLS scores"] },
-      { type: "heading", level: 2, content: "Key SEO Issues to Check" },
-      { type: "heading", level: 3, content: "1. Missing or Duplicate Title Tags" },
-      { type: "paragraph", content: "Every page needs a unique title tag between 30-60 characters. Duplicate titles confuse search engines about which page to rank." },
-      { type: "heading", level: 3, content: "2. Missing Meta Descriptions" },
-      { type: "paragraph", content: "Meta descriptions don't directly affect rankings, but they impact click-through rates. Aim for 120-160 characters that compel users to click." },
-      { type: "heading", level: 3, content: "3. Broken Links" },
-      { type: "paragraph", content: "404 errors frustrate users and waste crawl budget. Regularly check for and fix broken internal and external links." },
-      { type: "heading", level: 3, content: "4. Slow Page Speed" },
-      { type: "paragraph", content: "Page speed is a ranking factor. If your pages take more than 3 seconds to load, you're losing both rankings and conversions." },
-      { type: "callout", calloutType: "tip", content: "Run your SEO check monthly. Issues can creep in as you add content and make changes." },
-      { type: "heading", level: 3, content: "5. Missing Alt Text" },
-      { type: "paragraph", content: "Images without alt text are invisible to search engines. Add descriptive alt text to help with image search and accessibility." },
-      { type: "heading", level: 3, content: "6. No HTTPS" },
-      { type: "paragraph", content: "Google has confirmed HTTPS is a ranking signal. If you're still on HTTP, you're hurting your rankings and user trust." },
-      { type: "heading", level: 2, content: "Free SEO Checker Tools" },
-      { type: "list", content: "", items: ["Google Search Console — Free, essential for every site", "Google PageSpeed Insights — Core Web Vitals analysis", "Bing Webmaster Tools — Additional search engine data", "Lighthouse — Built into Chrome DevTools", "NamoLux SEO Audit — Quick, comprehensive checks"] },
-      { type: "heading", level: 2, content: "How to Fix Common SEO Issues" },
-      { type: "list", content: "", items: ["Title tags: Write unique, keyword-rich titles for each page", "Meta descriptions: Craft compelling descriptions with CTAs", "Broken links: Redirect or remove broken URLs", "Page speed: Compress images, minimize JavaScript, use CDN", "Alt text: Add descriptive text to all images", "HTTPS: Install SSL certificate (free with Let's Encrypt)"] },
-      { type: "callout", calloutType: "cta", content: "Check your website's SEO health in seconds.", ctaLink: "/seo-audit", ctaText: "Run Free SEO Audit →" }
-    ]
-  },
   {
     slug: "seo-audit-tool-guide",
     title: "SEO Audit Tool: Complete Guide to Analyzing Your Website",
@@ -1242,48 +1216,6 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Not all issues are equal. Prioritize based on:" },
       { type: "list", content: "", items: ["Impact: How much will fixing this improve rankings?", "Effort: How difficult is the fix?", "Quick wins: High impact, low effort items first", "Critical issues: Security, indexation, major errors"] },
       { type: "callout", calloutType: "cta", content: "Get a quick SEO health check for your website.", ctaLink: "/seo-audit", ctaText: "Free SEO Audit Tool →" }
-    ]
-  },
-  {
-    slug: "technical-seo-guide",
-    title: "Technical SEO Guide: Everything You Need to Know",
-    description: "Master technical SEO with this comprehensive guide. Learn crawling, indexing, site speed, and more to build a search-friendly website.",
-    category: "SEO Foundations",
-    readTime: 12,
-    publishedAt: "2026-03-01",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Technical SEO is the foundation of search visibility. Without it, even the best content won't rank. This guide covers everything you need to know about technical SEO." },
-      { type: "heading", level: 2, content: "What Is Technical SEO?" },
-      { type: "paragraph", content: "Technical SEO refers to optimizations that help search engines crawl, index, and render your website. It's the infrastructure that supports your content." },
-      { type: "heading", level: 2, content: "Crawling and Indexing" },
-      { type: "heading", level: 3, content: "How Search Engines Crawl" },
-      { type: "paragraph", content: "Search engines use bots (crawlers) to discover and download pages. They follow links from page to page, building a map of your site." },
-      { type: "list", content: "", items: ["Googlebot crawls your site regularly", "Crawl budget limits how many pages are crawled", "Internal links help crawlers discover pages", "Robots.txt controls what can be crawled"] },
-      { type: "heading", level: 3, content: "Controlling Indexation" },
-      { type: "paragraph", content: "Not every page should be indexed. Use these tools to control what appears in search results:" },
-      { type: "list", content: "", items: ["Robots.txt: Block crawling (but not indexing)", "Noindex meta tag: Prevent indexing", "Canonical tags: Specify preferred version", "XML sitemap: Guide crawlers to important pages"] },
-      { type: "callout", calloutType: "tip", content: "Use Google Search Console's URL Inspection tool to see how Google views any page on your site." },
-      { type: "heading", level: 2, content: "Site Architecture" },
-      { type: "paragraph", content: "Good site architecture helps users and search engines navigate your content." },
-      { type: "list", content: "", items: ["Flat structure: Important pages within 3 clicks of homepage", "Logical hierarchy: Categories → Subcategories → Pages", "Breadcrumbs: Help users understand location", "Internal linking: Connect related content", "URL structure: Clean, descriptive, hierarchical"] },
-      { type: "heading", level: 2, content: "Site Speed Optimization" },
-      { type: "paragraph", content: "Page speed is a confirmed ranking factor. Here's how to optimize:" },
-      { type: "heading", level: 3, content: "Image Optimization" },
-      { type: "list", content: "", items: ["Use modern formats (WebP, AVIF)", "Compress images without quality loss", "Specify dimensions to prevent layout shift", "Lazy load below-the-fold images"] },
-      { type: "heading", level: 3, content: "Code Optimization" },
-      { type: "list", content: "", items: ["Minify CSS and JavaScript", "Remove unused code", "Defer non-critical JavaScript", "Inline critical CSS"] },
-      { type: "heading", level: 3, content: "Server Optimization" },
-      { type: "list", content: "", items: ["Use a CDN for global delivery", "Enable compression (Gzip/Brotli)", "Implement caching headers", "Optimize server response time"] },
-      { type: "heading", level: 2, content: "Mobile-First Indexing" },
-      { type: "paragraph", content: "Google uses the mobile version of your site for indexing and ranking. Ensure your mobile site:" },
-      { type: "list", content: "", items: ["Has the same content as desktop", "Loads quickly on mobile networks", "Is fully functional on touch devices", "Has readable text without zooming"] },
-      { type: "heading", level: 2, content: "Structured Data" },
-      { type: "paragraph", content: "Schema markup helps search engines understand your content and can enable rich results." },
-      { type: "list", content: "", items: ["Article schema for blog posts", "Product schema for e-commerce", "FAQ schema for question pages", "Organization schema for your business", "Breadcrumb schema for navigation"] },
-      { type: "heading", level: 2, content: "Security" },
-      { type: "list", content: "", items: ["HTTPS is required (ranking factor)", "Security headers protect against attacks", "Regular security audits prevent issues", "Keep CMS and plugins updated"] },
-      { type: "callout", calloutType: "cta", content: "Check your site's technical SEO health.", ctaLink: "/seo-audit", ctaText: "Run Technical SEO Audit →" }
     ]
   },
   // SERP STACKING - BUILDER INSIGHTS BATCH 3
@@ -1554,27 +1486,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
   {
-    slug: "pricing-new-saas",
-    title: "Pricing a New SaaS: A Practical First-Price Strategy",
-    description: "How to set your first price when you have no data, with simple tiers, validation tactics, and adjustment rules.",
-    category: "Builder Insights",
-    readTime: 7,
-    publishedAt: "2026-02-11",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Pricing feels risky when you are new. The goal is not a perfect price on day one, but a price you can learn from quickly." },
-      { type: "heading", level: 2, content: "Start With a Value Band" },
-      { type: "paragraph", content: "Estimate the value you create per month for a customer, then price at 5-10 percent of that value." },
-      { type: "heading", level: 2, content: "Pick 1-2 Simple Tiers" },
-      { type: "list", content: "", items: ["Starter plan for individuals or small teams", "Pro plan with your core value unlocked", "Avoid complex add-ons at the start"] },
-      { type: "heading", level: 2, content: "Validate With Conversations" },
-      { type: "paragraph", content: "Ask prospects whether the price feels low, fair, or high. Track drop-off points during onboarding and trials." },
-      { type: "heading", level: 2, content: "When to Change Price" },
-      { type: "list", content: "", items: ["If conversion is high and churn is low, test a small increase", "If deals stall at checkout, simplify or lower the entry price", "Review every 6-8 weeks early on"] },
-      { type: "callout", calloutType: "tip", content: "Announce price changes with clear benefits. Customers accept increases when value is obvious." }
-    ]
-  },
-  {
     slug: "launch-checklist-first-product",
     title: "Launch Checklist for Your First Product",
     description: "A pre-launch checklist for first-time founders covering positioning, onboarding, analytics, and a smooth release.",
@@ -1663,27 +1574,6 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Link to your pricing page", "Link to a product or features page", "Link to a key blog post"] },
       { type: "callout", calloutType: "tip", content: "A single well-structured page can rank if it is the best answer for the query." },
       { type: "callout", calloutType: "cta", content: "Find on-page issues quickly.", ctaLink: "/seo-audit", ctaText: "Run a Free SEO Audit ->" }
-    ]
-  },
-  {
-    slug: "site-speed-priorities-2026",
-    title: "Site Speed Priorities in 2026: What Actually Moves Rankings",
-    description: "Focus on the fixes that improve real user metrics and search.",
-    category: "SEO Foundations",
-    readTime: 6,
-    publishedAt: "2026-02-17",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Speed matters, but not every optimization is worth your time. Focus on the changes that move Core Web Vitals." },
-      { type: "heading", level: 2, content: "The Only Metrics That Matter" },
-      { type: "list", content: "", items: ["Largest Contentful Paint (LCP)", "Interaction to Next Paint (INP)", "Cumulative Layout Shift (CLS)"] },
-      { type: "heading", level: 2, content: "High-Impact Fixes" },
-      { type: "list", content: "", items: ["Optimize hero images and fonts", "Remove heavy third-party scripts", "Use server-side rendering for key pages", "Cache aggressively at the edge"] },
-      { type: "heading", level: 2, content: "Low-Impact Fixes" },
-      { type: "list", content: "", items: ["Chasing a 100 Lighthouse score", "Micro-optimizing unused routes", "Over-compressing images until quality drops"] },
-      { type: "heading", level: 2, content: "A Simple Speed Checklist" },
-      { type: "list", content: "", items: ["Hero image under 200 KB", "Fonts loaded with swap", "Fewer than 3 third-party scripts", "CLS under 0.1 on mobile"] },
-      { type: "callout", calloutType: "cta", content: "Find speed issues holding you back.", ctaLink: "/seo-audit", ctaText: "Check Site Performance ->" }
     ]
   },
   {
@@ -1799,80 +1689,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
   {
-    slug: "best-ai-domain-name-generators",
-    title: "Best AI domain name generators in 2026",
-    description: "A practical, neutral comparison of real domain naming tools and where each one fits.",
-    seoTitle: "Best AI Domain Name Generators (2026) \u2014 Compared",
-    metaDescription: "Compare the best AI domain name generators in 2026, including NamoLux, Namelix and Lean Domain Search, with availability checks, pros, cons and notes.",
-    category: "Domain Strategy",
-    readTime: 10,
-    publishedAt: "2026-02-23",
-    author: "NamoLux Team",
-    content: [
-      { type: "buttonCta", content: "If you want an availability-first workflow with scoring and export, start here.", ctaLink: "/generate", ctaText: "Try NamoLux free" },
-      { type: "paragraph", content: "Choosing a domain tool is less about flashy ideas and more about fit. You need names that are brandable, easy to say, and available to register without extra friction." },
-      { type: "paragraph", content: "Below is a practical comparison of widely used, real tools in 2026. The goal is to help you pick the right workflow for your stage, budget and naming style." },
-      { type: "heading", level: 2, content: "Comparison table" },
-      {
-        type: "table",
-        content: "",
-        headers: ["Tool", "Best for", "Availability checking", "Notes"],
-        rows: [
-          ["NamoLux", "Founders who want brandability plus scoring", "Yes, availability-first flow", "Includes Founder Signal(TM), shortlist/export and vibe modes"],
-          ["Namelix", "Quick AI name ideas", "Limited or indirect", "Strong ideation UI; registration depends on downstream provider"],
-          ["Lean Domain Search", "Fast keyword-based .com discovery", "Yes, .com-focused", "Great for simple combinations; less depth on brand scoring"],
-          ["NameSnack", "AI suggestions with broad style variety", "Yes", "Useful for brainstorming; quality varies by prompt/theme"],
-          ["BrandBucket", "Buying premium, curated brand domains", "Marketplace inventory", "Not a generator-first workflow; good if budget is available"],
-          ["Squadhelp", "Brand naming plus premium marketplace options", "Marketplace and assisted checks", "Includes naming contests/services alongside domains"],
-          ["GoDaddy domain search", "Direct registration and bulk lookup", "Yes", "Strong registrar tooling; less guidance on brand quality"]
-        ]
-      },
-      { type: "heading", level: 2, content: "Pros and cons at a glance" },
-      { type: "heading", level: 3, content: "NamoLux" },
-      { type: "list", content: "", items: ["Pro: Availability-first output reduces wasted shortlisting time", "Pro: Founder Signal(TM) scoring adds structured decision support", "Con: Smaller feature surface than broad registrar suites"] },
-      { type: "heading", level: 3, content: "Namelix" },
-      { type: "list", content: "", items: ["Pro: Fast AI ideation with many naming patterns", "Con: Availability workflow is not the main strength"] },
-      { type: "heading", level: 3, content: "Lean Domain Search" },
-      { type: "list", content: "", items: ["Pro: Useful for quick .com combinations", "Con: Limited to a narrower style of generated names"] },
-      { type: "heading", level: 3, content: "NameSnack" },
-      { type: "list", content: "", items: ["Pro: Flexible for early brainstorming", "Con: Output quality can be uneven across categories"] },
-      { type: "heading", level: 3, content: "BrandBucket" },
-      { type: "list", content: "", items: ["Pro: Curated premium names can save time", "Con: Marketplace pricing is often higher than hand registration"] },
-      { type: "heading", level: 3, content: "Squadhelp" },
-      { type: "list", content: "", items: ["Pro: Useful when you want naming support plus domain options", "Con: Can feel heavier than a simple DIY naming tool"] },
-      { type: "heading", level: 3, content: "GoDaddy domain search" },
-      { type: "list", content: "", items: ["Pro: Reliable registration path and bulk search", "Con: Discovery and brand scoring depth is limited"] },
-      { type: "heading", level: 2, content: "Where NamoLux is different" },
-      { type: "paragraph", content: "NamoLux is designed for founders who care about both naming quality and execution speed. Instead of generating big lists first and checking later, it keeps availability central throughout the process." },
-      { type: "list", content: "", items: ["Availability-first suggestions", "Founder Signal(TM) scoring", "Shortlist and export for team review", "Vibe modes for controlled creative direction"] },
-      { type: "heading", level: 2, content: "Choosing the right tool" },
-      { type: "list", content: "", items: ["If you already know your keywords and just need quick .com options, start with Lean Domain Search", "If you want premium inventory and budget is available, review BrandBucket or Squadhelp", "If you want AI ideation plus practical filters and scoring in one place, NamoLux is the better fit"] },
-      { type: "buttonCta", content: "Run your own shortlist and compare options in minutes.", ctaLink: "/generate", ctaText: "Try NamoLux free" }
-    ],
-    faqs: [
-      {
-        question: "What is the best AI domain name generator in 2026?",
-        answer: "It depends on your workflow. If you want availability-first suggestions with scoring and export, NamoLux is a strong choice. If you prefer premium marketplace buying, BrandBucket or Squadhelp may suit better."
-      },
-      {
-        question: "Is Namelix still worth using in 2026?",
-        answer: "Yes. Namelix remains useful for quick ideation and creative naming directions. Many teams still pair it with separate availability checks and shortlist validation."
-      },
-      {
-        question: "Do I need a .com domain for a new startup?",
-        answer: "Not always, but .com is usually the easiest extension for trust and recall. If your audience is technical, alternatives like .io can still work well."
-      },
-      {
-        question: "How should I evaluate domain name options quickly?",
-        answer: "Use a simple process: check availability first, shortlist the best candidates, run pronunciation and memorability checks, then score each option for brand fit and risk."
-      },
-      {
-        question: "What makes NamoLux different from a registrar search tool?",
-        answer: "Registrar search tools focus on registration. NamoLux focuses on decision quality before registration, using availability-first suggestions, Founder Signal(TM) scoring and shortlist export."
-      }
-    ]
-  },
-  {
     slug: "domain-name-availability-checker-com-guide",
     title: "Domain Name Availability Checker: Find an Available .com Faster",
     description: "A practical guide to checking .com availability, filtering weak options, and securing a strong domain without wasting time.",
@@ -1935,94 +1751,9 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "If a domain feels clever but is difficult to say once, it is usually not the right choice." }
     ]
   },
-  {
-    slug: "topical-authority-seo-plan-for-new-websites",
-    title: "Topical Authority SEO for New Websites: A 90-Day Plan That Actually Works",
-    description: "Build topical authority with a clear 90-day SEO plan for new websites, including keyword clustering, internal links, and search intent mapping.",
-    seoTitle: "Topical Authority SEO Plan: 90 Days for New Websites",
-    metaDescription: "Follow this 90-day topical authority SEO plan to map search intent, build keyword clusters, and improve rankings with smarter internal linking.",
-    category: "SEO Foundations",
-    readTime: 9,
-    publishedAt: "2026-02-27",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Topical authority SEO is one of the most practical ways for new websites to compete. Instead of publishing isolated posts, you build a structured cluster around one core topic and prove depth over time." },
-      { type: "heading", level: 2, content: "Why topical authority beats random publishing" },
-      { type: "paragraph", content: "Random posts dilute focus. A topical cluster improves relevance signals, strengthens internal linking, and makes crawling easier for search engines." },
-      { type: "heading", level: 2, content: "Days 1-15: map intent and build your keyword clusters" },
-      { type: "list", content: "", items: ["Choose one primary topic linked to commercial value", "Group supporting keywords by search intent", "Assign one pillar page plus 6 to 10 supporting articles", "Define clear on-page goals for each page"] },
-      { type: "heading", level: 2, content: "Days 16-45: publish the pillar and core supporting pages" },
-      { type: "paragraph", content: "Start with one high-quality pillar page, then publish supporting pages in a tight sequence. Keep structure consistent so users and crawlers can move through the cluster naturally." },
-      { type: "heading", level: 2, content: "Days 46-70: strengthen internal linking and content depth" },
-      { type: "list", content: "", items: ["Add contextual internal links between related pages", "Refresh weak sections based on early performance data", "Expand pages that attract impressions but low clicks", "Add FAQs where user intent is unclear"] },
-      { type: "heading", level: 2, content: "Days 71-90: optimise for CTR and technical health" },
-      { type: "list", content: "", items: ["Tighten title tags and meta descriptions", "Fix crawl and indexation issues", "Improve Core Web Vitals on top pages", "Review schema for articles and FAQs"] },
-      { type: "callout", calloutType: "cta", content: "Run a technical and on-page check before scaling content.", ctaLink: "/seo-audit", ctaText: "Run a free SEO audit ->" },
-      { type: "heading", level: 2, content: "Topical authority checklist for founders" },
-      { type: "list", content: "", items: ["One clear topic focus", "Intent-mapped keyword clusters", "Strong internal linking", "Consistent publishing rhythm", "Monthly updates on ageing pages"] },
-      { type: "paragraph", content: "Topical authority is not about publishing more. It is about publishing connected pages with clear intent and strong structure." },
-      { type: "callout", calloutType: "tip", content: "Prioritise quality and intent coverage over raw article count. Depth wins." }
-    ]
-  },
-  {
-    slug: "saas-idea-validation-playbook-for-founders",
-    title: "SaaS Idea Validation Playbook: How Founders Can Test Demand Before Building",
-    description: "Validate your SaaS idea with a practical founder playbook covering customer discovery, landing page tests, and MVP demand signals.",
-    seoTitle: "SaaS Idea Validation Playbook for Founders",
-    metaDescription: "Use this SaaS idea validation playbook to run customer discovery, test demand with landing pages, and decide what to build with more confidence.",
-    category: "Builder Insights",
-    readTime: 8,
-    publishedAt: "2026-02-28",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Many founders build too early and validate too late. A lightweight validation process helps you test real demand before committing engineering time. The goal is simple: evidence first, build second." },
-      { type: "heading", level: 2, content: "What validation should prove" },
-      { type: "list", content: "", items: ["The problem is urgent enough to solve", "Your target users recognise the pain quickly", "People are willing to take a next step", "Your positioning is clear and credible"] },
-      { type: "heading", level: 2, content: "Week 1: customer discovery interviews" },
-      { type: "paragraph", content: "Run short interviews with your ideal users. Focus on current behaviour, not hypothetical feature requests. Ask how they solve the problem today and what it costs them." },
-      { type: "heading", level: 2, content: "Week 2: offer and messaging test" },
-      { type: "paragraph", content: "Create a simple landing page with one clear promise, one audience, and one call to action. Drive a small amount of targeted traffic and measure response quality." },
-      { type: "heading", level: 2, content: "Week 3: pre-MVP signal checks" },
-      { type: "list", content: "", items: ["Email sign-up conversion quality", "Reply rate from qualified leads", "Problem urgency in follow-up calls", "Willingness to join pilot or waitlist"] },
-      { type: "heading", level: 2, content: "Week 4: decide build, pivot, or pause" },
-      { type: "paragraph", content: "Use evidence, not enthusiasm. If signals are strong, build a narrow MVP. If signals are mixed, adjust positioning and test again before shipping." },
-      { type: "callout", calloutType: "tip", content: "If users do not care before the build, they rarely care after the build." },
-      { type: "heading", level: 2, content: "Founder mistakes that break validation" },
-      { type: "list", content: "", items: ["Interviewing the wrong audience", "Asking leading questions", "Testing too many offers at once", "Ignoring weak conversion quality", "Mistaking clicks for true demand"] },
-      { type: "heading", level: 2, content: "Build a brand you can launch with confidence" },
-      { type: "paragraph", content: "Once demand is validated, brand clarity matters. A strong name makes outreach, onboarding, and retention easier from day one." },
-      { type: "callout", calloutType: "cta", content: "Generate brandable names aligned with your product direction.", ctaLink: "/generate", ctaText: "Generate names free ->" }
-    ]
-  },
-
   // ============ NEW HIGH-VALUE KEYWORD ARTICLES - FEBRUARY 2026 ============
 
   // DOMAIN STRATEGY - 5 New Articles
-  {
-    slug: "best-domain-name-generator-2026",
-    title: "Best Domain Name Generator 2026: AI Tools Compared",
-    description: "Compare the top domain name generators of 2026. Find out which AI-powered tools deliver the best brandable names with availability checking.",
-    category: "Domain Strategy",
-    readTime: 8,
-    publishedAt: "2026-02-17",
-    author: "NamoLux Team",
-    featured: true,
-    content: [
-      { type: "paragraph", content: "Finding the perfect domain name is harder than ever. With billions of domains registered, founders need smart tools to discover available, brandable options. We tested the leading domain name generators of 2026 to help you find the right one." },
-      { type: "heading", level: 2, content: "What Makes a Great Domain Name Generator?" },
-      { type: "list", content: "", items: ["AI-powered suggestions that understand context", "Real-time availability checking", "Brandability scoring", "Alternative TLD suggestions", "Social handle availability", "Trademark conflict detection"] },
-      { type: "heading", level: 2, content: "Top Domain Name Generators Compared" },
-      { type: "paragraph", content: "We evaluated tools based on suggestion quality, speed, accuracy, and overall user experience. The best generators combine AI creativity with practical availability data." },
-      { type: "heading", level: 3, content: "NamoLux - Best for Brandable Names" },
-      { type: "paragraph", content: "NamoLux uses AI to generate creative, memorable domain names with instant .com availability checking. The Founder Signal score rates each suggestion for brand potential, making it ideal for startups and entrepreneurs." },
-      { type: "callout", calloutType: "tip", content: "Pro tip: Look for generators that check availability in real-time, not cached data. Stale results lead to disappointment." },
-      { type: "heading", level: 2, content: "Free vs Paid Domain Generators" },
-      { type: "paragraph", content: "Free tools often limit daily searches or show outdated availability. Paid options typically offer bulk checking, premium TLD access, and advanced filtering. For serious founders, the investment pays for itself in time saved." },
-      { type: "heading", level: 2, content: "How to Evaluate Generator Results" },
-      { type: "list", content: "", items: ["Check if the .com is actually available", "Verify no trademark conflicts exist", "Test pronunciation with others", "Search social media handles", "Consider international audiences"] },
-      { type: "callout", calloutType: "cta", content: "Try the highest-rated domain name generator of 2026.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
-    ]
-  },
   {
     slug: "creative-business-names-that-stand-out",
     title: "Creative Business Names That Stand Out: A Complete Guide",
@@ -2135,32 +1866,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
   {
-    slug: "on-page-seo-checklist",
-    title: "On-Page SEO Checklist 2026: Every Element You Need to Optimize",
-    description: "Complete on-page SEO checklist for 2026. Optimize every element of your pages to rank higher with this comprehensive, actionable guide.",
-    category: "SEO Foundations",
-    readTime: 11,
-    publishedAt: "2026-02-15",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "On-page SEO is everything you control directly on your website. Unlike backlinks or brand mentions, you have complete power over these elements. Use this checklist to optimize every page." },
-      { type: "heading", level: 2, content: "Title Tag Optimization" },
-      { type: "list", content: "", items: ["Include primary keyword near the beginning", "Keep under 60 characters", "Make it compelling and click-worthy", "Include brand name for homepage", "Each page should have a unique title"] },
-      { type: "heading", level: 2, content: "Meta Description" },
-      { type: "list", content: "", items: ["Write 150-160 characters", "Include a call-to-action", "Incorporate target keyword naturally", "Make it accurately describe the page", "Avoid duplicate descriptions across pages"] },
-      { type: "heading", level: 2, content: "URL Structure" },
-      { type: "list", content: "", items: ["Keep URLs short and descriptive", "Include target keyword", "Use hyphens between words", "Avoid unnecessary parameters", "Maintain consistent structure site-wide"] },
-      { type: "callout", calloutType: "tip", content: "Tip: A clean URL like /seo-checklist beats /p=123&cat=seo every time." },
-      { type: "heading", level: 2, content: "Header Tags (H1-H6)" },
-      { type: "list", content: "", items: ["One H1 per page with primary keyword", "Use H2s for main sections", "H3s for subsections", "Include keywords naturally in headers", "Maintain logical hierarchy"] },
-      { type: "heading", level: 2, content: "Content Optimization" },
-      { type: "list", content: "", items: ["Answer the search query thoroughly", "Use keyword variations naturally", "Include relevant internal links", "Add external links to authoritative sources", "Break content into scannable sections"] },
-      { type: "heading", level: 2, content: "Image Optimization" },
-      { type: "list", content: "", items: ["Descriptive, keyword-rich file names", "Alt text for accessibility and SEO", "Compressed file sizes", "Modern formats (WebP) when possible", "Lazy loading for performance"] },
-      { type: "callout", calloutType: "cta", content: "Run our on-page SEO audit to check your optimization.", ctaLink: "/seo-audit", ctaText: "Audit Your Page →" }
-    ]
-  },
-  {
     slug: "keyword-research-guide",
     title: "Keyword Research Guide: Find Keywords That Drive Traffic",
     description: "Master keyword research with our comprehensive guide. Learn how to find high-value keywords that bring targeted traffic to your website.",
@@ -2187,33 +1892,6 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "cta", content: "Audit your current keyword targeting with our SEO tool.", ctaLink: "/seo-audit", ctaText: "Check Your Keywords →" }
     ]
   },
-  {
-    slug: "local-seo-guide-small-business",
-    title: "Local SEO Guide: How Small Businesses Can Dominate Local Search",
-    description: "Complete local SEO guide for small businesses. Learn how to rank in Google Maps, optimize your Google Business Profile, and attract local customers.",
-    category: "SEO Foundations",
-    readTime: 11,
-    publishedAt: "2026-02-13",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "For local businesses, appearing in local search results is everything. When someone searches 'coffee shop near me,' you want to be the first result they see. Local SEO makes that happen." },
-      { type: "heading", level: 2, content: "What is Local SEO?" },
-      { type: "paragraph", content: "Local SEO optimizes your online presence for location-based searches. It includes Google Business Profile, local keywords, citations, reviews, and geographic relevance signals." },
-      { type: "heading", level: 2, content: "Google Business Profile Optimization" },
-      { type: "list", content: "", items: ["Claim and verify your profile", "Choose accurate primary and secondary categories", "Add complete business information", "Upload high-quality photos regularly", "Post updates and offers weekly", "Respond to all reviews promptly"] },
-      { type: "heading", level: 2, content: "Building Local Citations" },
-      { type: "paragraph", content: "Citations are mentions of your business name, address, and phone number (NAP) on other websites. Consistency matters—ensure your NAP is identical everywhere it appears." },
-      { type: "callout", calloutType: "tip", content: "Tip: Start with major directories like Yelp, Yellow Pages, and industry-specific platforms before building broader citations." },
-      { type: "heading", level: 2, content: "Getting Customer Reviews" },
-      { type: "paragraph", content: "Reviews influence both rankings and conversions. Ask happy customers for reviews, respond professionally to negative ones, and never fake reviews—Google can detect and penalize this." },
-      { type: "heading", level: 2, content: "Local Content Strategy" },
-      { type: "list", content: "", items: ["Create location-specific landing pages", "Write about local events and news", "Feature local case studies", "Include location keywords naturally", "Build relationships with local bloggers"] },
-      { type: "heading", level: 2, content: "Tracking Local SEO Success" },
-      { type: "paragraph", content: "Monitor your Google Business Profile insights, local pack rankings, and foot traffic or calls from local searches. Use Google Search Console filtered by location for detailed data." },
-      { type: "callout", calloutType: "cta", content: "Audit your local SEO presence with our free tool.", ctaLink: "/seo-audit", ctaText: "Run Local SEO Audit →" }
-    ]
-  },
-
   // BUILDER INSIGHTS - 5 New Articles
   {
     slug: "how-to-start-online-business-2026",
@@ -2329,35 +2007,6 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "cta", content: "Name your no-code business with a memorable, brandable domain.", ctaLink: "/generate", ctaText: "Generate Business Names →" }
     ]
   },
-  {
-    slug: "first-1000-customers",
-    title: "How to Get Your First 1,000 Customers: A Founder's Playbook",
-    description: "Practical guide to acquiring your first 1,000 customers. Learn proven strategies founders use to go from zero to traction.",
-    category: "Builder Insights",
-    readTime: 13,
-    publishedAt: "2026-02-13",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Getting from zero to 1,000 customers is the hardest part of building a business. There's no brand recognition, no word of mouth, no social proof. Here's how successful founders bridge that gap." },
-      { type: "heading", level: 2, content: "Why the First 1,000 Matter Most" },
-      { type: "paragraph", content: "Your first customers validate your business, provide feedback for improvement, and become your initial advocates. They're harder to acquire but more valuable than any customers that follow." },
-      { type: "heading", level: 2, content: "Phase 1: First 10 Customers" },
-      { type: "paragraph", content: "Your first customers come from direct outreach. Email, DM, or call people you know who have the problem you solve. Don't scale—learn what makes them buy." },
-      { type: "heading", level: 2, content: "Phase 2: 10 to 100 Customers" },
-      { type: "paragraph", content: "Start systematizing what worked. Which channels convert? What messaging resonates? Double down on winners and cut losers. Ask happy customers for referrals." },
-      { type: "callout", calloutType: "tip", content: "Every interaction teaches you something. Document what you learn about objections, use cases, and buying triggers." },
-      { type: "heading", level: 2, content: "Phase 3: 100 to 1,000 Customers" },
-      { type: "paragraph", content: "Now you can invest in repeatable channels. Content marketing, paid ads, partnerships, and product-led growth become viable with validated messaging and some budget." },
-      { type: "heading", level: 2, content: "Channels That Work for Early Traction" },
-      { type: "list", content: "", items: ["Direct outreach (LinkedIn, email, communities)", "Content marketing (SEO, social, video)", "Product Hunt and community launches", "Partnerships and integrations", "Referral programs", "Paid ads (once unit economics work)"] },
-      { type: "heading", level: 2, content: "Common Mistakes to Avoid" },
-      { type: "list", content: "", items: ["Focusing on channels before product-market fit", "Scaling ads before understanding CAC/LTV", "Ignoring retention while chasing acquisition", "Underspending on what's working", "Giving up before compounding kicks in"] },
-      { type: "heading", level: 2, content: "Building for Word of Mouth" },
-      { type: "paragraph", content: "The best acquisition strategy is a product people naturally talk about. Build something remarkable, deliver unexpected value, and make sharing easy." },
-      { type: "callout", calloutType: "cta", content: "Build a memorable brand that customers want to share.", ctaLink: "/generate", ctaText: "Generate Brand Names →" }
-    ]
-  },
-
   // ── DOMAIN STRATEGY ─────────────────────────────────────────────────────────
 
   {
@@ -3854,38 +3503,6 @@ export const blogPosts: BlogPost[] = [
   } as BlogPost,
 
   {
-    slug: "schema-markup-for-startups",
-    title: "Schema Markup for Startups: How to Add Structured Data and Get Rich Results",
-    description: "Structured data (schema markup) helps Google understand your content and display rich results in search. Here's a practical guide for founders, no developer required.",
-    seoTitle: "Schema Markup for Startups: A Practical Structured Data Guide (2026)",
-    metaDescription: "Structured data schema markup helps Google display rich results for your site. Learn which schema types matter for startups and how to implement them without a developer.",
-    category: "SEO Foundations",
-    readTime: 7,
-    publishedAt: "2026-03-08",
-    author: "Andrew Barrett",
-    content: [
-      { type: "paragraph", content: "Rich results — the FAQ dropdowns, star ratings, article headers, and breadcrumbs you see above ordinary search results — are driven by schema markup. Most startup sites have none. That's an opportunity: adding schema to pages that already rank gets you more visual real estate in search results without requiring you to outrank anyone." },
-      { type: "heading", level: 2, content: "What Schema Markup Is" },
-      { type: "paragraph", content: "Schema markup is structured data you add to your HTML that tells Google explicitly what your content is — an Article, a FAQ, a Product, an Organisation. It doesn't change what users see on your page. It changes what Google understands about the page, and how Google can present it in search results. Schema.org is the standard vocabulary; JSON-LD is the implementation format Google explicitly recommends." },
-      { type: "heading", level: 2, content: "Which Schema Types Matter for Startups" },
-      { type: "list", content: "The highest-value schema types for early-stage startups and SaaS products:", items: ["Organisation: your company identity, logo, and social profile links — this is what populates your Knowledge Panel", "WebSite: enables the sitelinks search box that appears under your brand name in search results", "Article / BlogPosting: author attribution, published date, and hero image for rich article display", "FAQPage: each FAQ question and answer can appear as a collapsible dropdown directly under your search result — significant click-through uplift", "Product: price, availability, and rating display for any product you sell", "SoftwareApplication: app category, rating, operating system — the correct schema type for SaaS tools"] },
-      { type: "heading", level: 2, content: "How to Add JSON-LD Schema Without a Developer" },
-      { type: "paragraph", content: "JSON-LD schema lives in a single script block in your page's head section: <script type=\"application/ld+json\">{ your schema here }</script>. In Next.js, add it to your layout.tsx metadata or via a Script component with strategy='afterInteractive'. In WordPress, plugins like Yoast SEO and Rank Math handle the most common schema types automatically — Organisation, Article, and BreadcrumbList are all generated without writing any code." },
-      { type: "callout", calloutType: "tip", content: "The FAQPage schema is the highest-value quick win for most startup blogs. If you have FAQ sections on your pages, mark them up with FAQPage schema. FAQ rich results can double your search result footprint visually — showing two, three, or four additional lines under your listing — without requiring any ranking improvement." },
-      { type: "heading", level: 2, content: "Testing Your Schema" },
-      { type: "paragraph", content: "Google's Rich Results Test (search.google.com/test/rich-results) shows you exactly what schema Google can see on any URL and whether your markup qualifies for rich results. The Schema.org Validator catches syntax errors before you publish. Google Search Console shows validated structured data under the Enhancements tab, including any errors or warnings that are preventing rich result eligibility." },
-      { type: "heading", level: 2, content: "Common Mistakes" },
-      { type: "list", content: "Schema mistakes that prevent rich results or trigger manual actions:", items: ["Marking up content that isn't visible on the page — Google penalises schema that misrepresents page content", "Using Microdata instead of JSON-LD — harder to maintain and not Google's preferred format", "Not updating schema when content changes — stale schema creates inconsistencies Google flags", "Adding schema types that don't apply — a landing page doesn't need Article schema; a blog post doesn't need Product schema"] },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with real-time domain checking — find a name worth building your SEO strategy around.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
-    ],
-    faqs: [
-      { question: "Does schema markup directly improve rankings?", answer: "Not directly. Schema helps Google understand your content and display rich results — it doesn't boost your position itself. But rich results (FAQ dropdowns, article enhancements) typically increase click-through rates significantly, which indirectly signals quality to Google over time." },
-      { question: "Is JSON-LD or Microdata better for schema?", answer: "JSON-LD. Google explicitly recommends it, it's easier to maintain (lives in one script block rather than scattered through HTML attributes), and it doesn't break if your HTML structure changes. There's no practical reason to choose Microdata for a new implementation." },
-      { question: "How long does it take for schema to show up in search results?", answer: "Google needs to recrawl and reindex your page after you add schema. For new sites, this can take 2–4 weeks. For established sites with frequent Googlebot visits, schema changes often appear in search results within a few days. You can request indexing via Google Search Console URL Inspection to accelerate the process." }
-    ]
-  } as BlogPost,
-
-  {
     slug: "seo-first-90-days-new-site",
     title: "SEO in Your First 90 Days: What to Focus on When You Have No Traffic Yet",
     description: "New sites start with zero authority. Here's the exact order of operations for SEO in your first 90 days — focusing on what actually moves the needle early.",
@@ -4357,58 +3974,6 @@ export const blogPosts: BlogPost[] = [
       { question: "How long should a pillar page be?", answer: "Typically 2,000–4,000 words for competitive topics. The length should match the depth required to cover the topic thoroughly at a summary level. Avoid padding — Google can detect thin content regardless of word count. Match the length of what's already ranking for your target keyword." },
       { question: "Should my pillar page or cluster pages be published first?", answer: "Publish the pillar page first, then cluster pages. The pillar page acts as the cornerstone — cluster pages derive additional authority from linking back to it, and that dynamic works better when the pillar exists first. However, don't wait for a perfect pillar page before publishing any content." },
       { question: "Can I convert existing blog posts into a topic cluster?", answer: "Yes — this is one of the highest-ROI SEO tasks for sites that have published content without architecture. Audit your existing posts, identify natural pillar topics, create or designate pillar pages, and add bidirectional internal links. The results are often visible within 60-90 days." }
-    ]
-  } as BlogPost,
-
-  {
-    slug: "ai-overviews-seo-strategy",
-    title: "How to Rank in Google AI Overviews (and Whether You Should Try)",
-    description: "Google's AI Overviews are changing organic search results. Here's what you need to know and how to adjust your content strategy.",
-    seoTitle: "Google AI Overviews SEO Strategy: How to Get Featured in 2026",
-    metaDescription: "Google AI Overviews appear above organic results for many queries. Learn what types of content get included, how to optimise for them, and whether it's worth pursuing.",
-    category: "SEO Foundations",
-    readTime: 7,
-    publishedAt: "2026-03-10",
-    author: "Andrew Barrett",
-    content: [
-      { type: "paragraph", content: "Google AI Overviews — the AI-generated summaries that appear above organic results — have fundamentally changed what showing up on page one means. For some queries, the Overview takes up the entire above-the-fold view, reducing clicks to organic results significantly. Here's what's actually happening and how to think about it." },
-      { type: "heading", level: 2, content: "What Are Google AI Overviews?" },
-      { type: "paragraph", content: "AI Overviews are summaries generated by Google's AI systems and displayed at the top of search results for informational queries. They pull content from multiple sources, synthesise an answer, and attribute the sources with links. They appear most frequently for how-to, what-is, and comparison queries — the bread and butter of informational content marketing." },
-      { type: "heading", level: 2, content: "The Good News and the Bad News" },
-      { type: "paragraph", content: "The bad news: AI Overviews reduce click-through rates for informational content in many niches. If your page ranked number one for 'how to choose a domain name' and an AI Overview now answers that question without requiring a click, your traffic for that query drops." },
-      { type: "paragraph", content: "The good news: sites cited in AI Overviews receive credibility signals that can strengthen brand recognition and click-through rates for related queries. Being cited in an AI Overview is a quality signal — and it tends to correlate with improved rankings for the cited pages." },
-      { type: "callout", calloutType: "tip", content: "Data from early AI Overview rollouts suggests that cited sources see 20–40% lower click volume for that specific query but higher branded search volume overall. The trade-off depends on your business model." },
-      { type: "heading", level: 2, content: "What Content Gets Included in AI Overviews" },
-      { type: "list", content: "", items: [
-        "Content that directly and concisely answers the query in the first 100 words",
-        "Pages with clear E-E-A-T signals: demonstrated author expertise, clear sourcing",
-        "Well-structured content with headers matching common question variants",
-        "Pages already ranking in the top 5 for the target query",
-        "Content with strong internal linking and topical authority signals"
-      ]},
-      { type: "heading", level: 2, content: "How to Optimise for AI Overview Inclusion" },
-      { type: "heading", level: 3, content: "1. Answer the Query Directly in Your Opening" },
-      { type: "paragraph", content: "AI systems prefer content that gets to the point. Put a clear, direct answer to the primary query in your first paragraph. Don't bury the answer behind context and preamble — AI extraction systems weight content at the top of the page higher." },
-      { type: "heading", level: 3, content: "2. Use Structured Formats" },
-      { type: "paragraph", content: "Numbered lists, comparison tables, and definition-style headings make content easier for AI systems to parse and extract. If the target query has a list-format intent ('what are the X ways to…'), answer in a numbered list near the top of the page." },
-      { type: "heading", level: 3, content: "3. Strengthen E-E-A-T" },
-      { type: "list", content: "", items: [
-        "Add clear author attribution with credentials or experience indicators",
-        "Include publication dates and update dates",
-        "Cite primary sources and data",
-        "Link to authoritative external sources where relevant",
-        "Build author pages that demonstrate expertise in your niche"
-      ]},
-      { type: "heading", level: 2, content: "When AI Overviews Are Good for Your Business" },
-      { type: "paragraph", content: "If your business model depends on brand recognition rather than pure content click volume — SaaS, services, physical products — being cited in AI Overviews builds brand awareness at no additional cost. Every Overview citation is a mention of your brand to a searcher who may not click but will remember the attribution." },
-      { type: "heading", level: 2, content: "When AI Overviews Hurt Your Business" },
-      { type: "paragraph", content: "If you monetise content through display advertising, affiliate links, or paywalled content, AI Overviews directly reduce your revenue per search. For these business models, the strategic response is to shift toward content types where AI Overviews appear less frequently: opinion pieces, original research, tools and interactive content, and highly specific long-tail queries." },
-      { type: "callout", calloutType: "cta", content: "Strong SEO starts with a credible domain. Score yours for brand strength before your first piece of content goes live.", ctaLink: "/generate", ctaText: "Find Your Domain on NamoLux →" }
-    ],
-    faqs: [
-      { question: "Do AI Overviews appear for all search queries?", answer: "No. As of 2026, AI Overviews appear most frequently for informational queries — how-to, what-is, definition, comparison — and less for navigational (brand name searches) and transactional (purchase-intent) queries. Commercial and local searches see fewer AI Overviews, which is why local SEO and e-commerce SEO are less disrupted than content marketing." },
-      { question: "Is it possible to opt out of being included in AI Overviews?", answer: "Not via a specific AI Overviews exclusion. However, Google respects noindex tags and robots.txt, which would exclude pages from all Google features including AI Overviews. Using noindex to exclude your best content from AI Overviews would also remove it from organic rankings — a worse trade-off for most sites." },
-      { question: "Should I stop producing informational content because of AI Overviews?", answer: "No. Informational content still drives brand awareness, builds topical authority, earns backlinks, and supports customers through your funnel. The metrics change — you'll see lower organic CTR for some queries — but the strategic value of high-quality informational content remains significant. The adaptation is to focus on content that supplements AI answers rather than purely duplicating them." }
     ]
   } as BlogPost,
 
@@ -5211,49 +4776,6 @@ export const blogPosts: BlogPost[] = [
     ]
   },
 
-  {
-    slug: "first-100-customers-founders",
-    title: "How Founders Actually Get Their First 100 Customers",
-    description: "The first 100 customers don't come from ads, SEO, or virality. They come from doing things that don't scale. Here's what actually works.",
-    category: "Builder Insights",
-    readTime: 6,
-    publishedAt: "2026-03-21",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "Most growth advice is written for companies that already have traction. 'Optimize your funnel', 'run A/B tests', 'invest in SEO' — none of this is useful for a founder with zero customers and zero traffic. The first 100 customers require a completely different playbook." },
-      { type: "heading", level: 2, content: "Why Normal Marketing Doesn't Work at 0" },
-      { type: "paragraph", content: "Advertising requires knowing what message converts — you don't know yet. SEO takes 6-12 months to produce traffic. Virality requires existing users to share. Influencer partnerships require budget and credibility you don't have yet. The 0-to-100 phase is fundamentally about direct, unscalable action." },
-      { type: "callout", calloutType: "tip", content: "Paul Graham's instruction to Airbnb: 'Do things that don't scale.' Manually photograph listings, meet hosts in person, handle every customer issue yourself. This is the only reliable path from 0 to 100." },
-      { type: "heading", level: 2, content: "The 5 Channels That Consistently Work for 0-100" },
-      { type: "heading", level: 3, content: "1. Your Personal Network" },
-      { type: "paragraph", content: "Every founder has a warm network — former colleagues, classmates, friends, family, and professional contacts. Tell every single one of them what you're building. Ask them to use it. Ask them if they know anyone who would benefit. One warm referral is worth 100 cold outreach attempts." },
-      { type: "heading", level: 3, content: "2. Online Communities" },
-      { type: "paragraph", content: "Find where your target users congregate: Reddit subreddits, Discord servers, Slack communities, Facebook groups, LinkedIn groups. Don't post 'Check out my product' — that gets ignored or banned. Participate genuinely for 2-4 weeks, then share your product when it's naturally relevant to a conversation." },
-      { type: "heading", level: 3, content: "3. Direct Cold Outreach" },
-      { type: "paragraph", content: "Identify 50-100 specific people who have exactly the problem you solve. Find them on LinkedIn, Twitter, or in communities. Send a personalised message (not a template) referencing something specific about them and why your product is relevant. Keep it to 3-4 sentences. Conversion rate of 5-15% is achievable with genuine personalisation." },
-      { type: "heading", level: 3, content: "4. Product Hunt and Launch Platforms" },
-      { type: "paragraph", content: "Product Hunt, Hacker News 'Show HN', and BetaList can generate hundreds of signups in 24 hours. This requires preparation: build a following before launch, warm up supporters to comment and upvote on day one, and time your launch for a Tuesday-Thursday when the platforms have peak traffic." },
-      { type: "heading", level: 3, content: "5. Partner Distribution" },
-      { type: "paragraph", content: "Find a tool, community, or newsletter that already reaches your exact audience and propose a partnership — a guest post, a mention, a bundle deal, or a co-promotion. One strong partner relationship can deliver more targeted users than months of individual outreach." },
-      { type: "heading", level: 2, content: "What 100 Customers Actually Requires" },
-      { type: "paragraph", content: "Rough math: if you do 20 genuine personal outreach messages per day, get a 10% response rate, and convert 30% of respondents, you'll get about 0.6 customers per day. That's 100 customers in about 6 months of consistent effort. Most founders underestimate the required volume and consistency." },
-      { type: "heading", level: 2, content: "The Mindset Shift Required" },
-      { type: "paragraph", content: "The first 100 customers is a sales job, not a marketing job. You are the sales team. Every customer conversation is manual. Every support email is answered by you. This is expensive in time but invaluable in learning — by customer 100, you'll know exactly who your real customer is, what they care about, and what language converts." },
-      { type: "links", content: "Further Reading", links: [
-        { text: "How to Write a Landing Page That Converts Cold Traffic", href: "/blog/landing-page-conversion-guide" },
-        { text: "Cold Email for Founders: How to Get Replies", href: "/blog/cold-email-for-founders" },
-        { text: "From Side Project to SaaS: When to Make the Leap", href: "/blog/side-project-to-saas" },
-        { text: "How to Launch on Product Hunt", href: "/blog/how-to-launch-on-product-hunt" },
-      ]},
-      { type: "callout", calloutType: "cta", content: "Before you go to market, make sure your brand is built on a domain name that's worth sharing. Find one with Founder Signal™ scoring.", ctaLink: "/generate", ctaText: "Find Your Domain →" },
-    ],
-    faqs: [
-      { question: "Should I have a referral program from day one?", answer: "Only if your product is good enough that users would refer it without a program. Incentivised referrals before product-market fit produce noise, not signal. Build the referral program after you see organic sharing — that's when you know users genuinely value what you've built." },
-      { question: "How important is pricing for the first 100 customers?", answer: "Very. Charge something — even a small amount — from customer one. Free users don't tell you if the product is valuable enough to pay for. A £5/month customer is more informative than 1,000 free signups. Your first 100 paying customers are the real validation milestone." },
-      { question: "What if I'm in a B2B market where sales cycles are longer?", answer: "Adjust the unit: 100 customers becomes 10 companies. For B2B, focus on building relationships with 10-20 potential accounts simultaneously through a mix of direct outreach, community presence, and content that demonstrates expertise. The timeline is longer but the qualitative learning per customer is also deeper." }
-    ]
-  },
-
   // ── TOOL COMPARISONS (4 new) ────────────────────────────────────────────────
 
   {
@@ -5390,67 +4912,6 @@ export const blogPosts: BlogPost[] = [
   },
 
   // ── 10 Namelix-targeting posts ────────────────────────────────────────────
-
-  {
-    slug: "top-10-ai-business-name-generators-tested",
-    title: "Top 10 AI Business Name Generators Tested for Real Brand Quality",
-    description: "We tested 10 AI business name generators on brandability, domain availability, and real usability. Here's the ranked verdict.",
-    category: "Tool Comparisons",
-    readTime: 9,
-    publishedAt: "2026-03-26",
-    author: "NamoLux Team",
-    content: [
-      { type: "paragraph", content: "There are dozens of AI business name generators available in 2026. Most produce similar-looking outputs. We tested 10 of the most popular tools on three criteria: brandability (do the names have emotional depth and meaning anchors?), domain availability (does the tool check it, and how accurately?), and usability (can a founder go from brief to registered domain in under an hour?)." },
-      { type: "heading", level: 2, content: "#1 NamoLux — Best Overall" },
-      { type: "list", content: "", items: [
-        "Brandability: ✅ Vibe-specific generation, meaning-anchor testing, anti-pattern rejection",
-        "Availability: ✅ RDAP real-time for all results, 6 TLDs, Deep Search mode",
-        "Usability: ✅ From brief to registered domain in under 30 minutes",
-        "Standout: Founder Signal™ scoring gives every name an objective 0–100 quality rating",
-      ]},
-      { type: "heading", level: 2, content: "#2 Namelix — Best for Pure Ideation" },
-      { type: "list", content: "", items: [
-        "Brandability: ✅ Strong visual identity preview, good style variety",
-        "Availability: ❌ No real-time checking — manual verification required",
-        "Usability: ⚠️ Great for exploration, but availability gap adds significant manual work",
-        "Standout: Logo previews help visualise brand identity alongside names",
-      ]},
-      { type: "heading", level: 2, content: "#3 Namify — Best for Short Available Domains" },
-      { type: "list", content: "", items: [
-        "Brandability: ⚠️ Invented words with good phonetics but limited emotional depth",
-        "Availability: ✅ Checks availability as part of generation",
-        "Usability: ✅ Fast and simple",
-      ]},
-      { type: "heading", level: 2, content: "#4 Bust a Name — Best for Compound Names" },
-      { type: "list", content: "", items: [
-        "Brandability: ⚠️ Limited to keyword combinations",
-        "Availability: ✅ Shows available domains",
-        "Usability: ✅ Very simple, no AI complexity",
-      ]},
-      { type: "heading", level: 2, content: "#5 Squadhelp — Best for Budget Crowdsourcing" },
-      { type: "list", content: "", items: [
-        "Brandability: ✅ Human-generated names with trademark checks",
-        "Availability: ✅ Included",
-        "Usability: ⚠️ Takes days to get results, minimum spend required",
-      ]},
-      { type: "heading", level: 2, content: "#6–10 Brief Rankings" },
-      { type: "table", content: "", headers: ["Tool", "Brandability", "Availability", "Speed"], rows: [
-        ["Novanym", "✅ Premium quality", "✅ Included", "⚠️ High cost"],
-        ["Panabee", "⚠️ Basic", "✅ Yes", "✅ Fast"],
-        ["Looka Name", "⚠️ Generic", "⚠️ Partial", "✅ Fast"],
-        ["Wordoid", "⚠️ Invented words only", "✅ Yes", "✅ Fast"],
-        ["ChatGPT + manual", "✅ Good with strong prompts", "❌ Manual check required", "⚠️ 10–20 min setup"],
-      ]},
-      { type: "heading", level: 2, content: "The Verdict" },
-      { type: "paragraph", content: "For most founders, the choice comes down to NamoLux (best overall: quality + availability in one tool) and Namelix (best for exploration when you're not ready to commit). If you're in the ideation phase, use both. If you're ready to find a name to register, NamoLux is the faster path." },
-      { type: "callout", calloutType: "cta", content: "NamoLux — free, real-time availability, Founder Signal™ scored.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
-    ],
-    faqs: [
-      { question: "What is the best free AI business name generator?", answer: "NamoLux offers the strongest combination of AI naming quality and real-time domain availability on a free tier. Namelix is also free and excellent for ideation without needing instant availability confirmation." },
-      { question: "Which AI name generator checks domain availability?", answer: "NamoLux, Namify, Bust a Name, and Panabee all check domain availability. Namelix does not — it requires manual verification." },
-      { question: "How do I know if an AI-generated name is actually good?", answer: "Look for three things: a meaning anchor (the name comes from a real word or concept), an emotional hook (it evokes a feeling), and availability (the .com is free). NamoLux's Founder Signal™ score quantifies quality across six dimensions including pronounceability, memorability, and brand risk." },
-    ],
-  },
 
   {
     slug: "why-ai-business-name-generators-give-useless-names",
@@ -6086,194 +5547,6 @@ export const blogPosts: BlogPost[] = [
   },
 
   // Builder Insights
-  {
-    slug: "validate-business-idea-without-code",
-    title: "How to Validate a Business Idea Without Writing a Line of Code",
-    description: "Most founders build first and validate later — then wonder why no one cares. Here's how to know if your idea has legs before you write a single line of code.",
-    seoTitle: "How to Validate a Business Idea Without Coding | NamoLux",
-    metaDescription: "Validate your startup idea before you build. This guide walks through practical, fast validation techniques that founders can run in days — not months.",
-    category: "Builder Insights",
-    readTime: 9,
-    publishedAt: "2026-03-31",
-    author: "Andrew Barrett",
-    content: [
-      {
-        type: "paragraph",
-        content: "The most expensive mistake in startups isn't a bad hire or a wrong pivot. It's building a product nobody wanted — spending months and thousands in the wrong direction. Validation is the discipline of finding out before you build.",
-      },
-      {
-        type: "paragraph",
-        content: "The good news: you can validate most business ideas in a week. No code required.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "What You're Actually Validating",
-      },
-      {
-        type: "paragraph",
-        content: "Validation isn't about whether people say they like your idea. People will always say they like your idea to avoid conflict. What you're validating is whether people will change their behaviour — specifically, whether they will spend money, time, or attention on your solution.",
-      },
-      {
-        type: "list",
-        content: "",
-        items: [
-          "Is the problem real? (Do people actually experience it?)",
-          "Is it painful enough to pay for a solution? (Or just mildly annoying?)",
-          "Will they choose your solution over existing alternatives?",
-          "Is the market large enough to build a business on?",
-        ],
-      },
-      {
-        type: "callout",
-        calloutType: "tip",
-        content: "'Would you use this?' is the wrong question. 'Would you pay £20/month for this today?' is the right question. The friction of a real purchase commitment is what reveals real intent.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Step 1: Problem Interview (Days 1–2)",
-      },
-      {
-        type: "paragraph",
-        content: "Talk to 10 people in your target market. Not your friends — people who actually face the problem you're solving. Your goal is not to pitch your solution. Your goal is to understand their life.",
-      },
-      {
-        type: "paragraph",
-        content: "Ask: What's the hardest part of [the area you're building in]? How are you handling it today? How much is that costing you (time, money, frustration)? What have you already tried?",
-      },
-      {
-        type: "paragraph",
-        content: "If you hear the same frustrations from 7 of 10 people, the problem is real. If you hear 10 different problems, you don't yet understand your niche.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Step 2: Competitive Research (Day 2)",
-      },
-      {
-        type: "paragraph",
-        content: "Every market worth entering already has competition. The question isn't whether competition exists — it's whether you can find a wedge. Search for your top competitors and look at their one-star reviews. That's where your opportunity lives.",
-      },
-      {
-        type: "paragraph",
-        content: "What do customers consistently complain about? What's missing? What's overpriced? What's confusing? The gap between what existing tools offer and what customers actually want is the space your product occupies.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Step 3: The Smoke Test Landing Page (Days 3–4)",
-      },
-      {
-        type: "paragraph",
-        content: "Build a landing page — not a product. One page that describes the problem, explains your solution, and has a call to action. The CTA can be an email signup ('Join the waitlist'), a pre-order form, or even a Calendly link to book a demo.",
-      },
-      {
-        type: "list",
-        content: "",
-        items: [
-          "Carrd or Framer for a fast, professional-looking page",
-          "A domain name that communicates the product clearly",
-          "One headline that states the outcome, not the feature",
-          "Three bullet points of benefits",
-          "A single CTA button",
-        ],
-      },
-      {
-        type: "callout",
-        calloutType: "cta",
-        content: "A smoke test page needs a credible domain. Find an available one in minutes.",
-        ctaLink: "/generate",
-        ctaText: "Generate Domain Names →",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Step 4: Drive Traffic to Your Page (Days 4–5)",
-      },
-      {
-        type: "paragraph",
-        content: "Post in communities where your target users live. Reddit is underrated for this — find the subreddits where your ideal customer hangs out and post something genuinely useful, then mention what you're building. LinkedIn works if your product is B2B. Twitter/𝕏 works if your audience is founders or technical people.",
-      },
-      {
-        type: "paragraph",
-        content: "You can also run a small paid campaign — £50–100 on Google or Meta, targeted precisely at your audience. This isn't marketing spend. It's research spend. The conversion rate on that spend tells you more about product-market fit than a hundred conversations.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Step 5: Read the Signal (Day 6–7)",
-      },
-      {
-        type: "paragraph",
-        content: "What you're looking for is not a number — it's a ratio. If 100 people visited your page and 30 signed up for the waitlist, that's an extraordinary signal. If 100 visited and 1 signed up, the messaging is off or the problem isn't felt strongly enough.",
-      },
-      {
-        type: "paragraph",
-        content: "Email everyone who signed up. Tell them you're building this and ask: what made you sign up? What problem were you hoping it would solve? These answers will shape the entire product.",
-      },
-      {
-        type: "callout",
-        calloutType: "tip",
-        content: "A good conversion rate on a cold traffic smoke test is 5–15%. Anything over 15% is exceptional. Under 3% means something is wrong — usually the messaging, occasionally the problem.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "What Validated Looks Like",
-      },
-      {
-        type: "list",
-        content: "",
-        items: [
-          "At least 10 strangers confirmed the problem in interviews",
-          "You found a clear gap in what existing tools offer",
-          "Your landing page converted at 5%+ from relevant traffic",
-          "At least 5 people said 'how soon can I use this?'",
-          "At least 2 people tried to pay you, even before it existed",
-        ],
-      },
-      {
-        type: "paragraph",
-        content: "If you hit three or more of those, you have enough signal to start building. Not forever — just enough to start. Validation is a continuous process, not a one-time gate.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "What Invalidated Looks Like",
-      },
-      {
-        type: "paragraph",
-        content: "Interviews where people say 'that's a good idea' but can't name an instance where the problem actually cost them anything. Landing pages where everyone who visits is a friend or family member. Communities that discuss the problem theoretically but wouldn't switch from their current solution.",
-      },
-      {
-        type: "paragraph",
-        content: "Invalidation is not failure — it's information. The goal is to get that information as cheaply as possible. That's the whole point of validating before building.",
-      },
-      {
-        type: "callout",
-        calloutType: "cta",
-        content: "When you're ready to build, start with the right brand foundation.",
-        ctaLink: "/generate",
-        ctaText: "Find Your Brand Name →",
-      },
-    ],
-    faqs: [
-      {
-        question: "How many customer interviews do I need to validate an idea?",
-        answer: "Ten is a good minimum for pattern recognition. You're listening for consistent themes — if 7 of 10 people mention the same frustration, that's a signal. More interviews are better, but ten conducted properly is enough to start drawing conclusions.",
-      },
-      {
-        question: "What if my landing page converts terribly?",
-        answer: "First, check the traffic quality — are these people actually in your target market? Second, review your headline — does it state a clear outcome, not a feature? Third, consider whether the problem is painful enough. Low conversion can mean weak messaging or a weak problem. Both are valuable to learn early.",
-      },
-      {
-        question: "Can I validate with a free offer instead of a paid one?",
-        answer: "You can, but be careful. Free signups validate interest, not intent to pay. If your business requires revenue, try to get people to exchange something with real value — money, or at minimum a detailed interview commitment. The friction of that exchange reveals whether they care enough.",
-      },
-    ],
-  },
-
   // Tool Comparisons
   {
     slug: "namecheap-business-name-generator-vs-namolux",
@@ -7398,206 +6671,6 @@ export const blogPosts: BlogPost[] = [
   },
 
   // ── Tool Comparisons (April 2026) ──────────────────────────────────
-  {
-    slug: "tested-7-ai-name-generators",
-    title: "I Tested 7 AI Name Generators So You Don't Have To (2026 Results)",
-    description: "We put 7 popular AI name generators through the same test: one keyword, 10 minutes each. Here's what they actually produced — and which one was worth using.",
-    seoTitle: "7 AI Name Generators Tested and Compared | 2026 Honest Review",
-    metaDescription: "We tested 7 AI name generators with the same keyword. See real results, actual availability rates, and which tool produced the best brandable names in 2026.",
-    category: "Tool Comparisons",
-    readTime: 11,
-    publishedAt: "2026-04-07",
-    author: "NamoLux Team",
-    content: [
-      {
-        type: "paragraph",
-        content: "Every founder has the same experience: you need a name, you Google 'AI name generator,' and you're hit with a dozen options that all claim to use artificial intelligence to generate the perfect brand name. But which ones actually work?",
-      },
-      {
-        type: "paragraph",
-        content: "We tested seven popular AI name generators using the same keyword ('fintech'), the same time limit (10 minutes per tool), and the same evaluation criteria. Here's what actually happened.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "The Test Setup",
-      },
-      {
-        type: "list",
-        content: "",
-        items: [
-          "Keyword: 'fintech' (competitive space, high bar for quality)",
-          "Time per tool: 10 minutes of active use",
-          "What we measured: number of names generated, .com availability rate, brandability quality, and unique features",
-          "What we looked for: names you'd actually build a company on — not just names that are technically available",
-        ],
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "1. Namelix",
-      },
-      {
-        type: "paragraph",
-        content: "Namelix is the most recognizable name generator on the market. It generates names using AI, shows logo mockups alongside each name, and lets you filter by name length and style. The interface is polished and the volume of output is high — we got 100+ names in our 10-minute window.",
-      },
-      {
-        type: "paragraph",
-        content: "The issue: quantity over quality. Most results were generic keyword combinations (FinoHub, PayEdge, MoneyVault) that you'd find in any random name generator from 2015. The AI generates names quickly but doesn't evaluate them — there's no scoring, no phonetic analysis, and no indication of which names are actually good versus merely available. The logo mockups, while visually appealing, can bias you toward a mediocre name that looks good in a specific font.",
-      },
-      {
-        type: "paragraph",
-        content: "Availability rate: Roughly 40% of the names had .com domains available. But most of the available ones were the generic, low-quality suggestions — the better-sounding names were almost always taken.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "2. Squadhelp",
-      },
-      {
-        type: "paragraph",
-        content: "Squadhelp takes a different approach — it combines an AI generator with a marketplace of pre-vetted premium names and a community naming contest option. The AI generator itself is basic, but the curated marketplace has genuinely strong names (at premium prices ranging from $1,000 to $50,000+).",
-      },
-      {
-        type: "paragraph",
-        content: "For founders on a budget, the AI generator alone doesn't justify the visit. The marketplace is where the real value lives, but it's not a free solution — it's a premium name broker with AI generation as a side feature.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "3. Looka (Business Name Generator)",
-      },
-      {
-        type: "paragraph",
-        content: "Looka is primarily a logo design platform that added a name generator. The naming tool feels exactly like what it is — an afterthought. Results were mostly keyword + suffix patterns (FinoTech, PayaFi, CashLynk) with no quality differentiation. The real pitch is that you can immediately design a logo for any name you pick, which locks you into Looka's paid logo service.",
-      },
-      {
-        type: "paragraph",
-        content: "If you need a logo, Looka is worth exploring for that specific purpose. For naming alone, it's not competitive.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "4. Shopify Business Name Generator",
-      },
-      {
-        type: "paragraph",
-        content: "Shopify's generator is free and fast, but it's clearly designed to funnel users into Shopify's e-commerce platform. The names are heavily oriented toward retail and e-commerce patterns, and availability checking routes you directly to Shopify's domain registration. For a fintech startup, the results felt off-target — lots of 'shop' and 'store' patterns that don't fit the industry.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "5. Lean Domain Search",
-      },
-      {
-        type: "paragraph",
-        content: "Lean Domain Search (acquired by Automattic) takes a purely keyword-combination approach. Type 'fintech' and get hundreds of two-word combinations: FintechPeak, FintechForge, PrimFintech, and so on. Every result has a .com available — because the tool only shows what's available.",
-      },
-      {
-        type: "paragraph",
-        content: "The advantage: you'll always find something available. The disadvantage: all the names feel like the same template with different words plugged in. There's no AI, no quality scoring, and no attempt to generate genuinely brandable invented names. It's a keyword combiner, not a brand builder.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "6. Panabee",
-      },
-      {
-        type: "paragraph",
-        content: "Panabee generates names based on syllable patterns derived from your input words. It also checks social media handle availability alongside domain availability, which is a nice touch. The output quality is inconsistent — some genuinely interesting phonetic combinations mixed in with a lot of random-looking strings. No scoring or quality filtering means you're doing all the evaluation work yourself.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "7. NamoLux",
-      },
-      {
-        type: "paragraph",
-        content: "Full disclosure: we built NamoLux, so we're obviously biased. But here's what the tool actually produced in the same 10-minute test, using the same 'fintech' keyword.",
-      },
-      {
-        type: "paragraph",
-        content: "NamoLux generated 40+ names across four style modes (invented, blended, metaphor, and real-word). Each name came with a Founder Signal score (0–100) evaluating pronounceability, memorability, length, extension strength, character quality, and brand risk. The tool checked .com availability in real-time and flagged the top-scoring names with available domains.",
-      },
-      {
-        type: "paragraph",
-        content: "The key difference: instead of scrolling through 100+ unranked names hoping something catches your eye, you start from the top-scored names and work down. The scoring eliminates the paradox of choice that makes other generators exhausting to use.",
-      },
-      {
-        type: "callout",
-        calloutType: "cta",
-        content: "See the difference for yourself. Enter a keyword and get quality-scored brand names with live .com availability.",
-        ctaLink: "/generate",
-        ctaText: "Try NamoLux Free →",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Side-by-Side Results",
-      },
-      {
-        type: "table",
-        content: "",
-        headers: ["Tool", "Names Generated", "Quality Scoring", "Availability Check", "Best For"],
-        rows: [
-          ["Namelix", "100+", "None", "Basic", "High volume browsing"],
-          ["Squadhelp", "30+", "None (AI), Curated (marketplace)", "Yes", "Premium name purchases"],
-          ["Looka", "50+", "None", "Basic", "Logo design (not naming)"],
-          ["Shopify", "100+", "None", "Shopify only", "E-commerce brands"],
-          ["Lean Domain Search", "200+", "None", "100% available", "Finding any available .com"],
-          ["Panabee", "40+", "None", "Domain + social", "Social handle checking"],
-          ["NamoLux", "40+", "Founder Signal (0–100)", "Real-time .com", "Brand-quality names with scoring"],
-        ],
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "What We Learned",
-      },
-      {
-        type: "paragraph",
-        content: "The biggest problem with most name generators isn't the names they produce — it's the lack of evaluation. When a tool gives you 200 names with no way to distinguish good from bad, you're not closer to a decision. You're just overwhelmed. The tools that performed best were the ones that helped you evaluate, not just generate.",
-      },
-      {
-        type: "paragraph",
-        content: "The second insight: 'AI-powered' is meaningless as a differentiator. Nearly every tool claims AI, but most are doing basic keyword combination with a language model veneer. The question isn't whether a tool uses AI — it's whether the AI is trained or tuned for brand naming specifically, and whether the output is evaluated on brand-relevant criteria.",
-      },
-      {
-        type: "heading",
-        level: 2,
-        content: "Our Recommendation",
-      },
-      {
-        type: "paragraph",
-        content: "If you want high-volume keyword combinations with guaranteed availability, use Lean Domain Search. It's free and does exactly what it promises. If you have budget for a premium pre-made name, explore Squadhelp's marketplace. If you want AI-generated names that are actually scored for brand quality — and you want to make a confident decision instead of scrolling endlessly — NamoLux is what we'd recommend (and obviously, what we built it for).",
-      },
-      {
-        type: "callout",
-        calloutType: "cta",
-        content: "Stop scrolling through hundreds of unscored names. Generate brand names ranked by quality, with live .com availability, in seconds.",
-        ctaLink: "/generate",
-        ctaText: "Generate Scored Names →",
-      },
-    ],
-    faqs: [
-      {
-        question: "Which AI name generator is the best overall?",
-        answer: "It depends on your goal. For pure volume of available domains, Lean Domain Search can't be beat. For premium curated names, Squadhelp's marketplace is strong. For brand-quality names with objective scoring and live availability checking, NamoLux offers the most complete evaluation experience. The 'best' tool is the one that matches how you make decisions.",
-      },
-      {
-        question: "Are AI name generators better than brainstorming?",
-        answer: "For most founders, yes. AI generators produce higher volume, check availability in real-time, and remove the bias that makes brainstorming sessions converge on clever-but-impractical names. The best approach combines AI generation (for volume and variety) with human judgment (for final selection and stress testing).",
-      },
-      {
-        question: "Do I have to pay for a good name generator?",
-        answer: "No. Several quality generators including NamoLux offer free tiers that are sufficient for finding a strong brand name. Paid tiers typically offer unlimited generations, additional features like brand palette generation, and premium support — but you can find an excellent name without spending anything beyond the domain registration fee.",
-      },
-      {
-        question: "How many names should I generate before picking one?",
-        answer: "Aim for at least 50 candidates before narrowing down. This gives you enough variety to compare meaningfully. Generate across different style modes (invented, blended, metaphor) and then score your top 10 on pronounceability, memorability, length, and domain availability. From those 10, stress-test your top 3 with real people before making a final decision.",
-      },
-    ],
-  },
   {
     slug: "free-vs-paid-domain-name-generators",
     title: "Free vs Paid Domain Name Generators: What You Actually Get",

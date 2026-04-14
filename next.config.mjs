@@ -36,6 +36,40 @@ const nextConfig = {
       ["find-available-com-domain-2026", "domain-name-availability-checker-com-guide"],
       // Earlier consolidations (exact-duplicate slug + accidental ChatGPT duplicate)
       ["chatgpt-for-domain-names-vs-namolux", "namolux-vs-chatgpt-domain-name-generator"],
+      // Technical SEO cluster → technical-seo-checklist-2026 (44 impressions)
+      ["technical-seo-guide", "technical-seo-checklist-2026"],
+      // On-page SEO cluster → on-page-seo-complete-guide
+      ["on-page-seo-checklist", "on-page-seo-complete-guide"],
+      // Pricing SaaS cluster → pricing-strategy-for-saas (39 impressions)
+      ["pricing-your-saas-product", "pricing-strategy-for-saas"],
+      ["pricing-new-saas", "pricing-strategy-for-saas"],
+      // Best AI generator roundup cluster → best-ai-domain-name-generators-2026
+      ["best-ai-domain-name-generators", "best-ai-domain-name-generators-2026"],
+      ["best-domain-name-generator-2026", "best-ai-domain-name-generators-2026"],
+      ["top-10-ai-business-name-generators-tested", "best-ai-domain-name-generators-2026"],
+      ["tested-7-ai-name-generators", "best-ai-domain-name-generators-2026"],
+      // First customers cluster → first-100-customers-playbook
+      ["first-1000-customers", "first-100-customers-playbook"],
+      ["first-100-customers-founders", "first-100-customers-playbook"],
+      // Validate idea cluster → how-to-validate-a-business-idea
+      ["validate-startup-idea-before-building", "how-to-validate-a-business-idea"],
+      ["saas-idea-validation-playbook-for-founders", "how-to-validate-a-business-idea"],
+      ["validate-business-idea-without-code", "how-to-validate-a-business-idea"],
+      // Keyword research cluster → keyword-research-guide
+      ["keyword-research-for-new-websites", "keyword-research-guide"],
+      // Local SEO cluster → local-seo-complete-guide
+      ["local-seo-guide-small-business", "local-seo-complete-guide"],
+      // Schema markup cluster → schema-markup-beginners-guide
+      ["schema-markup-for-startups", "schema-markup-beginners-guide"],
+      // Page speed cluster → page-speed-for-founders-guide
+      ["site-speed-priorities-2026", "page-speed-for-founders-guide"],
+      // Topical authority cluster → topical-authority-without-100-posts (has 15 impressions)
+      ["topical-authority-seo-plan-for-new-websites", "topical-authority-without-100-posts"],
+      // AI Overviews cluster → ai-overviews-seo-strategy-2026
+      ["ai-overviews-seo-strategy", "ai-overviews-seo-strategy-2026"],
+      // SEO audit cluster → seo-audit-tool-guide (55 impressions)
+      ["what-real-seo-audit-shows", "seo-audit-tool-guide"],
+      ["website-seo-checker", "seo-audit-tool-guide"],
     ]
 
     return [
