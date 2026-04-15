@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "token_limit_reached",
-          message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.",
+          message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.",
           upgradeUrl: "/pricing",
         },
         { status: 429 }

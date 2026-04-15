@@ -108,8 +108,8 @@ export function GenerateFunnel() {
         if (data.isPro) setIsPro(true)
         const t = {
           used: Number(data.used ?? 0),
-          total: Number(data.total ?? 10),
-          remaining: Number(data.remaining ?? 10),
+          total: Number(data.total ?? 3),
+          remaining: Number(data.remaining ?? 3),
         }
         setTokens(t)
         // Tokens already exhausted before they generate? Prime the paywall state.
@@ -203,8 +203,8 @@ export function GenerateFunnel() {
             if (t.isPro) setIsPro(true)
             setTokens({
               used: Number(t.used ?? 0),
-              total: Number(t.total ?? 10),
-              remaining: Number(t.remaining ?? 10),
+              total: Number(t.total ?? 3),
+              remaining: Number(t.remaining ?? 3),
             })
           })
           .catch(() => {})
@@ -386,7 +386,7 @@ export function GenerateFunnel() {
         )}
         {tokensExhausted && !isPro && (
           <p className="mt-3 text-xs text-center" style={{ color: GOLD }}>
-            You've used all {tokens?.total ?? 10} free generations — unlock lifetime access below ↓
+            You've used all {tokens?.total ?? 3} free generations — unlock lifetime access below ↓
           </p>
         )}
         {error && (

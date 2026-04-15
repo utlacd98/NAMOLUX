@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   const rateLimit = await checkRateLimit(req, "palette")
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
+      { error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
       { status: 429 }
     )
   }

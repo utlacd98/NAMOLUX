@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { getClientIP } from "@/lib/rate-limit"
 
-const FREE_TOKEN_LIMIT = 10
+const FREE_TOKEN_LIMIT = 3
 
 export async function GET(request: NextRequest) {
   try {

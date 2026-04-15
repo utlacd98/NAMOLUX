@@ -521,7 +521,7 @@ export function GenerateNames() {
   // Fetch token count on mount and after generations finish
   const refreshTokens = () => {
     fetch("/api/tokens").then(r => r.json()).then(t => {
-      setTokens({ used: t.used ?? 0, total: t.total ?? 10, remaining: t.remaining ?? 10 })
+      setTokens({ used: t.used ?? 0, total: t.total ?? 3, remaining: t.remaining ?? 3 })
       if (t.isPro) setIsPro(true)
     }).catch(() => {})
   }

@@ -11,7 +11,7 @@ export type FeatureType =
   | "name-tools"
   | "ai-chat"
 
-const FREE_TOKEN_LIMIT = 10
+const FREE_TOKEN_LIMIT = 3
 
 export interface RateLimitResult {
   allowed: boolean
@@ -98,8 +98,8 @@ export async function checkRateLimit(
     userCount = count || 0
   }
 
-  // Use the higher count — if someone used 8 tokens anonymously then signs up,
-  // they don't get another 10 tokens. IP tracks the device, user_id tracks the account.
+  // Use the higher count — if someone used tokens anonymously then signs up,
+  // they don't get another full allocation. IP tracks the device, user_id tracks the account.
   const tokensUsed = Math.max(ipCount || 0, userCount)
   const remaining = Math.max(0, FREE_TOKEN_LIMIT - tokensUsed)
 

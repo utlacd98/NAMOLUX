@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
   const rateLimit = await checkRateLimit(request, "deep-search")
   if (!rateLimit.allowed) {
     return new Response(
-      JSON.stringify({ error: "token_limit_reached", message: "You've used all 10 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" }),
+      JSON.stringify({ error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" }),
       { status: 429, headers: { "Content-Type": "application/json" } }
     )
   }

@@ -285,7 +285,7 @@ function DashboardContent() {
         const tokenRes = await fetch("/api/tokens")
         if (tokenRes.ok) {
           const t = await tokenRes.json()
-          setTokens({ used: t.used ?? 0, total: t.total ?? 10, remaining: t.remaining ?? 10 })
+          setTokens({ used: t.used ?? 0, total: t.total ?? 3, remaining: t.remaining ?? 3 })
         }
       } catch {}
 
