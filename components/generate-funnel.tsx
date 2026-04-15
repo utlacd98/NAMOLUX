@@ -677,7 +677,7 @@ function LockedOverlay({
         >
           {pending ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : <Lock className="h-4 w-4 shrink-0" />}
           <span className="whitespace-normal sm:whitespace-nowrap">
-            {pending ? "Redirecting to checkout..." : "Unlock full results — £15 lifetime"}
+            {pending ? "Redirecting to checkout..." : "Get unlimited access — £15 lifetime"}
           </span>
         </button>
 
