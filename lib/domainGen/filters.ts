@@ -126,6 +126,47 @@ export function containsKeywordRoot(name: string, roots: string[]): boolean {
   return false
 }
 
+// AI-smell suffix patterns used by isKeywordAnchored
+const MUTATION_SUFFIXES = /(?:ora|ium|ova|ity|ion|yx|era|ara|ava|ify|oxa|exa|ory|ious|eous)$/
+
+/**
+ * Reject names that are semantically anchored to an input keyword.
+ *
+ * Checks three patterns:
+ * 1. Name starts with keyword root (cloudora → cloud + ora)
+ * 2. Keyword root dominates the first 50%+ of the name (namolora → namol from namolux)
+ * 3. Keyword + mutation suffix pattern (shopium → shop + ium)
+ */
+export function isKeywordAnchored(name: string, keywords: string[]): boolean {
+  const clean = sanitiseCandidate(name)
+  if (!clean || clean.length < 4) return false
+
+  const roots = keywords.map(normaliseKeywordRoot).filter(r => r.length >= 3)
+
+  for (const root of roots) {
+    // 1. Name starts with the keyword
+    if (clean.startsWith(root)) return true
+
+    // 2. First 50%+ of the name matches the keyword's leading chars
+    //    "namolora" from "namolux" → "namo" (4 chars) matches first 57% of "namolux"
+    const matchLen = Math.min(root.length, clean.length)
+    for (let len = matchLen; len >= 4; len--) {
+      const namePrefix = clean.slice(0, len)
+      const rootPrefix = root.slice(0, len)
+      if (namePrefix === rootPrefix) {
+        // Check if this prefix dominates the name (>= 50% of name length)
+        if (len >= clean.length * 0.5) return true
+        // Check if remainder is just a mutation suffix
+        const remainder = clean.slice(len)
+        if (MUTATION_SUFFIXES.test(remainder) || remainder.length <= 3) return true
+        break
+      }
+    }
+  }
+
+  return false
+}
+
 export function hasAiSmellPattern(name: string): boolean {
   const cleanName = sanitiseCandidate(name)
   return hasBannedSuffix(cleanName) || AI_SMELL_PREFIX_RE.test(cleanName)
@@ -156,6 +197,7 @@ export function evaluateCandidateFilters(
   if (!isPronounceable(name, options.controls.style)) reasons.push("low_pronounceability")
   if (TRADEMARK_LIKE_FRAGMENTS.some((fragment) => name.includes(fragment))) reasons.push("trademark_like_fragment")
   if (containsKeywordRoot(name, options.keywordRoots || [])) reasons.push("keyword_mutation")
+  if (isKeywordAnchored(name, options.keywordRoots || [])) reasons.push("keyword_anchored")
 
   // Reject AI-generated naming patterns (fake-Latin suffixes, meaningless tech prefixes)
   if (hasBannedSuffix(name)) reasons.push("ai_smell_suffix")

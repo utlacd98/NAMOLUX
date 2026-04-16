@@ -1,5 +1,5 @@
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
-import { containsKeywordRoot, passesTasteGate } from "@/lib/domainGen/filters"
+import { containsKeywordRoot, isKeywordAnchored, passesTasteGate } from "@/lib/domainGen/filters"
 import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
 import { scoreName } from "@/lib/founderSignal/scoreName"
 import type { AutoFindRequestInput } from "@/lib/domainGen/types"
@@ -342,6 +342,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
       .filter((name) => passesHardRules(name, maxLen, bannedTokens))
       .filter((name) => passesTasteGate(name))
       .filter((name) => !containsKeywordRoot(name, keywords))
+      .filter((name) => !isKeywordAnchored(name, keywords))
 
     const domainCandidates = buildDomainCandidates({
       names: filteredNames,

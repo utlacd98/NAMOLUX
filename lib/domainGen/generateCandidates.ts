@@ -5,7 +5,7 @@
   isStyleBlend,
   parseKeywordTokens,
 } from "@/lib/domainGen/synonyms"
-import { containsKeywordRoot, passesTasteGate } from "@/lib/domainGen/filters"
+import { containsKeywordRoot, isKeywordAnchored, passesTasteGate } from "@/lib/domainGen/filters"
 import type { AutoFindRequestInput, Candidate, NameStyleMode } from "@/lib/domainGen/types"
 
 interface GenerateCandidateOptions {
@@ -370,6 +370,7 @@ export function generateCandidatePool(
 
     // Keyword mutation gate — reject names derived from input keywords
     if (containsKeywordRoot(name, keywordTokens)) return
+    if (isKeywordAnchored(name, keywordTokens)) return
 
     // Suffix diversity gate
     if (name.length >= 4) {

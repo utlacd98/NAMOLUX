@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
-import { containsKeywordRoot, hasAiSmellPattern, passesTasteGate } from "@/lib/domainGen/filters"
+import { containsKeywordRoot, isKeywordAnchored, hasAiSmellPattern, passesTasteGate } from "@/lib/domainGen/filters"
 import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
@@ -222,6 +222,7 @@ export async function POST(request: NextRequest) {
         const clean = item.name.toLowerCase().replace(/[^a-z]/g, "")
         if (hasAiSmellPattern(clean)) return false
         if (containsKeywordRoot(clean, v2KeywordRoots)) return false
+        if (isKeywordAnchored(clean, v2KeywordRoots)) return false
         if (!passesTasteGate(clean)) return false
         return true
       })
@@ -291,6 +292,7 @@ export async function POST(request: NextRequest) {
     function passesQualityGate(name: string): boolean {
       if (hasAiSmellPattern(name)) return false
       if (containsKeywordRoot(name, keywordRoots)) return false
+      if (isKeywordAnchored(name, keywordRoots)) return false
       if (!passesTasteGate(name)) return false
       return true
     }
