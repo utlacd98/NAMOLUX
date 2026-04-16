@@ -1,6 +1,11 @@
 ﻿import type { AutoFindControls, FilterDecision } from "@/lib/domainGen/types"
 
 const HARD_BANNED_CLUSTERS = ["qzx", "xq", "jjj", "zzz", "vvv", "kkk", "wq"]
+
+// AI-generated name patterns — hard reject these before scoring
+const AI_SMELL_SUFFIX_RE = /(?:ora|ova|ium|yx|ara|ava|rix|trix|nix|vix|oxa|exa)$/
+const AI_SMELL_PREFIX_RE = /^(?:nexo|zyro|axio|synq|velo|zeno|quant|vex[^t]|zent|xero|vyra|zynth)/
+
 const TRADEMARK_LIKE_FRAGMENTS = [
   "google",
   "amazon",
@@ -80,6 +85,10 @@ export function evaluateCandidateFilters(
   if (hasExcessiveRepeatedLetters(name)) reasons.push("repeated_letters")
   if (!isPronounceable(name, options.controls.style)) reasons.push("low_pronounceability")
   if (TRADEMARK_LIKE_FRAGMENTS.some((fragment) => name.includes(fragment))) reasons.push("trademark_like_fragment")
+
+  // Reject AI-generated naming patterns (fake-Latin suffixes, meaningless tech prefixes)
+  if (AI_SMELL_SUFFIX_RE.test(name)) reasons.push("ai_smell_suffix")
+  if (AI_SMELL_PREFIX_RE.test(name)) reasons.push("ai_smell_prefix")
 
   for (const blocked of options.blocklist) {
     if (blocked && name.includes(blocked)) {

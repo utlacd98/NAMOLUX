@@ -383,6 +383,17 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
       if (!availabilityMap.get(candidate.domain)) continue
       if (pickedNames.has(candidate.name)) continue
 
+      // ── Batch Diversity Enforcement ──
+      // No more than 2 names sharing the same 4-char prefix (root overlap)
+      const prefix4 = candidate.name.slice(0, 4)
+      const rootOverlap = picked.filter(p => p.name.slice(0, 4) === prefix4).length
+      if (rootOverlap >= 2) continue
+
+      // No more than 2 names sharing the same 2-char suffix pattern
+      const suffix2 = candidate.name.slice(-2)
+      const suffixOverlap = picked.filter(p => p.name.slice(-2) === suffix2).length
+      if (suffixOverlap >= 2) continue
+
       picked.push({
         name: candidate.name,
         tld: candidate.tld,

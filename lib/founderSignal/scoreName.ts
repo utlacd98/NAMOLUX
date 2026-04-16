@@ -67,6 +67,20 @@ const DICTIONARY_WORDS = new Set([
   "trust", "vault", "wealth", "ledger", "pure", "glow", "dream", "forge", "pixel"
 ])
 
+// Real-word substrates that signal metaphorical depth / brand weight
+// Names built on these feel grounded, not randomly generated
+const REAL_WORD_SUBSTRATES = new Set([
+  "drift", "loom", "plaid", "stripe", "slate", "grain", "bloom", "ember",
+  "flint", "grove", "haven", "ridge", "vale", "crest", "shore", "field",
+  "stone", "forge", "raven", "wren", "cedar", "birch", "cliff", "peak",
+  "dune", "glen", "fern", "moss", "sage", "tide", "helm", "arch",
+  "blade", "prism", "gleam", "craft", "lumen", "orbit", "pulse", "spark",
+  "frame", "lever", "scope", "scale", "vista", "loft", "nest", "base",
+  "root", "stem", "core", "seed", "bolt", "hinge", "pivot", "wedge",
+  "clad", "sift", "mend", "tend", "fold", "cast", "mint", "bond",
+  "knot", "link", "mesh", "weave", "loop", "arc", "span", "rift",
+])
+
 // Awkward consonant clusters that hurt pronounceability
 // Natural English blends (str, thr, sch, tch, ght, etc.) are intentionally excluded —
 // they appear in real brand names like Stripe, Three, Chrome, Watch, Night.
@@ -240,8 +254,30 @@ function calculateMemorabilityScore(name: string): number {
   // Triple letter penalty
   if (/(.)\1\1/.test(name)) score -= 15
 
+  // AI-generated patterns are forgettable — they sound alike, blend together
+  if (/(?:ora|ova|ium|yx|ara|ava|rix|trix|oxa|exa)$/.test(name)) score -= 20
+  if (/^(?:nexo|zyro|axio|synq|velo|zeno|quant|vex|zent|xero|vyra|zynth)/.test(name)) score -= 15
+
   // Bonus for clear word structure (contains recognizable patterns)
   if (/^[a-z]+[aeiouy][a-z]+$/i.test(name) && syllables >= 2) score += 5
+
+  // ── Positive Signals: names that feel founder-grade ──
+
+  // Natural CVCV rhythm (Figma, Canva, Notion, Stripe patterns)
+  if (/^[bcdfghjklmnpqrstvwxyz][aeiouy][bcdfghjklmnpqrstvwxyz][aeiouy]([bcdfghjklmnpqrstvwxyz][aeiouy]?)?$/.test(name)) {
+    score += 8 // clean invented word with natural rhythm
+  }
+
+  // Real-word substrate: name contains a recognisable English word of 4+ letters
+  // (signals metaphorical depth — like "Stripe", "Notion", "Loom", "Plaid")
+  if (Array.from(REAL_WORD_SUBSTRATES).some(w => name.includes(w) && name.length <= w.length + 3)) {
+    score += 6
+  }
+
+  // Ends with a natural English sound (not a bolted-on morpheme)
+  if (/(?:le|er|en|on|in|al|an|ar|el|or|nt|st|ft|ld|nd|ve|ke|se|te|ne|de|ge|pe|be|me|ce|re)$/.test(name)) {
+    score += 3
+  }
 
   return clamp(score, 0, 100)
 }
@@ -326,6 +362,25 @@ function calculateBrandRiskScore(name: string): number {
   // Overused suffixes: -ly, -ify (when overused)
   if (/ify$/.test(name)) score -= 8
   if (/ly$/.test(name) && name.length > 5) score -= 5
+
+  // ── AI Smell Detection (Founder Instinct Layer) ──
+  // Fake-Latin / generator suffixes bolted onto invented roots
+  const AI_SMELL_SUFFIXES = /(?:ora|ova|ium|yx|ara|ava|rix|trix|nix|vix|oxa|exa)$/
+  const AI_SMELL_PREFIXES = /^(?:nexo|zyro|axio|synq|velo|zeno|quant|vex|zent|xero|vyra|zynth)/
+  if (AI_SMELL_SUFFIXES.test(name)) score -= 25
+  if (AI_SMELL_PREFIXES.test(name)) score -= 25
+
+  // Keyword + generic morpheme glue (e.g. "horizon" → "horizora", "horizium")
+  // Detect: recognisable root (≥4 chars) followed by a short generic tail (≤3 chars)
+  const tailMatch = name.match(/^(.{4,})([aeiouy][a-z]{0,2})$/)
+  if (tailMatch) {
+    const tail = tailMatch[2]
+    if (/^(ora|ova|ium|yx|ix|era|ara|ava|oxa)$/.test(tail)) score -= 15
+  }
+
+  // Overuse of uncommon letters purely for "tech" signalling
+  const exoticCount = (name.match(/[xzq]/g) || []).length
+  if (exoticCount >= 2 && name.length <= 8) score -= 12
 
   return clamp(score, 0, 100)
 }

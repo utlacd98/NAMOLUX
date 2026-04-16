@@ -21,37 +21,23 @@ interface GenerateCandidateOptions {
   seedSalt?: string
 }
 
+// Natural, metaphor-rich morphemes — grounded real words that signal brand weight
+// Avoids the "nova/nexus/flux/pixel" generator trap
 const FLAIR_MORPHEMES = [
-  "mint",
-  "nova",
-  "lumen",
-  "pulse",
-  "atlas",
-  "forge",
-  "craft",
-  "halo",
-  "zen",
-  "spark",
-  "vault",
-  "nexus",
-  "drift",
-  "prism",
-  "ember",
-  "aurora",
-  "quill",
-  "pixel",
-  "snap",
-  "hive",
-  "flux",
-  "stride",
-  "anchor",
-  "echo",
-  "crest",
-  "field",
-  "orbit",
-  "core",
-  "frame",
-  "blend",
+  // Nature / terrain — timeless, distinctive
+  "drift", "ember", "grove", "ridge", "vale", "shore", "glen", "fern",
+  "cedar", "birch", "dune", "moss", "sage", "tide", "bloom", "wren",
+  // Material / craft — signals quality
+  "forge", "craft", "loom", "slate", "flint", "grain", "clad", "mint",
+  // Structure / precision — signals competence
+  "frame", "hinge", "lever", "scope", "arch", "bolt", "wedge", "pivot",
+  "span", "helm", "loft", "base", "stem", "root", "core", "bond",
+  // Light / perception — signals clarity
+  "lumen", "gleam", "prism", "spark", "vista", "crest", "cast", "beacon",
+  // Movement / action — signals energy
+  "stride", "sift", "tend", "fold", "loop", "arc", "rift", "pulse",
+  // Human / warmth — signals approachability
+  "haven", "nest", "hearth", "quill", "echo", "mend", "knot", "weave",
 ]
 
 const TASTEFUL_SUFFIXES = ["hq", "lab", "app", "get", "try", "join"]
@@ -148,10 +134,13 @@ function createWordplayBlend(first: string, second: string): string {
 function createRealWordTwist(base: string): string {
   const clean = toAsciiWord(base)
   if (clean.length <= 3) return clean
-  if (clean.endsWith("t")) return `${clean}ry`
-  if (clean.endsWith("s")) return `${clean}io`
-  if (clean.endsWith("n")) return `${clean}ly`
-  return `${clean}ry`
+  // Use natural English endings that don't feel bolted-on
+  if (clean.endsWith("t")) return `${clean}er`
+  if (clean.endsWith("s")) return `${clean}el`
+  if (clean.endsWith("n")) return `${clean}er`
+  if (clean.endsWith("d")) return `${clean}le`
+  if (clean.endsWith("k")) return `${clean}en`
+  return `${clean}er`
 }
 
 function lightlySwapVowel(word: string): string {
@@ -230,7 +219,8 @@ function getStyleSuffixes(style: NameStyleMode): string[] {
     return ["lane", "path", "base", "point", "guide", "flow", "nest", "house", "loop"]
   }
 
-  return ["ly", "io", "ora", "ify", "forge", "beam", "pulse", "sy", "zen"]
+  // Clean endings that feel natural, not bolted-on — no fake-Latin (ora, ova, ium)
+  return ["ly", "en", "er", "al", "le", "ry", "fy", "forge", "craft", "field"]
 }
 
 function getVibeFlavor(vibe: string | undefined): {
@@ -293,15 +283,16 @@ function buildStrategyWeights(preferTwoWordBrands: boolean) {
     { value: "wordplay_blend", weight: 1.3 },
     { value: "emotive_modifier", weight: 1.35 },
     { value: "action_noun", weight: 1.15 },
-    { value: "root_suffix", weight: 1.25 },
-    { value: "prefix_root", weight: 1.1 },
+    { value: "root_suffix", weight: 0.8 },     // reduced — often produces AI-smelling output
+    { value: "prefix_root", weight: 0.7 },      // reduced — tech-prefix gluing
     { value: "vibe_compound", weight: 1.8 },
     { value: "portmanteau", weight: preferTwoWordBrands ? 0.8 : 1.5 },
-    { value: "soft_connector_blend", weight: 1.2 },
-    { value: "real_word_twist", weight: 1.15 },
-    { value: "vowel_swap", weight: 0.65 },
-    { value: "letter_omission", weight: 0.55 },
+    { value: "soft_connector_blend", weight: 0.9 }, // reduced — produces unnatural joins
+    { value: "real_word_twist", weight: 0.5 },  // reduced — appends -ry/-io/-ly mechanically
+    { value: "vowel_swap", weight: 0.25 },      // heavily reduced — mutation, not creation
+    { value: "letter_omission", weight: 0.2 },  // heavily reduced — mutation, not creation
     { value: "mood_pairing", weight: 1.1 },
+    { value: "metaphor_blend", weight: 1.6 },   // NEW — concept-driven naming
   ] as const
 }
 
@@ -417,6 +408,18 @@ export function generateCandidatePool(
       const source = styleIsBlend ? blendWords(rootA, rootB) : mergeReadableParts(verb, rootA)
       built = omitOneLetter(source)
       roots = [verb, rootA, rootB]
+    } else if (strategy === "metaphor_blend") {
+      // Concept-driven: pick from natural morphemes and blend for brand feel
+      const morphA = pickOne(FLAIR_MORPHEMES, rng)
+      const morphB = pickOne(FLAIR_MORPHEMES, rng)
+      // Either merge two concepts or use one with a clean trim
+      if (rng() > 0.5 && morphA !== morphB) {
+        built = blendWords(morphA, morphB)
+      } else {
+        // Single strong morpheme — the Stripe/Notion/Loom pattern
+        built = morphA
+      }
+      roots = [morphA, morphB]
     } else {
       built = mergeReadableParts(modifier, emotionalNoun)
       roots = [modifier, emotionalNoun]

@@ -480,9 +480,10 @@ Like "Notion" = concept, "Slack" = ease, "Plaid" = pattern.
 Find words that feel evocative and relevant but aren't literally describing the product.
 
 2. RECOGNIZABLE ROOTS WITH CLEAN ENDINGS (at least 3 names):
-Familiar word root + natural ending: -ly, -ify, -era, -io, -fy, -able, -ist, -iva, -ara, -ora.
-Like Shopify = shop + ify, Cloudera = cloud + era.
-The root must be a real, recognizable word fragment.
+Familiar word root + a natural English ending: -er, -en, -le, -al, -ly, -fy, -ry.
+Like Render = render, Timber = timber, Figma = figure + form.
+The root must be a real, recognizable word. The ending must sound like it belongs on a real English word.
+NEVER use fake-Latin endings: -ora, -ova, -ara, -ava, -ium, -yx, -ix. These are AI generator clichés.
 
 3. SHORT COMPOUND WORDS (at least 2 names):
 Two short real words combined into one name.
@@ -530,8 +531,15 @@ QUALITY TEST — before including any name:
 2. Would a founder proudly put this on their business card?
 3. Can someone hear it once and spell it correctly?
 4. Does it have an origin story — a real word, root, or concept behind it?
+5. Is it genuinely different from every other name in this batch? (different root, different ending, different feel)
 
-If any answer is no, discard and replace.${vibeNote}${deepSearchNote}${strategyNote}${takenNote}`
+If any answer is no, discard and replace.
+
+BATCH DIVERSITY — critical:
+- No two names in the batch may share the same ending pattern (e.g. if one ends "-er", no other name ends "-er")
+- No two names may be derived from the same root concept
+- The batch must feel like it came from five different creative directions, not one template
+- Aim for a MIX: one real word, one compound, one invented, one metaphorical — variety is the signal of quality${vibeNote}${deepSearchNote}${strategyNote}${takenNote}`
 
   const user = `Generate ${batchSize} unique, brandable startup names.
 
