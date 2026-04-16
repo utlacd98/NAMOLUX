@@ -1,4 +1,5 @@
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
+import { passesTasteGate } from "@/lib/domainGen/filters"
 import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
 import { scoreName } from "@/lib/founderSignal/scoreName"
 import type { AutoFindRequestInput } from "@/lib/domainGen/types"
@@ -339,6 +340,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
         return true
       })
       .filter((name) => passesHardRules(name, maxLen, bannedTokens))
+      .filter((name) => passesTasteGate(name))
 
     const domainCandidates = buildDomainCandidates({
       names: filteredNames,
