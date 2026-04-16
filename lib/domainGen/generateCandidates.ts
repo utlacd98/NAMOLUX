@@ -429,7 +429,7 @@ export function generateCandidatePool(
   let bucketIndex = 0
 
   let guard = 0
-  const maxGuard = poolSize * 20 // increased from 12× to 20× to accommodate diversity gates
+  const maxGuard = poolSize * 25 // increased to accommodate diversity + keyword rejection gates
   while (candidates.size < poolSize && guard < maxGuard) {
     guard += 1
 
@@ -521,14 +521,10 @@ export function generateCandidatePool(
       built = mergeReadableParts(built, pickOne(TASTEFUL_SUFFIXES, rng))
     }
 
-    if (keywordRoot && effectiveKeywordMode === "exact") {
-      built = keywordInPosition(built, keywordRoot, effectivePosition, rng)
-      roots = [keywordRoot, ...roots]
-    } else if (keywordRoot && effectiveKeywordMode === "partial" && rng() > 0.35) {
-      const partialToken = keywordRoot.length > 4 ? keywordRoot.slice(0, keywordRoot.length - 1) : keywordRoot
-      built = keywordInPosition(built, partialToken, effectivePosition, rng)
-      roots = [partialToken, ...roots]
-    }
+    // Keyword injection disabled — the keyword mutation filter rejects any name
+    // containing the input keyword or its prefix, so injecting keywords into
+    // candidates wastes generation cycles. Names should be inspired by keywords
+    // (via industry lexicon, related terms, vibe) not built from them.
 
     const compacted = compactToLength(normaliseCandidateName(built), targetLength)
     if (compacted.length >= 3) {

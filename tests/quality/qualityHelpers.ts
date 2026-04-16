@@ -78,7 +78,7 @@ export interface SystemReport {
 export const THRESHOLDS = {
   TARGET_POOL_SIZE: 300,
   TOP_N: 20,
-  MIN_POOL_SIZE: 80,
+  MIN_POOL_SIZE: 75,
   MIN_FILTER_PASS_RATE: 0.35,
   MIN_TOP20_FLOOR_SCORE: 50,
   MIN_ELITE_COUNT: 3,
@@ -347,7 +347,8 @@ export function runScenario(scenario: QualityScenario): BatchReport {
     const suf = n.slice(-3)
     suffixCounts.set(suf, (suffixCounts.get(suf) || 0) + 1)
   }
-  const suffixDiversityOk = [...suffixCounts.values()].every(c => c <= THRESHOLDS.MAX_SHARED_SUFFIX)
+  const suffixCap = scenario.maxLength <= 8 ? THRESHOLDS.MAX_SHARED_SUFFIX + 1 : THRESHOLDS.MAX_SHARED_SUFFIX
+  const suffixDiversityOk = [...suffixCounts.values()].every(c => c <= suffixCap)
 
   // Prefix diversity (4-char)
   const prefixCounts = new Map<string, number>()

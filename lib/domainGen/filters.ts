@@ -106,9 +106,11 @@ export function containsKeywordRoot(name: string, roots: string[]): boolean {
     // Full substring match
     if (root.length >= 3 && cleanName.includes(root)) return true
 
-    // Short roots (2-3 chars): only match if the name IS the root or starts/ends with it
+    // Short roots (≤3 chars): reject any name containing the keyword as a substring.
+    // "ai" → rejects "aiora", "aiium", "webai", "maido" (contains "ai")
+    // This eliminates short-root mutation spam entirely.
     if (root.length <= 3) {
-      if (cleanName === root || cleanName.startsWith(root) || cleanName.endsWith(root)) return true
+      if (cleanName.includes(root)) return true
       continue
     }
 
