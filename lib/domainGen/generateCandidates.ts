@@ -338,18 +338,92 @@ export function generateCandidatePool(
 
   const candidates = new Map<string, Candidate>()
 
+  // ── Diversity tracking ──────────────────────────────────────────────────
+  // Lightweight counters that prevent suffix/prefix/root/rhythm clustering
+  const suffixUsage = new Map<string, number>()   // 3-char suffix → count
+  const prefixUsage = new Map<string, number>()   // 4-char prefix → count
+  const keywordRootUsage = new Map<string, number>() // keyword token → count
+  const rhythmUsage = new Map<string, number>()    // syllable-length pattern → count
+
+  // Scale diversity caps with target length — short names have fewer possible endings
+  const isShortTarget = targetLength <= 8
+  const MAX_SUFFIX_REUSE = isShortTarget ? 3 : 2
+  const MAX_PREFIX_REUSE = isShortTarget ? 4 : 3
+  const MAX_KEYWORD_ROOT_REUSE = 2
+  const MAX_RHYTHM_REUSE = isShortTarget ? 12 : 8
+
+  function countNameSyllables(n: string): number {
+    return (n.match(/[aeiouy]+/g) || []).length
+  }
+
   const tryAdd = (candidate: Candidate | null) => {
     if (!candidate || !candidate.name) return
     if (candidate.name.length < 3) return
     if (hasUglyCollision(candidate.name)) return
+    if (candidates.has(candidate.name)) return
 
-    if (!candidates.has(candidate.name)) {
-      candidates.set(candidate.name, candidate)
+    const name = candidate.name
+
+    // Suffix diversity gate
+    if (name.length >= 4) {
+      const suf3 = name.slice(-3)
+      const sufCount = suffixUsage.get(suf3) || 0
+      if (sufCount >= MAX_SUFFIX_REUSE) return // skip, suffix overused
     }
+
+    // Prefix diversity gate
+    if (name.length >= 5) {
+      const pre4 = name.slice(0, 4)
+      const preCount = prefixUsage.get(pre4) || 0
+      if (preCount >= MAX_PREFIX_REUSE) return
+    }
+
+    // Root keyword diversity gate
+    for (const token of keywordTokens) {
+      if (token.length >= 3 && name.includes(token)) {
+        const kwCount = keywordRootUsage.get(token) || 0
+        if (kwCount >= MAX_KEYWORD_ROOT_REUSE) return
+      }
+    }
+
+    // Phonetic rhythm diversity gate (syllable count + length bucket)
+    const rhythm = `${countNameSyllables(name)}-${Math.floor(name.length / 2)}`
+    const rhythmCount = rhythmUsage.get(rhythm) || 0
+    if (rhythmCount >= MAX_RHYTHM_REUSE) return
+
+    // Passed all gates — accept and update counters
+    candidates.set(name, candidate)
+
+    if (name.length >= 4) {
+      const suf3 = name.slice(-3)
+      suffixUsage.set(suf3, (suffixUsage.get(suf3) || 0) + 1)
+    }
+    if (name.length >= 5) {
+      const pre4 = name.slice(0, 4)
+      prefixUsage.set(pre4, (prefixUsage.get(pre4) || 0) + 1)
+    }
+    for (const token of keywordTokens) {
+      if (token.length >= 3 && name.includes(token)) {
+        keywordRootUsage.set(token, (keywordRootUsage.get(token) || 0) + 1)
+      }
+    }
+    rhythmUsage.set(rhythm, rhythmCount + 1)
   }
 
+  // ── Strategy diversity buckets ────────────────────────────────────────
+  // Group strategies into conceptual categories to ensure batch variety
+  const STRATEGY_BUCKETS = [
+    ["two_word_compound", "semantic_compound", "action_noun"],           // compound / real-word
+    ["wordplay_blend", "portmanteau", "soft_connector_blend"],           // blended
+    ["emotive_modifier", "vibe_compound", "mood_pairing"],              // mood / abstract
+    ["metaphor_blend"],                                                  // metaphor
+    ["root_suffix", "prefix_root", "real_word_twist", "vowel_swap", "letter_omission"], // structural
+  ]
+  let bucketIndex = 0
+
   let guard = 0
-  while (candidates.size < poolSize && guard < poolSize * 12) {
+  const maxGuard = poolSize * 20 // increased from 12× to 20× to accommodate diversity gates
+  while (candidates.size < poolSize && guard < maxGuard) {
     guard += 1
 
     const keywordRoot = keywordTokens.length > 0 ? pickOne(keywordTokens, rng) : ""
@@ -361,7 +435,16 @@ export function generateCandidatePool(
     const suffix = pickOne(suffixes, rng)
     const emotionalNoun = pickOne(emotionalNouns, rng)
     const styleIsBlend = isStyleBlend(effectiveStyle)
-    const strategy = pickWeighted(strategyWeights as Array<{ value: string; weight: number }>, rng)
+
+    // Rotate through strategy buckets every 5 iterations to force diversity
+    let strategy: string
+    if (guard % 5 === 0) {
+      const bucket = STRATEGY_BUCKETS[bucketIndex % STRATEGY_BUCKETS.length]
+      strategy = pickOne(bucket, rng)
+      bucketIndex++
+    } else {
+      strategy = pickWeighted(strategyWeights as Array<{ value: string; weight: number }>, rng)
+    }
 
     let built = ""
     let roots: string[] = [rootA, rootB]

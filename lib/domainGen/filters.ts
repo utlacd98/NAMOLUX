@@ -1,9 +1,25 @@
 ﻿import type { AutoFindControls, FilterDecision } from "@/lib/domainGen/types"
 
 const HARD_BANNED_CLUSTERS = ["qzx", "xq", "jjj", "zzz", "vvv", "kkk", "wq"]
+const BANNED_AI_SMELL_SUFFIXES = [
+  "ora",
+  "ium",
+  "ova",
+  "yx",
+  "era",
+  "ion",
+  "ity",
+  "ara",
+  "ava",
+  "rix",
+  "trix",
+  "nix",
+  "vix",
+  "oxa",
+  "exa",
+]
 
 // AI-generated name patterns — hard reject these before scoring
-const AI_SMELL_SUFFIX_RE = /(?:ora|ova|ium|yx|ara|ava|rix|trix|nix|vix|oxa|exa)$/
 const AI_SMELL_PREFIX_RE = /^(?:nexo|zyro|axio|synq|velo|zeno|quant|vex[^t]|zent|xero|vyra|zynth)/
 
 const TRADEMARK_LIKE_FRAGMENTS = [
@@ -62,6 +78,27 @@ export function sanitiseCandidate(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9-]/g, "")
 }
 
+function normaliseKeywordRoot(root: string): string {
+  return sanitiseCandidate(root)
+}
+
+export function hasBannedSuffix(name: string): boolean {
+  const cleanName = sanitiseCandidate(name)
+  return BANNED_AI_SMELL_SUFFIXES.some((suffix) => cleanName.endsWith(suffix))
+}
+
+export function containsKeywordRoot(name: string, roots: string[]): boolean {
+  const cleanName = sanitiseCandidate(name)
+  const safeRoots = roots.map(normaliseKeywordRoot).filter((root) => root.length >= 3)
+
+  return safeRoots.some((root) => cleanName.includes(root))
+}
+
+export function hasAiSmellPattern(name: string): boolean {
+  const cleanName = sanitiseCandidate(name)
+  return hasBannedSuffix(cleanName) || AI_SMELL_PREFIX_RE.test(cleanName)
+}
+
 export function evaluateCandidateFilters(
   rawCandidate: string,
   options: {
@@ -69,6 +106,7 @@ export function evaluateCandidateFilters(
     controls: AutoFindControls
     blocklist: string[]
     allowlist: string[]
+    keywordRoots?: string[]
   },
 ): FilterDecision {
   const name = sanitiseCandidate(rawCandidate)
@@ -85,9 +123,10 @@ export function evaluateCandidateFilters(
   if (hasExcessiveRepeatedLetters(name)) reasons.push("repeated_letters")
   if (!isPronounceable(name, options.controls.style)) reasons.push("low_pronounceability")
   if (TRADEMARK_LIKE_FRAGMENTS.some((fragment) => name.includes(fragment))) reasons.push("trademark_like_fragment")
+  if (containsKeywordRoot(name, options.keywordRoots || [])) reasons.push("keyword_mutation")
 
   // Reject AI-generated naming patterns (fake-Latin suffixes, meaningless tech prefixes)
-  if (AI_SMELL_SUFFIX_RE.test(name)) reasons.push("ai_smell_suffix")
+  if (hasBannedSuffix(name)) reasons.push("ai_smell_suffix")
   if (AI_SMELL_PREFIX_RE.test(name)) reasons.push("ai_smell_prefix")
 
   for (const blocked of options.blocklist) {
