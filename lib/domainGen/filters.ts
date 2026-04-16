@@ -87,11 +87,41 @@ export function hasBannedSuffix(name: string): boolean {
   return BANNED_AI_SMELL_SUFFIXES.some((suffix) => cleanName.endsWith(suffix))
 }
 
+/**
+ * Reject names derived from any input keyword — full match, substring, or truncated prefix.
+ *
+ * Given roots ["horizon", "pulse"], rejects:
+ *   "horizora"  — contains "horizon" (full)
+ *   "horizium"  — contains "horiz" (truncated prefix, 5 chars)
+ *   "pulser"    — contains "pulse" (full)
+ *   "pulsify"   — contains "puls" (truncated prefix, 4 chars)
+ *
+ * Short roots (≤3 chars) require exact containment to avoid false positives.
+ */
 export function containsKeywordRoot(name: string, roots: string[]): boolean {
   const cleanName = sanitiseCandidate(name)
-  const safeRoots = roots.map(normaliseKeywordRoot).filter((root) => root.length >= 3)
+  const safeRoots = roots.map(normaliseKeywordRoot).filter((root) => root.length >= 2)
 
-  return safeRoots.some((root) => cleanName.includes(root))
+  for (const root of safeRoots) {
+    // Full substring match
+    if (root.length >= 3 && cleanName.includes(root)) return true
+
+    // Short roots (2-3 chars): only match if the name IS the root or starts/ends with it
+    if (root.length <= 3) {
+      if (cleanName === root || cleanName.startsWith(root) || cleanName.endsWith(root)) return true
+      continue
+    }
+
+    // Truncated prefix match — catch "horiz" from "horizon", "puls" from "pulse"
+    // Use prefixes from 4 chars up to root.length - 1
+    const minPrefix = Math.min(4, root.length - 1)
+    for (let len = root.length - 1; len >= minPrefix; len--) {
+      const prefix = root.slice(0, len)
+      if (cleanName.includes(prefix)) return true
+    }
+  }
+
+  return false
 }
 
 export function hasAiSmellPattern(name: string): boolean {

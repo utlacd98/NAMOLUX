@@ -5,7 +5,7 @@
   isStyleBlend,
   parseKeywordTokens,
 } from "@/lib/domainGen/synonyms"
-import { passesTasteGate } from "@/lib/domainGen/filters"
+import { containsKeywordRoot, passesTasteGate } from "@/lib/domainGen/filters"
 import type { AutoFindRequestInput, Candidate, NameStyleMode } from "@/lib/domainGen/types"
 
 interface GenerateCandidateOptions {
@@ -367,6 +367,9 @@ export function generateCandidatePool(
 
     // Taste gate — reject names that feel generic, awkward, or not brand-worthy
     if (!passesTasteGate(name)) return
+
+    // Keyword mutation gate — reject names derived from input keywords
+    if (containsKeywordRoot(name, keywordTokens)) return
 
     // Suffix diversity gate
     if (name.length >= 4) {
