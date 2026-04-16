@@ -99,6 +99,17 @@ const TLD_STRENGTH: Record<string, number> = {
   dev: 48,
 }
 
+/** Return a zero-score result for hard-rejected names */
+function zeroScoreResult(reasons: string[], tld: string): ScoreNameResult {
+  return {
+    score: 0,
+    label: "Brandable",
+    reasons,
+    breakdown: { lengthScore: 0, pronounceScore: 0, memorabilityScore: 0, extensionScore: 0, characterScore: 0, brandRiskScore: 0, vibeModifier: 0 },
+    rawScores: { length: 0, pronounceability: 0, memorability: 0, extension: TLD_STRENGTH[tld] || 30, characterQuality: 0, brandRisk: 0 },
+  }
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
@@ -458,6 +469,35 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const vibe = input.vibe || ""
 
   const reasons: string[] = []
+
+  // ── Keyword mutation hard block ──
+  // If keywords were provided, any name containing a keyword root scores 0.
+  // This is the last line of defence — names should already be rejected by
+  // filters, but this ensures they never appear with a real score.
+  if (input.keywords && input.keywords.length > 0) {
+    for (const kw of input.keywords) {
+      const root = kw.toLowerCase().replace(/[^a-z]/g, "")
+      if (root.length <= 3) {
+        if (name.includes(root)) {
+          reasons.push("Keyword mutation detected")
+          return zeroScoreResult(reasons, tld)
+        }
+      } else if (root.length >= 4) {
+        // Check full and truncated prefix (4+ chars)
+        if (name.includes(root)) {
+          reasons.push("Keyword mutation detected")
+          return zeroScoreResult(reasons, tld)
+        }
+        const minPre = Math.min(4, root.length - 1)
+        for (let len = root.length - 1; len >= minPre; len--) {
+          if (name.includes(root.slice(0, len))) {
+            reasons.push("Keyword mutation detected")
+            return zeroScoreResult(reasons, tld)
+          }
+        }
+      }
+    }
+  }
 
   // Calculate raw scores (0-100 each)
   const rawLength = calculateLengthScore(name)
