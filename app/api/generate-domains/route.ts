@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
+import { containsKeywordRoot, hasAiSmellPattern, passesTasteGate } from "@/lib/domainGen/filters"
 import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
@@ -210,11 +211,26 @@ export async function POST(request: NextRequest) {
         logGeneration(request, rateLimitResult.userId, "domain", keyword, generated.length).catch(() => {})
       }
 
+      // Apply quality filters to style V2 output — same gates as advanced generator
+      const v2KeywordRoots = keyword
+        .trim()
+        .toLowerCase()
+        .split(/[\s,]+/)
+        .filter((t: string) => t.length >= 2)
+
+      const filteredGenerated = generated.filter((item) => {
+        const clean = item.name.toLowerCase().replace(/[^a-z]/g, "")
+        if (hasAiSmellPattern(clean)) return false
+        if (containsKeywordRoot(clean, v2KeywordRoots)) return false
+        if (!passesTasteGate(clean)) return false
+        return true
+      })
+
       return NextResponse.json({
         success: true,
         generatorV2: true,
         isPro: rateLimitResult.isPro,
-        domains: generated.map((item) => ({
+        domains: filteredGenerated.map((item) => ({
           name: item.name,
           style: item.style,
           meaningShort: item.meaningShort || null,
@@ -262,37 +278,52 @@ export async function POST(request: NextRequest) {
       domainSuggestions = []
     }
 
-    let finalSuggestions = domainSuggestions
+    // ── Quality filtering on LLM output ────────────────────────────────────
+    // Apply the same filters the advanced generator uses: keyword mutation
+    // rejection, AI-smell detection, and taste gate. Without this, the basic
+    // generator returns raw GPT output with no quality control.
+    const keywordRoots = keyword
+      .trim()
+      .toLowerCase()
+      .split(/[\s,]+/)
+      .filter((t: string) => t.length >= 2)
 
-    if (hasCustomCount) {
-      // Normalise, dedupe, and cap suggestions for high-volume auto-find requests.
-      const seenNames = new Set<string>()
-      finalSuggestions = (Array.isArray(domainSuggestions) ? domainSuggestions : [])
-        .map((item: any) => {
-          const rawName = typeof item === "string" ? item : item?.name
-          const cleanName = String(rawName || "")
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "")
-            .slice(0, 63)
-
-          if (cleanName.length < 3 || seenNames.has(cleanName)) return null
-          seenNames.add(cleanName)
-
-          return {
-            name: cleanName,
-            reasoning:
-              typeof item?.reasoning === "string" && item.reasoning.trim().length > 0
-                ? item.reasoning.trim()
-                : "Generated for brandability and memorability.",
-            meaning:
-              typeof item?.meaning === "string" && item.meaning.trim().length > 0
-                ? item.meaning.trim()
-                : undefined,
-          }
-        })
-        .filter(Boolean)
-        .slice(0, safeCount)
+    function passesQualityGate(name: string): boolean {
+      if (hasAiSmellPattern(name)) return false
+      if (containsKeywordRoot(name, keywordRoots)) return false
+      if (!passesTasteGate(name)) return false
+      return true
     }
+
+    const seenNames = new Set<string>()
+    let finalSuggestions = (Array.isArray(domainSuggestions) ? domainSuggestions : [])
+      .map((item: any) => {
+        const rawName = typeof item === "string" ? item : item?.name
+        const cleanName = String(rawName || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+          .slice(0, 63)
+
+        if (cleanName.length < 3 || seenNames.has(cleanName)) return null
+        seenNames.add(cleanName)
+
+        // Quality gate — reject keyword mutations, AI patterns, and tasteless names
+        if (!passesQualityGate(cleanName)) return null
+
+        return {
+          name: cleanName,
+          reasoning:
+            typeof item?.reasoning === "string" && item.reasoning.trim().length > 0
+              ? item.reasoning.trim()
+              : "Generated for brandability and memorability.",
+          meaning:
+            typeof item?.meaning === "string" && item.meaning.trim().length > 0
+              ? item.meaning.trim()
+              : undefined,
+        }
+      })
+      .filter(Boolean)
+      .slice(0, safeCount)
 
     // Track metric (non-blocking)
     const userAgent = request.headers.get("user-agent") || undefined
