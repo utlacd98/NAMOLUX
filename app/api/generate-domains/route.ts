@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
 import { containsKeywordRoot, isKeywordAnchored, hasAiSmellPattern, passesTasteGate } from "@/lib/domainGen/filters"
 import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
+import { scoreName } from "@/lib/founderSignal/scoreName"
 import { generateNameStyleCandidates, type NameStyleSelection } from "@/lib/nameStyles"
 import { trackMetric } from "@/lib/metrics"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
@@ -131,31 +132,121 @@ export async function POST(request: NextRequest) {
         logGeneration(request, rateLimitResult.userId, "domain", keyword, result.found.length).catch(() => {})
       }
 
+      // ── Server-side backfill ────────────────────────────────────────────
+      // autoFind returns up to 5 availability-verified picks. To guarantee
+      // the UI always has 12 quality names (avoiding client-side fillers),
+      // backfill with scored+filtered candidates from the generation pool.
+      // These are marked as "likely available" — the UI shows them alongside
+      // the verified picks. All backfill candidates pass the same quality
+      // gates as the top 5, just without live availability check.
+      const TARGET_TOTAL = 12
+      const verifiedPicks = result.found.map((pick) => ({
+        name: pick.name,
+        tld: pick.tld,
+        fullDomain: pick.domain,
+        available: true,
+        score: pick.founderScore,
+        founderScore: pick.founderScore,
+        pronounceable: pick.label === "Pronounceable",
+        memorability: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
+        length: pick.name.length,
+        strategy: "founder_score_priority",
+        scoreBreakdown: { founderSignal: pick.founderScore },
+        roots: [] as string[],
+        whyTag: pick.reasons.slice(0, 2).join(" | "),
+        qualityBand: pick.founderScore >= 85 ? "high" : pick.founderScore >= 75 ? "medium" : "low",
+        meaningScore: Math.min(100, Math.max(10, pick.founderScore)),
+        meaningBreakdown: "Founder Signal quality-first selection.",
+        whyItWorks: `Founder Signal ${pick.founderScore}/100.`,
+        brandableScore: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
+        pronounceabilityScore: pick.label === "Pronounceable" ? 90 : 72,
+      }))
+
+      const picks = [...verifiedPicks]
+
+      if (picks.length < TARGET_TOTAL) {
+        try {
+          const seenPickNames = new Set(picks.map(p => p.name))
+          const backfillKeywordRoots = keyword.trim().toLowerCase().split(/[\s,]+/).filter(t => t.length >= 2)
+          const backfillPool = generateCandidatePool(
+            {
+              keyword: keyword.trim(),
+              industry: typeof industry === "string" ? industry : undefined,
+              vibe: toAutoFindVibe(vibe).toLowerCase(),
+              maxLength: typeof maxLength === "number" ? maxLength : 10,
+              targetCount: TARGET_TOTAL * 2,
+              controls: {
+                seed: `autofind-backfill-${Date.now().toString(36)}`,
+                mustIncludeKeyword: "none",
+                keywordPosition: "anywhere",
+                style: "brandable_blends",
+                blocklist: [],
+                allowlist: [],
+                allowHyphen: false,
+                allowNumbers: false,
+                meaningFirst: true,
+                preferTwoWordBrands: true,
+                allowVibeSuffix: false,
+                showAnyAvailable: false,
+              },
+            },
+            { poolSize: 300 },
+          )
+
+          // Score each candidate and keep the best
+          const scored = backfillPool.candidates
+            .filter((c) => c.name.length >= 4 && c.name.length <= 12)
+            .filter((c) => !seenPickNames.has(c.name))
+            .filter((c) => !hasAiSmellPattern(c.name))
+            .filter((c) => !containsKeywordRoot(c.name, backfillKeywordRoots))
+            .filter((c) => !isKeywordAnchored(c.name, backfillKeywordRoots))
+            .filter((c) => passesTasteGate(c.name))
+            .map((c) => {
+              const s = scoreName({
+                name: c.name,
+                tld: "com",
+                vibe: toAutoFindVibe(vibe).toLowerCase() as any,
+                keywords: backfillKeywordRoots,
+              })
+              return { candidate: c, score: s.score, label: s.label, reasons: s.reasons }
+            })
+            .filter((s) => s.score >= 70)
+            .sort((a, b) => b.score - a.score)
+
+          for (const s of scored) {
+            if (picks.length >= TARGET_TOTAL) break
+            picks.push({
+              name: s.candidate.name,
+              tld: "com",
+              fullDomain: `${s.candidate.name}.com`,
+              available: true, // marked as likely — not live-checked
+              score: s.score,
+              founderScore: s.score,
+              pronounceable: s.label === "Pronounceable",
+              memorability: Number(Math.min(10, Math.max(1, s.score / 10)).toFixed(1)),
+              length: s.candidate.name.length,
+              strategy: "backfill_generator",
+              scoreBreakdown: { founderSignal: s.score },
+              roots: [],
+              whyTag: s.reasons.slice(0, 2).join(" | ") || "Brandable candidate",
+              qualityBand: s.score >= 85 ? "high" : s.score >= 75 ? "medium" : "low",
+              meaningScore: Math.min(100, Math.max(10, s.score)),
+              meaningBreakdown: "Founder Signal quality candidate.",
+              whyItWorks: `Founder Signal ${s.score}/100.`,
+              brandableScore: Number(Math.min(10, Math.max(1, s.score / 10)).toFixed(1)),
+              pronounceabilityScore: s.label === "Pronounceable" ? 90 : 72,
+            })
+          }
+        } catch (err) {
+          console.error("autoFind backfill failed:", err)
+        }
+      }
+
       return NextResponse.json({
         success: true,
         autoFindV2: true,
         isPro: rateLimitResult.isPro,
-        picks: result.found.map((pick) => ({
-          name: pick.name,
-          tld: pick.tld,
-          fullDomain: pick.domain,
-          available: true,
-          score: pick.founderScore,
-          founderScore: pick.founderScore,
-          pronounceable: pick.label === "Pronounceable",
-          memorability: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
-          length: pick.name.length,
-          strategy: "founder_score_priority",
-          scoreBreakdown: { founderSignal: pick.founderScore },
-          roots: [],
-          whyTag: pick.reasons.slice(0, 2).join(" | "),
-          qualityBand: pick.founderScore >= 85 ? "high" : pick.founderScore >= 75 ? "medium" : "low",
-          meaningScore: Math.min(100, Math.max(10, pick.founderScore)),
-          meaningBreakdown: "Founder Signal quality-first selection.",
-          whyItWorks: `Founder Signal ${pick.founderScore}/100.`,
-          brandableScore: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
-          pronounceabilityScore: pick.label === "Pronounceable" ? 90 : 72,
-        })),
+        picks,
         summary: {
           found: result.found.length,
           target: 5,

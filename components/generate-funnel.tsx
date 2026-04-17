@@ -188,9 +188,9 @@ export function GenerateFunnel() {
             }))
           : []
 
-        // If API returned too few, synthesise additional brandable-looking
-        // locked candidates so the gate always has something to unlock.
-        const total = picks.length >= 8 ? picks : [...picks, ...synthFillers(opts.keyword, 12 - picks.length)]
+        // Server returns 12 quality candidates via backfill. Only fall back to
+        // client-side fillers if the API genuinely returns very little (<4).
+        const total = picks.length >= 4 ? picks : [...picks, ...synthFillers(opts.keyword, 12 - picks.length)]
 
         setResults(total)
         setIsPreview(false)
