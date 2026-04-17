@@ -2416,14 +2416,16 @@ export function GenerateNames() {
                   )}
                 </div>
 
-                {/* Deep Search for .com — sits between filter bar and results */}
-                <DeepSearch
-                  key={generationId}
-                  keyword={keyword}
-                  vibe={selectedVibe}
-                  industry={selectedIndustry}
-                  maxLength={maxLength}
-                />
+                {/* Deep Search for .com — only shown in keyword-driven mode */}
+                {!isBulkMode && (
+                  <DeepSearch
+                    key={generationId}
+                    keyword={keyword}
+                    vibe={selectedVibe}
+                    industry={selectedIndustry}
+                    maxLength={maxLength}
+                  />
+                )}
 
                 {/* Bulk sort controls — shown in bulk mode */}
                 {isBulkMode && groupedResults.length > 1 && (
@@ -2796,7 +2798,7 @@ export function GenerateNames() {
                           </div>
 
                           {/* Brand Story + Taglines */}
-                          <NameInsightsPanel name={name} vibe={selectedVibe} />
+                          <NameInsightsPanel name={name} vibe={selectedVibe} industry={selectedIndustry} keyword={keyword} />
 
                           {/* Stress Test */}
                           <NameStressTest name={name} founderScore={best.score} />
@@ -2808,8 +2810,8 @@ export function GenerateNames() {
               </div>
             )}
 
-            {/* ── Refine Results ── */}
-            {results.length > 0 && !isGenerating && (
+            {/* ── Refine Results — keyword-driven generation only ── */}
+            {results.length > 0 && !isGenerating && !isBulkMode && (
               <RefineResults
                 onRefine={handleRefine}
                 isRefining={isRefining}

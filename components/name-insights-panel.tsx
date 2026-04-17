@@ -6,9 +6,11 @@ import { Loader2, Wand2, MessageSquareQuote, ChevronDown, ChevronUp } from "luci
 interface NameInsightsPanelProps {
   name: string
   vibe?: string
+  industry?: string
+  keyword?: string
 }
 
-export function NameInsightsPanel({ name, vibe }: NameInsightsPanelProps) {
+export function NameInsightsPanel({ name, vibe, industry, keyword }: NameInsightsPanelProps) {
   const [open, setOpen] = useState(false)
   const [narrative, setNarrative] = useState("")
   const [taglines, setTaglines] = useState<string[]>([])
@@ -22,7 +24,7 @@ export function NameInsightsPanel({ name, vibe }: NameInsightsPanelProps) {
       const res = await fetch("/api/name-tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "narrative", name }),
+        body: JSON.stringify({ action: "narrative", name, vibe, industry, keyword }),
       })
       const data = await res.json()
       setNarrative(data.narrative ?? "")
@@ -38,7 +40,7 @@ export function NameInsightsPanel({ name, vibe }: NameInsightsPanelProps) {
       const res = await fetch("/api/name-tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "taglines", name, vibe }),
+        body: JSON.stringify({ action: "taglines", name, vibe, industry, keyword }),
       })
       const data = await res.json()
       setTaglines(data.taglines ?? [])
