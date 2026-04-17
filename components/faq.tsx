@@ -3,44 +3,49 @@ import { cn } from "@/lib/utils"
 
 const faqs = [
   {
-    question: "What do I get with a free account?",
+    question: "What is NamoLux?",
     answer:
-      "Free accounts get 2 domain generations per day, with full access to AI-powered name suggestions, real-time availability checking, and Founder Signal™ scoring. Perfect for exploring ideas before committing.",
-  },
-  {
-    question: "What's included in NamoLux Pro?",
-    answer:
-      "Pro is a one-time payment of £15 — no subscription, no monthly fees. You get unlimited domain generations, priority support, and full access to all features, forever.",
-  },
-  {
-    question: "How does the AI generate names?",
-    answer:
-      "Enter a keyword or describe your brand, select a vibe (Luxury, Futuristic, Playful, etc.), and our AI generates creative, brandable domain names tailored to your vision.",
+      "NamoLux is a domain naming consultancy powered by Founder Signal™. You paste your candidate names — from any source — and we score each one on brand strength, memorability, phonetic punch, realness, and live availability across six TLDs. You get the analysis a brand consultant would run, delivered in seconds.",
   },
   {
     question: "What is Founder Signal™?",
     answer:
-      "Founder Signal™ scores each domain from 0-100 based on brand strength, memorability, and scalability. It helps you quickly identify which names have the strongest potential for building a lasting brand.",
+      "Founder Signal™ is our proprietary 0–100 brand scoring system. It weighs realness, memorability, brand risk, length, pronounceability, character quality, and TLD strength — plus context-agnostic originality penalties and elite-tier caps. A name scoring 95+ has earned it; most names sit between 70–85.",
+  },
+  {
+    question: "What do I get with a free account?",
+    answer:
+      "Free accounts can check and score three shortlists. You get full Founder Signal™ analysis, live availability across six TLDs, and the full reasoning breakdown on every name. Perfect for validating a shortlist before you commit.",
+  },
+  {
+    question: "What's included in NamoLux Pro?",
+    answer:
+      "Pro is a one-time payment of £15 — no subscription, no monthly fees. You get unlimited shortlist checks, bulk scoring up to 50 names at a time, the full brand consultant toolkit (stress tests, brand story, palette), and CSV export. Forever.",
+  },
+  {
+    question: "Do I have to come with my own names?",
+    answer:
+      "The core product scores candidate names you already have — whether you wrote them yourself, got them from an AI tool, or paid a consultant. NamoLux is the independent judge. Many users combine it with AI name generators to filter for the ones actually worth pursuing.",
   },
   {
     question: "How do you check availability?",
     answer:
-      "We use real-time DNS lookups to verify domain availability. Results are best-effort and may vary slightly by registrar—we recommend confirming with your preferred registrar before purchasing.",
+      "We use real-time DNS lookups and RDAP queries across .com, .io, .co, .ai, .app and .dev. Results are best-effort and may vary slightly by registrar — we recommend confirming at your preferred registrar before you purchase.",
   },
   {
     question: "Which TLDs do you support?",
     answer:
-      "We support .com, .io, .co, .ai, and .net domains. We prioritize .com as it's the most valuable for brand recognition, but you can filter results by any supported TLD.",
+      ".com, .io, .co, .ai, .app and .dev. We prioritise .com since it remains the strongest trust signal, but every TLD is scored and verified in the same batch.",
   },
   {
     question: "Is this really a one-time payment?",
     answer:
-      "Yes — £15 once, Pro access forever. There's no subscription, no auto-renewal, and no hidden fees. Once you pay, your account is upgraded permanently.",
+      "Yes — £15 once, Pro access forever. No subscription, no auto-renewal, no hidden fees. Once you pay, your account is upgraded permanently.",
   },
   {
     question: "Can I export my shortlist?",
     answer:
-      "Yes! Save your favorite domains to a shortlist and export them to CSV with a single click. Perfect for sharing with your team or tracking your options.",
+      "Yes. Export the full scored shortlist as CSV in one click — with Founder Signal scores, availability for all six TLDs, and the reasoning for each name. Great for team sign-off.",
   },
 ]
 

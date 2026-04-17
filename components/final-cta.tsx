@@ -22,12 +22,12 @@ export function FinalCTA() {
           id="final-cta-heading"
           className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl"
         >
-          Stop losing hours to
+          Make the name decision
           <br />
-          <span className="text-primary">taken domains.</span>
+          <span className="text-primary">with evidence.</span>
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-          Generate a clean shortlist of available .com domains in under a minute. Start free, no credit card required.
+          Paste your shortlist. Get Founder Signal™ scores, live availability across 6 TLDs, and a clear verdict on every candidate. Start free, no credit card required.
         </p>
         <div className="mt-10">
           <Button
@@ -37,7 +37,7 @@ export function FinalCTA() {
           >
             <Link href="/generate">
               <Sparkles className="mr-2 h-5 w-5" aria-hidden="true" />
-              Generate my first shortlist
+              Score my shortlist free
             </Link>
           </Button>
         </div>

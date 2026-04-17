@@ -3,19 +3,19 @@ import { cn } from "@/lib/utils"
 const steps = [
   {
     number: "01",
-    title: "Pick vibe + keywords",
-    description: "Choose your brand personality and enter a few keywords that describe your business or product.",
+    title: "Paste your shortlist",
+    description: "Drop up to 50 candidate names into NamoLux. Your ideas, your AI output, names from a consultant — all welcome.",
   },
   {
     number: "02",
-    title: "Generate & verify .com",
+    title: "We score & verify each one",
     description:
-      "Our AI generates dozens of unique names and live-checks availability across .com, .io, .ai, .co and more — usually ready in under a minute.",
+      "Every name gets a Founder Signal™ score out of 100 and live availability checks across .com, .io, .co, .ai, .app and .dev — with reasoning you can defend.",
   },
   {
     number: "03",
-    title: "Save, export, buy",
-    description: "Add favorites to your shortlist, export to your tools, and purchase your domain directly.",
+    title: "Pick the winner with evidence",
+    description: "Rank by score, filter by availability, export the report. Walk into your next meeting with a decision, not a guess.",
   },
 ]
 
@@ -28,7 +28,7 @@ export function HowItWorks() {
             How it works
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            From idea to available .com domain in under a minute.
+            From a list of candidate names to a scored, verified shortlist — the work of a brand consultant, done in seconds.
           </p>
         </div>
 

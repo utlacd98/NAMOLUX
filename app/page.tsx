@@ -66,6 +66,8 @@ export default function Home() {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
         name: "NamoLux",
+        description:
+          "A domain naming consultancy powered by Founder Signal™. Paste your shortlist, get live availability checks across six TLDs plus elite-tier brand scoring on every candidate.",
         url: `${siteUrl}/`,
         logo: {
           "@type": "ImageObject",
@@ -85,7 +87,9 @@ export default function Home() {
         "@type": "WebPage",
         "@id": `${siteUrl}/#webpage`,
         url: `${siteUrl}/`,
-        name: "NamoLux - Domain Name Finder & SEO Audit",
+        name: "NamoLux — Domain Naming Consultancy with Founder Signal™ Scoring",
+        description:
+          "Paste your domain name shortlist. Get Founder Signal™ brand scoring, live availability across six TLDs, and a clear verdict on every candidate.",
         isPartOf: { "@id": `${siteUrl}/#website` },
         about: { "@id": `${siteUrl}/#organization` },
         inLanguage: "en-US",

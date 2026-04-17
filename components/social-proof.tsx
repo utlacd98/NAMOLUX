@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils"
 
 const stats = [
-  { value: "10,000+", label: "Names generated" },
-  { value: "1,200+", label: "Shortlists created" },
-  { value: "<60s", label: "AI + live domain check" },
+  { value: "10,000+", label: "Names scored" },
+  { value: "6 TLDs", label: "Verified per name" },
+  { value: "<60s", label: "Full shortlist analysis" },
 ]
 
 const fictionalLogos = [
@@ -25,7 +25,7 @@ export function SocialProof() {
           className={cn("text-center animate-fade-up")}
           style={{ animationFillMode: "forwards" }}
         >
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/70">Loved by builders</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/70">Used by founders to pick names with confidence</p>
 
           <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-y-4 sm:flex-nowrap">
             {stats.map((stat, index) => (

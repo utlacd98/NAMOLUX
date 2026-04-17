@@ -138,24 +138,24 @@ export function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D4AF37] opacity-60" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
               </span>
-              Bulk Check · 6 TLDs · Founder Signal™ Scoring
+              Brand Consultancy · Founder Signal™ Scoring
             </div>
 
             {/* Headline */}
             <h1 id="hero-heading"
               className="animate-hero-fade-up hero-delay-1 w-full font-black tracking-tight text-white"
               style={{ fontSize: "clamp(1.75rem, 6vw, 4.5rem)", lineHeight: 1.15, letterSpacing: "-0.03em", wordBreak: "break-word", overflowWrap: "break-word" }}>
-              <span className="block sm:inline">Rank your shortlist. </span>
+              <span className="block sm:inline">A brand consultant </span>
               <span className="block sm:inline" style={{
                 backgroundImage: "linear-gradient(135deg, #D4AF37 0%, #F6E27A 40%, #E8C84A 60%, #B8922E 100%)",
                 backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              }}>Pick the winner.</span>
+              }}>for your shortlist.</span>
             </h1>
 
             {/* Sub */}
             <p className="animate-hero-fade-up hero-delay-2 mt-5 w-full text-sm leading-relaxed text-white/50 sm:max-w-lg sm:text-base">
-              Paste your domain name shortlist. Get{" "}
-              <span className="font-semibold text-white/80">live availability across 6 TLDs</span> plus Founder Signal™ brand scoring on every name — so you know which one is actually worth building on.
+              NamoLux is a domain naming consultancy powered by Founder Signal™. Paste your candidate names — we score each one on{" "}
+              <span className="font-semibold text-white/80">brand strength, availability, and founder fit</span> so you choose the name with the evidence to back it.
             </p>
 
             {/* CTA */}
@@ -168,15 +168,15 @@ export function Hero() {
                   color: "#000000",
                   WebkitTextFillColor: "#000000",
                 }}>
-                Generate names free
+                Score your shortlist free
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/30">
                 {[
                   "No account required",
-                  "Live .com availability — not just ideas",
-                  "Namelix gives names. We give names you can own.",
+                  "Live availability across 6 TLDs",
+                  "Founder Signal™ score on every name",
                 ].map(t => (
                   <span key={t} className="flex items-center gap-1">
                     <Check className="h-3 w-3 text-emerald-500/70" /> {t}
