@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
-import { ArrowRight, Check, Dot } from "lucide-react"
+import { ArrowRight, Check } from "lucide-react"
 
 const editorialSerif =
   '"Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Book Antiqua", Georgia, serif'
@@ -12,43 +12,6 @@ const supportingPoints = [
   "No account required",
   "Live availability across 6 TLDs",
   `${founderSignalMark} score on every name`,
-]
-
-const shortlistRows = [
-  {
-    name: "Aurelium",
-    availability: "Open on .com, .io, and .ai",
-    brandStrength: 96,
-    founderFit: 93,
-    spotlight: true,
-  },
-  {
-    name: "Northvale",
-    availability: "Open on .io and .co",
-    brandStrength: 82,
-    founderFit: 79,
-  },
-  {
-    name: "Verden",
-    availability: ".com taken, .ai open",
-    brandStrength: 74,
-    founderFit: 72,
-  },
-]
-
-const evidenceNotes = [
-  "Brand strength weighs memorability, distinctiveness, and premium fit.",
-  "Availability is checked live so shortlist decisions are grounded in market reality.",
-  "Founder fit rewards names that sound credible when attached to the person building it.",
-]
-
-const availabilityPills = [
-  { label: ".com", state: "open" },
-  { label: ".io", state: "open" },
-  { label: ".ai", state: "open" },
-  { label: ".co", state: "watch" },
-  { label: ".vc", state: "watch" },
-  { label: ".studio", state: "open" },
 ]
 
 const ambientParticles = [
@@ -87,39 +50,6 @@ function getReveal({ delay, reducedMotion }: RevealProps) {
       },
     },
   }
-}
-
-function MetricBar({
-  label,
-  value,
-  delay,
-  reducedMotion,
-}: {
-  label: string
-  value: number
-  delay: number
-  reducedMotion: boolean
-}) {
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-[#c3b081]/72">
-        <span>{label}</span>
-        <span className="font-medium text-[#f0dfb5]">{value}</span>
-      </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-        <motion.div
-          initial={{ scaleX: 0, opacity: 0.7 }}
-          animate={{ scaleX: value / 100, opacity: 1 }}
-          transition={{
-            duration: reducedMotion ? 0.01 : 0.9,
-            delay: reducedMotion ? 0 : delay,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          className="h-full origin-left rounded-full bg-[linear-gradient(90deg,#7f5b1f_0%,#cfa24d_48%,#f2ddb0_100%)] shadow-[0_0_14px_rgba(212,175,55,0.2)]"
-        />
-      </div>
-    </div>
-  )
 }
 
 export function Hero() {
@@ -190,8 +120,8 @@ export function Hero() {
       <div className="hero-noise absolute inset-0 opacity-[0.16]" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-20 xl:pt-24">
-        <div className="grid items-start gap-10 lg:min-h-[calc(100svh-6.5rem)] lg:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] lg:gap-12 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] xl:gap-14">
-          <div className="relative z-10 min-w-0 max-w-2xl lg:flex lg:min-h-[calc(100svh-10rem)] lg:flex-col">
+        <div className="lg:min-h-[calc(100svh-6.5rem)]">
+          <div className="relative z-10 min-w-0 max-w-4xl lg:flex lg:min-h-[calc(100svh-10rem)] lg:flex-col">
             <motion.div
               {...getReveal({ delay: 0.05, reducedMotion })}
               className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#876628]/45 bg-[linear-gradient(180deg,rgba(20,16,11,0.92),rgba(10,8,6,0.9))] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[#d7be84] shadow-[0_14px_40px_rgba(0,0,0,0.35)] sm:text-[11px]"
@@ -206,7 +136,7 @@ export function Hero() {
               <motion.h1
                 {...getReveal({ delay: 0.14, reducedMotion })}
                 id="hero-heading"
-                className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.1rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none lg:mt-0"
+                className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.6rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none lg:mt-0"
                 style={{ fontFamily: editorialSerif }}
               >
                 <span className="block">A brand consultant</span>
@@ -234,7 +164,7 @@ export function Hero() {
               {...getReveal({ delay: 0.25, reducedMotion })}
               className="relative mt-8 flex flex-col items-start gap-5 lg:mt-0 lg:pb-3"
             >
-              <p className="max-w-xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg">
+              <p className="max-w-2xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg">
                 NamoLux is a domain naming consultancy powered by {founderSignalMark}. Paste
                 your candidate names and we score each one on{" "}
                 <span className="text-[#f5ead0]">brand strength, availability, and founder fit</span>{" "}
@@ -287,165 +217,6 @@ export function Hero() {
               </div>
             </motion.div>
           </div>
-
-          <motion.div
-            {...getReveal({ delay: 0.24, reducedMotion })}
-            className="relative mx-auto w-full min-w-0 max-w-full lg:ml-auto lg:max-w-[38rem]"
-          >
-            <motion.div
-              aria-hidden="true"
-              animate={
-                reducedMotion
-                  ? undefined
-                  : {
-                      opacity: [0.22, 0.38, 0.22],
-                      scale: [1, 1.03, 1],
-                    }
-              }
-              transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              className="absolute -inset-x-3 top-10 h-72 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.18)_0%,rgba(212,175,55,0.04)_38%,transparent_72%)] blur-3xl"
-            />
-
-            <div className="absolute -top-5 left-4 z-20 max-w-[calc(100%-2rem)] rounded-full border border-[#7e622b]/45 bg-black/70 px-3.5 py-2 text-[9px] uppercase tracking-[0.22em] text-[#d4b26c] shadow-[0_16px_30px_rgba(0,0,0,0.45)] backdrop-blur-md sm:left-5 sm:max-w-none sm:px-4 sm:text-[10px] sm:tracking-[0.26em]">
-              Founder Signal dossier
-            </div>
-
-            <div className="relative overflow-hidden rounded-[28px] border border-[#7a5d2e]/32 bg-[linear-gradient(180deg,rgba(14,11,8,0.96),rgba(8,8,8,0.94))] p-3.5 shadow-[0_32px_120px_rgba(0,0,0,0.72)] backdrop-blur-xl sm:rounded-[30px] sm:p-5">
-              <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#e1c383]/50 to-transparent" />
-
-              <div className="grid gap-4">
-                <div className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(18,15,12,0.94),rgba(8,8,8,0.9))] p-4 sm:p-5">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-[0.24em] text-[#baa473]/72">
-                    <span>Shortlist brief</span>
-                    <span>Consultancy review</span>
-                  </div>
-
-                  <div className="mt-4 rounded-[20px] border border-white/8 bg-black/35 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/35">
-                      Paste candidate names
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {shortlistRows.map((row) => (
-                        <span
-                          key={row.name}
-                          className="rounded-full border border-[#6e5426]/45 bg-[#130f09] px-3 py-1.5 text-sm text-[#efe3c4]"
-                        >
-                          {row.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-3">
-                    {shortlistRows.map((row, index) => (
-                      <motion.div
-                        key={row.name}
-                        initial={{
-                          opacity: 0,
-                          x: reducedMotion ? 0 : 16,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          x: 0,
-                          transition: {
-                            duration: reducedMotion ? 0.01 : 0.8,
-                            delay: reducedMotion ? 0 : 0.38 + index * 0.12,
-                            ease: [0.16, 1, 0.3, 1],
-                          },
-                        }}
-                        className={`rounded-[22px] border p-4 ${
-                          row.spotlight
-                            ? "border-[#9b7330]/50 bg-[linear-gradient(180deg,rgba(44,31,10,0.55),rgba(17,12,7,0.88))]"
-                            : "border-white/8 bg-white/[0.025]"
-                        }`}
-                      >
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h2 className="text-lg font-medium text-white" style={{ fontFamily: editorialSerif }}>
-                                {row.name}
-                              </h2>
-                              {row.spotlight ? (
-                                <span className="rounded-full border border-[#a57d34]/45 bg-[#1a1308] px-2 py-1 text-[10px] uppercase tracking-[0.22em] text-[#dcbc77]">
-                                  Recommended
-                                </span>
-                              ) : null}
-                            </div>
-                            <p className="mt-1 text-sm leading-6 text-[#d9cfbb]/66">{row.availability}</p>
-                          </div>
-
-                          <div className="shrink-0 rounded-full border border-[#83652c]/35 bg-[#120e09] px-3 py-1.5 text-sm text-[#f2e0b6]">
-                            {row.brandStrength}
-                          </div>
-                        </div>
-
-                        <div className="mt-4 space-y-3">
-                          <MetricBar
-                            label="Brand Strength"
-                            value={row.brandStrength}
-                            delay={0.54 + index * 0.1}
-                            reducedMotion={reducedMotion}
-                          />
-                          <MetricBar
-                            label="Founder Fit"
-                            value={row.founderFit}
-                            delay={0.62 + index * 0.1}
-                            reducedMotion={reducedMotion}
-                          />
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-[1.05fr_0.95fr]">
-                  <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9b07b]/74">
-                      Decision signal
-                    </p>
-                    <div className="mt-3 space-y-3">
-                      {evidenceNotes.map((note) => (
-                        <div key={note} className="flex gap-2.5 text-sm leading-6 text-[#ddd2bc]/72">
-                          <Dot className="mt-1 h-4 w-4 shrink-0 text-[#d3af67]" />
-                          <p>{note}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9b07b]/74">
-                        Live availability
-                      </p>
-                      <span className="rounded-full border border-[#446d4e]/50 bg-[#0d1510] px-2.5 py-1 text-[10px] uppercase tracking-[0.22em] text-[#9ac7a0]">
-                        6 TLDs
-                      </span>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2.5">
-                      {availabilityPills.map((pill) => (
-                        <span
-                          key={pill.label}
-                          className={`rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-[0.2em] ${
-                            pill.state === "open"
-                              ? "border-[#4f7656]/45 bg-[#101711] text-[#a7cbad]"
-                              : "border-[#6f5f3d]/45 bg-[#15120d] text-[#d2c08d]"
-                          }`}
-                        >
-                          {pill.label}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-4 rounded-[18px] border border-white/8 bg-black/25 p-3.5">
-                      <p className="text-sm leading-6 text-[#ddd2bc]/68">
-                        A shortlist that looks elegant is not enough. The name needs evidence.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
 
