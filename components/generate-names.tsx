@@ -40,7 +40,7 @@ import { AiNameChat } from "@/components/ai-name-chat"
 import { useNamePreferences } from "@/hooks/useNamePreferences"
 import { NamePronunciation } from "@/components/name-pronunciation"
 import { NameStressTest } from "@/components/name-stress-test"
-import { NameInsightsPanel } from "@/components/name-insights-panel"
+import { BrandPalette } from "@/components/brand-palette"
 import { NameBattleDialog } from "@/components/name-battle-dialog"
 import { NamesLikeSearch } from "@/components/names-like-search"
 import { SavedNamesBoard } from "@/components/saved-names-board"
@@ -2797,8 +2797,13 @@ export function GenerateNames() {
                             </a>
                           </div>
 
-                          {/* Brand Story + Taglines */}
-                          <NameInsightsPanel name={name} vibe={selectedVibe} industry={selectedIndustry} keyword={keyword} />
+                          {/* Brand Palette — user picks brand type, gets 3 palette variants */}
+                          <BrandPalette
+                            initialName={name}
+                            initialKeywords={keyword}
+                            initialVibe={selectedVibe}
+                            lockName
+                          />
 
                           {/* Stress Test */}
                           <NameStressTest name={name} founderScore={best.score} />

@@ -66,6 +66,18 @@ const VIBES = [
   { value: "minimal",     label: "Minimal" },
 ]
 
+// Brand-type categories that map to the palette sub-styles in the API prompt.
+// Labels must match the list the API expects (see app/api/brand-palette/route.ts).
+const BRAND_TYPES = [
+  { value: "SaaS / AI Tool",     label: "SaaS / AI",   hint: "Dashboards, tools, AI products" },
+  { value: "Fintech / Trust",    label: "Fintech",     hint: "Banking, money, trust" },
+  { value: "Luxury Brand",       label: "Luxury",      hint: "Premium, editorial, prestige" },
+  { value: "Consumer App",       label: "Consumer",    hint: "Mass-market, friendly" },
+  { value: "Creative / Playful", label: "Creative",    hint: "Studios, media, playful" },
+  { value: "Wellness / Calm",    label: "Wellness",    hint: "Health, spa, calm" },
+  { value: "Developer Tool",     label: "Dev Tool",    hint: "CLIs, IDEs, infra" },
+]
+
 function swatchTextColor(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
@@ -241,21 +253,30 @@ interface BrandPaletteProps {
   initialName?: string
   initialKeywords?: string
   initialVibe?: string
+  initialBrandType?: string
+  /** When true, hide the name/keywords inputs — used when this is embedded in
+   *  a result card where the name is already fixed. User only picks brand type. */
+  lockName?: boolean
 }
 
 export function BrandPalette({
   initialName = "",
   initialKeywords = "",
   initialVibe = "modern",
+  initialBrandType = "",
+  lockName = false,
 }: BrandPaletteProps) {
   const [brandName, setBrandName] = useState(initialName)
   const [keywords, setKeywords] = useState(initialKeywords)
   const [vibe, setVibe] = useState(initialVibe)
+  const [brandType, setBrandType] = useState(initialBrandType)
   const [palette, setPalette] = useState<PaletteResult | null>(null)
   const [activeVariantIndex, setActiveVariantIndex] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showInputs, setShowInputs] = useState(!initialName)
+  // Default open when there's no name, OR when embedded in lockName mode
+  // (user still needs to pick a brand type to generate).
+  const [showInputs, setShowInputs] = useState(!initialName || lockName)
 
   const generate = useCallback(async () => {
     if (!brandName.trim()) return
@@ -266,7 +287,7 @@ export function BrandPalette({
       const res = await fetch("/api/brand-palette", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandName, keywords, vibe }),
+        body: JSON.stringify({ brandName, keywords, vibe, brandType }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -327,11 +348,18 @@ export function BrandPalette({
               <span className="text-base font-bold text-white">Your Brand Identity</span>
             </div>
             <p className="mt-0.5 text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-              {hasPalette
-                ? `Colour identity for `
-                : "AI-crafted colour palette for your brand"}
-              {hasPalette && (
-                <span style={{ color: "#D4AF37" }}>{brandName}</span>
+              {hasPalette ? (
+                <>
+                  Colour identity for{" "}
+                  <span style={{ color: "#D4AF37" }}>{brandName}</span>
+                </>
+              ) : lockName ? (
+                <>
+                  Pick a brand type to generate 3 palettes for{" "}
+                  <span style={{ color: "#D4AF37" }}>{brandName}</span>
+                </>
+              ) : (
+                "AI-crafted colour palette for your brand"
               )}
             </p>
           </div>
@@ -375,89 +403,139 @@ export function BrandPalette({
           className="space-y-4 px-6 py-5"
           style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
         >
+          {/* Name & context — hidden in lockName mode (inline in a result card) */}
+          {!lockName && (
+            <div>
+              <label
+                className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                style={{ color: "rgba(212,175,55,0.65)" }}
+              >
+                Your brand name
+              </label>
+              <input
+                type="text"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                placeholder="e.g. indulgo, vexora, bloom"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+                onKeyDown={(e) => e.key === "Enter" && generate()}
+              />
+            </div>
+          )}
+
+          {!lockName && (
+            <div>
+              <label
+                className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                style={{ color: "rgba(255,255,255,0.28)" }}
+              >
+                Context{" "}
+                <span className="font-normal normal-case tracking-normal" style={{ color: "rgba(255,255,255,0.18)" }}>
+                  — optional
+                </span>
+              </label>
+              <input
+                type="text"
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
+                placeholder="e.g. premium skincare, wellness app, B2B SaaS"
+                className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+                onKeyDown={(e) => e.key === "Enter" && generate()}
+              />
+            </div>
+          )}
+
+          {/* Brand Type — drives the palette sub-style */}
           <div>
             <label
               className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
               style={{ color: "rgba(212,175,55,0.65)" }}
             >
-              Your brand name
-            </label>
-            <input
-              type="text"
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
-              placeholder="e.g. indulgo, vexora, bloom"
-              className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-              onKeyDown={(e) => e.key === "Enter" && generate()}
-            />
-          </div>
-
-          <div>
-            <label
-              className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
-              style={{ color: "rgba(255,255,255,0.28)" }}
-            >
-              Context{" "}
-              <span className="font-normal normal-case tracking-normal" style={{ color: "rgba(255,255,255,0.18)" }}>
-                — optional
+              Brand type
+              <span className="ml-1 font-normal normal-case tracking-normal" style={{ color: "rgba(255,255,255,0.25)" }}>
+                — what kind of business is this?
               </span>
             </label>
-            <input
-              type="text"
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder="e.g. premium skincare, wellness app, B2B SaaS"
-              className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-white/20"
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-              onKeyDown={(e) => e.key === "Enter" && generate()}
-            />
-          </div>
-
-          <div>
-            <label
-              className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
-              style={{ color: "rgba(255,255,255,0.28)" }}
-            >
-              Brand vibe
-            </label>
             <div className="flex flex-wrap gap-2">
-              {VIBES.map((v) => (
+              {BRAND_TYPES.map((t) => (
                 <button
-                  key={v.value}
-                  onClick={() => setVibe(v.value)}
+                  key={t.value}
+                  onClick={() => setBrandType(t.value)}
+                  title={t.hint}
                   className="rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-all hover:-translate-y-0.5"
                   style={
-                    vibe === v.value
+                    brandType === t.value
                       ? {
                           background: "rgba(212,175,55,0.16)",
-                          border: "1px solid rgba(212,175,55,0.38)",
+                          border: "1px solid rgba(212,175,55,0.45)",
                           color: "#D4AF37",
-                          boxShadow: "0 0 12px rgba(212,175,55,0.12)",
+                          boxShadow: "0 0 14px rgba(212,175,55,0.16)",
                         }
                       : {
                           background: "rgba(255,255,255,0.04)",
                           border: "1px solid rgba(255,255,255,0.08)",
-                          color: "rgba(255,255,255,0.4)",
+                          color: "rgba(255,255,255,0.45)",
                         }
                   }
                 >
-                  {v.label}
+                  {t.label}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Vibe — optional refinement, collapsed under a disclosure in lockName mode */}
+          {!lockName && (
+            <div>
+              <label
+                className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                style={{ color: "rgba(255,255,255,0.28)" }}
+              >
+                Brand vibe
+                <span className="ml-1 font-normal normal-case tracking-normal" style={{ color: "rgba(255,255,255,0.18)" }}>
+                  — optional
+                </span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {VIBES.map((v) => (
+                  <button
+                    key={v.value}
+                    onClick={() => setVibe(v.value)}
+                    className="rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-all hover:-translate-y-0.5"
+                    style={
+                      vibe === v.value
+                        ? {
+                            background: "rgba(212,175,55,0.16)",
+                            border: "1px solid rgba(212,175,55,0.38)",
+                            color: "#D4AF37",
+                            boxShadow: "0 0 12px rgba(212,175,55,0.12)",
+                          }
+                        : {
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                            color: "rgba(255,255,255,0.4)",
+                          }
+                    }
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Generate CTA */}
           <button
             onClick={generate}
-            disabled={loading || !brandName.trim()}
+            disabled={loading || !brandName.trim() || (lockName && !brandType.trim())}
             className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl py-3.5 text-sm font-bold text-black transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             style={{
               background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
