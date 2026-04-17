@@ -1,18 +1,6 @@
-import type { Metadata } from "next"
-import { Suspense } from "react"
-import { GenerateNames } from "@/components/generate-names"
+import { redirect } from "next/navigation"
 
-export const metadata: Metadata = {
-  title: "Advanced Generator | NamoLux",
-  description:
-    "Full NamoLux generator with deep search, AutoFind V2, name styles, brand palette, and Founder Signal scoring.",
-  robots: { index: false, follow: false },
-}
-
+// The "advanced" generator is now the default. Redirect to /generate.
 export default function GenerateAdvancedPage() {
-  return (
-    <Suspense fallback={null}>
-      <GenerateNames />
-    </Suspense>
-  )
+  redirect("/generate")
 }

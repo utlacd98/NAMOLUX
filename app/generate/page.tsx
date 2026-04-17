@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import { GenerateFunnel } from "@/components/generate-funnel"
+import { GenerateNames } from "@/components/generate-names"
 
 export const metadata: Metadata = {
   title: "Generate Domain Names | NamoLux",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function GeneratePage() {
   return (
     <Suspense fallback={null}>
-      <GenerateFunnel />
+      <GenerateNames />
     </Suspense>
   )
 }
