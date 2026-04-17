@@ -11,6 +11,21 @@ interface PaletteColour {
   usage: string
 }
 
+interface PaletteVariant {
+  name: string
+  feel: string
+  role: "core" | "dark" | "expressive"
+  subStyle: string
+  palette: {
+    background: PaletteColour
+    primary: PaletteColour
+    accent: PaletteColour
+    surface: PaletteColour
+    text: PaletteColour
+  }
+  usageInsight: string
+}
+
 interface PaletteResult {
   palette: {
     primary: PaletteColour
@@ -19,7 +34,20 @@ interface PaletteResult {
     background: PaletteColour
     text: PaletteColour
   }
+  variants?: PaletteVariant[]
   rationale: string
+}
+
+// Map a variant (new shape: background/primary/accent/surface/text) to the
+// legacy shape the rest of the app consumes (primary/secondary/accent/background/text).
+function variantToLegacy(v: PaletteVariant): PaletteResult["palette"] {
+  return {
+    primary: v.palette.primary,
+    secondary: v.palette.surface,
+    accent: v.palette.accent,
+    background: v.palette.background,
+    text: v.palette.text,
+  }
 }
 
 const COLOUR_ROLES = [
@@ -224,6 +252,7 @@ export function BrandPalette({
   const [keywords, setKeywords] = useState(initialKeywords)
   const [vibe, setVibe] = useState(initialVibe)
   const [palette, setPalette] = useState<PaletteResult | null>(null)
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showInputs, setShowInputs] = useState(!initialName)
@@ -245,6 +274,7 @@ export function BrandPalette({
       }
       const data: PaletteResult = await res.json()
       setPalette(data)
+      setActiveVariantIndex(0)
       setShowInputs(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed")
@@ -254,6 +284,15 @@ export function BrandPalette({
   }, [brandName, keywords, vibe])
 
   const hasPalette = palette !== null
+  const variants = palette?.variants ?? []
+  const hasVariants = variants.length > 0
+  // The "active" palette for all downstream consumers (swatches, landing preview,
+  // stitch export). If variants exist, switch based on activeVariantIndex. Otherwise
+  // fall back to the legacy top-level palette.
+  const activePalette: PaletteResult["palette"] | null = hasVariants && variants[activeVariantIndex]
+    ? variantToLegacy(variants[activeVariantIndex])
+    : palette?.palette ?? null
+  const activeVariant = hasVariants ? variants[activeVariantIndex] : null
 
   return (
     <div
@@ -488,8 +527,78 @@ export function BrandPalette({
       )}
 
       {/* ── Palette results ── */}
-      {hasPalette && palette && (
+      {hasPalette && palette && activePalette && (
         <div className="p-6 space-y-5">
+          {/* Variant selector — only shown when the API returned multiple */}
+          {hasVariants && variants.length > 1 && (
+            <div>
+              <div className="mb-2.5 flex items-center justify-between">
+                <p
+                  className="text-[10px] font-bold uppercase tracking-widest"
+                  style={{ color: "rgba(255,255,255,0.28)" }}
+                >
+                  {activeVariant?.subStyle ? `Direction — ${activeVariant.subStyle}` : "Palette variants"}
+                </p>
+                {activeVariant?.feel && (
+                  <p className="text-[10px] italic" style={{ color: "rgba(212,175,55,0.55)" }}>
+                    {activeVariant.feel}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {variants.map((variant, idx) => {
+                  const isActive = idx === activeVariantIndex
+                  const bg = isValidHex(variant.palette.background.hex) ? variant.palette.background.hex : "#111"
+                  const primary = isValidHex(variant.palette.primary.hex) ? variant.palette.primary.hex : "#D4AF37"
+                  const accent = isValidHex(variant.palette.accent.hex) ? variant.palette.accent.hex : "#888"
+                  const surface = isValidHex(variant.palette.surface.hex) ? variant.palette.surface.hex : "#333"
+                  const text = isValidHex(variant.palette.text.hex) ? variant.palette.text.hex : "#fff"
+                  const roleLabel = variant.role === "core" ? "Core" : variant.role === "dark" ? "Dark" : "Expressive"
+                  return (
+                    <button
+                      key={`${variant.name}-${idx}`}
+                      onClick={() => setActiveVariantIndex(idx)}
+                      className="group relative overflow-hidden rounded-xl text-left transition-all hover:-translate-y-0.5"
+                      style={{
+                        border: isActive
+                          ? "1px solid rgba(212,175,55,0.55)"
+                          : "1px solid rgba(255,255,255,0.08)",
+                        boxShadow: isActive
+                          ? "0 0 0 1px rgba(212,175,55,0.25) inset, 0 10px 30px rgba(0,0,0,0.35)"
+                          : "0 2px 10px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      {/* Colour strip */}
+                      <div className="flex h-14 w-full">
+                        <span className="flex-1" style={{ background: bg }} />
+                        <span className="flex-1" style={{ background: surface }} />
+                        <span className="flex-1" style={{ background: primary }} />
+                        <span className="flex-1" style={{ background: accent }} />
+                        <span className="flex-1" style={{ background: text }} />
+                      </div>
+                      {/* Info */}
+                      <div className="px-3 py-2.5" style={{ background: "rgba(255,255,255,0.025)" }}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">{variant.name}</span>
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+                            style={{
+                              background: isActive ? "rgba(212,175,55,0.16)" : "rgba(255,255,255,0.04)",
+                              color: isActive ? "#D4AF37" : "rgba(255,255,255,0.4)",
+                              border: isActive ? "1px solid rgba(212,175,55,0.32)" : "1px solid rgba(255,255,255,0.06)",
+                            }}
+                          >
+                            {roleLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Brand Preview */}
           <div>
             <p
@@ -498,7 +607,7 @@ export function BrandPalette({
             >
               Brand Preview
             </p>
-            <BrandPreviewBar palette={palette.palette} />
+            <BrandPreviewBar palette={activePalette} />
           </div>
 
           {/* Swatch grid */}
@@ -511,7 +620,7 @@ export function BrandPalette({
             </p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
               {COLOUR_ROLES.map(({ key, label }) => {
-                const colour = palette.palette[key]
+                const colour = activePalette[key]
                 return colour ? (
                   <ColourSwatch key={key} colour={colour} role={label} />
                 ) : null
@@ -519,8 +628,8 @@ export function BrandPalette({
             </div>
           </div>
 
-          {/* Rationale */}
-          {palette.rationale && (
+          {/* Designer's note — variant-specific insight when available */}
+          {(activeVariant?.usageInsight || palette.rationale) && (
             <div
               className="rounded-xl px-5 py-4 text-xs leading-relaxed"
               style={{
@@ -532,9 +641,11 @@ export function BrandPalette({
                 className="mr-1.5 text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: "rgba(212,175,55,0.55)" }}
               >
-                Designer's note
+                Designer&apos;s note
               </span>
-              <span style={{ color: "rgba(255,255,255,0.45)" }}>{palette.rationale}</span>
+              <span style={{ color: "rgba(255,255,255,0.45)" }}>
+                {activeVariant?.usageInsight || palette.rationale}
+              </span>
             </div>
           )}
 
@@ -543,8 +654,8 @@ export function BrandPalette({
             className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-4 py-3"
             style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
           >
-            {COLOUR_ROLES.map(({ key, label }) => {
-              const c = palette.palette[key]
+            {COLOUR_ROLES.map(({ key }) => {
+              const c = activePalette[key]
               if (!c) return null
               const safe = isValidHex(c.hex) ? c.hex : "#888888"
               return (
@@ -569,7 +680,7 @@ export function BrandPalette({
             brandName={brandName}
             keywords={keywords}
             vibe={vibe}
-            palette={palette.palette}
+            palette={activePalette}
           />
 
           {/* Stitch export — collapsible secondary option */}
@@ -577,7 +688,7 @@ export function BrandPalette({
             brandName={brandName}
             keywords={keywords}
             vibe={vibe}
-            palette={palette.palette}
+            palette={activePalette}
           />
         </div>
       )}
