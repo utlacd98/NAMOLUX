@@ -6,11 +6,12 @@ import { ArrowRight, Check, Dot } from "lucide-react"
 
 const editorialSerif =
   '"Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Book Antiqua", Georgia, serif'
+const founderSignalMark = "Founder Signal\u2122"
 
 const supportingPoints = [
   "No account required",
   "Live availability across 6 TLDs",
-  "Founder Signal™ score on every name",
+  `${founderSignalMark} score on every name`,
 ]
 
 const shortlistRows = [
@@ -188,9 +189,9 @@ export function Hero() {
 
       <div className="hero-noise absolute inset-0 opacity-[0.16]" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8 lg:pb-28 lg:pt-36">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] lg:gap-14">
-          <div className="relative z-10 max-w-2xl">
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-28 lg:pt-24 xl:pt-28">
+        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] lg:gap-12 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] xl:gap-14">
+          <div className="relative z-10 min-w-0 max-w-2xl">
             <motion.div
               {...getReveal({ delay: 0.05, reducedMotion })}
               className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#876628]/45 bg-[linear-gradient(180deg,rgba(20,16,11,0.92),rgba(10,8,6,0.9))] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[#d7be84] shadow-[0_14px_40px_rgba(0,0,0,0.35)] sm:text-[11px]"
@@ -198,13 +199,13 @@ export function Hero() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#d8b15b] shadow-[0_0_12px_rgba(216,177,91,0.85)]" />
               <span>Brand Consultancy</span>
               <span className="text-[#6a5330]">/</span>
-              <span>Founder Signal™ Scoring</span>
+              <span>{founderSignalMark} Scoring</span>
             </motion.div>
 
             <motion.h1
               {...getReveal({ delay: 0.14, reducedMotion })}
               id="hero-heading"
-              className="mt-6 text-[clamp(2.85rem,10vw,6.1rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white"
+              className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.1rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none"
               style={{ fontFamily: editorialSerif }}
             >
               <span className="block">A brand consultant</span>
@@ -231,7 +232,7 @@ export function Hero() {
               {...getReveal({ delay: 0.25, reducedMotion })}
               className="mt-6 max-w-xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg"
             >
-              NamoLux is a domain naming consultancy powered by Founder Signal™. Paste
+              NamoLux is a domain naming consultancy powered by {founderSignalMark}. Paste
               your candidate names and we score each one on{" "}
               <span className="text-[#f5ead0]">brand strength, availability, and founder fit</span>{" "}
               so you choose the name with the evidence to back it.
@@ -271,17 +272,17 @@ export function Hero() {
                 </Link>
               </motion.div>
 
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex w-full flex-wrap gap-2.5">
                 {supportingPoints.map((point, index) => (
                   <motion.div
                     key={point}
                     {...getReveal({ delay: 0.46 + index * 0.08, reducedMotion })}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm text-[#e1d8c4]/75 backdrop-blur-sm"
+                    className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm text-[#e1d8c4]/75 backdrop-blur-sm"
                   >
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#7e622f]/45 bg-[#120f0a]">
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#7e622f]/45 bg-[#120f0a]">
                       <Check className="h-3 w-3 text-[#d3b06b]" />
                     </span>
-                    <span>{point}</span>
+                    <span className="min-w-0 break-words">{point}</span>
                   </motion.div>
                 ))}
               </div>
@@ -290,7 +291,7 @@ export function Hero() {
 
           <motion.div
             {...getReveal({ delay: 0.24, reducedMotion })}
-            className="relative mx-auto w-full max-w-[38rem] lg:ml-auto"
+            className="relative mx-auto w-full min-w-0 max-w-full lg:ml-auto lg:max-w-[38rem]"
           >
             <motion.div
               aria-hidden="true"
@@ -306,16 +307,16 @@ export function Hero() {
               className="absolute -inset-x-3 top-10 h-72 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.18)_0%,rgba(212,175,55,0.04)_38%,transparent_72%)] blur-3xl"
             />
 
-            <div className="absolute -top-5 left-5 z-20 rounded-full border border-[#7e622b]/45 bg-black/70 px-4 py-2 text-[10px] uppercase tracking-[0.26em] text-[#d4b26c] shadow-[0_16px_30px_rgba(0,0,0,0.45)] backdrop-blur-md">
+            <div className="absolute -top-5 left-4 z-20 max-w-[calc(100%-2rem)] rounded-full border border-[#7e622b]/45 bg-black/70 px-3.5 py-2 text-[9px] uppercase tracking-[0.22em] text-[#d4b26c] shadow-[0_16px_30px_rgba(0,0,0,0.45)] backdrop-blur-md sm:left-5 sm:max-w-none sm:px-4 sm:text-[10px] sm:tracking-[0.26em]">
               Founder Signal dossier
             </div>
 
-            <div className="relative overflow-hidden rounded-[30px] border border-[#7a5d2e]/32 bg-[linear-gradient(180deg,rgba(14,11,8,0.96),rgba(8,8,8,0.94))] p-4 shadow-[0_32px_120px_rgba(0,0,0,0.72)] backdrop-blur-xl sm:p-5">
+            <div className="relative overflow-hidden rounded-[28px] border border-[#7a5d2e]/32 bg-[linear-gradient(180deg,rgba(14,11,8,0.96),rgba(8,8,8,0.94))] p-3.5 shadow-[0_32px_120px_rgba(0,0,0,0.72)] backdrop-blur-xl sm:rounded-[30px] sm:p-5">
               <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#e1c383]/50 to-transparent" />
 
               <div className="grid gap-4">
                 <div className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(18,15,12,0.94),rgba(8,8,8,0.9))] p-4 sm:p-5">
-                  <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.24em] text-[#baa473]/72">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-[0.24em] text-[#baa473]/72">
                     <span>Shortlist brief</span>
                     <span>Consultancy review</span>
                   </div>
@@ -359,9 +360,9 @@ export function Hero() {
                             : "border-white/8 bg-white/[0.025]"
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
                               <h2 className="text-lg font-medium text-white" style={{ fontFamily: editorialSerif }}>
                                 {row.name}
                               </h2>
@@ -374,7 +375,7 @@ export function Hero() {
                             <p className="mt-1 text-sm leading-6 text-[#d9cfbb]/66">{row.availability}</p>
                           </div>
 
-                          <div className="rounded-full border border-[#83652c]/35 bg-[#120e09] px-3 py-1.5 text-sm text-[#f2e0b6]">
+                          <div className="shrink-0 rounded-full border border-[#83652c]/35 bg-[#120e09] px-3 py-1.5 text-sm text-[#f2e0b6]">
                             {row.brandStrength}
                           </div>
                         </div>
@@ -414,7 +415,7 @@ export function Hero() {
                   </div>
 
                   <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9b07b]/74">
                         Live availability
                       </p>
