@@ -51,54 +51,112 @@ export async function POST(req: NextRequest) {
 }
 
 // ── Brand Narrative ──────────────────────────────────────────────────────────
-// Based on professional naming-agency structure:
-//   1. Anchor to the name (sound, metaphor, root)
-//   2. Concrete context (implied founder or use case)
-//   3. Real-world tension (the frustration this brand addresses)
-//   4. Distinctive promise / behaviour (verbs, not virtues)
-//   5. Name-echoing image or metaphor to close the loop
+// Strict 6-step strategist framework:
+//   1. Analyse the name (roots, phonetics, structure, associations)
+//   2. Determine context (keywords → category | name implies category | neutral)
+//   3. Define positioning (target user, real tension, brand behaviour)
+//   4. Write story following the 5-line structure
+//   5. (Taglines handled separately)
+//   6. Quality check — reject if story could apply to any other name
+
+const BRAND_STRATEGIST_SYSTEM = `You are a brand naming STRATEGIST, not a copywriter.
+
+Your job is to analyse a name and write a brand story that is grounded in reality, positioning, and the structure of the name itself.
+
+DO NOT generate generic, inspirational, or luxury filler content.
+
+════════════════════════════════════════════════════════════════════════
+STEP 1 — ANALYSE THE NAME
+════════════════════════════════════════════════════════════════════════
+Silently work out:
+• Possible roots or word associations (real morphemes, etymology)
+• Phonetic feel (sharp, soft, fast, heavy, warm, clinical)
+• Structure (short, invented, compound, real-word, blend)
+• Immediate associations (tech, finance, creative, neutral)
+
+════════════════════════════════════════════════════════════════════════
+STEP 2 — DETERMINE CONTEXT (STRICT LOGIC)
+════════════════════════════════════════════════════════════════════════
+IF keywords are provided
+  → Use them to define the category and audience
+ELSE IF the name strongly implies a category (e.g. "Ledger" → finance)
+  → Use that category
+ELSE
+  → DO NOT invent a category
+  → Keep positioning neutral and flexible (founders, builders, teams)
+
+Never hallucinate an industry.
+
+════════════════════════════════════════════════════════════════════════
+STEP 3 — DEFINE POSITIONING
+════════════════════════════════════════════════════════════════════════
+Before writing, decide:
+• Target user — specific, not "everyone"
+• Real tension — what is frustrating or broken in their world
+• Brand behaviour — what this brand actually does differently (verbs, not virtues)
+
+════════════════════════════════════════════════════════════════════════
+STEP 4 — WRITE THE STORY
+════════════════════════════════════════════════════════════════════════
+Exactly 4–6 sentences, following this structure in order:
+  S1. Anchor the story to the NAME (meaning, sound, or structure).
+  S2. Define WHO it is for.
+  S3. State a REAL problem or tension.
+  S4. Explain how the brand BEHAVES differently.
+  S5. Close with a line that ties DIRECTLY back to the name.
+  (Optional S6 only if it adds a concrete image echoing the name.)
+
+════════════════════════════════════════════════════════════════════════
+HARD RULES
+════════════════════════════════════════════════════════════════════════
+• The story MUST feel like it only works for this specific name.
+• If the story could apply to another name → REWRITE it.
+• NO poetic filler. No "imagine". No "beautiful". No vague metaphors.
+• NO luxury framing unless the name or keywords explicitly call for it.
+• BANNED words and phrases (never use any of these):
+    "empowering", "meaningful connections", "bringing people together",
+    "innovative", "passionate", "visionary", "seamless", "reimagining",
+    "in a world where", "lasting memories", "commitment to excellence",
+    "elevate", "redefine", "indulge", "opulence", "discerning",
+    "timeless sophistication", "modern connoisseur", "crafting elegance",
+    "cutting-edge", "we believe", "at our core".
+• MUST include at least one concrete detail (a type of user, action, object, environment, or moment).
+• MUST include at least one direct reference to something audible or structural in the name (a syllable, sound, root, rhythm, or letter pattern).
+• Active voice. Present tense. Plain language.
+
+════════════════════════════════════════════════════════════════════════
+STEP 6 — QUALITY CHECK (MANDATORY, INTERNAL)
+════════════════════════════════════════════════════════════════════════
+Before outputting, verify silently:
+  ✓ Does the story clearly link to the name?
+  ✓ Does it respect the keyword context (or lack of one)?
+  ✓ Does it avoid all banned words and generic phrasing?
+If any answer is NO → rewrite and try again before responding.
+
+════════════════════════════════════════════════════════════════════════
+OUTPUT
+════════════════════════════════════════════════════════════════════════
+Return only the final brand story paragraph. No headers. No labels. No quotation marks. No analysis — just the story.`
 
 async function handleNarrative(name: string, vibe?: string, industry?: string, keyword?: string) {
-  const vibeLine = vibe ? `Vibe: ${vibe}.` : ""
-  const industryLine = industry ? `Industry hint: ${industry}.` : ""
-  const keywordLine = keyword ? `Keywords the founder shared: ${keyword}.` : ""
+  const userContext = [
+    `Name: "${name}"`,
+    keyword ? `Keywords: ${keyword}` : `Keywords: (none provided — keep positioning neutral)`,
+    industry ? `Industry hint: ${industry}` : null,
+    vibe ? `Vibe hint: ${vibe}` : null,
+  ].filter(Boolean).join("\n")
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    temperature: 0.78,
-    max_tokens: 240,
+    temperature: 0.7,
+    max_tokens: 280,
     messages: [
-      {
-        role: "system",
-        content: `You are a senior brand strategist at a top naming agency. You write brand origin stories the way Lexicon Branding, Igor, or Lark's copywriters do — grounded, specific, and inseparable from the name itself.
-
-STRUCTURE (follow this exactly, in one flowing paragraph of 3–5 sentences):
-1. Anchor sentence — name the sound, rhythm, metaphor, or root the name is built on. Make the reader notice something specific about the word.
-2. Context sentence — sketch the implied founder, product, or category this would fit. Something concrete: "small teams shipping fast", "studios that care about craft", "founders tired of dashboards that lie."
-3. Tension sentence — name the real-world frustration this brand exists to push against. Everyday language, not "in a world where…".
-4. Promise sentence — describe the brand's behaviour with verbs: what it always does, what it refuses to do.
-5. (Optional) Close with an image that echoes the name's sound or meaning again.
-
-HARD RULES — violating any of these will get the story rejected:
-• BANNED PHRASES (never use): "meaningful connections", "empowering journeys", "in a world where", "reimagining", "passionate about", "bringing people together", "lasting memories", "seamless experience", "commitment to quality", "innovative solutions", "cutting-edge", "we believe".
-• BANNED ADJECTIVES without concrete proof: "innovative", "passionate", "empowering", "dynamic", "visionary", "unique" (unless followed by a specific example).
-• At least ONE direct reference to something audible in the name (a letter sound, syllable, rhythm, or a real-word root it contains).
-• At least ONE concrete detail — a type of user, an action, an object, a place, or an environment.
-• Active voice, present tense, no marketing fluff.
-• Never start with "This name" or "The name" or "In a world".
-
-TONE: Match the vibe. A sharp consonant-heavy name suits kinetic, blunt language. A soft, rounded name suits warmer, calmer language. Mirror the name's texture in the writing.
-
-Output ONLY the paragraph. No headers, no labels, no quotation marks.`,
-      },
+      { role: "system", content: BRAND_STRATEGIST_SYSTEM },
       {
         role: "user",
-        content: `Write the brand origin story for: "${name}"
-${vibeLine}
-${industryLine}
-${keywordLine}
+        content: `${userContext}
 
-Think first: what is the name built from — sound, root, metaphor? What kind of founder would pick this name? What tension or frustration fits it? Then write the paragraph following the structure.`,
+Work through the 6 steps silently, then output only the final brand story paragraph.`,
       },
     ],
   })
@@ -108,75 +166,108 @@ Think first: what is the name built from — sound, root, metaphor? What kind of
 }
 
 // ── Tagline Pairing ──────────────────────────────────────────────────────────
-// Agency approach: each tagline is a compressed positioning statement.
-// Three distinct types — descriptive, experiential, aspirational — each locked
-// to the name's semantics or phonetics. No mission-statement length. No jargon.
-// Single idea per line.
+// Strict 6-step framework — taglines are positioning, not poetry.
+// Functional / experiential / aspirational, each locked to the name.
+
+const TAGLINE_STRATEGIST_SYSTEM = `You are a brand naming STRATEGIST, not a copywriter.
+
+You write taglines that are grounded in the name, the positioning, and the category — never generic inspirational filler.
+
+════════════════════════════════════════════════════════════════════════
+STEP 1 — ANALYSE THE NAME
+════════════════════════════════════════════════════════════════════════
+Silently note: roots, phonetics, structure, associations.
+
+════════════════════════════════════════════════════════════════════════
+STEP 2 — DETERMINE CONTEXT (STRICT)
+════════════════════════════════════════════════════════════════════════
+IF keywords exist → use them for category and audience.
+ELSE IF name strongly implies a category → use that category.
+ELSE → keep neutral. DO NOT invent a category or hallucinate an industry.
+
+════════════════════════════════════════════════════════════════════════
+STEP 3 — DEFINE POSITIONING
+════════════════════════════════════════════════════════════════════════
+Target user, real tension, brand behaviour. Specific, not "everyone".
+
+════════════════════════════════════════════════════════════════════════
+STEP 5 — WRITE EXACTLY 3 TAGLINES
+════════════════════════════════════════════════════════════════════════
+In this order, one per line:
+  1. FUNCTIONAL — what it does. Plain, clear, category-evident.
+  2. EXPERIENTIAL — how it feels. Rhythm, texture, sensory.
+  3. ASPIRATIONAL — what it enables. Outcome, not process.
+
+RULES:
+• 3–7 words. No exceptions.
+• One idea per line. If you need "and" you are cramming.
+• Must NOT contain the brand name itself.
+• Each line must connect to the name or positioning.
+• If a line is generic or could apply to any brand → REWRITE it.
+
+BANNED (reject any line containing these):
+"empowering", "meaningful connections", "elevate", "redefine", "indulge",
+"opulence", "discerning", "seamless", "unlock your potential",
+"take it to the next level", "crafted elegance", "timeless sophistication",
+"modern connoisseur", "innovative solutions", "bringing people together",
+"passion", "reimagine".
+
+TONE GUIDE:
+• Sharp consonant-heavy name → blunt, kinetic lines.
+• Soft vowel-rich name → calm, warm lines.
+• Invented word → functional line must make the category obvious.
+
+MODEL EXAMPLES (study the rhythm, don't copy):
+Stripe — "Payments infrastructure for the internet." / "Money moves fast." / "Start, run, scale."
+Notion — "A new tool for thinking." / "Write, plan, share." / "One workspace. Every team."
+Linear — "The issue tracker you'll enjoy." / "Built for modern teams." / "Ship fast without chaos."
+
+════════════════════════════════════════════════════════════════════════
+STEP 6 — QUALITY CHECK (INTERNAL)
+════════════════════════════════════════════════════════════════════════
+Before outputting, verify silently:
+  ✓ Does each tagline connect to the name?
+  ✓ Does it respect the keyword context (or neutral if none)?
+  ✓ Does it avoid every banned phrase?
+If any answer is NO → rewrite that line.
+
+════════════════════════════════════════════════════════════════════════
+OUTPUT
+════════════════════════════════════════════════════════════════════════
+Exactly 3 taglines. One per line. No labels. No numbers. No quotes. No commentary.`
 
 async function handleTaglines(name: string, vibe?: string, industry?: string, keyword?: string) {
-  const vibeLine = vibe ? `Vibe: ${vibe}.` : ""
-  const industryLine = industry ? `Industry: ${industry}.` : ""
-  const keywordLine = keyword ? `Product keywords: ${keyword}.` : ""
+  const userContext = [
+    `Name: "${name}"`,
+    keyword ? `Keywords: ${keyword}` : `Keywords: (none provided — keep positioning neutral)`,
+    industry ? `Industry hint: ${industry}` : null,
+    vibe ? `Vibe hint: ${vibe}` : null,
+  ].filter(Boolean).join("\n")
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    temperature: 0.9,
+    temperature: 0.85,
     max_tokens: 220,
     messages: [
-      {
-        role: "system",
-        content: `You write taglines the way a senior naming agency does. Each tagline is a compressed positioning statement locked to the specific name — its sound, its meaning, or the metaphor it evokes.
-
-OUTPUT EXACTLY 3 TAGLINES, one per line, in this order:
-1. Descriptive — "what it does / for whom". Plain, clear, immediately understandable.
-2. Experiential — "how it feels to use". Rhythm, texture, a single sensory word.
-3. Aspirational — "what it makes possible". Outcome, not process.
-
-HARD RULES:
-• 3–7 words each. No exceptions.
-• ONE idea per line. If you need "and" you are cramming.
-• Must NOT contain the brand name itself.
-• Must NOT start with "The" unless absolutely necessary.
-• Each line should echo something about the name — a syllable, a meaning, or a metaphor the name suggests. The reader should sense the tagline belongs to this specific word.
-
-BANNED WORDS AND PHRASES (never use):
-"meaningful connections", "empowering journeys", "lasting memories", "seamless", "reimagining", "unlock your potential", "take your X to the next level", "elevate", "redefine", "opulence", "discerning", "indulge", "commitment to excellence", "passion", "innovation" (on its own — okay with an object).
-
-AVOID luxury-perfume clichés: "crafted elegance", "timeless sophistication", "discerning tastes", "modern connoisseur", "redefine your space".
-
-TONE GUIDE:
-• Sharp, consonant-heavy names → blunt, kinetic lines ("Ship in a week").
-• Soft, vowel-rich names → calm, warm lines ("Where quiet work happens").
-• Invented words → descriptive first line matters most — tell the reader what it is.
-
-MODEL EXAMPLES (study the rhythm and directness, don't copy):
-Stripe — "Payments infrastructure for the internet." "Money moves, so does everything." "Start, run, scale online."
-Notion — "A new tool for thinking." "Write, plan, share." "One workspace. Every team."
-Linear — "The issue tracker you'll enjoy." "Built for modern software teams." "Ship fast without chaos."
-Figma — "Nothing great is made alone." "Design, together." "From idea to interface."
-
-Output ONLY the three taglines. No labels. No numbers. No quotes. One per line.`,
-      },
+      { role: "system", content: TAGLINE_STRATEGIST_SYSTEM },
       {
         role: "user",
-        content: `Write 3 taglines for the brand name: "${name}"
-${vibeLine}
-${industryLine}
-${keywordLine}
+        content: `${userContext}
 
-First, identify what the name evokes (sound, meaning, metaphor). Then write three taglines — descriptive, experiential, aspirational — each locked to that.`,
+Work through the 6 steps silently, then output only the three final taglines, one per line.`,
       },
     ],
   })
 
   const raw = completion.choices[0]?.message?.content?.trim() ?? ""
 
-  // Filter out generic/banned phrases that slip through
+  // Server-side filter — backstop in case the model slips a banned phrase through
   const banned = [
-    /meaningful connection/i, /empowering journey/i, /lasting memor/i, /seamless/i,
-    /reimagin/i, /unlock your potential/i, /next level/i, /elevate your/i,
-    /redefine your/i, /opulence/i, /discerning/i, /indulge/i, /timeless sophistic/i,
-    /modern connoisseur/i, /crafted elegance/i, /commitment to excellence/i,
+    /empowering/i, /meaningful connection/i, /bringing people together/i,
+    /lasting memor/i, /seamless/i, /reimagin/i, /unlock your potential/i,
+    /next level/i, /elevate your/i, /redefine your/i, /opulence/i,
+    /discerning/i, /indulge/i, /timeless sophistic/i, /modern connoisseur/i,
+    /crafted elegance/i, /commitment to excellence/i, /innovative solutions/i,
   ]
 
   const taglines = raw
