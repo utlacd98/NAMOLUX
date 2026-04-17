@@ -3,19 +3,19 @@ import { Suspense } from "react"
 import { GenerateNames } from "@/components/generate-names"
 
 export const metadata: Metadata = {
-  title: "Generate Domain Names | NamoLux",
+  title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
   description:
-    "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
+    "Paste up to 50 domain names and get live availability checks across 6 TLDs plus Founder Signal™ brand scoring. Rank your shortlist by elite-tier brand quality in seconds.",
   openGraph: {
-    title: "Generate Domain Names | NamoLux",
+    title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
     description:
-      "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
+      "Check domain availability in bulk and rank names by Founder Signal™ brand score. 6 TLDs, 50 names per batch, instant results.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Generate Domain Names | NamoLux",
+    title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
     description:
-      "Generate short, memorable domain names with live .com availability checks, brand vibe controls, and Founder Signal scoring to shortlist stronger options faster.",
+      "Check domain availability in bulk and rank names by Founder Signal™ brand score. 6 TLDs, 50 names per batch, instant results.",
   },
 }
 

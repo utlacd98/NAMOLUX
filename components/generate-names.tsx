@@ -431,7 +431,9 @@ export function GenerateNames() {
   const [isCheckingSocials, setIsCheckingSocials] = useState(false)
 
   // Bulk check state
-  const [isBulkMode, setIsBulkMode] = useState(false)
+  // Bulk Check is now the default and only mode — the other two are disabled
+  // at the UI level. Internal state kept for backwards compatibility.
+  const [isBulkMode, setIsBulkMode] = useState(true)
   const [showAiChat, setShowAiChat] = useState(false)
   const [bulkInput, setBulkInput] = useState("")
   const [description, setDescription] = useState("")
@@ -1377,46 +1379,20 @@ export function GenerateNames() {
               }}
             >
               {/* Mode Toggle */}
+              {/* Single-mode layout — Bulk Check is the only generator.
+                  The Generate and AI Chat tabs have been removed so the
+                  product focuses on what the Founder Signal scorer does best:
+                  rank and validate a user-provided list of names. */}
               <div
-                className="mb-5 grid grid-cols-3 gap-1 rounded-xl p-1 sm:mb-7"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+                className="mb-5 rounded-xl p-3 text-center sm:mb-7"
+                style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.20)" }}
               >
-                <button
-                  onClick={() => { setIsBulkMode(false); setShowAiChat(false) }}
-                  className={cn(
-                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
-                    !isBulkMode && !showAiChat
-                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
-                      : "text-white/60 hover:text-white/90"
-                  )}
-                  style={!isBulkMode && !showAiChat ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
-                >
-                  ✦ Generate
-                </button>
-                <button
-                  onClick={() => { setIsBulkMode(false); setShowAiChat(true) }}
-                  className={cn(
-                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
-                    showAiChat
-                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
-                      : "text-white/60 hover:text-white/90"
-                  )}
-                  style={showAiChat ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
-                >
-                  ✦ AI Chat
-                </button>
-                <button
-                  onClick={() => { setIsBulkMode(true); setShowAiChat(false) }}
-                  className={cn(
-                    "min-h-[42px] rounded-lg px-2 py-2 text-xs font-semibold transition-all duration-200 sm:px-4 sm:text-sm",
-                    isBulkMode
-                      ? "text-black shadow-[0_4px_16px_rgba(212,175,55,0.35)]"
-                      : "text-white/60 hover:text-white/90"
-                  )}
-                  style={isBulkMode ? { background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)" } : {}}
-                >
-                  📋 Bulk Check
-                </button>
+                <div className="text-sm font-semibold" style={{ color: "#D4AF37" }}>
+                  📋 Bulk Check & Founder Signal™ Scoring
+                </div>
+                <p className="mt-1 text-[11px] text-white/60">
+                  Paste your name shortlist — get live availability checks and elite-tier brand scoring in seconds.
+                </p>
               </div>
 
               {/* AI Chat Mode */}
