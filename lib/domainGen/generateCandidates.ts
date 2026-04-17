@@ -6,6 +6,7 @@
   parseKeywordTokens,
 } from "@/lib/domainGen/synonyms"
 import { containsKeywordRoot, isKeywordAnchored, passesTasteGate } from "@/lib/domainGen/filters"
+import { isGibberish, isKeywordClone, getRelevanceScore } from "@/lib/domainGen/realness"
 import type { AutoFindRequestInput, Candidate, NameStyleMode } from "@/lib/domainGen/types"
 
 interface GenerateCandidateOptions {
@@ -364,6 +365,15 @@ export function generateCandidatePool(
     if (candidates.has(candidate.name)) return
 
     const name = candidate.name
+
+    // Gibberish hard filter — reject meaningless consonant soup early
+    if (isGibberish(name)) return
+
+    // Keyword clone detection — reject keyword + mutation patterns
+    if (isKeywordClone(name, keywordTokens)) return
+
+    // Relevance gate — require at least a loose connection to user intent
+    if (keywordTokens.length > 0 && getRelevanceScore(name, keywordTokens) < 20) return
 
     // Taste gate — reject names that feel generic, awkward, or not brand-worthy
     if (!passesTasteGate(name)) return

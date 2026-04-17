@@ -1,3 +1,4 @@
+import { getRealnessScore } from "../domainGen/realness"
 import { computeBrandInstinct } from "./brandInstinct"
 
 export type FounderLabel = "Pronounceable" | "Brandable"
@@ -625,17 +626,25 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const rawExtension = calculateExtensionScore(tld)
   const rawCharacterQuality = calculateCharacterQualityScore(name)
   const rawBrandRisk = calculateBrandRiskScore(name)
+  const rawRealness = getRealnessScore(name)
 
-  // Apply weights as per the new formula:
-  // FounderSignal = (Length×0.15) + (Pronounce×0.15) + (Memorability×0.20) + (Extension×0.15) + (CharQuality×0.10) + (BrandRisk×0.25)
-  const weightedLength = rawLength * 0.15
-  const weightedPronounce = rawPronounceability * 0.15
-  const weightedMemorability = rawMemorability * 0.20
-  const weightedExtension = rawExtension * 0.15
+  // Weighted formula (extended to include realness):
+  //   realness      22%  (distinguishes real/brand-plausible from gibberish)
+  //   brand risk    17%
+  //   memorability  17%
+  //   length        13%
+  //   pronounce     11%
+  //   extension     10%
+  //   char quality  10%
+  const weightedLength = rawLength * 0.13
+  const weightedPronounce = rawPronounceability * 0.11
+  const weightedMemorability = rawMemorability * 0.17
+  const weightedExtension = rawExtension * 0.10
   const weightedCharacter = rawCharacterQuality * 0.10
-  const weightedBrandRisk = rawBrandRisk * 0.25
+  const weightedBrandRisk = rawBrandRisk * 0.17
+  const weightedRealness = rawRealness * 0.22
 
-  const baseScore = weightedLength + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk
+  const baseScore = weightedLength + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk + weightedRealness
 
   // Apply vibe modifier
   const vibeModifier = calculateVibeModifier(name, vibe)
