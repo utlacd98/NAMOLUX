@@ -753,26 +753,50 @@ const FILLER_POOL = [
   "Ember", "Forge", "Haven", "Ridge", "Slate", "Drift", "Grove", "Cedar",
   "Lumen", "Prism", "Spark", "Orbit", "Frame", "Crest", "Dune", "Tide",
   "Vela", "Soren", "Kaida", "Noren", "Elva", "Orin", "Thera", "Cira",
+  "Zephyr", "Aurum", "Quill", "Brine", "Helix", "Moras", "Caelum", "Renna",
+  "Tavo", "Nira", "Elan", "Brio", "Saren", "Oryn", "Wren", "Coen",
+  "Lira", "Fenn", "Marin", "Torin", "Vessa", "Auren", "Lumo", "Kade",
 ]
+
+// Seeded PRNG (mulberry32) for deterministic but genuinely varied shuffling
+function makeRng(seed: string): () => number {
+  let h = 2166136261
+  const s = seed || "brand"
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  let state = h >>> 0
+  return () => {
+    state = (state + 0x6D2B79F5) >>> 0
+    let t = state
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
 
 function synthFillers(seed: string, n: number): NameResult[] {
   if (n <= 0) return []
-  // Deterministic shuffle based on seed so the set stays stable per keyword
-  const seedHash = (seed || "brand").split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 0)
-  const pool = [...FILLER_POOL].sort((a, b) => {
-    const ha = (a.charCodeAt(0) + seedHash) % 997
-    const hb = (b.charCodeAt(0) + seedHash) % 997
-    return ha - hb
-  })
+  // Mix in time to ensure variance across regenerations with same keyword
+  const rng = makeRng(`${seed}:${Math.floor(Date.now() / 60000)}`)
+  const pool = [...FILLER_POOL]
+
+  // Fisher-Yates shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
 
   const out: NameResult[] = []
-  for (let i = 0; i < n; i++) {
-    const base = pool[i % pool.length]
+  for (let i = 0; i < n && i < pool.length; i++) {
+    const base = pool[i]
+    const scoreJitter = Math.floor(rng() * 18)
     out.push({
       name: base,
       fullDomain: `${base.toLowerCase()}.com`,
       available: true,
-      founderScore: 72 + ((i * 7) % 18),
+      founderScore: 72 + scoreJitter,
       whyTag: "Invented brandable",
     })
   }
