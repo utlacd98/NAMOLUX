@@ -371,10 +371,10 @@ export async function POST(request: NextRequest) {
       domainSuggestions = []
     }
 
-    // ── Quality filtering on LLM output ────────────────────────────────────
-    // Apply the same filters the advanced generator uses: keyword mutation
-    // rejection, AI-smell detection, and taste gate. Without this, the basic
-    // generator returns raw GPT output with no quality control.
+    // ── Hybrid pipeline: AI generates, Founder Signal ranks ───────────────
+    // AI is treated as one candidate source among several — NOT the authority.
+    // The deterministic Founder Signal + Brand Instinct layer picks the winners
+    // from a merged pool of AI output + deterministic generator output.
     const keywordRoots = keyword
       .trim()
       .toLowerCase()
@@ -389,86 +389,103 @@ export async function POST(request: NextRequest) {
       return true
     }
 
+    // Step 1: collect raw candidates from BOTH sources
+    interface RawCandidate {
+      name: string
+      reasoning?: string
+      meaning?: string
+      source: "ai" | "engine"
+    }
+
+    const rawCandidates: RawCandidate[] = []
     const seenNames = new Set<string>()
-    let finalSuggestions = (Array.isArray(domainSuggestions) ? domainSuggestions : [])
-      .map((item: any) => {
-        const rawName = typeof item === "string" ? item : item?.name
-        const cleanName = String(rawName || "")
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, "")
-          .slice(0, 63)
 
-        if (cleanName.length < 3 || seenNames.has(cleanName)) return null
-        seenNames.add(cleanName)
-
-        // Quality gate — reject keyword mutations, AI patterns, and tasteless names
-        if (!passesQualityGate(cleanName)) return null
-
-        return {
-          name: cleanName,
-          reasoning:
-            typeof item?.reasoning === "string" && item.reasoning.trim().length > 0
-              ? item.reasoning.trim()
-              : "Generated for brandability and memorability.",
-          meaning:
-            typeof item?.meaning === "string" && item.meaning.trim().length > 0
-              ? item.meaning.trim()
-              : undefined,
-        }
+    // Source A: AI output
+    for (const item of Array.isArray(domainSuggestions) ? domainSuggestions : []) {
+      const rawName = typeof item === "string" ? item : item?.name
+      const clean = String(rawName || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 63)
+      if (clean.length < 3 || seenNames.has(clean)) continue
+      seenNames.add(clean)
+      rawCandidates.push({
+        name: clean,
+        reasoning: typeof item?.reasoning === "string" && item.reasoning.trim().length > 0 ? item.reasoning.trim() : undefined,
+        meaning: typeof item?.meaning === "string" && item.meaning.trim().length > 0 ? item.meaning.trim() : undefined,
+        source: "ai",
       })
-      .filter(Boolean)
-      .slice(0, safeCount)
+    }
 
-    // ── Backfill guarantee ────────────────────────────────────────────────
-    // If the LLM + quality filters leave us with too few results, use the
-    // deterministic server-side generator as a fallback. This guarantees the
-    // user always gets good names no matter what keywords they provide —
-    // the server generator has all quality guards built in (diversity, taste
-    // gate, keyword rejection, AI-smell filter).
-    const MIN_RESULTS = Math.max(5, Math.floor(safeCount / 2))
-    if (finalSuggestions.length < MIN_RESULTS) {
-      try {
-        const backfillPool = generateCandidatePool(
-          {
-            keyword: keyword.trim(),
-            industry: typeof industry === "string" ? industry : undefined,
-            vibe: typeof vibe === "string" ? vibe : "minimal",
-            maxLength: typeof maxLength === "number" ? maxLength : 10,
-            targetCount: safeCount * 2,
-            controls: {
-              seed: `backfill-${Date.now().toString(36)}`,
-              mustIncludeKeyword: "none",
-              keywordPosition: "anywhere",
-              style: "brandable_blends",
-              blocklist: [],
-              allowlist: [],
-              allowHyphen: false,
-              allowNumbers: false,
-              meaningFirst: true,
-              preferTwoWordBrands: true,
-              allowVibeSuffix: false,
-              showAnyAvailable: false,
-            },
+    // Source B: deterministic generator (always runs, not just as fallback)
+    try {
+      const enginePool = generateCandidatePool(
+        {
+          keyword: keyword.trim(),
+          industry: typeof industry === "string" ? industry : undefined,
+          vibe: typeof vibe === "string" ? vibe : "minimal",
+          maxLength: typeof maxLength === "number" ? maxLength : 10,
+          targetCount: safeCount * 3,
+          controls: {
+            seed: `hybrid-${Date.now().toString(36)}`,
+            mustIncludeKeyword: "none",
+            keywordPosition: "anywhere",
+            style: "brandable_blends",
+            blocklist: [],
+            allowlist: [],
+            allowHyphen: false,
+            allowNumbers: false,
+            meaningFirst: true,
+            preferTwoWordBrands: true,
+            allowVibeSuffix: false,
+            showAnyAvailable: false,
           },
-          { poolSize: 300 },
-        )
+        },
+        { poolSize: 400 },
+      )
 
-        for (const candidate of backfillPool.candidates) {
-          if (finalSuggestions.length >= safeCount) break
-          const clean = candidate.name.toLowerCase().replace(/[^a-z0-9]/g, "")
-          if (clean.length < 3 || seenNames.has(clean)) continue
-          if (!passesQualityGate(clean)) continue
-          seenNames.add(clean)
-          finalSuggestions.push({
-            name: clean,
-            reasoning: "Generated by quality engine.",
-            meaning: undefined,
-          })
-        }
-      } catch (err) {
-        // Backfill is best-effort — if it fails, return whatever the LLM gave us.
-        console.error("Backfill generation failed:", err)
+      for (const candidate of enginePool.candidates) {
+        const clean = candidate.name.toLowerCase().replace(/[^a-z0-9]/g, "")
+        if (clean.length < 3 || seenNames.has(clean)) continue
+        seenNames.add(clean)
+        rawCandidates.push({ name: clean, source: "engine" })
       }
+    } catch (err) {
+      console.error("Engine pool generation failed:", err)
+    }
+
+    // Step 2: filter ALL candidates through identical quality gates
+    const filtered = rawCandidates.filter(c => passesQualityGate(c.name))
+
+    // Step 3: score EVERY candidate with Founder Signal (Brand Instinct auto-applies)
+    const scored = filtered.map(c => {
+      const result = scoreName({
+        name: c.name,
+        tld: "com",
+        vibe: typeof vibe === "string" ? (vibe.toLowerCase() as any) : undefined,
+        keywords: keywordRoots,
+      })
+      return { ...c, score: result.score, reasons: result.reasons }
+    })
+
+    // Step 4: rank by Founder Signal, return top N
+    // Minimum quality floor — 65 for basic path to ensure a reasonable bar
+    const MIN_SCORE = 65
+    const ranked = scored
+      .filter(s => s.score >= MIN_SCORE)
+      .sort((a, b) => b.score - a.score)
+
+    let finalSuggestions = ranked.slice(0, safeCount).map(s => ({
+      name: s.name,
+      reasoning: s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine."),
+      meaning: s.meaning,
+    }))
+
+    // If the ranked pool still has too few, drop the floor to salvage results
+    if (finalSuggestions.length < Math.max(5, Math.floor(safeCount / 2))) {
+      const relaxed = scored.sort((a, b) => b.score - a.score).slice(0, safeCount)
+      finalSuggestions = relaxed.map(s => ({
+        name: s.name,
+        reasoning: s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine."),
+        meaning: s.meaning,
+      }))
     }
 
     // Track metric (non-blocking)
