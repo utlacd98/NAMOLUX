@@ -101,6 +101,123 @@ const TLD_STRENGTH: Record<string, number> = {
   dev: 48,
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Elite-tier scoring: semantic signal, phonetic strength, brand presence
+// These gate the top scores — names without these qualities are capped.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * True if the name carries semantic weight — contains a recognisable English
+ * word or a curated brand-root substring. Without this, names are capped at 85.
+ */
+function hasSemanticSignal(name: string): boolean {
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "")
+  if (clean.length < 3) return false
+
+  // Whole name is a recognised root (strongest signal)
+  if (REAL_WORD_SUBSTRATES.has(clean)) return true
+
+  // Contains a recognised root of 4+ chars AND the root dominates the name
+  // (> 60% of name length) — e.g. "drifta" contains "drift" (5/6 = 83%)
+  // OR the name is built from TWO real roots (e.g. "ridgecraft", "forgemint")
+  let rootHits = 0
+  for (const root of REAL_WORD_SUBSTRATES) {
+    if (root.length >= 4 && clean.includes(root)) {
+      if (root.length / clean.length >= 0.6) return true
+      rootHits++
+      if (rootHits >= 2) return true
+    }
+  }
+
+  // Short concept words: must be the WHOLE name or clearly bookend it
+  // (reject cases like "arcahor" where "arc" is a weak prefix fragment)
+  const conceptWords = ["flow", "wave", "beam", "bolt", "nest", "tide", "peak", "core", "loom", "glow"]
+  for (const w of conceptWords) {
+    if (clean === w) return true
+    // Must be whole word at boundary with short tail (not buried in a longer name)
+    if (clean.length <= w.length + 2 && (clean.startsWith(w) || clean.endsWith(w))) return true
+  }
+
+  return false
+}
+
+/**
+ * Returns a phonetic strength score 0-100.
+ * Strong: sharp consonants (t, k, r, d, g, x), crisp endings, clear syllables.
+ * Weak: mushy double vowels, soft -oo/-ie endings, repetitive vowel-heavy structure.
+ */
+function getPhoneticStrength(name: string): number {
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "")
+  if (clean.length < 3) return 0
+
+  let strength = 50 // baseline
+
+  // Strong consonants present
+  const strongConsonants = (clean.match(/[tkrdgx]/g) || []).length
+  strength += Math.min(20, strongConsonants * 4)
+
+  // Sharp ending (t, k, r, x, n, d) — crisp brand close
+  if (/[tkrxnd]$/.test(clean)) strength += 10
+
+  // Clear syllable rhythm (2-3 syllables)
+  const syllables = (clean.match(/[aeiouy]+/g) || []).length
+  if (syllables === 2) strength += 10
+  else if (syllables === 3) strength += 5
+  else if (syllables >= 5) strength -= 15
+
+  // Weak ending penalties
+  if (/oo$/.test(clean)) strength -= 25 // -oo feels soft, immature
+  if (/ie$/.test(clean) && clean.length > 4) strength -= 15
+  if (/[aeiouy][aeiouy]$/.test(clean) && clean.length >= 5) strength -= 10 // double vowel close
+  if (/a$/.test(clean) && clean.length >= 6) strength -= 5 // long -a endings feel soft
+
+  // Vowel-heavy penalty
+  const vowelRatio = (clean.match(/[aeiouy]/g) || []).length / clean.length
+  if (vowelRatio > 0.6) strength -= 15 // too many vowels = mushy
+  if (vowelRatio < 0.25) strength -= 10 // too few = unreadable
+
+  // Triple vowel cluster = stutter
+  if (/[aeiouy]{3}/.test(clean)) strength -= 15
+
+  // Alliterative repetition within short name
+  if (/([bcdfghjklmnpqrstvwxyz]).*\1/.test(clean) && clean.length <= 6) strength += 5
+
+  return Math.max(0, Math.min(100, strength))
+}
+
+/**
+ * Heuristic brand-presence test: "Would this sound natural in a sentence?"
+ * Returns false for names that trip the ear — combinations that don't parse
+ * as plausible English words.
+ */
+function passesBrandPresence(name: string): boolean {
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "")
+  if (clean.length < 3 || clean.length > 12) return false
+
+  // Must have vowels
+  if (!/[aeiouy]/.test(clean)) return false
+
+  // No 4+ consonant cluster
+  if (/[bcdfghjklmnpqrstvwxyz]{4,}/.test(clean)) return false
+
+  // No triple vowels
+  if (/[aeiouy]{3,}/.test(clean)) return false
+
+  // No awkward starters
+  if (/^[aeiouy]{2,}/.test(clean)) return false
+
+  // No weak "mush" endings that wouldn't pass "We use X" test
+  if (/oom$/.test(clean) && !["bloom", "broom", "doom", "zoom", "loom", "groom"].includes(clean)) return false
+  if (/oorc?$/.test(clean)) return false
+  if (/eam$/.test(clean) && !["beam", "cream", "dream", "gleam", "stream", "team", "steam", "scream", "seam"].includes(clean)) return false
+
+  // Reject random-syllable feel: 3+ syllables with no real-word substring
+  const syllables = (clean.match(/[aeiouy]+/g) || []).length
+  if (syllables >= 3 && clean.length >= 7 && !hasSemanticSignal(clean)) return false
+
+  return true
+}
+
 /** Return a zero-score result for hard-rejected names */
 function zeroScoreResult(reasons: string[], tld: string): ScoreNameResult {
   return {
@@ -527,7 +644,66 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   // Reduces dominance of generic/overused names and boosts distinctive ones.
   const instinct = computeBrandInstinct(name)
 
-  const totalScore = clamp(Math.round(baseScore + vibeModifier + instinct.adjustment), 0, 100)
+  let combinedScore = baseScore + vibeModifier + instinct.adjustment
+
+  // ── Startup cliché suffix penalty ──
+  // Overused endings struggle to exceed 90 unless the name is exceptional.
+  const CLICHE_SUFFIX = /(?:ly|ify|sy|oo|ium|ora|era|ova|yx|fy|zy)$/
+  if (CLICHE_SUFFIX.test(name)) {
+    combinedScore -= 4
+  }
+
+  // ── Elite-tier gating ──
+  // Compute quality signals
+  const semantic = hasSemanticSignal(name)
+  const phoneticStrength = getPhoneticStrength(name)
+  const brandPresence = passesBrandPresence(name)
+
+  // Hard cap rules (strict tier hierarchy):
+  //   - Fails brand presence → cap at 75 (can't say it naturally)
+  //   - No semantic + weak phonetic (<50) → cap at 85
+  //   - Pronounceable but generic (no semantic, medium phonetic) → cap at 90
+  //   - 95+ requires at least ONE elite signal:
+  //       * semantic (real word/root), OR
+  //       * strong phonetic (>= 70), OR
+  //       * matches recognisable brand pattern
+  let cap = 100
+
+  if (!brandPresence) {
+    cap = Math.min(cap, 75)
+  }
+
+  if (!semantic && phoneticStrength < 50) {
+    cap = Math.min(cap, 85)
+  }
+
+  if (!semantic && phoneticStrength < 70) {
+    cap = Math.min(cap, 90)
+  }
+
+  // 95+ requires elite signal
+  const hasEliteSignal = semantic || phoneticStrength >= 70
+  if (!hasEliteSignal) {
+    cap = Math.min(cap, 94)
+  }
+
+  // Apply the cap
+  combinedScore = Math.min(combinedScore, cap)
+
+  // ── Score floor for brand-presence failures ──
+  if (!brandPresence && combinedScore > 60) {
+    combinedScore -= 10
+  }
+
+  const totalScore = clamp(Math.round(combinedScore), 0, 100)
+
+  // Track capping reason for UI
+  if (cap < 100) {
+    if (!brandPresence) instinct.reasons.push("Lacks brand presence")
+    else if (!semantic && phoneticStrength < 50) instinct.reasons.push("Weak semantic + phonetic")
+    else if (!semantic) instinct.reasons.push("Generic — no semantic anchor")
+    else if (!hasEliteSignal) instinct.reasons.push("No elite signal")
+  }
 
   // Generate reasons
   if (rawLength >= 90) reasons.push("Excellent length (≤6 chars)")

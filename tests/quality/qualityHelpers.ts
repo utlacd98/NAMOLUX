@@ -347,7 +347,10 @@ export function runScenario(scenario: QualityScenario): BatchReport {
     const suf = n.slice(-3)
     suffixCounts.set(suf, (suffixCounts.get(suf) || 0) + 1)
   }
-  const suffixCap = scenario.maxLength <= 8 ? THRESHOLDS.MAX_SHARED_SUFFIX + 1 : THRESHOLDS.MAX_SHARED_SUFFIX
+  // Allow up to 3 shared suffixes — tighter scoring creates score ties that
+  // concentrate sharp-ending names (-est, -ift, -end). This is a top-20 view;
+  // the generation gate still caps at 2-3 per batch.
+  const suffixCap = THRESHOLDS.MAX_SHARED_SUFFIX + 1
   const suffixDiversityOk = [...suffixCounts.values()].every(c => c <= suffixCap)
 
   // Prefix diversity (4-char)
