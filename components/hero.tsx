@@ -15,18 +15,21 @@ const supportingPoints = [
   `${founderSignalMark} score on every name`,
 ]
 
+// Heavier particle set for desktop — dust stays decorative but dense.
+// On mobile we only render the first 4 so GPU load during scroll stays minimal.
 const ambientParticles = [
+  { left: "22%", top: "28%", size: 2, duration: 16, delay: 2 },
+  { left: "47%", top: "14%", size: 2.5, duration: 18, delay: 1 },
+  { left: "66%", top: "24%", size: 2, duration: 17, delay: 3 },
+  { left: "81%", top: "62%", size: 2, duration: 14, delay: 2 },
   { left: "7%", top: "18%", size: 2, duration: 13, delay: 0 },
   { left: "14%", top: "63%", size: 1.5, duration: 15, delay: 4 },
-  { left: "22%", top: "28%", size: 2, duration: 16, delay: 2 },
   { left: "33%", top: "72%", size: 1.5, duration: 14, delay: 5 },
-  { left: "47%", top: "14%", size: 2.5, duration: 18, delay: 1 },
   { left: "58%", top: "56%", size: 1.5, duration: 15, delay: 6 },
-  { left: "66%", top: "24%", size: 2, duration: 17, delay: 3 },
   { left: "74%", top: "68%", size: 1.5, duration: 16, delay: 7 },
-  { left: "81%", top: "31%", size: 2, duration: 14, delay: 2 },
   { left: "90%", top: "60%", size: 1.5, duration: 18, delay: 8 },
 ]
+const MOBILE_PARTICLE_COUNT = 4
 
 // Headline parts — plain prefix + gold gradient suffix
 const HEADLINE_PREFIX = "A brand consultant for your "
@@ -98,8 +101,24 @@ function getReveal({ delay, reducedMotion }: RevealProps) {
   }
 }
 
+// Detects once on mount whether we're on a device wide enough for the heaviest
+// ambient animations. Avoids running gradient shimmer on small-screen GPUs.
+function useIsWideViewport(): boolean {
+  const [wide, setWide] = useState(false)
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return
+    const mq = window.matchMedia("(min-width: 640px)")
+    setWide(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setWide(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
+  return wide
+}
+
 export function Hero() {
   const reducedMotion = useReducedMotion()
+  const isWideViewport = useIsWideViewport()
   const { typed, done: typewriterDone } = useTypewriter(FULL_HEADLINE, !reducedMotion)
 
   // Split the typed output back into (plain prefix | gold suffix)
@@ -111,7 +130,8 @@ export function Hero() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative isolate overflow-hidden bg-[#050505] text-white"
+      className="relative isolate overflow-hidden bg-[#050505] text-white [contain:paint]"
+      style={{ transform: "translateZ(0)" }}
     >
       <div
         aria-hidden="true"
@@ -137,6 +157,7 @@ export function Hero() {
         }}
       />
 
+      {/* Gold radial glow — lighter blur on mobile to avoid scroll jank on GPU */}
       <motion.div
         aria-hidden="true"
         animate={
@@ -148,10 +169,12 @@ export function Hero() {
               }
         }
         transition={{ duration: 9, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute left-1/2 top-[20rem] h-[18rem] w-[18rem] -translate-x-1/2 rounded-full bg-[#d6aa52]/20 blur-[120px] sm:top-[17rem] sm:h-[22rem] sm:w-[22rem]"
+        style={{ willChange: "transform, opacity" }}
+        className="absolute left-1/2 top-[20rem] h-[18rem] w-[18rem] -translate-x-1/2 rounded-full bg-[#d6aa52]/20 blur-[60px] sm:top-[17rem] sm:h-[22rem] sm:w-[22rem] sm:blur-[120px]"
       />
 
-      {/* Slow-moving gold light sweep across the background */}
+      {/* Slow-moving gold light sweep — desktop only. The blur-2xl layer is
+          expensive during scroll on mobile GPUs. */}
       <motion.div
         aria-hidden="true"
         animate={
@@ -163,29 +186,38 @@ export function Hero() {
               }
         }
         transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="pointer-events-none absolute inset-y-0 left-0 w-[120%] bg-[linear-gradient(115deg,transparent_38%,rgba(240,212,147,0.18)_50%,transparent_62%)] blur-2xl"
+        style={{ willChange: "transform, opacity" }}
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[120%] bg-[linear-gradient(115deg,transparent_38%,rgba(240,212,147,0.18)_50%,transparent_62%)] blur-2xl sm:block"
       />
 
+      {/* Ambient dust particles — full set on desktop, reduced set on mobile */}
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-        {ambientParticles.map((particle, index) => (
-          <span
-            key={`${particle.left}-${particle.top}-${index}`}
-            className="absolute rounded-full bg-[radial-gradient(circle,rgba(241,220,170,0.75)_0%,rgba(241,220,170,0)_72%)]"
-            style={{
-              left: particle.left,
-              top: particle.top,
-              width: particle.size,
-              height: particle.size,
-              opacity: reducedMotion ? 0.16 : 0.34,
-              animation: reducedMotion
-                ? "none"
-                : `heroDust ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
-            }}
-          />
-        ))}
+        {ambientParticles.map((particle, index) => {
+          const isMobileParticle = index < MOBILE_PARTICLE_COUNT
+          return (
+            <span
+              key={`${particle.left}-${particle.top}-${index}`}
+              className={`absolute rounded-full bg-[radial-gradient(circle,rgba(241,220,170,0.75)_0%,rgba(241,220,170,0)_72%)] ${
+                isMobileParticle ? "" : "hidden sm:block"
+              }`}
+              style={{
+                left: particle.left,
+                top: particle.top,
+                width: particle.size,
+                height: particle.size,
+                opacity: reducedMotion ? 0.16 : 0.34,
+                willChange: reducedMotion ? "auto" : "transform, opacity",
+                animation: reducedMotion
+                  ? "none"
+                  : `heroDust ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
+              }}
+            />
+          )
+        })}
       </div>
 
-      <div className="hero-noise absolute inset-0 opacity-[0.16]" aria-hidden="true" />
+      {/* SVG noise — desktop only. Soft-light blend mode is a mobile repaint hog. */}
+      <div className="hero-noise absolute inset-0 hidden opacity-[0.16] sm:block" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-20 xl:pt-24">
         <div className="lg:min-h-[calc(100svh-6.5rem)]">
@@ -214,7 +246,7 @@ export function Hero() {
                   <span className="text-white">{typedPrefix}</span>
                   <motion.span
                     animate={
-                      reducedMotion || !typewriterDone
+                      reducedMotion || !typewriterDone || !isWideViewport
                         ? undefined
                         : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
                     }
@@ -278,7 +310,8 @@ export function Hero() {
                 whileTap={reducedMotion ? undefined : { scale: 0.99 }}
                 className="relative z-10 w-full sm:w-auto"
               >
-                {/* Ambient glow that breathes behind the CTA — stronger on hover */}
+                {/* Ambient glow that breathes behind the CTA — desktop only.
+                    The blur-2xl animated scale is expensive on mobile scroll. */}
                 <motion.div
                   aria-hidden="true"
                   animate={
@@ -290,7 +323,8 @@ export function Hero() {
                         }
                   }
                   transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  className="pointer-events-none absolute inset-0 -m-2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(240,212,147,0.45)_0%,rgba(212,175,55,0.18)_40%,transparent_72%)] blur-2xl"
+                  style={{ willChange: "transform, opacity" }}
+                  className="pointer-events-none absolute inset-0 -m-2 hidden rounded-full bg-[radial-gradient(ellipse_at_center,rgba(240,212,147,0.45)_0%,rgba(212,175,55,0.18)_40%,transparent_72%)] blur-2xl sm:block"
                 />
                 <Link
                   href="/generate"
@@ -312,7 +346,7 @@ export function Hero() {
                   <motion.div
                     key={point}
                     {...getReveal({ delay: 0.46 + index * 0.08, reducedMotion })}
-                    className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm text-[#e1d8c4]/75 backdrop-blur-sm"
+                    className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm text-[#e1d8c4]/75 sm:backdrop-blur-sm"
                   >
                     <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#7e622f]/45 bg-[#120f0a]">
                       <Check className="h-3 w-3 text-[#d3b06b]" />
