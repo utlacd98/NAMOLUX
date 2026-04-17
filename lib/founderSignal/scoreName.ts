@@ -1,3 +1,5 @@
+import { computeBrandInstinct } from "./brandInstinct"
+
 export type FounderLabel = "Pronounceable" | "Brandable"
 export type BrandVibe = "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""
 
@@ -520,7 +522,12 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   // Apply vibe modifier
   const vibeModifier = calculateVibeModifier(name, vibe)
-  const totalScore = clamp(Math.round(baseScore + vibeModifier), 0, 100)
+
+  // Apply Brand Instinct layer — context-agnostic originality adjustment.
+  // Reduces dominance of generic/overused names and boosts distinctive ones.
+  const instinct = computeBrandInstinct(name)
+
+  const totalScore = clamp(Math.round(baseScore + vibeModifier + instinct.adjustment), 0, 100)
 
   // Generate reasons
   if (rawLength >= 90) reasons.push("Excellent length (≤6 chars)")
@@ -538,6 +545,11 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   if (vibeModifier > 0) reasons.push(`Vibe match (+${vibeModifier})`)
   else if (vibeModifier < 0) reasons.push(`Vibe mismatch (${vibeModifier})`)
+
+  // Include the most impactful brand instinct reason
+  if (instinct.reasons.length > 0 && instinct.adjustment !== 0) {
+    reasons.push(instinct.reasons[0])
+  }
 
   // Determine label based on pronounceability score
   const label: FounderLabel = rawPronounceability >= 60 ? "Pronounceable" : "Brandable"
