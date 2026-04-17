@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, Check } from "lucide-react"
@@ -26,6 +27,51 @@ const ambientParticles = [
   { left: "81%", top: "31%", size: 2, duration: 14, delay: 2 },
   { left: "90%", top: "60%", size: 1.5, duration: 18, delay: 8 },
 ]
+
+// Headline parts — plain prefix + gold gradient suffix
+const HEADLINE_PREFIX = "A brand consultant for your "
+const HEADLINE_SUFFIX = "iconic name."
+const FULL_HEADLINE = HEADLINE_PREFIX + HEADLINE_SUFFIX
+
+// Typewriter timings (ms per character — subtle, professional pace)
+const TYPEWRITER_START_DELAY = 280
+const TYPEWRITER_CHAR_MS = 55
+
+function useTypewriter(text: string, enabled: boolean): {
+  typed: string
+  done: boolean
+} {
+  const [typed, setTyped] = useState(enabled ? "" : text)
+  const [done, setDone] = useState(!enabled)
+
+  useEffect(() => {
+    if (!enabled) {
+      setTyped(text)
+      setDone(true)
+      return
+    }
+    setTyped("")
+    setDone(false)
+    let charIndex = 0
+    let interval: ReturnType<typeof setInterval> | null = null
+    const startTimer = setTimeout(() => {
+      interval = setInterval(() => {
+        charIndex += 1
+        setTyped(text.slice(0, charIndex))
+        if (charIndex >= text.length) {
+          if (interval) clearInterval(interval)
+          setDone(true)
+        }
+      }, TYPEWRITER_CHAR_MS)
+    }, TYPEWRITER_START_DELAY)
+    return () => {
+      clearTimeout(startTimer)
+      if (interval) clearInterval(interval)
+    }
+  }, [text, enabled])
+
+  return { typed, done }
+}
 
 type RevealProps = {
   delay: number
@@ -54,6 +100,13 @@ function getReveal({ delay, reducedMotion }: RevealProps) {
 
 export function Hero() {
   const reducedMotion = useReducedMotion()
+  const { typed, done: typewriterDone } = useTypewriter(FULL_HEADLINE, !reducedMotion)
+
+  // Split the typed output back into (plain prefix | gold suffix)
+  const typedPrefix = typed.slice(0, Math.min(typed.length, HEADLINE_PREFIX.length))
+  const typedSuffix = typed.length > HEADLINE_PREFIX.length
+    ? typed.slice(HEADLINE_PREFIX.length)
+    : ""
 
   return (
     <section
@@ -98,6 +151,21 @@ export function Hero() {
         className="absolute left-1/2 top-[20rem] h-[18rem] w-[18rem] -translate-x-1/2 rounded-full bg-[#d6aa52]/20 blur-[120px] sm:top-[17rem] sm:h-[22rem] sm:w-[22rem]"
       />
 
+      {/* Slow-moving gold light sweep across the background */}
+      <motion.div
+        aria-hidden="true"
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                x: ["-30%", "30%", "-30%"],
+                opacity: [0.12, 0.22, 0.12],
+              }
+        }
+        transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        className="pointer-events-none absolute inset-y-0 left-0 w-[120%] bg-[linear-gradient(115deg,transparent_38%,rgba(240,212,147,0.18)_50%,transparent_62%)] blur-2xl"
+      />
+
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         {ambientParticles.map((particle, index) => (
           <span
@@ -136,27 +204,47 @@ export function Hero() {
               <motion.h1
                 {...getReveal({ delay: 0.14, reducedMotion })}
                 id="hero-heading"
-                className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.6rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none lg:mt-0"
+                className="mt-6 max-w-[14ch] text-[clamp(2.6rem,9.5vw,6.2rem)] font-medium leading-[0.98] tracking-[-0.055em] text-white sm:max-w-none lg:mt-0"
                 style={{ fontFamily: editorialSerif }}
+                aria-label={FULL_HEADLINE}
               >
-                <span className="block">A brand consultant</span>
-                <motion.span
-                  animate={
-                    reducedMotion
-                      ? undefined
-                      : {
-                          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                        }
-                  }
-                  transition={{
-                    duration: 8,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut",
-                  }}
-                  className="mt-1 block bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_26%,#f8ebcb_48%,#c3923b_70%,#74501c_100%)] bg-[length:180%_180%] bg-clip-text text-transparent"
-                >
-                  for your shortlist.
-                </motion.span>
+                {/* Screen readers get the full headline via aria-label; visual
+                    treatment types it in. */}
+                <span aria-hidden="true" className="block">
+                  <span className="text-white">{typedPrefix}</span>
+                  <motion.span
+                    animate={
+                      reducedMotion || !typewriterDone
+                        ? undefined
+                        : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
+                    }
+                    transition={{
+                      duration: 8,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                    className="bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_26%,#f8ebcb_48%,#c3923b_70%,#74501c_100%)] bg-[length:180%_180%] bg-clip-text text-transparent"
+                  >
+                    {typedSuffix}
+                  </motion.span>
+                  {/* Cursor — blinks while typing, fades out when done */}
+                  <motion.span
+                    aria-hidden="true"
+                    animate={
+                      reducedMotion
+                        ? { opacity: 0 }
+                        : typewriterDone
+                          ? { opacity: [1, 0], transition: { delay: 0.6, duration: 0.5 } }
+                          : { opacity: [1, 1, 0, 0, 1] }
+                    }
+                    transition={
+                      typewriterDone
+                        ? undefined
+                        : { duration: 1.1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }
+                    }
+                    className="ml-[0.08em] inline-block h-[0.82em] w-[0.05em] translate-y-[0.12em] rounded-sm bg-[#f0d493] align-baseline shadow-[0_0_12px_rgba(240,212,147,0.55)]"
+                  />
+                </span>
               </motion.h1>
             </div>
 
@@ -186,16 +274,34 @@ export function Hero() {
               />
 
               <motion.div
-                whileHover={reducedMotion ? undefined : { y: -2, scale: 1.01 }}
-                whileTap={reducedMotion ? undefined : { scale: 0.995 }}
+                whileHover={reducedMotion ? undefined : { y: -2, scale: 1.015 }}
+                whileTap={reducedMotion ? undefined : { scale: 0.99 }}
                 className="relative z-10 w-full sm:w-auto"
               >
+                {/* Ambient glow that breathes behind the CTA — stronger on hover */}
+                <motion.div
+                  aria-hidden="true"
+                  animate={
+                    reducedMotion
+                      ? undefined
+                      : {
+                          opacity: [0.35, 0.55, 0.35],
+                          scale: [0.98, 1.04, 0.98],
+                        }
+                  }
+                  transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                  className="pointer-events-none absolute inset-0 -m-2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(240,212,147,0.45)_0%,rgba(212,175,55,0.18)_40%,transparent_72%)] blur-2xl"
+                />
                 <Link
                   href="/generate"
-                  className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-full border border-[#f0daaa]/55 bg-[linear-gradient(180deg,#f4dfb3_0%,#ddbe7a_42%,#b98838_100%)] px-7 py-4 text-[15px] font-semibold text-[#090705] shadow-[0_18px_60px_rgba(0,0,0,0.55),0_10px_24px_rgba(212,175,55,0.14)] transition-all duration-300 hover:border-[#f7e7c3] hover:shadow-[0_24px_70px_rgba(0,0,0,0.62),0_12px_32px_rgba(212,175,55,0.18)] sm:w-auto sm:px-8"
+                  className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-full border border-[#f0daaa]/60 bg-[linear-gradient(180deg,#f4dfb3_0%,#ddbe7a_42%,#b98838_100%)] px-7 py-4 text-[15px] font-semibold text-[#090705] shadow-[0_18px_60px_rgba(0,0,0,0.55),0_10px_24px_rgba(212,175,55,0.18)] transition-all duration-300 hover:border-[#f7e7c3] hover:shadow-[0_28px_80px_rgba(0,0,0,0.65),0_14px_40px_rgba(240,212,147,0.35)] sm:w-auto sm:px-8"
                 >
+                  {/* Soft top-light sheen */}
+                  <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0)_42%)] opacity-70" />
+                  {/* Diagonal hover tint */}
                   <span className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0)_22%,rgba(255,255,255,0.34)_50%,rgba(255,255,255,0)_78%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <span className="absolute inset-y-1 left-0 w-20 -translate-x-[180%] rotate-12 bg-gradient-to-r from-transparent via-white/45 to-transparent blur-md transition-transform duration-1000 ease-out group-hover:translate-x-[360%]" />
+                  {/* Traveling light sweep */}
+                  <span className="absolute inset-y-1 left-0 w-24 -translate-x-[180%] rotate-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-md transition-transform duration-[1100ms] ease-out group-hover:translate-x-[360%]" />
                   <span className="relative">Score your shortlist free</span>
                   <ArrowRight className="relative ml-3 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
