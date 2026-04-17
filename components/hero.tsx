@@ -189,9 +189,9 @@ export function Hero() {
 
       <div className="hero-noise absolute inset-0 opacity-[0.16]" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-28 lg:pt-24 xl:pt-28">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] lg:gap-12 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] xl:gap-14">
-          <div className="relative z-10 min-w-0 max-w-2xl">
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-20 xl:pt-24">
+        <div className="grid items-start gap-10 lg:min-h-[calc(100svh-6.5rem)] lg:grid-cols-[minmax(0,1.02fr)_minmax(320px,0.98fr)] lg:gap-12 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] xl:gap-14">
+          <div className="relative z-10 min-w-0 max-w-2xl lg:flex lg:min-h-[calc(100svh-10rem)] lg:flex-col">
             <motion.div
               {...getReveal({ delay: 0.05, reducedMotion })}
               className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#876628]/45 bg-[linear-gradient(180deg,rgba(20,16,11,0.92),rgba(10,8,6,0.9))] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[#d7be84] shadow-[0_14px_40px_rgba(0,0,0,0.35)] sm:text-[11px]"
@@ -202,46 +202,45 @@ export function Hero() {
               <span>{founderSignalMark} Scoring</span>
             </motion.div>
 
-            <motion.h1
-              {...getReveal({ delay: 0.14, reducedMotion })}
-              id="hero-heading"
-              className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.1rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none"
-              style={{ fontFamily: editorialSerif }}
-            >
-              <span className="block">A brand consultant</span>
-              <motion.span
-                animate={
-                  reducedMotion
-                    ? undefined
-                    : {
-                        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                      }
-                }
-                transition={{
-                  duration: 8,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-                className="mt-1 block bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_26%,#f8ebcb_48%,#c3923b_70%,#74501c_100%)] bg-[length:180%_180%] bg-clip-text text-transparent"
+            <div className="lg:flex lg:flex-1 lg:items-center lg:py-8 xl:py-10">
+              <motion.h1
+                {...getReveal({ delay: 0.14, reducedMotion })}
+                id="hero-heading"
+                className="mt-6 max-w-[11ch] text-[clamp(2.85rem,10vw,6.1rem)] font-medium leading-[0.94] tracking-[-0.06em] text-white sm:max-w-none lg:mt-0"
+                style={{ fontFamily: editorialSerif }}
               >
-                for your shortlist.
-              </motion.span>
-            </motion.h1>
-
-            <motion.p
-              {...getReveal({ delay: 0.25, reducedMotion })}
-              className="mt-6 max-w-xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg"
-            >
-              NamoLux is a domain naming consultancy powered by {founderSignalMark}. Paste
-              your candidate names and we score each one on{" "}
-              <span className="text-[#f5ead0]">brand strength, availability, and founder fit</span>{" "}
-              so you choose the name with the evidence to back it.
-            </motion.p>
+                <span className="block">A brand consultant</span>
+                <motion.span
+                  animate={
+                    reducedMotion
+                      ? undefined
+                      : {
+                          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                        }
+                  }
+                  transition={{
+                    duration: 8,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                  }}
+                  className="mt-1 block bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_26%,#f8ebcb_48%,#c3923b_70%,#74501c_100%)] bg-[length:180%_180%] bg-clip-text text-transparent"
+                >
+                  for your shortlist.
+                </motion.span>
+              </motion.h1>
+            </div>
 
             <motion.div
-              {...getReveal({ delay: 0.36, reducedMotion })}
-              className="relative mt-9 flex flex-col items-start gap-5"
+              {...getReveal({ delay: 0.25, reducedMotion })}
+              className="relative mt-8 flex flex-col items-start gap-5 lg:mt-0 lg:pb-3"
             >
+              <p className="max-w-xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg">
+                NamoLux is a domain naming consultancy powered by {founderSignalMark}. Paste
+                your candidate names and we score each one on{" "}
+                <span className="text-[#f5ead0]">brand strength, availability, and founder fit</span>{" "}
+                so you choose the name with the evidence to back it.
+              </p>
+
               <motion.div
                 aria-hidden="true"
                 animate={
