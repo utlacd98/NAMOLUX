@@ -746,13 +746,28 @@ function buildTagline(name: string, vibe: string): string {
 
 // Generate plausible-looking locked filler names so the gate is never empty,
 // even if the API returns fewer picks than expected.
+// Uses a pool of independent brandable names — NEVER keyword mutations.
+const FILLER_POOL = [
+  "Velora", "Nyxos", "Stellium", "Orbita", "Lumena", "Vanta", "Aerix", "Solen",
+  "Arcen", "Kairo", "Verix", "Nova", "Mira", "Lucen", "Aven", "Cinder",
+  "Ember", "Forge", "Haven", "Ridge", "Slate", "Drift", "Grove", "Cedar",
+  "Lumen", "Prism", "Spark", "Orbit", "Frame", "Crest", "Dune", "Tide",
+  "Vela", "Soren", "Kaida", "Noren", "Elva", "Orin", "Thera", "Cira",
+]
+
 function synthFillers(seed: string, n: number): NameResult[] {
   if (n <= 0) return []
-  const root = (seed.match(/[a-zA-Z]+/)?.[0] || "brand").slice(0, 5).toLowerCase()
-  const suffixes = ["ora", "yx", "ium", "era", "ion", "ity", "ova", "ax", "ely", "um"]
+  // Deterministic shuffle based on seed so the set stays stable per keyword
+  const seedHash = (seed || "brand").split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 0)
+  const pool = [...FILLER_POOL].sort((a, b) => {
+    const ha = (a.charCodeAt(0) + seedHash) % 997
+    const hb = (b.charCodeAt(0) + seedHash) % 997
+    return ha - hb
+  })
+
   const out: NameResult[] = []
   for (let i = 0; i < n; i++) {
-    const base = root.charAt(0).toUpperCase() + root.slice(1) + suffixes[i % suffixes.length]
+    const base = pool[i % pool.length]
     out.push({
       name: base,
       fullDomain: `${base.toLowerCase()}.com`,
