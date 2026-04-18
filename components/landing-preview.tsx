@@ -785,6 +785,10 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
             {useCompactMobilePreview ? (
               <div
                 style={{
+                  // Explicit outer width with border-box so the frame sizes
+                  // exactly to MOB_FRAME_W regardless of child sizing quirks.
+                  width: MOB_FRAME_W,
+                  boxSizing: "border-box",
                   border: "4px solid rgba(255,255,255,0.1)",
                   borderRadius: 34,
                   overflow: "hidden",
@@ -805,7 +809,7 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
                 }} />
                 <div style={{
                   overflow: "hidden",
-                  width: MOB_DISPLAY_W,
+                  width: "100%",
                   height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
                   position: "relative",
                 }}>
@@ -825,6 +829,8 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
               </div>
             ) : (
               <div style={{
+                width: MOB_FRAME_W,
+                boxSizing: "border-box",
                 border: "6px solid rgba(255,255,255,0.12)",
                 borderRadius: 42,
                 overflow: "hidden",
@@ -845,7 +851,7 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
                 }} />
                 <div style={{
                   overflow: "hidden",
-                  width: MOB_DISPLAY_W,
+                  width: "100%",
                   height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
                   position: "relative",
                 }}>
