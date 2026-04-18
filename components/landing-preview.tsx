@@ -111,7 +111,7 @@ function ProductCard({
   p: { primary: string; secondary: string; accent: string; bg: string; text: string }
   mob: boolean; isLux: boolean; brandName: string
 }) {
-  const cardW = mob ? 304 : 300
+  const cardW = mob ? 236 : 300
   const onPrimary = contrastText(p.primary)
 
   // Mini sparkline path points
@@ -648,9 +648,10 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
   const useCompactMobilePreview = wrapperWidth > 0 && wrapperWidth < 430
   const MOB_DISPLAY_W = wrapperWidth > 0
     ? useCompactMobilePreview
-      ? Math.max(280, Math.min(360, wrapperWidth - 16))
+      ? Math.max(272, Math.min(308, wrapperWidth - 28))
       : Math.min(320, wrapperWidth - 32 - 12)
     : 320
+  const MOBILE_PREVIEW_VIEWPORT_H = useCompactMobilePreview ? 620 : MOBILE_H
   const mobScale  = MOB_DISPLAY_W / MOBILE_W
   const deskScale = wrapperWidth > 0 ? (wrapperWidth - 32) / DESKTOP_W : 1
   const scale     = device === "mobile" ? mobScale : deskScale
@@ -773,19 +774,28 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
             {useCompactMobilePreview ? (
               <div
                 style={{
-                  width: MOB_DISPLAY_W,
+                  border: "4px solid rgba(255,255,255,0.1)",
+                  borderRadius: 34,
                   overflow: "hidden",
-                  borderRadius: 26,
-                  background: "rgba(0,0,0,0.58)",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  boxShadow: "0 20px 48px rgba(0,0,0,0.45)",
+                  background: "#000",
+                  boxShadow: "0 22px 54px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05)",
                   position: "relative",
+                  flexShrink: 0,
                 }}
               >
                 <div style={{
+                  position: "absolute", top: 7, left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 72, height: 20,
+                  background: "#000",
+                  borderRadius: 12,
+                  zIndex: 20,
+                  pointerEvents: "none",
+                }} />
+                <div style={{
                   overflow: "hidden",
                   width: MOB_DISPLAY_W,
-                  height: MOBILE_H * mobScale,
+                  height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
                   position: "relative",
                 }}>
                   <div
@@ -797,6 +807,7 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
                       position: "absolute", top: 0, left: 0,
                     }}
                   >
+                    <div style={{ height: 34, background: safeHex(palette.background) }} />
                     <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
                   </div>
                 </div>
@@ -824,7 +835,7 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
                 <div style={{
                   overflow: "hidden",
                   width: MOB_DISPLAY_W,
-                  height: MOBILE_H * mobScale,
+                  height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
                   position: "relative",
                 }}>
                   <div
