@@ -111,7 +111,7 @@ function ProductCard({
   p: { primary: string; secondary: string; accent: string; bg: string; text: string }
   mob: boolean; isLux: boolean; brandName: string
 }) {
-  const cardW = mob ? 200 : 300
+  const cardW = mob ? 304 : 300
   const onPrimary = contrastText(p.primary)
 
   // Mini sparkline path points
@@ -337,9 +337,9 @@ function MockPage({ brandName, vibe, palette, device }: {
 
       {/* ── Hero ── */}
       <section style={{
-        padding: mob ? "40px 22px 32px" : "72px 64px 64px",
+        padding: mob ? "34px 22px 28px" : "72px 64px 64px",
         display: "flex",
-        alignItems: mob ? "flex-start" : "center",
+        alignItems: mob ? "stretch" : "center",
         gap: mob ? 0 : 56,
         flexDirection: mob ? "column" : "row",
         position: "relative",
@@ -407,7 +407,7 @@ function MockPage({ brandName, vibe, palette, device }: {
             lineHeight: 1.65,
             color: `${p.text}68`,
             margin: "0 0 30px",
-            maxWidth: 420,
+            maxWidth: mob ? "100%" : 420,
           }}>
             {copy.sub}
           </p>
@@ -462,6 +462,9 @@ function MockPage({ brandName, vibe, palette, device }: {
           position: "relative",
           zIndex: 1,
           marginTop: mob ? 28 : 0,
+          width: mob ? "100%" : undefined,
+          display: mob ? "flex" : undefined,
+          justifyContent: mob ? "center" : undefined,
           flexShrink: 0,
         }}>
           {/* Glow behind card */}
@@ -642,9 +645,12 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
   }, [])
 
   // Dynamic mobile display width — fits inside the container with p-4 (32px) + 12px phone border
+  const useCompactMobilePreview = wrapperWidth > 0 && wrapperWidth < 430
   const MOB_DISPLAY_W = wrapperWidth > 0
-    ? Math.min(290, wrapperWidth - 32 - 12)
-    : 290
+    ? useCompactMobilePreview
+      ? Math.max(280, Math.min(360, wrapperWidth - 16))
+      : Math.min(320, wrapperWidth - 32 - 12)
+    : 320
   const mobScale  = MOB_DISPLAY_W / MOBILE_W
   const deskScale = wrapperWidth > 0 ? (wrapperWidth - 32) / DESKTOP_W : 1
   const scale     = device === "mobile" ? mobScale : deskScale
@@ -764,46 +770,79 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
           </div>
         ) : (
           <div className="flex justify-center">
-            <div style={{
-              border: "6px solid rgba(255,255,255,0.12)",
-              borderRadius: 42,
-              overflow: "hidden",
-              background: "#000",
-              boxShadow: "0 28px 64px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.07)",
-              position: "relative",
-              flexShrink: 0,
-            }}>
-              {/* Dynamic island */}
-              <div style={{
-                position: "absolute", top: 9, left: "50%",
-                transform: "translateX(-50%)",
-                width: 80, height: 22,
-                background: "#000",
-                borderRadius: 12,
-                zIndex: 20,
-                pointerEvents: "none",
-              }} />
-              <div style={{
-                overflow: "hidden",
-                width: MOB_DISPLAY_W,
-                height: MOBILE_H * mobScale,
-                position: "relative",
-              }}>
-                <div
-                  ref={mockRef}
-                  style={{
-                    transformOrigin: "top left",
-                    transform: `scale(${mobScale})`,
-                    width: MOBILE_W,
-                    position: "absolute", top: 0, left: 0,
-                  }}
-                >
-                  {/* Notch spacer */}
-                  <div style={{ height: 38, background: safeHex(palette.background) }} />
-                  <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
+            {useCompactMobilePreview ? (
+              <div
+                style={{
+                  width: MOB_DISPLAY_W,
+                  overflow: "hidden",
+                  borderRadius: 26,
+                  background: "rgba(0,0,0,0.58)",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  boxShadow: "0 20px 48px rgba(0,0,0,0.45)",
+                  position: "relative",
+                }}
+              >
+                <div style={{
+                  overflow: "hidden",
+                  width: MOB_DISPLAY_W,
+                  height: MOBILE_H * mobScale,
+                  position: "relative",
+                }}>
+                  <div
+                    ref={mockRef}
+                    style={{
+                      transformOrigin: "top left",
+                      transform: `scale(${mobScale})`,
+                      width: MOBILE_W,
+                      position: "absolute", top: 0, left: 0,
+                    }}
+                  >
+                    <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div style={{
+                border: "6px solid rgba(255,255,255,0.12)",
+                borderRadius: 42,
+                overflow: "hidden",
+                background: "#000",
+                boxShadow: "0 28px 64px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.07)",
+                position: "relative",
+                flexShrink: 0,
+              }}>
+                {/* Dynamic island */}
+                <div style={{
+                  position: "absolute", top: 9, left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 80, height: 22,
+                  background: "#000",
+                  borderRadius: 12,
+                  zIndex: 20,
+                  pointerEvents: "none",
+                }} />
+                <div style={{
+                  overflow: "hidden",
+                  width: MOB_DISPLAY_W,
+                  height: MOBILE_H * mobScale,
+                  position: "relative",
+                }}>
+                  <div
+                    ref={mockRef}
+                    style={{
+                      transformOrigin: "top left",
+                      transform: `scale(${mobScale})`,
+                      width: MOBILE_W,
+                      position: "absolute", top: 0, left: 0,
+                    }}
+                  >
+                    {/* Notch spacer */}
+                    <div style={{ height: 38, background: safeHex(palette.background) }} />
+                    <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
