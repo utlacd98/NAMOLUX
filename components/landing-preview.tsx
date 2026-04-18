@@ -632,28 +632,36 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
   const [device, setDevice]           = useState<Device>("mobile")
   const [downloading, setDownloading] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const stageRef   = useRef<HTMLDivElement>(null)
   const mockRef    = useRef<HTMLDivElement>(null)
-  const [wrapperWidth, setWrapperWidth] = useState(0)
+  // Measure the preview stage directly (the element the phone/desktop frame
+  // lives inside). Earlier versions measured the outer wrapper and then
+  // subtracted padding by hand, which double-counted on narrow screens.
+  const [stageWidth, setStageWidth] = useState(0)
 
   useLayoutEffect(() => {
-    if (!wrapperRef.current) return
+    const el = stageRef.current
+    if (!el) return
     // Read initial width synchronously before first paint to avoid overflow flash
-    setWrapperWidth(wrapperRef.current.clientWidth)
-    const ro = new ResizeObserver(e => setWrapperWidth(e[0].contentRect.width))
-    ro.observe(wrapperRef.current)
+    setStageWidth(el.clientWidth)
+    const ro = new ResizeObserver(e => setStageWidth(e[0].contentRect.width))
+    ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
-  // Dynamic mobile display width — fits inside the container with p-4 (32px) + 12px phone border
-  const useCompactMobilePreview = wrapperWidth > 0 && wrapperWidth < 430
-  const MOB_DISPLAY_W = wrapperWidth > 0
-    ? useCompactMobilePreview
-      ? Math.max(272, Math.min(308, wrapperWidth - 28))
-      : Math.min(320, wrapperWidth - 32 - 12)
-    : 320
+  // Compact preview on narrow cards so the phone frame doesn't dwarf the page.
+  const useCompactMobilePreview = stageWidth > 0 && stageWidth < 400
+  // Phone outer frame width (incl. 6px border on each side). We let the frame
+  // fill the stage up to a sensible ceiling. Content inside = frame - 12.
+  const MOB_FRAME_W   = stageWidth > 0
+    ? (useCompactMobilePreview
+        ? Math.max(240, Math.min(320, stageWidth))
+        : Math.min(330, stageWidth))
+    : 300
+  const MOB_DISPLAY_W = MOB_FRAME_W - 12
   const MOBILE_PREVIEW_VIEWPORT_H = useCompactMobilePreview ? 620 : MOBILE_H
   const mobScale  = MOB_DISPLAY_W / MOBILE_W
-  const deskScale = wrapperWidth > 0 ? (wrapperWidth - 32) / DESKTOP_W : 1
+  const deskScale = stageWidth > 0 ? stageWidth / DESKTOP_W : 1
   const scale     = device === "mobile" ? mobScale : deskScale
   const W         = device === "mobile" ? MOBILE_W : DESKTOP_W
   const H         = device === "mobile" ? MOBILE_H : DESKTOP_H
@@ -732,6 +740,9 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
 
       {/* Preview area */}
       <div className="p-4">
+        {/* stageRef captures the true inner width available to the
+            phone / desktop frame — padding has already been applied above. */}
+        <div ref={stageRef}>
         {device === "desktop" ? (
           <div className="overflow-hidden rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
             {/* Browser chrome */}
@@ -856,6 +867,7 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
             )}
           </div>
         )}
+        </div>
       </div>
 
       {/* Footer */}

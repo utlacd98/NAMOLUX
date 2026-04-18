@@ -326,28 +326,28 @@ export function BrandPalette({
     >
       {/* ── Header ── */}
       <div
-        className="flex items-center justify-between gap-3 px-6 py-5"
+        className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5"
         style={{
           borderBottom: "1px solid rgba(255,255,255,0.06)",
           background: "linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(212,175,55,0.02) 100%)",
         }}
       >
-        <div className="flex items-center gap-3.5">
+        <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-3.5">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10"
             style={{
               background: "rgba(212,175,55,0.14)",
               border: "1px solid rgba(212,175,55,0.28)",
               boxShadow: "0 0 20px rgba(212,175,55,0.12)",
             }}
           >
-            <Palette className="h-5 w-5" style={{ color: "#D4AF37" }} />
+            <Palette className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: "#D4AF37" }} />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-base font-bold text-white">Your Brand Identity</span>
+              <span className="truncate text-sm font-bold text-white sm:text-base">Your Brand Identity</span>
             </div>
-            <p className="mt-0.5 text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+            <p className="mt-0.5 truncate text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
               {hasPalette ? (
                 <>
                   Colour identity for{" "}
@@ -370,7 +370,7 @@ export function BrandPalette({
             <button
               onClick={generate}
               disabled={loading}
-              className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-[11px] font-semibold transition-all hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 sm:px-3.5 sm:py-2"
               style={{
                 background: "rgba(212,175,55,0.1)",
                 border: "1px solid rgba(212,175,55,0.25)",
@@ -380,7 +380,8 @@ export function BrandPalette({
               title="Generate a new palette"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-              New palette
+              <span className="hidden sm:inline">New palette</span>
+              <span className="sm:hidden">New</span>
             </button>
           )}
           <button
