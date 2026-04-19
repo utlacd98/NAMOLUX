@@ -633,34 +633,41 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
   const [downloading, setDownloading] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const stageRef   = useRef<HTMLDivElement>(null)
+  const phoneInnerRef = useRef<HTMLDivElement>(null)
   const mockRef    = useRef<HTMLDivElement>(null)
-  // Measure the preview stage directly (the element the phone/desktop frame
-  // lives inside). Earlier versions measured the outer wrapper and then
-  // subtracted padding by hand, which double-counted on narrow screens.
+  // Measure the preview stage directly (controls desktop sizing + whether
+  // we use the compact mobile layout).
   const [stageWidth, setStageWidth] = useState(0)
+  // Measure the phone's ACTUAL inner width at runtime. We drive the scale from
+  // this rather than chaining arithmetic (stage → frame → window → content),
+  // which was leaving a small mismatch that compounded into a visible dark band.
+  const [phoneInnerWidth, setPhoneInnerWidth] = useState(0)
 
   useLayoutEffect(() => {
     const el = stageRef.current
     if (!el) return
-    // Read initial width synchronously before first paint to avoid overflow flash
     setStageWidth(el.clientWidth)
     const ro = new ResizeObserver(e => setStageWidth(e[0].contentRect.width))
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
 
+  useLayoutEffect(() => {
+    const el = phoneInnerRef.current
+    if (!el) return
+    setPhoneInnerWidth(el.clientWidth)
+    const ro = new ResizeObserver(e => setPhoneInnerWidth(e[0].contentRect.width))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // Compact preview on narrow cards so the phone frame doesn't dwarf the page.
   const useCompactMobilePreview = stageWidth > 0 && stageWidth < 400
-  // Phone outer frame width (incl. 6px border on each side). We let the frame
-  // fill the stage up to a sensible ceiling. Content inside = frame - 12.
-  const MOB_FRAME_W   = stageWidth > 0
-    ? (useCompactMobilePreview
-        ? Math.max(240, Math.min(320, stageWidth))
-        : Math.min(330, stageWidth))
-    : 300
-  const MOB_DISPLAY_W = MOB_FRAME_W - 12
+  // Phone outer frame width is CSS-driven now via width/maxWidth, so the
+  // content scales to phoneInnerWidth (the real measured inner dimension).
+  const effectivePhoneInnerW = phoneInnerWidth > 0 ? phoneInnerWidth : 260
   const MOBILE_PREVIEW_VIEWPORT_H = useCompactMobilePreview ? 620 : MOBILE_H
-  const mobScale  = MOB_DISPLAY_W / MOBILE_W
+  const mobScale  = effectivePhoneInnerW / MOBILE_W
   const deskScale = stageWidth > 0 ? stageWidth / DESKTOP_W : 1
   const scale     = device === "mobile" ? mobScale : deskScale
   const W         = device === "mobile" ? MOBILE_W : DESKTOP_W
@@ -782,95 +789,71 @@ export function LandingPreview({ brandName, keywords, vibe, palette }: LandingPr
           </div>
         ) : (
           <div className="flex justify-center">
-            {useCompactMobilePreview ? (
-              <div
-                style={{
-                  // Explicit outer width with border-box so the frame sizes
-                  // exactly to MOB_FRAME_W regardless of child sizing quirks.
-                  width: MOB_FRAME_W,
-                  boxSizing: "border-box",
-                  border: "4px solid rgba(255,255,255,0.1)",
-                  borderRadius: 34,
-                  overflow: "hidden",
-                  background: "#000",
-                  boxShadow: "0 22px 54px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05)",
-                  position: "relative",
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{
-                  position: "absolute", top: 7, left: "50%",
-                  transform: "translateX(-50%)",
-                  width: 72, height: 20,
-                  background: "#000",
-                  borderRadius: 12,
-                  zIndex: 20,
-                  pointerEvents: "none",
-                }} />
-                <div style={{
-                  overflow: "hidden",
-                  width: "100%",
-                  height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
-                  position: "relative",
-                }}>
-                  <div
-                    ref={mockRef}
-                    style={{
-                      transformOrigin: "top left",
-                      transform: `scale(${mobScale})`,
-                      width: MOBILE_W,
-                      position: "absolute", top: 0, left: 0,
-                    }}
-                  >
-                    <div style={{ height: 34, background: safeHex(palette.background) }} />
-                    <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div style={{
-                width: MOB_FRAME_W,
+            {/* Phone frame: CSS-sized (fills the stage up to a sensible cap).
+                We measure phoneInnerRef inside the frame to get the real inner
+                width and use THAT to drive the scale — no arithmetic chains. */}
+            <div
+              style={{
+                width: "100%",
+                maxWidth: useCompactMobilePreview ? 320 : 340,
                 boxSizing: "border-box",
-                border: "6px solid rgba(255,255,255,0.12)",
-                borderRadius: 42,
+                border: useCompactMobilePreview
+                  ? "4px solid rgba(255,255,255,0.1)"
+                  : "6px solid rgba(255,255,255,0.12)",
+                borderRadius: useCompactMobilePreview ? 34 : 42,
                 overflow: "hidden",
                 background: "#000",
-                boxShadow: "0 28px 64px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.07)",
+                boxShadow: useCompactMobilePreview
+                  ? "0 22px 54px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05)"
+                  : "0 28px 64px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.07)",
                 position: "relative",
                 flexShrink: 0,
-              }}>
-                {/* Dynamic island */}
-                <div style={{
-                  position: "absolute", top: 9, left: "50%",
-                  transform: "translateX(-50%)",
-                  width: 80, height: 22,
-                  background: "#000",
-                  borderRadius: 12,
-                  zIndex: 20,
-                  pointerEvents: "none",
-                }} />
-                <div style={{
+              }}
+            >
+              {/* Dynamic island */}
+              <div style={{
+                position: "absolute",
+                top: useCompactMobilePreview ? 7 : 9,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: useCompactMobilePreview ? 72 : 80,
+                height: useCompactMobilePreview ? 20 : 22,
+                background: "#000",
+                borderRadius: 12,
+                zIndex: 20,
+                pointerEvents: "none",
+              }} />
+              {/* phoneInnerRef: the true container for the mock. Its clientWidth
+                  is what we scale MobilePage to. */}
+              <div
+                ref={phoneInnerRef}
+                style={{
                   overflow: "hidden",
                   width: "100%",
                   height: MOBILE_PREVIEW_VIEWPORT_H * mobScale,
                   position: "relative",
-                }}>
+                }}
+              >
+                <div
+                  ref={mockRef}
+                  style={{
+                    transformOrigin: "top left",
+                    transform: `scale(${mobScale})`,
+                    width: MOBILE_W,
+                    position: "absolute", top: 0, left: 0,
+                  }}
+                >
+                  {/* Notch spacer — sized to whichever island is showing */}
                   <div
-                    ref={mockRef}
                     style={{
-                      transformOrigin: "top left",
-                      transform: `scale(${mobScale})`,
-                      width: MOBILE_W,
-                      position: "absolute", top: 0, left: 0,
+                      height: useCompactMobilePreview ? 34 : 38,
+                      background: safeHex(palette.background),
                     }}
-                  >
-                    {/* Notch spacer */}
-                    <div style={{ height: 38, background: safeHex(palette.background) }} />
-                    <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
-                  </div>
+                  />
+                  <MockPage brandName={brandName} vibe={vibe} palette={palette} device={device} />
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )}
         </div>
