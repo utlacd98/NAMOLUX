@@ -7,34 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(request: NextRequest) {
-  const body = await request.text()
-  const signature = request.headers.get("stripe-signature")!
-
-  let event: Stripe.Event
-
-  try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
-  } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message)
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
-  }
-
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session
-        await handleCheckoutComplete(session)
-        break
-      }
-      default:
-        console.log(`Unhandled event type: ${event.type}`)
-    }
-
-    return NextResponse.json({ received: true })
-  } catch (error: any) {
-    console.error("Webhook handler error:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
+  // TEMPORARY: webhook disabled while API keys are rotated — acknowledge but do not process
+  return NextResponse.json({ received: true })
 }
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {

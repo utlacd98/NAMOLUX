@@ -58,59 +58,18 @@ export async function checkRateLimit(
   request: NextRequest,
   _featureType: FeatureType = "domain"
 ): Promise<RateLimitResult> {
-  const ip = getClientIP(request)
-
-  // Use regular client just for auth check
+  // TEMPORARY: paywall disabled while API keys are rotated — all users get pro access
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Pro users → unlimited
-  if (user) {
-    const isPro = await checkProAccess(user.id)
-    if (isPro) {
-      return {
-        allowed: true,
-        isPro: true,
-        userId: user.id,
-        tokensUsed: 0,
-        tokensTotal: -1,
-        remaining: -1,
-        plan: "pro",
-      }
-    }
-  }
-
-  // Use service client for generation_logs queries (bypasses RLS)
-  const service = createServiceClient()
-
-  // Count IP-based usage (always, to prevent abuse across accounts)
-  const { count: ipCount } = await service
-    .from("generation_logs")
-    .select("*", { count: "exact", head: true })
-    .eq("ip_address", ip)
-
-  let userCount = 0
-  if (user) {
-    const { count } = await service
-      .from("generation_logs")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-    userCount = count || 0
-  }
-
-  // Use the higher count — if someone used tokens anonymously then signs up,
-  // they don't get another full allocation. IP tracks the device, user_id tracks the account.
-  const tokensUsed = Math.max(ipCount || 0, userCount)
-  const remaining = Math.max(0, FREE_TOKEN_LIMIT - tokensUsed)
-
   return {
-    allowed: remaining > 0,
-    isPro: false,
+    allowed: true,
+    isPro: true,
     userId: user?.id || null,
-    tokensUsed,
-    tokensTotal: FREE_TOKEN_LIMIT,
-    remaining,
-    plan: "free",
+    tokensUsed: 0,
+    tokensTotal: -1,
+    remaining: -1,
+    plan: "pro",
   }
 }
 
