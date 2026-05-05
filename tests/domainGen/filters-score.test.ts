@@ -82,6 +82,58 @@ describe("filters and scoring", () => {
     expect(decision.accepted).toBe(true)
   })
 
+  it("hard rejects banned AI-smell suffixes before scoring", () => {
+    const decision = evaluateCandidateFilters("brandEra", {
+      maxLength: 12,
+      controls: {
+        seed: "",
+        mustIncludeKeyword: "none",
+        keywordPosition: "anywhere",
+        style: "brandable_blends",
+        blocklist: [],
+        allowlist: [],
+        allowHyphen: false,
+        allowNumbers: false,
+        meaningFirst: true,
+        preferTwoWordBrands: false,
+        allowVibeSuffix: false,
+        showAnyAvailable: false,
+      },
+      blocklist: [],
+      allowlist: [],
+    })
+
+    expect(decision.accepted).toBe(false)
+    expect(decision.reasons).toContain("ai_smell_suffix")
+  })
+
+  it("hard rejects direct keyword mutations with a debug reason", () => {
+    const decision = evaluateCandidateFilters("CloudION", {
+      maxLength: 12,
+      controls: {
+        seed: "",
+        mustIncludeKeyword: "none",
+        keywordPosition: "anywhere",
+        style: "brandable_blends",
+        blocklist: [],
+        allowlist: [],
+        allowHyphen: false,
+        allowNumbers: false,
+        meaningFirst: true,
+        preferTwoWordBrands: false,
+        allowVibeSuffix: false,
+        showAnyAvailable: false,
+      },
+      blocklist: [],
+      allowlist: [],
+      keywordRoots: ["Cloud"],
+    })
+
+    expect(decision.accepted).toBe(false)
+    expect(decision.reasons).toContain("keyword_mutation")
+    expect(decision.reasons).toContain("ai_smell_suffix")
+  })
+
   it("scores Novalux higher than gosnap for luxury flair", () => {
     const controls = {
       seed: "",

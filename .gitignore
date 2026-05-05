@@ -36,6 +36,7 @@ next-env.d.ts
 
 # internal / private docs
 .INTERNALS.md
+.COSTS.md
 PROJECT_SUMMARY.md
 
 # documentation with secrets

@@ -486,6 +486,7 @@ export async function runAutoFindV2(
         },
         blocklist,
         allowlist,
+        keywordRoots: generated.keywordTokens,
       })
 
       if (!decision.accepted) {
