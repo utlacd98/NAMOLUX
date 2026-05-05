@@ -431,9 +431,7 @@ export function GenerateNames() {
   const [isCheckingSocials, setIsCheckingSocials] = useState(false)
 
   // Bulk check state
-  // Bulk Check is now the default and only mode — the other two are disabled
-  // at the UI level. Internal state kept for backwards compatibility.
-  const [isBulkMode, setIsBulkMode] = useState(true)
+  const [isBulkMode, setIsBulkMode] = useState(false)
   const [showAiChat, setShowAiChat] = useState(false)
   const [bulkInput, setBulkInput] = useState("")
   const [description, setDescription] = useState("")
@@ -1379,20 +1377,25 @@ export function GenerateNames() {
               }}
             >
               {/* Mode Toggle */}
-              {/* Single-mode layout — Bulk Check is the only generator.
-                  The Generate and AI Chat tabs have been removed so the
-                  product focuses on what the Founder Signal scorer does best:
-                  rank and validate a user-provided list of names. */}
-              <div
-                className="mb-5 rounded-xl p-3 text-center sm:mb-7"
-                style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.20)" }}
-              >
-                <div className="text-sm font-semibold" style={{ color: "#D4AF37" }}>
-                  📋 Bulk Check & Founder Signal™ Scoring
-                </div>
-                <p className="mt-1 text-[11px] text-white/60">
-                  Paste your name shortlist — get live availability checks and elite-tier brand scoring in seconds.
-                </p>
+              <div className="mb-5 flex rounded-xl p-1 sm:mb-7" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(212,175,55,0.15)" }}>
+                {[
+                  { label: "✨ Generate", active: !isBulkMode && !showAiChat, onClick: () => { setIsBulkMode(false); setShowAiChat(false) } },
+                  { label: "📋 Bulk Check", active: isBulkMode && !showAiChat, onClick: () => { setIsBulkMode(true); setShowAiChat(false) } },
+                  { label: "💬 AI Chat", active: showAiChat, onClick: () => { setShowAiChat(true); setIsBulkMode(false) } },
+                ].map(({ label, active, onClick }) => (
+                  <button
+                    key={label}
+                    onClick={onClick}
+                    className="flex-1 rounded-lg py-2 text-xs font-semibold transition-all sm:text-sm"
+                    style={{
+                      background: active ? "rgba(212,175,55,0.18)" : "transparent",
+                      color: active ? "#D4AF37" : "rgba(255,255,255,0.4)",
+                      border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid transparent",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
 
               {/* AI Chat Mode */}
