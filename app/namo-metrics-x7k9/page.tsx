@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, type FormEvent } from "react"
 import {
   RefreshCw, TrendingUp, TrendingDown, Users, MousePointerClick,
   Activity, Zap, Search, FileSearch, Download, Copy,
@@ -8,7 +8,8 @@ import {
   Megaphone, Linkedin, Facebook, Send, Calendar, FileText, MessageSquare, Sparkles, CheckCircle, AlertCircle,
   PenTool, Plus, Trash2, Eye, Code, Mail, UserPlus, Tag, MailCheck, MailX,
   Target, LineChart as LineChartIcon, AlertTriangle, Trophy, ArrowUpRight, ArrowDownRight,
-  Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock, Clapperboard, Play
+  Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock, Clapperboard, Play,
+  LockKeyhole, LogOut
 } from "lucide-react"
 import NextLink from "next/link"
 import { adCampaigns, generateAdScript, type AdCampaign } from "@/lib/ads-data"
@@ -301,11 +302,87 @@ function FunnelStep({ step, count, rate, isLast, dropOff }: {
   )
 }
 
+async function readApiError(res: Response, fallback: string) {
+  try {
+    const body = await res.json()
+    return typeof body?.error === "string" ? body.error : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function AdminUnlockPanel({
+  token,
+  error,
+  loading,
+  onTokenChange,
+  onSubmit,
+}: {
+  token: string
+  error: string | null
+  loading: boolean
+  onTokenChange: (token: string) => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  return (
+    <div className="mx-auto flex min-h-[calc(100vh-140px)] max-w-xl items-center justify-center py-10">
+      <form
+        onSubmit={onSubmit}
+        className="w-full rounded-2xl border border-primary/20 bg-card/40 p-6 shadow-2xl shadow-black/20 backdrop-blur"
+      >
+        <div className="mb-6 flex items-start gap-4">
+          <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 text-primary">
+            <LockKeyhole className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">Admin access required</h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              Enter the NamoLux admin token once to unlock analytics, exports, email lists, and marketing tools in this browser.
+            </p>
+          </div>
+        </div>
+
+        <label htmlFor="admin-token" className="mb-2 block text-sm font-medium text-muted-foreground">
+          Admin token
+        </label>
+        <input
+          id="admin-token"
+          type="password"
+          value={token}
+          onChange={(event) => onTokenChange(event.target.value)}
+          autoComplete="current-password"
+          className="w-full rounded-xl border border-border/60 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
+          placeholder="Paste admin token"
+        />
+
+        {error && (
+          <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <LockKeyhole className="h-4 w-4" />
+          {loading ? "Unlocking..." : "Unlock analytics"}
+        </button>
+      </form>
+    </div>
+  )
+}
+
 export default function MetricsPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [events, setEvents] = useState<EventData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [adminLocked, setAdminLocked] = useState(false)
+  const [adminToken, setAdminToken] = useState("")
+  const [adminAuthError, setAdminAuthError] = useState<string | null>(null)
+  const [adminAuthLoading, setAdminAuthLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [days, setDays] = useState<7 | 30 | 90>(7)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -393,6 +470,67 @@ export default function MetricsPage() {
   const [emailSearchQuery, setEmailSearchQuery] = useState("")
   const [emailStatusFilter, setEmailStatusFilter] = useState<"all" | "subscribed" | "unsubscribed" | "bounced">("all")
 
+  const readProtectedJson = async (res: Response, fallback: string) => {
+    if (res.status === 401) {
+      setAdminLocked(true)
+      setData(null)
+      setError(null)
+      throw new Error("Admin access required")
+    }
+
+    if (!res.ok) {
+      throw new Error(await readApiError(res, fallback))
+    }
+
+    return res.json()
+  }
+
+  const handleAdminUnlock = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const token = adminToken.trim()
+
+    if (!token) {
+      setAdminAuthError("Enter the admin token.")
+      return
+    }
+
+    setAdminAuthLoading(true)
+    setAdminAuthError(null)
+
+    try {
+      const res = await fetch("/api/metrics/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ token }),
+      })
+
+      if (!res.ok) {
+        throw new Error(await readApiError(res, "Invalid admin token"))
+      }
+
+      setAdminToken("")
+      setAdminLocked(false)
+      setError(null)
+      await fetchData(days)
+      if (activeTab === "events") await fetchEvents(1)
+      if (activeTab === "blog-analytics") await fetchBlogAnalytics()
+      if (activeTab === "email-list" || activeTab === "signups") await fetchEmailList()
+    } catch (e: any) {
+      setAdminAuthError(e.message || "Unable to unlock analytics")
+    } finally {
+      setAdminAuthLoading(false)
+    }
+  }
+
+  const handleAdminSignOut = async () => {
+    await fetch("/api/metrics/auth", { method: "DELETE", credentials: "include" }).catch(() => null)
+    setAdminLocked(true)
+    setData(null)
+    setEvents([])
+    setError(null)
+  }
+
   const fetchEmailList = async () => {
     setEmailLoading(true)
     try {
@@ -451,11 +589,12 @@ export default function MetricsPage() {
     setBlogAnalyticsLoading(true)
     try {
       const res = await fetch(`/api/metrics/blog-analytics?days=${days}`)
-      if (!res.ok) throw new Error("Failed to fetch blog analytics")
-      const json = await res.json()
+      const json = await readProtectedJson(res, "Failed to fetch blog analytics")
       setBlogAnalytics(json)
     } catch (e: any) {
-      console.error("Failed to fetch blog analytics:", e)
+      if (e.message !== "Admin access required") {
+        console.error("Failed to fetch blog analytics:", e)
+      }
     } finally {
       setBlogAnalyticsLoading(false)
     }
@@ -466,11 +605,13 @@ export default function MetricsPage() {
     setError(null)
     try {
       const res = await fetch(`/api/metrics/summary?days=${d}`)
-      if (!res.ok) throw new Error("Failed to fetch metrics")
-      const json = await res.json()
+      const json = await readProtectedJson(res, "Failed to fetch metrics")
       setData(json)
+      setAdminLocked(false)
     } catch (e: any) {
-      setError(e.message)
+      if (e.message !== "Admin access required") {
+        setError(e.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -482,12 +623,15 @@ export default function MetricsPage() {
       if (eventFilter) params.set("action", eventFilter)
       if (searchQuery) params.set("search", searchQuery)
       const res = await fetch(`/api/metrics/events?${params}`)
-      if (!res.ok) throw new Error("Failed to fetch events")
-      const json = await res.json()
+      const json = await readProtectedJson(res, "Failed to fetch events")
       setEvents(json.events)
       setTotalPages(json.pagination.totalPages)
       setCurrentPage(json.pagination.page)
-    } catch (e) { console.error("Failed to fetch events:", e) }
+    } catch (e: any) {
+      if (e.message !== "Admin access required") {
+        console.error("Failed to fetch events:", e)
+      }
+    }
   }
 
   useEffect(() => { fetchData(); fetchEvents() }, [])
@@ -753,12 +897,19 @@ export default function MetricsPage() {
             <button onClick={() => fetchData()} className="p-2 hover:bg-muted/50 rounded-lg" title="Refresh">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
-            <button onClick={handleExport} className="p-2 hover:bg-muted/50 rounded-lg" title="Export CSV">
-              <Download className="h-4 w-4" />
-            </button>
-            <button onClick={handleCopySummary} className="p-2 hover:bg-muted/50 rounded-lg" title="Copy Summary">
-              <Copy className="h-4 w-4" />
-            </button>
+            {!adminLocked && (
+              <>
+                <button onClick={handleExport} className="p-2 hover:bg-muted/50 rounded-lg" title="Export CSV">
+                  <Download className="h-4 w-4" />
+                </button>
+                <button onClick={handleCopySummary} className="p-2 hover:bg-muted/50 rounded-lg" title="Copy Summary">
+                  <Copy className="h-4 w-4" />
+                </button>
+                <button onClick={handleAdminSignOut} className="p-2 hover:bg-muted/50 rounded-lg" title="Lock dashboard">
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -794,10 +945,19 @@ export default function MetricsPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-6">
-          {error && <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-red-400">Error: {error}</div>}
+          {adminLocked && (
+            <AdminUnlockPanel
+              token={adminToken}
+              error={adminAuthError}
+              loading={adminAuthLoading}
+              onTokenChange={setAdminToken}
+              onSubmit={handleAdminUnlock}
+            />
+          )}
+          {!adminLocked && error && <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-red-400">Error: {error}</div>}
 
           {/* OVERVIEW TAB */}
-          {activeTab === "overview" && data && (
+          {!adminLocked && activeTab === "overview" && data && (
             <div className="space-y-6">
               {/* Metric Cards */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -872,7 +1032,7 @@ export default function MetricsPage() {
           )}
 
           {/* FUNNEL TAB */}
-          {activeTab === "funnel" && data && (
+          {!adminLocked && activeTab === "funnel" && data && (
             <div className="space-y-6">
               <h2 className="text-lg font-semibold text-foreground">🔄 Conversion Funnel</h2>
               {data.funnel.every(f => f.count === 0) ? (
@@ -897,7 +1057,7 @@ export default function MetricsPage() {
           )}
 
           {/* GEO & DEVICES TAB */}
-          {activeTab === "geo" && data && (() => {
+          {!adminLocked && activeTab === "geo" && data && (() => {
             // Clean up country data - handle nil/null/Unknown
             const cleanedCountries = data.topCountries
               .map(c => ({
@@ -958,7 +1118,7 @@ export default function MetricsPage() {
           )})()}
 
           {/* EVENTS TAB */}
-          {activeTab === "events" && (
+          {!adminLocked && activeTab === "events" && (
             <div className="space-y-4">
               {/* Filters */}
               <div className="flex flex-wrap gap-3">
@@ -1033,7 +1193,7 @@ export default function MetricsPage() {
           )}
 
           {/* EMAIL LIST TAB */}
-          {activeTab === "email-list" && (
+          {!adminLocked && activeTab === "email-list" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1253,7 +1413,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* SIGNUPS TAB */}
-          {activeTab === "signups" && (() => {
+          {!adminLocked && activeTab === "signups" && (() => {
             const signupList = emailList.filter(e => e.source === "signup")
             const todaySignups = signupList.filter(e => new Date(e.created_at).toDateString() === new Date().toDateString()).length
             const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7)
@@ -1351,7 +1511,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           })()}
 
           {/* SEO INTELLIGENCE TAB */}
-          {activeTab === "seo-intel" && (
+          {!adminLocked && activeTab === "seo-intel" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1480,7 +1640,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* CONTENT PERFORMANCE TAB */}
-          {activeTab === "content-perf" && (
+          {!adminLocked && activeTab === "content-perf" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1593,7 +1753,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* COMPETITOR MONITOR TAB */}
-          {activeTab === "competitor" && (
+          {!adminLocked && activeTab === "competitor" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1710,7 +1870,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* SYSTEMATIC VALUE SCORE TAB */}
-          {activeTab === "value-score" && (
+          {!adminLocked && activeTab === "value-score" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1871,7 +2031,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* MARKETING AGENT TAB */}
-          {activeTab === "marketing" && (
+          {!adminLocked && activeTab === "marketing" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2048,7 +2208,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* BLOG ANALYTICS TAB */}
-          {activeTab === "blog-analytics" && (
+          {!adminLocked && activeTab === "blog-analytics" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2182,7 +2342,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* BLOG EDITOR TAB */}
-          {activeTab === "blog" && (
+          {!adminLocked && activeTab === "blog" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2441,7 +2601,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* ADS LIBRARY TAB */}
-          {activeTab === "ads" && (
+          {!adminLocked && activeTab === "ads" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
