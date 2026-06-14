@@ -58,18 +58,67 @@ export async function checkRateLimit(
   request: NextRequest,
   _featureType: FeatureType = "domain"
 ): Promise<RateLimitResult> {
-  // TEMPORARY: paywall disabled while API keys are rotated — all users get pro access
+  const ip = getClientIP(request)
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  return {
-    allowed: true,
-    isPro: true,
-    userId: user?.id || null,
-    tokensUsed: 0,
-    tokensTotal: -1,
-    remaining: -1,
-    plan: "pro",
+  if (user && await checkProAccess(user.id)) {
+    return {
+      allowed: true,
+      isPro: true,
+      userId: user.id,
+      tokensUsed: 0,
+      tokensTotal: -1,
+      remaining: -1,
+      plan: "pro",
+    }
+  }
+
+  try {
+    const service = createServiceClient()
+
+    const { count: ipCount, error: ipError } = await service
+      .from("generation_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("ip_address", ip)
+
+    if (ipError) throw ipError
+
+    let userCount = 0
+    if (user) {
+      const { count, error } = await service
+        .from("generation_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+      if (error) throw error
+      userCount = count || 0
+    }
+
+    const used = Math.max(ipCount || 0, userCount)
+    const remaining = Math.max(0, FREE_TOKEN_LIMIT - used)
+
+    return {
+      allowed: used < FREE_TOKEN_LIMIT,
+      isPro: false,
+      userId: user?.id || null,
+      tokensUsed: used,
+      tokensTotal: FREE_TOKEN_LIMIT,
+      remaining,
+      plan: "free",
+    }
+  } catch (error) {
+    console.error("Rate limit check failed:", error)
+    return {
+      allowed: false,
+      isPro: false,
+      userId: user?.id || null,
+      tokensUsed: FREE_TOKEN_LIMIT,
+      tokensTotal: FREE_TOKEN_LIMIT,
+      remaining: 0,
+      plan: "free",
+    }
   }
 }
 

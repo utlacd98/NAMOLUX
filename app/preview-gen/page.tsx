@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { GenerateNames } from "@/components/generate-names"
+import { GenerateNames } from "@/components/generate-names-premium"
 
 export const metadata = {
   title: "Name Generator — Test Environment",

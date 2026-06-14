@@ -21,11 +21,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Retrieve the session from Stripe to verify payment
     const session = await stripe.checkout.sessions.retrieve(sessionId)
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ error: "Payment not completed" }, { status: 400 })
+    }
+
+    if (session.metadata?.supabase_user_id !== user.id) {
+      return NextResponse.json({ error: "Payment session does not belong to this account" }, { status: 403 })
     }
 
     // Use service client to bypass RLS and update the profile
@@ -44,6 +47,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error("Verify payment error:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to verify payment" }, { status: 500 })
   }
 }

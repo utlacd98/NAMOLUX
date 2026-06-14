@@ -2,8 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { RefreshCw, Copy, CheckCircle, Palette, ChevronDown, Sparkles } from "lucide-react"
-import { LandingPreview } from "@/components/landing-preview"
-import { StitchPrompt } from "@/components/stitch-prompt"
+import { BrandLaunchSandbox } from "@/components/brand-launch-sandbox"
 
 interface PaletteColour {
   hex: string
@@ -302,14 +301,13 @@ export function BrandPalette({
     } finally {
       setLoading(false)
     }
-  }, [brandName, keywords, vibe])
+  }, [brandName, keywords, vibe, brandType])
 
   const hasPalette = palette !== null
   const variants = palette?.variants ?? []
   const hasVariants = variants.length > 0
-  // The "active" palette for all downstream consumers (swatches, landing preview,
-  // stitch export). If variants exist, switch based on activeVariantIndex. Otherwise
-  // fall back to the legacy top-level palette.
+  // The active palette powers swatches and the launch sandbox. If variants exist,
+  // switch based on activeVariantIndex. Otherwise fall back to the legacy top-level palette.
   const activePalette: PaletteResult["palette"] | null = hasVariants && variants[activeVariantIndex]
     ? variantToLegacy(variants[activeVariantIndex])
     : palette?.palette ?? null
@@ -754,19 +752,13 @@ export function BrandPalette({
             })}
           </div>
 
-          {/* Live landing page mockup */}
-          <LandingPreview
+          {/* Native launch sandbox */}
+          <BrandLaunchSandbox
             brandName={brandName}
             keywords={keywords}
             vibe={vibe}
-            palette={activePalette}
-          />
-
-          {/* Stitch export — collapsible secondary option */}
-          <StitchPrompt
-            brandName={brandName}
-            keywords={keywords}
-            vibe={vibe}
+            brandType={brandType}
+            variantName={activeVariant?.name}
             palette={activePalette}
           />
         </div>

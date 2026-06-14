@@ -5,8 +5,9 @@ import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 let openaiInstance: OpenAI | null = null
 function getOpenAI(): OpenAI {
   if (!openaiInstance) {
-    if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set")
-    openaiInstance = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const apiKey = process.env.OPENAI_API_KEY?.trim()
+    if (!apiKey) throw new Error("OPENAI_API_KEY is not set")
+    openaiInstance = new OpenAI({ apiKey })
   }
   return openaiInstance
 }
@@ -18,9 +19,110 @@ const VALID_INDUSTRIES = [
   "Cybersecurity", "Media & Entertainment", "Developer Tools",
   "Technology", "Finance", "Education", "Creative", "Fashion & Beauty",
   "Travel & Tourism", "Sports & Fitness", "Entertainment & Media",
+  "Consulting & Services", "Legal & Professional", "Automotive",
+  "Home & Garden", "Pet Care", "Gaming & Esports",
+  "Sustainability & Green Tech", "Blockchain & Crypto",
+  "Manufacturing", "Nonprofit & Social Impact", "Other",
 ]
 
 const VALID_VIBES = ["luxury", "futuristic", "playful", "trustworthy", "minimal"]
+
+const STOPWORDS = new Set([
+  "about",
+  "after",
+  "also",
+  "and",
+  "are",
+  "brand",
+  "business",
+  "for",
+  "from",
+  "into",
+  "our",
+  "platform",
+  "small",
+  "that",
+  "the",
+  "their",
+  "this",
+  "through",
+  "using",
+  "with",
+])
+
+function normaliseToken(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function inferIndustry(text: string): string {
+  const lower = text.toLowerCase()
+  if (/(logistics|supply chain|shipping|delivery|freight|warehouse|inventory|e-commerce|ecommerce|commerce|merchant|store)/.test(lower)) return "E-Commerce"
+  if (/(mental|therapy|teen|teenager|support network|nonprofit|charity|community|social impact)/.test(lower)) return "Nonprofit & Social Impact"
+  if (/(skin|skincare|beauty|botanical|cosmetic|wellness|health|therapy|fitness|care)/.test(lower)) return "Health & Wellness"
+  if (/(renewable|clean energy|energy|solar|wind|climate|carbon|green tech|waste|recycle|environment|grid)/.test(lower)) return "Sustainability & Green Tech"
+  if (/(ai|machine learning|automation|agent|model|data|analytics)/.test(lower)) return "AI & Machine Learning"
+  if (/(software|saas|workflow|dashboard|developer|app)/.test(lower)) return "SaaS & Software"
+  if (/(finance|fintech|bank|payment|invoice|ledger|cashflow|accounting)/.test(lower)) return "Fintech & Finance"
+  if (/(education|school|student|course|learn|teacher|tutor)/.test(lower)) return "Education & EdTech"
+  return "SaaS & Software"
+}
+
+function inferVibe(text: string, industry: string): string {
+  const lower = text.toLowerCase()
+  if (/(luxury|premium|high-end|exclusive|elegant|botanical|heritage)/.test(lower)) return "luxury"
+  if (/(ai|futuristic|next-gen|advanced|automation|autonomous|predictive)/.test(lower)) return "futuristic"
+  if (/(teen|kids|game|play|fun|community|social|creative)/.test(lower)) return "playful"
+  if (/(nonprofit|support|mental|finance|legal|security|consulting|business|trust|reliable)/.test(lower)) return "trustworthy"
+  if (industry === "Nonprofit & Social Impact" || industry === "Fintech & Finance") return "trustworthy"
+  if (industry === "AI & Machine Learning") return "futuristic"
+  return "minimal"
+}
+
+function keywordCandidates(text: string, industry: string): string[] {
+  const lower = text.toLowerCase()
+  const domainHints: Record<string, string[]> = {
+    "E-Commerce": ["logistics", "delivery", "route", "ship", "stock", "commerce", "flow", "fleet"],
+    "Sustainability & Green Tech": ["energy", "solar", "carbon", "green", "renew", "climate", "grid", "future"],
+    "Nonprofit & Social Impact": ["support", "teen", "mind", "care", "community", "safe", "haven", "help"],
+    "Health & Wellness": ["skin", "botanical", "well", "care", "pure", "glow", "restore", "nourish"],
+    "AI & Machine Learning": ["agent", "model", "signal", "predict", "smart", "data", "flow", "sync"],
+    "SaaS & Software": ["workflow", "sync", "team", "flow", "cloud", "signal", "pilot", "frame"],
+    "Fintech & Finance": ["vault", "cash", "ledger", "capital", "trust", "balance", "fund", "clear"],
+  }
+
+  const extracted = lower
+    .split(/[\s,./|&-]+/)
+    .map(normaliseToken)
+    .filter((token) => token.length >= 3 && token.length <= 16 && !STOPWORDS.has(token))
+
+  const weighted = new Set<string>()
+  for (const hint of domainHints[industry] || []) {
+    if (lower.includes(hint) || weighted.size < 3) weighted.add(hint)
+  }
+  for (const token of extracted) {
+    if (weighted.size >= 6) break
+    weighted.add(token)
+  }
+
+  return Array.from(weighted).slice(0, 6)
+}
+
+function fallbackAnalysis(description: string) {
+  const industry = inferIndustry(description)
+  const brandVibe = inferVibe(description, industry)
+  const keywords = keywordCandidates(description, industry)
+  const lower = description.toLowerCase()
+  const maxLength = /(enterprise|consulting|business|nonprofit|support|logistics)/.test(lower) ? 10 : 8
+
+  return {
+    summary: `You're building ${description.slice(0, 180).replace(/\s+/g, " ").trim()}.`,
+    keywords,
+    industry,
+    brandVibe,
+    maxLength,
+    vibeReasoning: `Selected ${brandVibe} based on the category, audience, and tone of the description.`,
+  }
+}
 
 export async function POST(request: NextRequest) {
   const rateLimit = await checkRateLimit(request, "analyze")
@@ -73,21 +175,26 @@ Read the startup description carefully, then return ONLY valid JSON with these e
 
 Return ONLY valid JSON, no markdown, no backticks.`
 
-    const completion = await getOpenAI().chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: truncated },
-      ],
-      temperature: 0.3,
-      max_tokens: 500,
-    })
+    let raw: any
+    try {
+      const completion = await getOpenAI().chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: truncated },
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      })
 
-    const content = completion.choices[0]?.message?.content?.trim() || ""
-    const jsonMatch = content.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error("Invalid AI response format")
-
-    const raw = JSON.parse(jsonMatch[0])
+      const content = completion.choices[0]?.message?.content?.trim() || ""
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error("Invalid AI response format")
+      raw = JSON.parse(jsonMatch[0])
+    } catch (error) {
+      console.warn("analyze-description falling back to local extraction:", error)
+      raw = fallbackAnalysis(truncated)
+    }
 
     // Normalise and validate
     const keywords: string[] = Array.isArray(raw.keywords)

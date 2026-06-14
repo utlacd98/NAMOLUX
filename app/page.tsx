@@ -2,8 +2,10 @@ import type { Metadata } from "next"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { SocialProof } from "@/components/social-proof"
+import { ProductShowcase } from "@/components/landing/product-showcase"
 import { Features } from "@/components/features"
 import { HowItWorks } from "@/components/how-it-works"
+import { Comparison } from "@/components/landing/comparison"
 import { FAQ } from "@/components/faq"
 import { FinalCTA } from "@/components/final-cta"
 import { Footer } from "@/components/footer"
@@ -11,34 +13,34 @@ import { Footer } from "@/components/footer"
 const siteUrl = "https://www.namolux.com"
 
 export const metadata: Metadata = {
-  title: "NamoLux — Bulk Domain Checker with Founder Signal™ Scoring",
+  title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
   description:
-    "Paste your name shortlist. Get live availability across 6 TLDs plus Founder Signal™ brand scoring. Rank your candidates by elite-tier brand quality in seconds.",
+    "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "NamoLux — Bulk Domain Checker with Founder Signal™ Scoring",
+    title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
     description:
-      "Paste your name shortlist. Get live availability across 6 TLDs plus Founder Signal™ brand scoring. Rank your candidates by elite-tier brand quality in seconds.",
+      "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
     url: siteUrl,
     siteName: "NamoLux",
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux — Bulk Domain Checker with Founder Signal™ Scoring",
+        alt: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux — Bulk Domain Checker with Founder Signal™ Scoring",
+    title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
     description:
-      "Paste your name shortlist. Get live availability across 6 TLDs plus Founder Signal™ brand scoring. Rank your candidates by elite-tier brand quality in seconds.",
-    images: ["/og-image.png"],
+      "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
+    images: ["/opengraph-image"],
   },
 }
 
@@ -67,13 +69,13 @@ export default function Home() {
         "@id": `${siteUrl}/#organization`,
         name: "NamoLux",
         description:
-          "A domain naming consultancy powered by Founder Signal™. Paste your shortlist, get live availability checks across six TLDs plus elite-tier brand scoring on every candidate.",
+          "A domain naming platform powered by Founder Signal scoring. Generate or paste a shortlist, get live availability checks across six TLDs, and rank every candidate with clear reasoning.",
         url: `${siteUrl}/`,
         logo: {
           "@type": "ImageObject",
-          url: `${siteUrl}/logo.png`,
-          width: 1200,
-          height: 337,
+          url: `${siteUrl}/icon.png`,
+          width: 563,
+          height: 563,
         },
         sameAs: [
           "https://www.facebook.com/profile.php?id=61587014966281",
@@ -87,9 +89,9 @@ export default function Home() {
         "@type": "WebPage",
         "@id": `${siteUrl}/#webpage`,
         url: `${siteUrl}/`,
-        name: "NamoLux — Domain Naming Consultancy with Founder Signal™ Scoring",
+        name: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
         description:
-          "Paste your domain name shortlist. Get Founder Signal™ brand scoring, live availability across six TLDs, and a clear verdict on every candidate.",
+          "Generate or paste your domain name shortlist. Get Founder Signal scoring, live availability across six TLDs, and a clear verdict on every candidate.",
         isPartOf: { "@id": `${siteUrl}/#website` },
         about: { "@id": `${siteUrl}/#organization` },
         inLanguage: "en-US",
@@ -107,8 +109,10 @@ export default function Home() {
         />
         <Hero />
         <SocialProof />
+        <ProductShowcase />
         <Features />
         <HowItWorks />
+        <Comparison />
         <FAQ />
         <FinalCTA />
       </main>
@@ -116,4 +120,3 @@ export default function Home() {
     </div>
   )
 }
-

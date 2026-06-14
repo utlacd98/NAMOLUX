@@ -13,11 +13,13 @@ export async function GET(request: NextRequest) {
     // Pro check
     if (user) {
       const service = createServiceClient()
-      const { data: profile } = await service
+      const { data: profile, error } = await service
         .from("profiles")
         .select("plan")
         .eq("id", user.id)
         .single()
+
+      if (error) throw error
 
       if (profile?.plan === "pro") {
         return NextResponse.json({ used: 0, total: -1, remaining: -1, isPro: true })
@@ -28,18 +30,21 @@ export async function GET(request: NextRequest) {
     const service = createServiceClient()
 
     // Count by IP (always)
-    const { count: ipCount } = await service
+    const { count: ipCount, error: ipError } = await service
       .from("generation_logs")
       .select("*", { count: "exact", head: true })
       .eq("ip_address", ip)
 
+    if (ipError) throw ipError
+
     // Count by user_id if signed in
     let userCount = 0
     if (user) {
-      const { count } = await service
+      const { count, error } = await service
         .from("generation_logs")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
+      if (error) throw error
       userCount = count || 0
     }
 
@@ -49,6 +54,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ used, total: FREE_TOKEN_LIMIT, remaining, isPro: false })
   } catch (error: unknown) {
     console.error("Error fetching tokens:", error)
-    return NextResponse.json({ used: 0, total: FREE_TOKEN_LIMIT, remaining: FREE_TOKEN_LIMIT, isPro: false })
+    return NextResponse.json({ used: FREE_TOKEN_LIMIT, total: FREE_TOKEN_LIMIT, remaining: 0, isPro: false })
   }
 }

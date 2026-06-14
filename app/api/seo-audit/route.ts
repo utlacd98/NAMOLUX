@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import { lookup } from "dns/promises"
+import http from "http"
+import https from "https"
+import net from "net"
 import * as cheerio from "cheerio"
 import { trackMetric } from "@/lib/metrics"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
@@ -41,24 +45,138 @@ interface AuditResult {
   timestamp: string
 }
 
-async function fetchWebsite(url: string): Promise<{ html: string; headers: Headers; loadTime: number }> {
-  const startTime = Date.now()
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-      "Accept-Language": "en-US,en;q=0.5",
-    },
-    signal: AbortSignal.timeout(15000),
-  })
-  const loadTime = Date.now() - startTime
+const MAX_AUDIT_BYTES = 1024 * 1024
+type ValidatedAuditUrl = { url: string; addresses: Array<{ address: string; family: number }> }
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch website: ${response.statusText}`)
+function isPrivateIPv4(address: string): boolean {
+  const parts = address.split(".").map((part) => Number(part))
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true
+  const [a, b] = parts
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    a >= 224
+  )
+}
+
+function isBlockedIPAddress(address: string): boolean {
+  const ipVersion = net.isIP(address)
+  if (ipVersion === 4) return isPrivateIPv4(address)
+  if (ipVersion === 6) {
+    const lowered = address.toLowerCase()
+    return (
+      lowered === "::1" ||
+      lowered === "::" ||
+      lowered.startsWith("fc") ||
+      lowered.startsWith("fd") ||
+      lowered.startsWith("fe80:") ||
+      lowered.startsWith("::ffff:127.") ||
+      lowered.startsWith("::ffff:10.") ||
+      lowered.startsWith("::ffff:192.168.") ||
+      lowered.startsWith("::ffff:172.")
+    )
+  }
+  return true
+}
+
+async function validatePublicHttpUrl(rawUrl: string): Promise<ValidatedAuditUrl> {
+  const urlObj = new URL(rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`)
+  if (urlObj.protocol !== "https:" && urlObj.protocol !== "http:") {
+    throw new Error("Only HTTP and HTTPS URLs can be audited")
+  }
+  if (urlObj.username || urlObj.password) {
+    throw new Error("URLs with embedded credentials cannot be audited")
   }
 
-  const html = await response.text()
-  return { html, headers: response.headers, loadTime }
+  const hostname = urlObj.hostname
+  if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+    throw new Error("Private or local URLs cannot be audited")
+  }
+
+  if (net.isIP(hostname)) {
+    if (isBlockedIPAddress(hostname)) throw new Error("Private or local URLs cannot be audited")
+    return { url: urlObj.toString(), addresses: [{ address: hostname, family: net.isIP(hostname) }] }
+  }
+
+  const addresses = await lookup(hostname, { all: true, verbatim: true })
+  if (addresses.length === 0 || addresses.some((item) => isBlockedIPAddress(item.address))) {
+    throw new Error("Private or local URLs cannot be audited")
+  }
+
+  return { url: urlObj.toString(), addresses }
+}
+
+async function fetchWebsite(validated: ValidatedAuditUrl): Promise<{ html: string; headers: Headers; loadTime: number }> {
+  const startTime = Date.now()
+  const target = new URL(validated.url)
+  const pinned = validated.addresses[0]
+
+  return new Promise((resolve, reject) => {
+    const transport = target.protocol === "https:" ? https : http
+    const req = transport.request(
+      target,
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.5",
+        },
+        lookup: (_hostname, _options, callback) => {
+          callback(null, pinned.address, pinned.family)
+        },
+        servername: target.hostname,
+        timeout: 15000,
+      },
+      (response) => {
+        const loadTime = Date.now() - startTime
+        const statusCode = response.statusCode || 0
+        const headers = new Headers(response.headers as Record<string, string>)
+
+        if (statusCode >= 300 && statusCode < 400) {
+          response.resume()
+          reject(new Error("Redirecting URLs cannot be audited"))
+          return
+        }
+
+        if (statusCode < 200 || statusCode >= 300) {
+          response.resume()
+          reject(new Error(`Failed to fetch website: ${response.statusMessage || statusCode}`))
+          return
+        }
+
+        const contentLength = response.headers["content-length"]
+        const declaredLength = Array.isArray(contentLength) ? contentLength[0] : contentLength
+        if (declaredLength && Number(declaredLength) > MAX_AUDIT_BYTES) {
+          response.resume()
+          reject(new Error("Page is too large to audit"))
+          return
+        }
+
+        const chunks: Buffer[] = []
+        let received = 0
+        response.on("data", (chunk: Buffer) => {
+          received += chunk.length
+          if (received > MAX_AUDIT_BYTES) {
+            req.destroy(new Error("Page is too large to audit"))
+            return
+          }
+          chunks.push(chunk)
+        })
+        response.on("end", () => {
+          resolve({ html: Buffer.concat(chunks).toString("utf8"), headers, loadTime })
+        })
+      }
+    )
+
+    req.on("timeout", () => req.destroy(new Error("Request timed out")))
+    req.on("error", reject)
+    req.end()
+  })
 }
 
 function getGrade(score: number): string {
@@ -1019,17 +1137,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 })
     }
 
-    // Validate URL format
-    let validUrl: string
+    let validAuditUrl: ValidatedAuditUrl
     try {
-      const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`)
-      validUrl = urlObj.toString()
-    } catch {
-      return NextResponse.json({ error: "Invalid URL format" }, { status: 400 })
+      validAuditUrl = await validatePublicHttpUrl(url.trim())
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message || "Invalid URL format" }, { status: 400 })
     }
 
     // Fetch the website
-    const { html, headers, loadTime } = await fetchWebsite(validUrl)
+    const { html, headers, loadTime } = await fetchWebsite(validAuditUrl)
+    const validUrl = validAuditUrl.url
     const $ = cheerio.load(html)
 
     // Run all audits
@@ -1123,4 +1240,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

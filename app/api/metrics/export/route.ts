@@ -1,23 +1,30 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { getEvents } from "@/lib/metrics"
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 export async function GET(request: NextRequest) {
   try {
+    const unauthorized = requireAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get("days") || "7")
     
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days + 1)
-    startDate.setHours(0, 0, 0, 0)
-    
-    const events = await db.metrics.findMany({
-      where: { createdAt: { gte: startDate } },
-      orderBy: { createdAt: "desc" },
-    })
+    const { events: rawEvents } = await getEvents({ days, page: 1, limit: 50000 })
+    const events = rawEvents as Array<{
+      id: string
+      action: string
+      sessionId?: string | null
+      device?: string | null
+      country?: string | null
+      route?: string | null
+      createdAt: Date
+      metadata?: unknown
+    }>
     
     // Build CSV
     const headers = ["id", "action", "sessionId", "device", "country", "route", "createdAt", "metadata"]
-    const rows = events.map(e => [
+    const rows = events.map((e) => [
       e.id,
       e.action,
       e.sessionId || "",
@@ -30,7 +37,7 @@ export async function GET(request: NextRequest) {
     
     const csv = [
       headers.join(","),
-      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
     ].join("\n")
     
     const response = new NextResponse(csv, {
@@ -46,4 +53,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message || "Failed to export" }, { status: 500 })
   }
 }
-

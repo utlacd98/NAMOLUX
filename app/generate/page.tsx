@@ -1,28 +1,74 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import { GenerateNames } from "@/components/generate-names"
+import { GenerateNames } from "@/components/generate-names-premium"
 
 export const metadata: Metadata = {
-  title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
+  title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
   description:
-    "Paste up to 50 domain names and get live availability checks across 6 TLDs plus Founder Signal™ brand scoring. Rank your shortlist by elite-tier brand quality in seconds.",
+    "Generate high-quality brandable domain names from your keywords, verify availability across 6 TLDs, and rank every result with Founder Signal scoring.",
+  keywords: [
+    "AI domain name generator",
+    "business name generator",
+    "startup name generator",
+    "domain availability checker",
+    "brand name ideas",
+    "Founder Signal scoring",
+  ],
+  alternates: {
+    canonical: "/generate",
+  },
   openGraph: {
-    title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
+    title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
     description:
-      "Check domain availability in bulk and rank names by Founder Signal™ brand score. 6 TLDs, 50 names per batch, instant results.",
+      "Generate brandable names, check availability across .com, .io, .co, .ai, .app, and .dev, and buy available domains through Namecheap.",
+    url: "https://www.namolux.com/generate",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "NamoLux AI domain name generator",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bulk Domain Name Checker with Founder Signal™ Scoring | NamoLux",
+    title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
     description:
-      "Check domain availability in bulk and rank names by Founder Signal™ brand score. 6 TLDs, 50 names per batch, instant results.",
+      "Generate brandable names, verify availability, and rank every result with Founder Signal scoring.",
+    images: ["/opengraph-image"],
   },
 }
 
 export default function GeneratePage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": "https://www.namolux.com/generate#app",
+    name: "NamoLux Domain Name Generator",
+    url: "https://www.namolux.com/generate",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description:
+      "Generate brandable startup names, verify live availability across 6 TLDs, and rank every result with Founder Signal scoring.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    publisher: { "@id": "https://www.namolux.com/#organization" },
+  }
+
   return (
-    <Suspense fallback={null}>
-      <GenerateNames />
-    </Suspense>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <Suspense fallback={null}>
+        <GenerateNames />
+      </Suspense>
+    </>
   )
 }

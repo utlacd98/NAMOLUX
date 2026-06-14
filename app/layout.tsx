@@ -1,16 +1,22 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Geist_Mono } from "next/font/google"
+import { Inter, Geist_Mono, Fraunces } from "next/font/google"
 import { LazyAnalytics } from "@/components/lazy-analytics"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" })
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+})
 
 export const metadata: Metadata = {
-  title: "NamoLux — AI Domain Name Generator",
+  title: "NamoLux - AI Domain Name Generator",
   description:
-    "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
+    "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
   keywords: [
     "AI domain name generator",
     "domain name finder",
@@ -33,9 +39,9 @@ export const metadata: Metadata = {
     canonical: "https://www.namolux.com/",
   },
   openGraph: {
-    title: "NamoLux — AI Domain Name Generator",
+    title: "NamoLux - AI Domain Name Generator",
     description:
-      "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
+      "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
@@ -45,15 +51,15 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux — AI Domain Name Generator",
+        alt: "NamoLux - AI Domain Name Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux — AI Domain Name Generator",
+    title: "NamoLux - AI Domain Name Generator",
     description:
-      "Generate brandable startup names with AI. Live .com availability checking, Founder Signal™ scoring, and multi-TLD results. Find a name worth building on.",
+      "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
     images: ["/opengraph-image"],
     site: "@namolux",
     creator: "@namolux",
@@ -69,17 +75,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.png", sizes: "512x512", type: "image/png" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/favicon.ico",
-  },
+  // Icons resolve via App Router file conventions (app/favicon.ico, app/icon.png)
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
   },
@@ -107,7 +103,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${geistMono.variable} ${fraunces.variable} font-sans antialiased`}>
         {children}
         <LazyAnalytics />
       </body>

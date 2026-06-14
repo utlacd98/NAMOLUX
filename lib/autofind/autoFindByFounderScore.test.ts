@@ -83,6 +83,64 @@ describe("autoFind5DotComByFounderScore", () => {
     expect(pickedNames).not.toContain("futurns")
   })
 
+  it("rejects unsafe and random-syllable names even when scoring and availability are favorable", async () => {
+    generateCandidatePoolMock.mockReturnValue({
+      candidates: [
+        { name: "boner" },
+        { name: "roore" },
+        { name: "hinore" },
+        { name: "apave" },
+        { name: "sagemint" },
+      ],
+      keywordTokens: ["skin"],
+      relatedTerms: ["beauty"],
+    })
+
+    scoreNameMock.mockImplementation(({ name }: { name: string }) => ({
+      score: name === "sagemint" ? 91 : 99,
+      label: "Pronounceable",
+      reasons: ["mock-score"],
+      breakdown: {
+        lengthScore: 18,
+        pronounceScore: 16,
+        memorabilityScore: 12,
+        extensionScore: 10,
+        characterScore: 14,
+        brandRiskPenalty: 0,
+        relevanceScore: 20,
+      },
+    }))
+
+    checkAvailabilityBatchMock.mockImplementation(async (domains: string[]) =>
+      domains.map((domain) => ({
+        domain,
+        available: true,
+        provider: "mock",
+        latencyMs: 1,
+        confidence: "high" as const,
+      })),
+    )
+
+    const result = await autoFind5DotComByFounderScore({
+      keywords: "skin, beauty",
+      industry: "Fashion & Beauty",
+      vibe: "Luxury",
+      maxAttempts: 1,
+      poolSize: 20,
+      topNToCheck: 10,
+      scoreFloor: 80,
+    })
+
+    const pickedNames = result.found.map((item) => item.name)
+
+    expect(pickedNames).not.toContain("boner")
+    expect(pickedNames).not.toContain("roore")
+    expect(pickedNames).not.toContain("hinore")
+    expect(pickedNames).not.toContain("apave")
+    expect(pickedNames.length).toBeGreaterThan(0)
+    expect(checkAvailabilityBatchMock.mock.calls[0][0]).not.toEqual(expect.arrayContaining(["boner.com", "roore.com", "hinore.com", "apave.com"]))
+  })
+
   it("prefers higher Founder Signal scores when both are available", async () => {
     generateCandidatePoolMock.mockReturnValue({
       candidates: [{ name: "soilux" }, { name: "terravio" }, { name: "verdava" }],

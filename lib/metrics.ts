@@ -1,5 +1,3 @@
-import { db } from "./db"
-
 export type MetricAction = "name_generation" | "bulk_check" | "seo_audit" | "affiliate_click" | "page_view" | "blog_view"
 
 interface TrackMetricParams {
@@ -13,8 +11,20 @@ interface TrackMetricParams {
   route?: string
 }
 
+async function getMetricsDb() {
+  try {
+    const { db } = await import("./db")
+    return db
+  } catch {
+    return null
+  }
+}
+
 export async function trackMetric(params: TrackMetricParams) {
   try {
+    const db = await getMetricsDb()
+    if (!db) return
+
     await db.metrics.create({
       data: {
         action: params.action,
@@ -34,8 +44,21 @@ export async function trackMetric(params: TrackMetricParams) {
 }
 
 export async function getDailyTrends(days: number = 7) {
+  const db = await getMetricsDb()
   const now = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days + 1)
+
+  if (!db) {
+    return Array.from({ length: days }, (_, i) => {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000)
+      return {
+        date: date.toISOString().split("T")[0],
+        nameGeneration: 0,
+        bulkCheck: 0,
+        seoAudit: 0,
+      }
+    })
+  }
 
   // Get all metrics from the past N days
   const metrics = await db.metrics.findMany({
@@ -78,6 +101,17 @@ export async function getDailyTrends(days: number = 7) {
 }
 
 export async function getMetricsSummary() {
+  const db = await getMetricsDb()
+  if (!db) {
+    return {
+      allTime: { nameGeneration: 0, bulkCheck: 0, seoAudit: 0, total: 0 },
+      today: { nameGeneration: 0, bulkCheck: 0, seoAudit: 0, total: 0 },
+      thisWeek: { nameGeneration: 0, bulkCheck: 0, seoAudit: 0, total: 0 },
+      thisMonth: { nameGeneration: 0, bulkCheck: 0, seoAudit: 0, total: 0 },
+      recentActivity: [],
+    }
+  }
+
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
@@ -165,6 +199,28 @@ function getStartDate(days: number): Date {
 
 // Enhanced dashboard metrics
 export async function getDashboardMetrics(days: number = 7) {
+  const db = await getMetricsDb()
+  if (!db) {
+    return {
+      totalEvents: 0,
+      uniqueSessions: 0,
+      returningSessions: 0,
+      affiliateClickRate: 0,
+      avgActionsPerSession: 0,
+      eventCounts: {
+        nameGeneration: 0,
+        bulkCheck: 0,
+        seoAudit: 0,
+        affiliateClick: 0,
+        pageView: 0,
+      },
+      deviceCounts: { desktop: 0, mobile: 0, tablet: 0, unknown: 0 },
+      topCountries: [],
+      eventGrowth: 0,
+      sessionGrowth: 0,
+    }
+  }
+
   const startDate = getStartDate(days)
   const previousStartDate = getStartDate(days * 2)
 
@@ -272,6 +328,25 @@ export async function getDashboardMetrics(days: number = 7) {
 
 // Get funnel data
 export async function getFunnelData(days: number = 7) {
+  const db = await getMetricsDb()
+  if (!db) {
+    return {
+      funnel: [
+        { step: "Landing", count: 0, rate: 100 },
+        { step: "Generate Names", count: 0, rate: 0 },
+        { step: "Bulk Check", count: 0, rate: 0 },
+        { step: "SEO Audit", count: 0, rate: 0 },
+        { step: "Buy Click", count: 0, rate: 0 },
+      ],
+      dropOffs: {
+        landingToGenerate: 0,
+        generateToCheck: 0,
+        checkToAudit: 0,
+        auditToClick: 0,
+      },
+    }
+  }
+
   const startDate = getStartDate(days)
 
   const metrics = await db.metrics.findMany({
@@ -315,7 +390,22 @@ export async function getFunnelData(days: number = 7) {
 
 // Enhanced daily trends with all event types
 export async function getEnhancedTrends(days: number = 7) {
+  const db = await getMetricsDb()
   const startDate = getStartDate(days)
+
+  if (!db) {
+    return Array.from({ length: days }, (_, i) => {
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000)
+      return {
+        date: date.toISOString().split("T")[0],
+        nameGeneration: 0,
+        bulkCheck: 0,
+        seoAudit: 0,
+        affiliateClick: 0,
+        total: 0,
+      }
+    })
+  }
 
   const metrics = await db.metrics.findMany({
     where: { createdAt: { gte: startDate } },
@@ -371,6 +461,19 @@ export async function getEvents(options: {
   device?: string
   search?: string
 }) {
+  const db = await getMetricsDb()
+  if (!db) {
+    return {
+      events: [],
+      pagination: {
+        page: options.page || 1,
+        limit: options.limit || 50,
+        total: 0,
+        totalPages: 0,
+      },
+    }
+  }
+
   const {
     days = 7,
     page = 1,
@@ -425,4 +528,3 @@ export async function getEvents(options: {
     }
   }
 }
-

@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getEvents } from "@/lib/metrics"
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 export async function GET(request: NextRequest) {
   try {
+    const unauthorized = requireAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const { searchParams } = new URL(request.url)
     
     const days = parseInt(searchParams.get("days") || "7")
@@ -32,4 +36,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message || "Failed to get events" }, { status: 500 })
   }
 }
-

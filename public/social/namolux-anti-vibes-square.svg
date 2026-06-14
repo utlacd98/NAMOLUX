@@ -1,0 +1,48 @@
+
+  <svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#E7B83F"/>
+        <stop offset="1" stop-color="#C9952D"/>
+      </linearGradient>
+      <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#111111"/>
+        <stop offset="1" stop-color="#181512"/>
+      </linearGradient>
+      <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#000000" flood-opacity="0.45"/>
+      </filter>
+      <style>
+        .brand { font: 800 34px Georgia, serif; fill: #F8F5EC; letter-spacing: 0; }
+        .brandGold { fill: #E7B83F; }
+        .eyebrow { font: 700 24px Arial, sans-serif; fill: #E7B83F; letter-spacing: 3px; }
+        .h1 { font: 800 82px Arial, sans-serif; fill: #F8F5EC; letter-spacing: 0; }
+        .h1Small { font: 800 66px Arial, sans-serif; fill: #F8F5EC; letter-spacing: 0; }
+        .body { font: 400 34px Arial, sans-serif; fill: #AFA89B; letter-spacing: 0; }
+        .bodyStrong { font: 700 34px Arial, sans-serif; fill: #F8F5EC; letter-spacing: 0; }
+        .tiny { font: 600 24px Arial, sans-serif; fill: #AFA89B; letter-spacing: 0; }
+        .metric { font: 800 58px Arial, sans-serif; fill: #F8F5EC; letter-spacing: 0; }
+        .label { font: 700 24px Arial, sans-serif; fill: #AFA89B; letter-spacing: 0; }
+      </style>
+    </defs>
+    <rect width="1080" height="1080" fill="#050505"/>
+    <rect x="34" y="34" width="1012" height="1012" rx="34" fill="url(#panel)" stroke="#2b261a" stroke-width="2"/>
+    <g transform="translate(72 74)">
+      <text class="brand">Namo<tspan class="brandGold">Lux</tspan></text>
+    </g>
+    <text x="72" y="1008" class="tiny">namolux.com/generate</text>
+    <text x="1008" y="1008" text-anchor="end" class="tiny">Founder Signal&#8482;</text>
+    <text x="72" y="190" class="eyebrow">FOR FOUNDERS</text>
+    <text x="72" y="292" class="h1">Not just vibes.</text>
+    <text x="72" y="352" class="body">NamoLux turns naming into a sharper decision.</text>
+    <g transform="translate(96 454)">
+      <rect width="888" height="92" rx="22" fill="#0B0B0B" stroke="#2A2A2A"/>
+      <text x="34" y="58" class="body">1. Paste your shortlist</text>
+      <rect y="124" width="888" height="92" rx="22" fill="#0B0B0B" stroke="#2A2A2A"/>
+      <text x="34" y="182" class="body">2. Compare signals and TLDs</text>
+      <rect y="248" width="888" height="92" rx="22" fill="#0B0B0B" stroke="#C9952D"/>
+      <text x="34" y="306" class="bodyStrong">3. Pick the name worth building on</text>
+    </g>
+    <path d="M874 804l24 48 53 8-38 37 9 53-48-25-48 25 9-53-38-37 53-8 24-48z" fill="url(#gold)" opacity="0.95"/>
+  
+  </svg>

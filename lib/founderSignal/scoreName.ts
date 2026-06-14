@@ -1,4 +1,5 @@
 import { getRealnessScore } from "../domainGen/realness"
+import { hasRandomSyllablePattern, hasUnsafeBrandMeaning } from "../domainGen/filters"
 import { computeBrandInstinct } from "./brandInstinct"
 
 export type FounderLabel = "Pronounceable" | "Brandable"
@@ -82,6 +83,8 @@ const REAL_WORD_SUBSTRATES = new Set([
   "root", "stem", "core", "seed", "bolt", "hinge", "pivot", "wedge",
   "clad", "sift", "mend", "tend", "fold", "cast", "mint", "bond",
   "knot", "link", "mesh", "weave", "loop", "arc", "span", "rift",
+  "ledger", "cash", "vault", "pilot", "signal", "opal", "glow",
+  "invoice", "receipt", "books", "balance",
 ])
 
 // Awkward consonant clusters that hurt pronounceability
@@ -140,6 +143,19 @@ function hasSemanticSignal(name: string): boolean {
   }
 
   return false
+}
+
+function countSemanticRoots(name: string): number {
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "")
+  if (!clean) return 0
+
+  let count = 0
+  for (const root of REAL_WORD_SUBSTRATES) {
+    if (root.length >= 4 && clean.includes(root)) {
+      count += 1
+    }
+  }
+  return count
 }
 
 /**
@@ -217,6 +233,20 @@ function passesBrandPresence(name: string): boolean {
   if (syllables >= 3 && clean.length >= 7 && !hasSemanticSignal(clean)) return false
 
   return true
+}
+
+function hasChildishOrRandomTone(name: string): boolean {
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "")
+  if (!clean) return false
+
+  if (hasUnsafeBrandMeaning(clean) || hasRandomSyllablePattern(clean)) return true
+  if (/(poo|pee|babe|baby|bee|pop|jaj|zoz|zizi|kiki|gigi|bobo|poi)/.test(clean)) return true
+  if (/(?:ie|ee|oo)$/.test(clean) && clean.length >= 6) return true
+  if (/ctiv|cec|aea|eace|uict/.test(clean)) return true
+
+  const syllables = (clean.match(/[aeiouy]+/g) || []).length
+  const exoticCount = (clean.match(/[jzq]/g) || []).length
+  return syllables >= 3 && exoticCount >= 2 && !hasSemanticSignal(clean)
 }
 
 /** Return a zero-score result for hard-rejected names */
@@ -590,6 +620,16 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   const reasons: string[] = []
 
+  if (hasUnsafeBrandMeaning(name)) {
+    reasons.push("Unsafe or accidental meaning")
+    return zeroScoreResult(reasons, tld)
+  }
+
+  if (hasRandomSyllablePattern(name)) {
+    reasons.push("Random syllable pattern")
+    return zeroScoreResult(reasons, tld)
+  }
+
   // ── Keyword mutation hard block ──
   // If keywords were provided, any name containing a keyword root scores 0.
   // This is the last line of defence — names should already be rejected by
@@ -655,6 +695,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   let combinedScore = baseScore + vibeModifier + instinct.adjustment
 
+  if (countSemanticRoots(name) >= 2) {
+    combinedScore += 8
+  }
+
   // ── Startup cliché suffix penalty ──
   // Overused endings struggle to exceed 90 unless the name is exceptional.
   const CLICHE_SUFFIX = /(?:ly|ify|sy|oo|ium|ora|era|ova|yx|fy|zy)$/
@@ -667,6 +711,7 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const semantic = hasSemanticSignal(name)
   const phoneticStrength = getPhoneticStrength(name)
   const brandPresence = passesBrandPresence(name)
+  const randomTone = hasChildishOrRandomTone(name)
 
   // Hard cap rules (strict tier hierarchy):
   //   - Fails brand presence → cap at 75 (can't say it naturally)
@@ -680,6 +725,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   if (!brandPresence) {
     cap = Math.min(cap, 75)
+  }
+
+  if (randomTone) {
+    cap = Math.min(cap, 52)
   }
 
   if (!semantic && phoneticStrength < 50) {
@@ -708,7 +757,8 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   // Track capping reason for UI
   if (cap < 100) {
-    if (!brandPresence) instinct.reasons.push("Lacks brand presence")
+    if (randomTone) instinct.reasons.push("Random or childish tone")
+    else if (!brandPresence) instinct.reasons.push("Lacks brand presence")
     else if (!semantic && phoneticStrength < 50) instinct.reasons.push("Weak semantic + phonetic")
     else if (!semantic) instinct.reasons.push("Generic — no semantic anchor")
     else if (!hasEliteSignal) instinct.reasons.push("No elite signal")
@@ -730,6 +780,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   if (vibeModifier > 0) reasons.push(`Vibe match (+${vibeModifier})`)
   else if (vibeModifier < 0) reasons.push(`Vibe mismatch (${vibeModifier})`)
+
+  if (randomTone) {
+    reasons.push("Random or childish tone")
+  }
 
   // Include the most impactful brand instinct reason
   if (instinct.reasons.length > 0 && instinct.adjustment !== 0) {

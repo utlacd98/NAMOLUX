@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, "")
+const isProduction = process.env.NODE_ENV === "production"
+const localDistDir = process.env.NEXT_DIST_DIR?.trim()
 
 const nextConfig = {
   ...(cdnUrl ? { assetPrefix: cdnUrl } : {}),
+  ...(localDistDir ? { distDir: localDistDir } : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -154,7 +157,7 @@ const nextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: isProduction ? "public, max-age=31536000, immutable" : "no-store, must-revalidate",
           },
         ],
       },
@@ -163,7 +166,7 @@ const nextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=604800, stale-while-revalidate=86400",
+            value: isProduction ? "public, max-age=604800, stale-while-revalidate=86400" : "no-store, must-revalidate",
           },
         ],
       },

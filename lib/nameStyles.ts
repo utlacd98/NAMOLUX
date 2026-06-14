@@ -34,7 +34,10 @@ interface GeneratorContext {
 
 const SCAM_PATTERN = /(free|cheap|crypto1000|earn\d{3,}|guaranteedprofit|doublemoney)/i
 const BAD_CLUSTER_PATTERN = /(xq|qz|ptk|qk|zxq|jj|vvv)/i
+const AWKWARD_CLUSTER_PATTERN = /(q[bcdfghjklmnpqrstvwxyz]|[bcdfghjklmnpqrstvwxyz]q|x[bcdfghjklmnpqrstvwxyz]{2,}|[bcdfghjklmnpqrstvwxyz]{2,}x|ptk|pdk|bdg|gdt|tdk|kpt|zv|vz|jq|qj|xj|jx)/i
 const REPEATED_PATTERN = /(.)\1\1/i
+const CONFUSING_LETTER_PATTERN = /(rnm|mrn|vv|lll|iii)/i
+const BROKEN_SPELLING_PATTERN = /(?:kreat|qik|kwik|xpress|ez[a-z]|[a-z]z$|4|2|u4|gr8)/i
 const HARSH_ENDINGS = ["dl", "vt", "cf", "zx", "rk", "cl"]
 const PREFERRED_ENDINGS = ["a", "o", "io", "ly", "fy", "e"]
 const FINTECH_METAPHOR_BOOST = ["anchor", "haven", "nest", "shield", "vault", "ledger", "beacon"]
@@ -68,6 +71,32 @@ const GENERIC_SCAMMY_TOKENS = [
   "verse",
   "world",
   "global",
+]
+
+const LOW_FIT_TONE_TERMS = [
+  "grim",
+  "doom",
+  "gloom",
+  "void",
+  "dark",
+  "rage",
+  "venom",
+  "blade",
+  "kill",
+  "war",
+  "sick",
+  "pain",
+  "dose",
+  "pill",
+  "drug",
+  "rx",
+  "bot",
+  "robo",
+  "random",
+  "kidd",
+  "baby",
+  "bunny",
+  "giggle",
 ]
 
 const INDUSTRY_SYNONYMS: Record<string, string[]> = {
@@ -304,16 +333,23 @@ function isEasyToSay(name: string): boolean {
   if (ratio < 0.24 || ratio > 0.68) return false
   if (syllables < 2 || syllables > 4) return false
   if (hasConsonantRun(name, 3)) return false
-  if (BAD_CLUSTER_PATTERN.test(name)) return false
+  if (BAD_CLUSTER_PATTERN.test(name) || AWKWARD_CLUSTER_PATTERN.test(name)) return false
   return true
+}
+
+function hasLowEmotionalFit(name: string): boolean {
+  return LOW_FIT_TONE_TERMS.some((term) => name.includes(term))
 }
 
 function shouldRejectBySafety(name: string, maxLength: number, isFintech: boolean): boolean {
   if (name.length < 4 || name.length > maxLength) return true
   if (/[-_\d]/.test(name)) return true
   if (SCAM_PATTERN.test(name)) return true
-  if (BAD_CLUSTER_PATTERN.test(name)) return true
+  if (BAD_CLUSTER_PATTERN.test(name) || AWKWARD_CLUSTER_PATTERN.test(name)) return true
   if (REPEATED_PATTERN.test(name)) return true
+  if (CONFUSING_LETTER_PATTERN.test(name)) return true
+  if (BROKEN_SPELLING_PATTERN.test(name)) return true
+  if (hasLowEmotionalFit(name)) return true
   if (hasConsonantRun(name, 3)) return true
   if (hasHarshEnding(name)) return true
   if (looksChoppedWord(name)) return true
@@ -389,6 +425,9 @@ function brandabilityScore(candidate: StyledNameCandidate, context: GeneratorCon
   if (hasHarshEnding(name)) score -= 30
   if (looksChoppedWord(name)) score -= 22
   if (/(.)\1\1/.test(name)) score -= 15
+  if (AWKWARD_CLUSTER_PATTERN.test(name)) score -= 24
+  if (CONFUSING_LETTER_PATTERN.test(name) || BROKEN_SPELLING_PATTERN.test(name)) score -= 18
+  if (hasLowEmotionalFit(name)) score -= 28
 
   if (candidate.style === "Invented") score += 12
   if (candidate.style === "Metaphor") score += 11

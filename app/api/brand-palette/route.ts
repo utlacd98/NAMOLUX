@@ -40,7 +40,11 @@ export interface BrandPaletteResult {
 }
 
 function getClient() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const apiKey = process.env.OPENAI_API_KEY?.trim()
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not set")
+  }
+  return new OpenAI({ apiKey })
 }
 
 const SYSTEM_PROMPT = `You are a brand identity system inside NamoLux. You generate high-quality colour palettes that feel intentional, diverse, and non-generic — the way a real designer would pick a direction for a specific brand.
@@ -135,6 +139,239 @@ Shape:
   ]
 }`
 
+const HEX_RE = /^#[0-9A-F]{6}$/
+
+function hashString(value: string): number {
+  let hash = 2166136261
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i)
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)
+  }
+  return hash >>> 0
+}
+
+function cleanHex(value: unknown, fallback: string): string {
+  const raw = String(value || "").trim().toUpperCase()
+  return HEX_RE.test(raw) ? raw : fallback
+}
+
+function cleanText(value: unknown, fallback: string): string {
+  const text = String(value || "").replace(/\s+/g, " ").trim()
+  return text || fallback
+}
+
+function colour(hex: string, name: string, usage: string): PaletteColour {
+  return { hex, name, usage }
+}
+
+function toLegacyPalette(variant: PaletteVariant): BrandPaletteResult["palette"] {
+  return {
+    primary: variant.palette.primary,
+    secondary: variant.palette.surface,
+    accent: variant.palette.accent,
+    background: variant.palette.background,
+    text: variant.palette.text,
+  }
+}
+
+function normaliseVariant(raw: any, index: number, fallback: PaletteVariant): PaletteVariant {
+  const sourcePalette = raw?.palette || {}
+  return {
+    name: cleanText(raw?.name, fallback.name),
+    feel: cleanText(raw?.feel, fallback.feel),
+    role: raw?.role === "dark" || raw?.role === "expressive" || raw?.role === "core" ? raw.role : fallback.role,
+    subStyle: cleanText(raw?.subStyle, fallback.subStyle),
+    palette: {
+      background: {
+        hex: cleanHex(sourcePalette.background?.hex, fallback.palette.background.hex),
+        name: cleanText(sourcePalette.background?.name, fallback.palette.background.name),
+        usage: cleanText(sourcePalette.background?.usage, fallback.palette.background.usage),
+      },
+      primary: {
+        hex: cleanHex(sourcePalette.primary?.hex, fallback.palette.primary.hex),
+        name: cleanText(sourcePalette.primary?.name, fallback.palette.primary.name),
+        usage: cleanText(sourcePalette.primary?.usage, fallback.palette.primary.usage),
+      },
+      accent: {
+        hex: cleanHex(sourcePalette.accent?.hex, fallback.palette.accent.hex),
+        name: cleanText(sourcePalette.accent?.name, fallback.palette.accent.name),
+        usage: cleanText(sourcePalette.accent?.usage, fallback.palette.accent.usage),
+      },
+      surface: {
+        hex: cleanHex(sourcePalette.surface?.hex, fallback.palette.surface.hex),
+        name: cleanText(sourcePalette.surface?.name, fallback.palette.surface.name),
+        usage: cleanText(sourcePalette.surface?.usage, fallback.palette.surface.usage),
+      },
+      text: {
+        hex: cleanHex(sourcePalette.text?.hex, fallback.palette.text.hex),
+        name: cleanText(sourcePalette.text?.name, fallback.palette.text.name),
+        usage: cleanText(sourcePalette.text?.usage, fallback.palette.text.usage),
+      },
+    },
+    usageInsight: cleanText(raw?.usageInsight, fallback.usageInsight),
+  }
+}
+
+function fallbackVariants(brandName: string, brandType: string, vibe?: string): PaletteVariant[] {
+  const key = `${brandName}:${brandType}:${vibe || ""}`.toLowerCase()
+  const offset = hashString(key) % 3
+  const type = brandType.toLowerCase()
+
+  const sets: Record<string, PaletteVariant[]> = {
+    saas: [
+      {
+        name: "Signal Grove",
+        feel: "Calm, precise",
+        role: "core",
+        subStyle: "Corporate Clean",
+        palette: {
+          background: colour("#F7F7F2", "Soft Chalk", "Main page backdrop"),
+          primary: colour("#2F5D50", "Deep Teal", "Primary actions and logo marks"),
+          accent: colour("#C89B3C", "Measured Gold", "Highlights and success moments"),
+          surface: colour("#E6E2D8", "Warm Stone", "Cards and secondary panels"),
+          text: colour("#17201D", "Ink Green", "Body copy and navigation"),
+        },
+        usageInsight: "Best for a credible product that needs to feel polished without looking generic.",
+      },
+      {
+        name: "Graphite Console",
+        feel: "Focused, premium",
+        role: "dark",
+        subStyle: "Corporate Clean",
+        palette: {
+          background: colour("#101512", "Graphite Green", "Dark app background"),
+          primary: colour("#D5B46A", "Quiet Gold", "Buttons and active states"),
+          accent: colour("#6FAE9A", "System Mint", "Charts and secondary emphasis"),
+          surface: colour("#1B231F", "Panel Green", "Cards and tool surfaces"),
+          text: colour("#F3F1EA", "Soft White", "Body copy on dark surfaces"),
+        },
+        usageInsight: "Use this when the brand should feel more enterprise and command-centre ready.",
+      },
+      {
+        name: "Copper Grid",
+        feel: "Distinct, sharp",
+        role: "expressive",
+        subStyle: "Corporate Clean",
+        palette: {
+          background: colour("#FBFAF5", "Porcelain", "Marketing and documentation background"),
+          primary: colour("#7A4E2D", "Burnished Copper", "Primary brand mark"),
+          accent: colour("#1E7C68", "Deep Aqua", "Interactive highlights"),
+          surface: colour("#EDE4D3", "Linen Panel", "Cards and form fields"),
+          text: colour("#211A14", "Umber Ink", "Primary text"),
+        },
+        usageInsight: "A stronger direction for launch pages that need a memorable accent system.",
+      },
+    ],
+    luxury: [
+      {
+        name: "Editorial Ivory",
+        feel: "Quiet, refined",
+        role: "core",
+        subStyle: "Editorial Luxury",
+        palette: {
+          background: colour("#F6F1E8", "Editorial Ivory", "Main canvas"),
+          primary: colour("#6B5135", "Aged Bronze", "Logo marks and key actions"),
+          accent: colour("#B88645", "Polished Brass", "Highlights"),
+          surface: colour("#E8DDCC", "Warm Parchment", "Cards and product panels"),
+          text: colour("#1D1712", "Espresso Ink", "Editorial text"),
+        },
+        usageInsight: "Best for premium brands that need restraint and warmth.",
+      },
+      {
+        name: "Black Label",
+        feel: "Dark, assured",
+        role: "dark",
+        subStyle: "Editorial Luxury",
+        palette: {
+          background: colour("#11100E", "Black Label", "Dark hero and high-end sections"),
+          primary: colour("#D1AF6A", "Champagne Gold", "Primary CTA and monogram"),
+          accent: colour("#8C5E3C", "Cognac", "Secondary emphasis"),
+          surface: colour("#1F1B16", "Walnut Panel", "Cards and navigation"),
+          text: colour("#F7F1E7", "Silk White", "Body copy"),
+        },
+        usageInsight: "Use for a prestige direction with strong photography or minimal product imagery.",
+      },
+      {
+        name: "Sage Atelier",
+        feel: "Natural, elevated",
+        role: "expressive",
+        subStyle: "Editorial Luxury",
+        palette: {
+          background: colour("#F2EFE6", "Atelier Linen", "Page backdrop"),
+          primary: colour("#385144", "Deep Sage", "Primary identity colour"),
+          accent: colour("#C09254", "Soft Gilt", "Highlights and details"),
+          surface: colour("#DDD3C0", "Stone Silk", "Cards and image frames"),
+          text: colour("#18211C", "Botanical Ink", "Body text"),
+        },
+        usageInsight: "A useful premium route for wellness, beauty, and craft brands.",
+      },
+    ],
+    consumer: [
+      {
+        name: "Fresh Market",
+        feel: "Friendly, clear",
+        role: "core",
+        subStyle: "Friendly Bright",
+        palette: {
+          background: colour("#FFFDF7", "Milk Glass", "Main background"),
+          primary: colour("#256D5A", "Fresh Green", "Primary buttons"),
+          accent: colour("#F2B84B", "Sunny Marigold", "Highlights and badges"),
+          surface: colour("#EAF2E7", "Soft Mint", "Cards and input surfaces"),
+          text: colour("#17221E", "Garden Ink", "Text and navigation"),
+        },
+        usageInsight: "Works for approachable apps that still need a trustworthy base.",
+      },
+      {
+        name: "Night Pop",
+        feel: "Bold, social",
+        role: "dark",
+        subStyle: "Friendly Bright",
+        palette: {
+          background: colour("#161514", "Charcoal Cocoa", "Dark app shell"),
+          primary: colour("#FFB84D", "Mango Button", "Primary actions"),
+          accent: colour("#55C7A4", "Fresh Mint", "Secondary actions"),
+          surface: colour("#24211E", "Cocoa Surface", "Cards and drawers"),
+          text: colour("#FFF7E8", "Cream White", "Body copy"),
+        },
+        usageInsight: "Useful for a playful mobile product without falling into neon purple.",
+      },
+      {
+        name: "Coral Field",
+        feel: "Warm, lively",
+        role: "expressive",
+        subStyle: "Friendly Bright",
+        palette: {
+          background: colour("#FFF7EF", "Warm Paper", "Main canvas"),
+          primary: colour("#D85B3F", "Soft Coral", "Buttons and logo fill"),
+          accent: colour("#287C72", "Harbour Teal", "Highlights and links"),
+          surface: colour("#F4DFCA", "Peach Stone", "Cards and panels"),
+          text: colour("#2A1B16", "Brown Ink", "Primary text"),
+        },
+        usageInsight: "A memorable choice for consumer brands that need warmth and energy.",
+      },
+    ],
+  }
+
+  const selected =
+    type.includes("luxury") ? sets.luxury :
+    type.includes("consumer") || type.includes("creative") || type.includes("wellness") ? sets.consumer :
+    sets.saas
+
+  return [...selected.slice(offset), ...selected.slice(0, offset)].map((variant, index) => ({
+    ...variant,
+    role: index === 0 ? "core" : index === 1 ? "dark" : "expressive",
+  }))
+}
+
+function buildResponse(variants: PaletteVariant[]): BrandPaletteResult {
+  const first = variants[0]
+  return {
+    variants,
+    palette: toLegacyPalette(first),
+    rationale: first.usageInsight,
+  }
+}
+
 export async function POST(req: NextRequest) {
   const rateLimit = await checkRateLimit(req, "palette")
   if (!rateLimit.allowed) {
@@ -166,6 +403,7 @@ export async function POST(req: NextRequest) {
   // If the caller gave us an explicit brand type, use it. Otherwise infer from
   // the vibe the UI passes. This keeps the existing vibe selector working.
   const inferredType = brandType?.trim() || inferBrandTypeFromVibe(vibe)
+  const fallback = fallbackVariants(brandName.trim(), inferredType, vibe)
 
   const userPrompt = `Generate three palette variants for:
 
@@ -193,29 +431,10 @@ Work through the 4 steps silently. Pick ONE sub-style from the brand-type list. 
     }
 
     const parsed = JSON.parse(content) as { variants?: PaletteVariant[] }
-    const variants = Array.isArray(parsed.variants) ? parsed.variants.slice(0, 3) : []
-    if (variants.length === 0) {
-      return NextResponse.json({ error: "No palette variants returned" }, { status: 500 })
-    }
-
-    // Back-compat shape: expose first variant's palette at the top level,
-    // with `surface` aliased to `secondary` for existing consumers.
-    const first = variants[0]
-    const legacy = first?.palette
-      ? {
-          primary: first.palette.primary,
-          secondary: first.palette.surface,
-          accent: first.palette.accent,
-          background: first.palette.background,
-          text: first.palette.text,
-        }
-      : undefined
-
-    const response: BrandPaletteResult = {
-      variants,
-      palette: legacy as BrandPaletteResult["palette"],
-      rationale: first?.usageInsight ?? "",
-    }
+    const variants = Array.from({ length: 3 }, (_, index) =>
+      normaliseVariant(Array.isArray(parsed.variants) ? parsed.variants[index] : null, index, fallback[index]),
+    )
+    const response = buildResponse(variants)
 
     if (!rateLimit.isPro) {
       logGeneration(req, rateLimit.userId, "palette", brandName.trim()).catch(() => {})
@@ -224,10 +443,7 @@ Work through the 4 steps silently. Pick ONE sub-style from the brand-type list. 
     return NextResponse.json(response)
   } catch (err) {
     console.error("Brand palette generation error:", err)
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Generation failed" },
-      { status: 500 }
-    )
+    return NextResponse.json(buildResponse(fallback))
   }
 }
 

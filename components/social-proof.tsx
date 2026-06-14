@@ -1,70 +1,136 @@
-import { cn } from "@/lib/utils"
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { useInView, useReducedMotion } from "framer-motion"
+import { Reveal } from "@/components/landing/reveal"
 
 const stats = [
-  { value: "10,000+", label: "Names scored" },
-  { value: "6 TLDs", label: "Verified per name" },
-  { value: "<60s", label: "Full shortlist analysis" },
+  { target: 10000, suffix: "+", display: "10,000+", label: "Names scored" },
+  { target: 6, suffix: " TLDs", display: "6 TLDs", label: "Verified per name" },
+  { target: 60, prefix: "<", suffix: "s", display: "<60s", label: "Full shortlist analysis" },
 ]
 
-const fictionalLogos = [
-  "Northstar Studio",
-  "Velvet Works",
-  "Nova & Co",
-  "Aurum Labs",
-  "Kairo Systems",
-  "Ember Creative",
-  "Apex Ventures",
-  "Lunar Digital",
+const userSegments = [
+  "Venture studios",
+  "Indie founders",
+  "Naming consultants",
+  "Product teams",
+  "Agency strategists",
+  "Solo builders",
+  "SEO operators",
+  "Portfolio teams",
 ]
+
+function CountUpStat({
+  target,
+  prefix = "",
+  suffix = "",
+  display,
+  started,
+  delay,
+}: {
+  target: number
+  prefix?: string
+  suffix?: string
+  display: string
+  started: boolean
+  delay: number
+}) {
+  // null = not animating → show the real display string. The SSR HTML (and
+  // any crawler) always contains the final value, never a zero.
+  const [value, setValue] = useState<number | null>(null)
+  const reducedMotion = useReducedMotion()
+
+  useEffect(() => {
+    if (!started || reducedMotion) return
+    let frame = 0
+    const timer = setTimeout(() => {
+      const startedAt = performance.now()
+      const duration = 1400
+      const tick = (now: number) => {
+        const progress = Math.min(1, (now - startedAt) / duration)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        setValue(progress < 1 ? Math.round(eased * target) : null)
+        if (progress < 1) frame = requestAnimationFrame(tick)
+      }
+      frame = requestAnimationFrame(tick)
+    }, delay * 1000)
+    return () => {
+      clearTimeout(timer)
+      cancelAnimationFrame(frame)
+    }
+  }, [started, target, delay, reducedMotion])
+
+  if (value === null) return <>{display}</>
+  return (
+    <>
+      {prefix}
+      {value.toLocaleString()}
+      {suffix}
+    </>
+  )
+}
 
 export function SocialProof() {
-  return (
-    <section className="overflow-clip border-y border-border/30 bg-muted/20 py-12 sm:py-20" aria-label="Social proof">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div
-          className={cn("text-center animate-fade-up")}
-          style={{ animationFillMode: "forwards" }}
-        >
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/70">Used by founders to pick names with confidence</p>
+  const sectionRef = useRef<HTMLElement>(null)
+  const inView = useInView(sectionRef, { once: true, margin: "-20% 0px" })
 
-          <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-y-4 sm:flex-nowrap">
-            {stats.map((stat, index) => (
-              <div key={stat.label} className="flex items-center">
-                <div
-                  className={cn("px-4 py-2 text-center animate-fade-up sm:px-6 md:px-8 lg:px-12")}
-                  style={{
-                    animationDelay: `${0.1 + index * 0.1}s`,
-                    animationFillMode: "forwards",
-                  }}
-                >
-                  <div className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl lg:text-5xl">
-                    {stat.value}
-                  </div>
-                  <div className="mt-1 text-xs font-medium text-muted-foreground sm:mt-2 sm:text-sm">{stat.label}</div>
+  return (
+    <section
+      ref={sectionRef}
+      className="relative overflow-clip border-y border-primary/10 py-14 sm:py-20"
+      aria-label="Social proof"
+      style={{ background: "linear-gradient(180deg, rgba(212,175,55,0.025) 0%, rgba(0,0,0,0) 60%)" }}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Reveal className="text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground/70">
+            Used by founders to pick names with confidence
+          </p>
+        </Reveal>
+
+        <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-y-4 sm:flex-nowrap">
+          {stats.map((stat, index) => (
+            <div key={stat.label} className="flex items-center">
+              <Reveal delay={0.1 + index * 0.12} className="px-4 py-2 text-center sm:px-6 md:px-8 lg:px-12">
+                <div className="font-display text-3xl font-semibold tracking-tight text-foreground tabular-nums sm:text-4xl lg:text-5xl">
+                  <CountUpStat
+                    target={stat.target}
+                    prefix={stat.prefix}
+                    suffix={stat.suffix}
+                    display={stat.display}
+                    started={inView}
+                    delay={0.2 + index * 0.15}
+                  />
                 </div>
-                {/* Divider line */}
-                {index < stats.length - 1 && <div className="hidden h-10 w-px bg-border/50 sm:block sm:h-12" aria-hidden="true" />}
-              </div>
-            ))}
-          </div>
+                <div className="mt-2 text-xs font-medium text-muted-foreground sm:text-sm">{stat.label}</div>
+              </Reveal>
+              {index < stats.length - 1 && (
+                <div
+                  className="hidden h-12 w-px sm:block"
+                  style={{ background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.25), transparent)" }}
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+          ))}
         </div>
 
-        <div className="mt-16 overflow-clip">
+        <div className="mt-14 overflow-clip sm:mt-16">
           <p className="mb-6 text-center text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground/60">
-            Trusted by teams at
+            Built for high-stakes naming decisions
           </p>
-          <div className="relative w-full overflow-clip">
+          <div className="relative w-full overflow-clip [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
             <div className="animate-marquee flex w-max gap-8 sm:gap-16">
-              {[...fictionalLogos, ...fictionalLogos].map((logo, index) => (
+              {[...userSegments, ...userSegments].map((segment, index) => (
                 <div
-                  key={`${logo}-${index}`}
-                  className="flex shrink-0 items-center gap-2 text-sm font-medium tracking-wide text-muted-foreground/40 transition-colors hover:text-muted-foreground/60 sm:text-base"
+                  key={`${segment}-${index}`}
+                  className="flex shrink-0 items-center gap-2 font-display text-sm font-medium tracking-wide text-muted-foreground/40 transition-colors hover:text-primary/60 sm:text-base"
                 >
-                  {/* Simple geometric icon placeholder */}
-                  <div className="flex h-5 w-5 items-center justify-center rounded-md bg-muted/50 sm:h-6 sm:w-6">
-                    <div className="h-2.5 w-2.5 rounded-sm bg-muted-foreground/30 sm:h-3 sm:w-3" />
+                  <div className="flex h-5 w-5 items-center justify-center rounded-md border border-primary/10 bg-muted/50 sm:h-6 sm:w-6">
+                    <div className="h-2.5 w-2.5 rounded-sm bg-primary/25 sm:h-3 sm:w-3" />
                   </div>
-                  {logo}
+                  {segment}
                 </div>
               ))}
             </div>

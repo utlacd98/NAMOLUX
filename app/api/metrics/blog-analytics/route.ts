@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { getEvents } from "@/lib/metrics"
 import { getAllPosts } from "@/lib/blog"
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 // Common SEO keywords by category for suggestions
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
@@ -23,6 +24,9 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 
 export async function GET(request: NextRequest) {
   try {
+    const unauthorized = requireAdminRequest(request)
+    if (unauthorized) return unauthorized
+
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get("days") || "7")
     
@@ -30,24 +34,23 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - days + 1)
     startDate.setHours(0, 0, 0, 0)
 
-    // Get all blog view metrics
-    const blogViews = await db.metrics.findMany({
-      where: {
-        action: "blog_view",
-        createdAt: { gte: startDate }
-      },
-      select: {
-        metadata: true,
-        sessionId: true,
-        createdAt: true
-      }
+    const { events } = await getEvents({
+      days,
+      page: 1,
+      limit: 50000,
+      action: "blog_view",
     })
+    const blogViews = events as Array<{
+      sessionId?: string | null
+      metadata?: { slug?: string; title?: string; category?: string } | null
+      createdAt: Date
+    }>
 
     // Calculate total views
     const totalViews = blogViews.length
 
     // Calculate unique viewers (by sessionId)
-    const uniqueSessions = new Set(blogViews.map(v => v.sessionId).filter(Boolean))
+    const uniqueSessions = new Set(blogViews.map((v) => v.sessionId).filter(Boolean))
     const uniqueViewers = uniqueSessions.size
 
     // Get views per article
@@ -143,4 +146,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message || "Failed to get blog analytics" }, { status: 500 })
   }
 }
-

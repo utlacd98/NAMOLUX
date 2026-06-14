@@ -131,7 +131,7 @@ export class MarketingAgentEngine {
   private brandConfig: BrandConfig
 
   constructor(apiKey?: string, brandConfig?: BrandConfig) {
-    const key = apiKey || process.env.OPENAI_API_KEY
+    const key = (apiKey || process.env.OPENAI_API_KEY)?.trim()
     if (!key) {
       throw new Error("OpenAI API key is required")
     }
@@ -313,4 +313,3 @@ export function getMarketingAgentEngine(): MarketingAgentEngine {
   }
   return engineInstance
 }
-

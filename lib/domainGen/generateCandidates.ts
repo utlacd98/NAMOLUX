@@ -86,10 +86,6 @@ function pickWeighted<T>(items: Array<{ value: T; weight: number }>, rng: () => 
   return items[items.length - 1].value
 }
 
-function isConsonant(char: string): boolean {
-  return /^[bcdfghjklmnpqrstvwxyz]$/i.test(char)
-}
-
 function mergeReadableParts(first: string, second: string): string {
   if (!first) return second
   if (!second) return first
@@ -102,12 +98,6 @@ function mergeReadableParts(first: string, second: string): string {
   const dedupedRight = leftTail === rightHead ? right.slice(1) : right
 
   if (!dedupedRight) return left
-
-  const tail = left[left.length - 1]
-  const head = dedupedRight[0]
-  if (isConsonant(tail) && isConsonant(head)) {
-    return `${left}a${dedupedRight}`
-  }
 
   return `${left}${dedupedRight}`
 }
@@ -378,9 +368,12 @@ export function generateCandidatePool(
     // Taste gate — reject names that feel generic, awkward, or not brand-worthy
     if (!passesTasteGate(name)) return
 
-    // Keyword mutation gate — reject names derived from input keywords
-    if (containsKeywordRoot(name, keywordTokens)) return
-    if (isKeywordAnchored(name, keywordTokens)) return
+    // Keyword mutation gate — reject names derived from input keywords unless
+    // the caller explicitly requested keyword inclusion.
+    if (effectiveKeywordMode === "none") {
+      if (containsKeywordRoot(name, keywordTokens)) return
+      if (isKeywordAnchored(name, keywordTokens)) return
+    }
 
     // Suffix diversity gate
     if (name.length >= 4) {
@@ -464,6 +457,13 @@ export function generateCandidatePool(
       strategy = pickWeighted(strategyWeights as Array<{ value: string; weight: number }>, rng)
     }
 
+    if (
+      effectiveStyle === "real_words" &&
+      ["wordplay_blend", "portmanteau", "soft_connector_blend", "real_word_twist", "vowel_swap", "letter_omission"].includes(strategy)
+    ) {
+      strategy = pickOne(["two_word_compound", "semantic_compound", "vibe_compound", "metaphor_blend", "action_noun"], rng)
+    }
+
     let built = ""
     let roots: string[] = [rootA, rootB]
 
@@ -532,10 +532,10 @@ export function generateCandidatePool(
       built = mergeReadableParts(built, pickOne(TASTEFUL_SUFFIXES, rng))
     }
 
-    // Keyword injection disabled — the keyword mutation filter rejects any name
-    // containing the input keyword or its prefix, so injecting keywords into
-    // candidates wastes generation cycles. Names should be inspired by keywords
-    // (via industry lexicon, related terms, vibe) not built from them.
+    if (effectiveKeywordMode !== "none" && keywordRoot && rng() > 0.72) {
+      built = keywordInPosition(built, keywordRoot, effectivePosition, rng)
+      roots = [keywordRoot, ...roots]
+    }
 
     const compacted = compactToLength(normaliseCandidateName(built), targetLength)
     if (compacted.length >= 3) {
@@ -568,4 +568,3 @@ export function generateDomainCandidates(
 } {
   return generateCandidatePool(input, options)
 }
-

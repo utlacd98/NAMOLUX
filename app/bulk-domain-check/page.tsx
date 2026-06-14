@@ -7,7 +7,33 @@ import { ArrowRight, Building2, Hammer, TrendingUp, Lightbulb } from "lucide-rea
 
 export const metadata: Metadata = {
   title: "Bulk Domain Availability Check: Who It's For & How to Use It | NamoLux",
-  description: "Learn who benefits from bulk domain checking — agencies, builders, investors — and how to efficiently check multiple domain names at once.",
+  description:
+    "Check multiple domain names at once across key TLDs. Learn how agencies, founders, builders, and investors use NamoLux bulk domain checking.",
+  alternates: {
+    canonical: "/bulk-domain-check",
+  },
+  openGraph: {
+    title: "Bulk Domain Availability Check | NamoLux",
+    description:
+      "Check multiple domain names at once across key TLDs with Founder Signal scoring and shortlist-ready results.",
+    url: "https://www.namolux.com/bulk-domain-check",
+    type: "article",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "NamoLux bulk domain availability checker",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bulk Domain Availability Check | NamoLux",
+    description:
+      "Check multiple domain names at once across key TLDs with Founder Signal scoring.",
+    images: ["/opengraph-image"],
+  },
 }
 
 const useCases = [
@@ -53,16 +79,36 @@ const tips = [
 ]
 
 export default function BulkDomainCheckPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Bulk Domain Availability Check: Who It's For and How to Use It",
+    description:
+      "A practical guide to checking multiple domain names at once across key TLDs with NamoLux.",
+    url: "https://www.namolux.com/bulk-domain-check",
+    publisher: {
+      "@id": "https://www.namolux.com/#organization",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": "https://www.namolux.com/bulk-domain-check",
+    },
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1 px-4 pt-32 pb-20">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <article className="mx-auto max-w-2xl">
           <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Bulk Domain Availability Check
           </h1>
           <p className="mb-12 text-lg text-muted-foreground">
-            Checking domains one at a time is slow. Here's who uses bulk checking — and how to do it efficiently.
+            Checking domains one at a time is slow. Here's who uses bulk checking and how to do it efficiently.
           </p>
 
           <section className="mb-12">
@@ -91,7 +137,7 @@ export default function BulkDomainCheckPage() {
               Results show instantly. Green means available. You see the full picture in seconds, not minutes.
             </p>
             <p className="text-muted-foreground">
-              No account required. No rate limits. Just fast, accurate availability data.
+              No account required to start. Just fast, practical availability data for the names you are already considering.
             </p>
           </section>
 
@@ -129,4 +175,3 @@ export default function BulkDomainCheckPage() {
     </div>
   )
 }
-

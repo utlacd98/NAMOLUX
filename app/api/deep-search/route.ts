@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server"
 import OpenAI from "openai"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
+import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
+import { rankCandidates } from "@/lib/domainGen/scoreCandidates"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
 import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker"
@@ -38,11 +40,19 @@ function isPronounceable(name: string): boolean {
   return true
 }
 
+function keywordTokens(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[\s,]+/)
+    .map((token) => token.replace(/[^a-z0-9]/g, ""))
+    .filter((token) => token.length >= 2)
+}
+
 // ---------------------------------------------------------------------------
 // OpenAI call
 // ---------------------------------------------------------------------------
 function getClient() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY?.trim() })
 }
 
 async function generateBatch(
@@ -99,6 +109,50 @@ async function generateBatch(
       .filter((n) => n.length >= 3 && n.length <= maxLength && !alreadySeen.has(n))
       .filter(isPronounceable)
   )
+}
+
+function generateFallbackBatch(
+  keyword: string,
+  vibe: string,
+  industry: string,
+  maxLength: number,
+  alreadySeen: Set<string>,
+  batchIdx: number,
+): string[] {
+  const controls = {
+    seed: `deep-fallback-${keyword}:${vibe}:${industry}:${batchIdx}`,
+    mustIncludeKeyword: "none" as const,
+    keywordPosition: "anywhere" as const,
+    style: "brandable_blends" as const,
+    blocklist: [],
+    allowlist: [],
+    allowHyphen: false,
+    allowNumbers: false,
+    meaningFirst: true,
+    preferTwoWordBrands: maxLength >= 8,
+    allowVibeSuffix: false,
+    showAnyAvailable: false,
+  }
+  const pool = generateCandidatePool(
+    {
+      keyword,
+      industry,
+      vibe: vibe.toLowerCase(),
+      maxLength,
+      targetCount: BATCH_SIZE,
+      controls,
+    },
+    { poolSize: 700, seedSalt: `deep-${batchIdx}` },
+  )
+  return rankCandidates(pool.candidates, {
+    industry,
+    vibe: vibe.toLowerCase(),
+    keywordTokens: pool.keywordTokens,
+    controls,
+  })
+    .map((candidate) => candidate.name)
+    .filter((name) => !alreadySeen.has(name))
+    .slice(0, BATCH_SIZE)
 }
 
 // ---------------------------------------------------------------------------
@@ -168,14 +222,9 @@ export async function GET(request: NextRequest) {
               seen, takenNames, strategy,
               abortController.signal,
             )
-          } catch (err: unknown) {
+          } catch {
             if (abortController.signal.aborted) break
-            send({
-              type: "error",
-              message: `AI generation failed: ${err instanceof Error ? err.message : String(err)}`,
-              partial: found.length > 0,
-            })
-            break
+            candidates = generateFallbackBatch(keyword, vibe, industry, maxLength, seen, batchIdx)
           }
 
           // Mark all as seen so future batches don't duplicate
@@ -183,7 +232,7 @@ export async function GET(request: NextRequest) {
 
           // Pre-score: skip availability check for low-quality names
           const qualityCandidates = candidates.filter((name) => {
-            const scored = scoreName({ name, tld: "com", vibe: (vibe as BrandVibe) || undefined, keywords: [keyword] })
+            const scored = scoreName({ name, tld: "com", vibe: (vibe as BrandVibe) || undefined, keywords: keywordTokens(keyword) })
             return scored.score >= PRE_SCORE_FLOOR
           })
 
@@ -215,7 +264,7 @@ export async function GET(request: NextRequest) {
               name,
               tld: "com",
               vibe: (vibe as BrandVibe) || undefined,
-              keywords: [keyword],
+              keywords: keywordTokens(keyword),
             })
 
             found.push(r.domain)

@@ -27,13 +27,17 @@ const DICTIONARY_WORDS = new Set([
   "cloud", "data", "net", "lab", "grid", "byte", "code", "sync", "flow",
   "hub", "shop", "mail", "chat", "hire", "meet", "work", "team", "pay",
   "cart", "stack", "wave", "dock", "post", "news", "book", "live",
+  "sync", "team", "time", "slot", "meet", "tempo", "shift", "rally",
+  "route", "fleet", "ship", "grid", "stock", "dock", "load", "order",
+  "solar", "watt", "terra", "green", "renew", "carbon", "climate",
   "food", "farm", "ride", "track", "note", "trip", "bank", "card",
+  "cash", "ledger", "vault", "invoice", "receipt", "books", "balance",
   // Brand-style substrates
   "loom", "plaid", "stripe", "slate", "grain", "true", "clear", "swift",
   "bold", "calm", "keen", "fair", "warm", "rise", "wind", "step", "hand",
-  "bright", "hearth", "echo", "mend", "cast", "mint", "bond", "fold",
+  "bright", "hearth", "echo", "mend", "cast", "mint", "bond", "fold", "opal",
   "notion", "canvas", "fabric", "spark", "shift", "solid", "tempo",
-  "relay", "signal", "vector", "thread", "cipher", "atlas", "anchor",
+  "relay", "signal", "vector", "thread", "cipher", "atlas", "anchor", "pilot",
 ])
 
 // Common morphemes (startup/brand building blocks) — 3-5 char fragments
@@ -44,6 +48,11 @@ const COMMON_MORPHEMES = [
   "cast", "flux", "path", "span", "mesh", "node", "port", "stack",
   "mint", "bond", "loft", "nest", "haven", "forge", "drift", "ember",
   "frame", "ridge", "crest", "slate", "bloom", "lumen", "craft",
+  "ledger", "cash", "vault", "pilot", "signal", "opal", "glow",
+  "sync", "team", "time", "slot", "meet", "tempo", "shift", "rally",
+  "route", "fleet", "ship", "grid", "stock", "dock", "load", "order",
+  "solar", "watt", "terra", "green", "renew", "carbon", "climate",
+  "invoice", "receipt", "books", "balance",
 ]
 
 // Common, natural consonant clusters in English brand names.

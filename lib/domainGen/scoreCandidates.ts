@@ -4,6 +4,32 @@ import type { AutoFindControls, Candidate, ScoredCandidate } from "@/lib/domainG
 
 const GENERIC_PENALTY_TERMS = ["lux", "pro", "hub", "labs", "group", "works", "co", "app", "get", "try"]
 const VISUAL_PENALTY_PATTERNS = [/(.)\1\1/, /[bcdfghjklmnpqrstvwxyz]{5,}/, /(xxx|kkk|qzx|xq)/, /(rnm|mrn)/]
+const NEGATIVE_TONE_TERMS = [
+  "grim",
+  "doom",
+  "gloom",
+  "void",
+  "dark",
+  "rage",
+  "venom",
+  "blade",
+  "kill",
+  "war",
+  "sick",
+  "pain",
+  "dose",
+  "pill",
+  "drug",
+  "rx",
+  "bot",
+  "robo",
+  "auto",
+  "random",
+  "kidd",
+  "baby",
+  "bunny",
+  "giggle",
+]
 
 function countMatches(name: string, terms: string[]): number {
   let count = 0
@@ -21,6 +47,16 @@ function countSyllables(name: string): number {
   const onlyLetters = name.replace(/[^a-z]/g, "")
   if (!onlyLetters) return 0
   return (onlyLetters.match(/[aeiouy]+/g) || []).length
+}
+
+function emotionalTonePenalty(name: string, vibe: string | undefined, industry: string | undefined): number {
+  const clean = name.toLowerCase()
+  const hits = NEGATIVE_TONE_TERMS.filter((term) => clean.includes(term)).length
+  if (hits === 0) return 0
+
+  const context = `${vibe || ""} ${industry || ""}`.toLowerCase()
+  const sensitiveContext = /(health|wellness|mental|trust|legal|finance|care|therapy)/.test(context)
+  return hits * (sensitiveContext ? -4.2 : -2.6)
 }
 
 function keywordPositionScore(name: string, keywordTokens: string[], position: AutoFindControls["keywordPosition"]): number {
@@ -148,6 +184,7 @@ export function brandabilityScore(
       ? Math.max(0, genericMatches - 1) * -1.1
       : genericMatches * -1.45
   const offTopicPenalty = offTopicMatches * -4.6
+  const tonePenalty = emotionalTonePenalty(name, options.vibe, options.industry)
 
   const positionScore = keywordPositionScore(name, options.keywordTokens, options.controls.keywordPosition)
 
@@ -180,6 +217,7 @@ export function brandabilityScore(
       relevanceScore +
       meaningBoost +
       offTopicPenalty +
+      tonePenalty +
       genericPenalty +
       visualPenalty +
       positionScore +
@@ -202,6 +240,7 @@ export function brandabilityScore(
       memorability: Number(memorabilityScore.toFixed(2)),
       relevance: Number(relevanceScore.toFixed(2)),
       penalties: Number((offTopicPenalty + genericPenalty + visualPenalty).toFixed(2)),
+      emotionalFit: Number(tonePenalty.toFixed(2)),
       keywordPosition: Number(positionScore.toFixed(2)),
       style: Number((styleScore + vibeLetterScore).toFixed(2)),
       meaning: meaning.meaningScore,

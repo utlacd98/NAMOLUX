@@ -70,7 +70,7 @@ export function Footer() {
             <Link
               href="/"
               aria-label="NamoLux"
-              className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-primary"
+              className="font-display text-xl font-semibold tracking-tight text-foreground transition-colors hover:text-primary"
             >
               Namo<span className="text-[#D4A843]">Lux</span>
             </Link>

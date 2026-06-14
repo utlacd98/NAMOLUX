@@ -5,6 +5,9 @@
 
 # next.js
 /.next/
+/.next-local/
+/.next-codex-build*/
+/.next-codex-dev*/
 /out/
 
 # production
@@ -15,6 +18,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+.codex-next*.log
+.devserver*.log
+.prodserver*.log
+.next-start*.log
+
+# local agent/tooling state
+/.claude/
+/.codex-remote-attachments/
 
 # env files
 .env*

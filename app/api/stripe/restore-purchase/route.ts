@@ -22,11 +22,12 @@ async function grantPro(userId: string, _customerId: string | null) {
   }
 }
 
-async function findPaidCustomerByEmail(email: string): Promise<string | null> {
+async function findPaidCustomerByEmail(email: string, userId: string): Promise<string | null> {
   const customers = await stripe.customers.list({ email, limit: 10 })
-  console.log(`Stripe customers for ${email}:`, customers.data.length)
 
   for (const customer of customers.data) {
+    if (customer.metadata?.supabase_user_id !== userId) continue
+
     const [piList, sessionList] = await Promise.all([
       stripe.paymentIntents.list({ customer: customer.id, limit: 20 }),
       stripe.checkout.sessions.list({ customer: customer.id, limit: 20 }),
@@ -34,8 +35,6 @@ async function findPaidCustomerByEmail(email: string): Promise<string | null> {
 
     const hasSucceededPI = piList.data.some((pi) => pi.status === "succeeded")
     const hasPaidSession = sessionList.data.some((s) => s.payment_status === "paid")
-
-    console.log(`  Customer ${customer.id}: PI succeeded=${hasSucceededPI}, paid sessions=${hasPaidSession}`)
 
     if (hasSucceededPI || hasPaidSession) return customer.id
   }
@@ -57,7 +56,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "You must be signed in to restore a purchase" }, { status: 401 })
     }
 
-    console.log(`Restore purchase: user=${user.id} (${user.email}), entered email=${email}`)
+    const enteredEmail = email.toLowerCase().trim()
+    const accountEmail = user.email?.toLowerCase().trim()
+
+    if (!accountEmail || enteredEmail !== accountEmail) {
+      return NextResponse.json(
+        { error: "Use the email address on your signed-in NamoLux account." },
+        { status: 403 }
+      )
+    }
 
     // 1. Search payment intents by supabase_user_id metadata (most reliable)
     try {
@@ -69,7 +76,6 @@ export async function POST(request: NextRequest) {
       if (piSearch.data.length > 0) {
         const customerId = piSearch.data[0].customer as string | null
         await grantPro(user.id, customerId)
-        console.log(`Pro granted via metadata search for user ${user.id}`)
         return NextResponse.json({ success: true })
       }
     } catch (e) {
@@ -78,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Search checkout sessions by supabase_user_id metadata
     try {
-      const csSearch = await stripe.checkout.sessions.search({
+      const csSearch = await (stripe.checkout.sessions as any).search({
         query: `metadata['supabase_user_id']:'${user.id}' AND payment_status:'paid'`,
         limit: 5,
       })
@@ -86,22 +92,13 @@ export async function POST(request: NextRequest) {
       if (csSearch.data.length > 0) {
         const customerId = csSearch.data[0].customer as string | null
         await grantPro(user.id, customerId)
-        console.log(`Pro granted via session metadata search for user ${user.id}`)
         return NextResponse.json({ success: true })
       }
     } catch (e) {
       console.log("Session metadata search not available, skipping:", e)
     }
 
-    // 3. Try entered email
-    const enteredEmail = email.toLowerCase().trim()
-    let foundCustomerId = await findPaidCustomerByEmail(enteredEmail)
-
-    // 4. Also try the user's own account email if different
-    if (!foundCustomerId && user.email && user.email.toLowerCase() !== enteredEmail) {
-      console.log(`Trying user's own login email: ${user.email}`)
-      foundCustomerId = await findPaidCustomerByEmail(user.email.toLowerCase())
-    }
+    const foundCustomerId = await findPaidCustomerByEmail(enteredEmail, user.id)
 
     if (!foundCustomerId) {
       return NextResponse.json({
@@ -110,10 +107,9 @@ export async function POST(request: NextRequest) {
     }
 
     await grantPro(user.id, foundCustomerId)
-    console.log(`Pro restored for user ${user.id} via customer ${foundCustomerId}`)
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error("Restore purchase error:", error)
-    return NextResponse.json({ error: error.message || "Something went wrong" }, { status: 500 })
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }

@@ -123,6 +123,11 @@
 }
 
 @theme inline {
+  /* Typography — wire the next/font families into Tailwind utilities.
+     font-sans → Inter, font-mono → Geist Mono, font-display → Fraunces */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -175,6 +180,7 @@
     overflow-x: clip;
     overscroll-behavior-x: none;
     min-width: 0;
+    text-rendering: optimizeLegibility;
   }
   /* Prevent all horizontal overflow at root */
   #__next,
@@ -182,6 +188,59 @@
     overflow-x: clip;
     max-width: 100%;
   }
+
+  /* Balanced headings and orphan-free paragraphs — quiet typographic polish */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Keep anchored sections clear of the sticky navbar */
+  section[id],
+  [id]:target {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+/* Gold-tinted selection — small detail, large perceived quality */
+::selection {
+  background: rgba(214, 178, 124, 0.32);
+  color: #f8f4ea;
+}
+.light ::selection {
+  background: rgba(143, 122, 85, 0.25);
+  color: #18181b;
+}
+
+/* Refined scrollbar — slim, neutral, gold on hover */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(214, 178, 124, 0.22) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(214, 178, 124, 0.18);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 178, 124, 0.38);
+  background-clip: content-box;
 }
 
 /* Luxury Aura Animation - Subtle and refined */
@@ -393,6 +452,99 @@
   animation: badge-pop 0.3s ease-out forwards;
 }
 
+/* ── Landing page keyframes ────────────────────────────────────────────── */
+
+/* Score bar fill — scaleX from left so width animates on the GPU */
+@keyframes score-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.animate-score-fill {
+  transform-origin: left center;
+  animation: score-fill 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scanning beam that sweeps down the scorecard once */
+@keyframes scan-sweep {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  88% {
+    opacity: 0.85;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+.animate-scan-sweep {
+  animation: scan-sweep 2.4s cubic-bezier(0.45, 0, 0.55, 1) 0.4s forwards;
+}
+
+/* Slow conic glow rotation for premium card halos */
+@keyframes halo-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+.animate-halo-spin {
+  animation: halo-spin 14s linear infinite;
+}
+
+/* Gentle vertical drift for layered ambient orbs */
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0);
+  }
+}
+.animate-orb-drift {
+  animation: orb-drift 9s ease-in-out infinite;
+}
+
+/* Soft ping for "live" indicators */
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.animate-live-ping {
+  animation: live-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-score-fill,
+  .animate-scan-sweep {
+    animation-duration: 0.01s;
+    animation-delay: 0s;
+  }
+  .animate-halo-spin,
+  .animate-orb-drift,
+  .animate-live-ping {
+    animation: none;
+  }
+}
+
 /* Typewriter cursor blink */
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
@@ -466,6 +618,94 @@
   opacity: 0.02;
   pointer-events: none;
   mix-blend-mode: overlay;
+}
+
+/* NamoLux generate workbench */
+.namolux-generate-page {
+  background:
+    linear-gradient(112deg, rgba(51, 39, 12, 0.62) 0%, rgba(3, 4, 5, 0.97) 34%, rgba(2, 3, 4, 0.98) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 36%),
+    #030405;
+}
+
+.namolux-generate-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(214, 178, 124, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(214, 178, 124, 0.055) 1px, transparent 1px),
+    linear-gradient(120deg, transparent 0%, transparent 44%, rgba(214, 178, 124, 0.075) 44.15%, transparent 44.35%, transparent 100%);
+  background-size: 84px 84px, 84px 84px, 280px 280px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 82%, transparent 100%);
+  opacity: 0.62;
+}
+
+.namolux-generate-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.025), transparent 24%, transparent 70%, rgba(214,178,124,0.045)),
+    repeating-linear-gradient(135deg, transparent 0 34px, rgba(214,178,124,0.035) 35px, transparent 36px);
+  mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 88%, transparent 100%);
+  opacity: 0.48;
+}
+
+.namolux-signal-array {
+  background-image:
+    linear-gradient(120deg, transparent 0 38%, rgba(214,178,124,0.14) 38.15%, transparent 38.45%, transparent 100%),
+    linear-gradient(64deg, transparent 0 60%, rgba(255,255,255,0.08) 60.1%, transparent 60.35%, transparent 100%),
+    radial-gradient(circle, rgba(214,178,124,0.16) 1px, transparent 1.4px);
+  background-size: 220px 220px, 180px 180px, 22px 22px;
+  mask-image: linear-gradient(90deg, transparent, black 24%, black 82%, transparent);
+  opacity: 0.72;
+}
+
+.namolux-signal-array::before,
+.namolux-signal-array::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(214, 178, 124, 0.18);
+  transform: rotate(-8deg);
+}
+
+.namolux-signal-array::before {
+  right: 96px;
+  top: 38px;
+  width: 360px;
+  height: 164px;
+}
+
+.namolux-signal-array::after {
+  right: 26px;
+  top: 230px;
+  width: 280px;
+  height: 118px;
+  border-color: rgba(255, 255, 255, 0.095);
+}
+
+.premium-workbench {
+  position: relative;
+}
+
+.premium-workbench::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 233, 166, 0.48), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .namolux-generate-page::before,
+  .namolux-generate-page::after,
+  .namolux-signal-array {
+    opacity: 0.35;
+  }
 }
 
 /* Gradient border utility */

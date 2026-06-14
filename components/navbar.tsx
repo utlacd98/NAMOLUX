@@ -94,7 +94,7 @@ export function Navbar() {
             aria-label="NamoLux home"
           >
             <span
-              className="text-xl font-black tracking-tight sm:text-2xl"
+              className="font-display text-xl font-semibold tracking-tight sm:text-2xl"
               style={{ color: "#ffffff", letterSpacing: "-0.02em" }}
             >
               Namo

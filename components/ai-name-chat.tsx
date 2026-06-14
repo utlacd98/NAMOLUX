@@ -497,7 +497,15 @@ export function AiNameChat() {
   const topScore = results.length ? Math.max(...results.map((r) => r.score)) : 0
 
   return (
-    <div className="flex flex-col" style={{ minHeight: 440 }}>
+    <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+      <div
+        className="flex min-h-[520px] flex-col rounded-lg border p-4"
+        style={{
+          background: "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
+          borderColor: "rgba(255,255,255,0.08)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+        }}
+      >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -545,18 +553,18 @@ export function AiNameChat() {
             <div style={{ maxWidth: "88%" }}>
               {/* Bubble */}
               <div
-                className="rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
+                className="rounded-lg px-4 py-2.5 text-sm leading-relaxed"
                 style={
                   msg.role === "bot"
                     ? {
-                        background: "rgba(255,255,255,0.06)",
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
                         border: "1px solid rgba(255,255,255,0.08)",
                         color: "rgba(255,255,255,0.85)",
                       }
                     : {
-                        background: "rgba(212,175,55,0.13)",
-                        border: "1px solid rgba(212,175,55,0.22)",
-                        color: "rgba(255,255,255,0.9)",
+                        background: "linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.075))",
+                        border: "1px solid rgba(212,175,55,0.28)",
+                        color: "rgba(255,255,255,0.92)",
                       }
                 }
               >
@@ -572,7 +580,7 @@ export function AiNameChat() {
                       onClick={() =>
                         handleAnswer(c.value, `${c.emoji ? c.emoji + " " : ""}${c.label}`)
                       }
-                      className="rounded-xl px-3 py-1.5 text-xs font-semibold transition-all hover:-translate-y-0.5 active:scale-95"
+                      className="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all hover:-translate-y-0.5 active:scale-95"
                       style={{
                         background: "rgba(212,175,55,0.1)",
                         border: "1px solid rgba(212,175,55,0.28)",
@@ -592,7 +600,7 @@ export function AiNameChat() {
                   {msg.choices.map((c) => (
                     <span
                       key={c.value}
-                      className="rounded-xl px-2.5 py-1 text-[10px]"
+                      className="rounded-md px-2.5 py-1 text-[10px]"
                       style={{
                         background: "rgba(255,255,255,0.03)",
                         color: "rgba(255,255,255,0.14)",
@@ -696,9 +704,7 @@ export function AiNameChat() {
           {/* Context hint for optional steps */}
           {isSkippable && (
             <p className="text-[10px] text-white/30 px-1">
-              {currentStep === "industry"
-                ? "Type an industry or press Enter / Skip to continue."
-                : "Type keywords or press Enter / Skip to continue."}
+              {currentStep === "industry" ? "Optional industry detail." : "Optional naming roots."}
             </p>
           )}
 
@@ -724,9 +730,9 @@ export function AiNameChat() {
                   ? "e.g. SaaS, Fintech, Health…"
                   : "e.g. flow, sync, pulse…"
               }
-              className="flex-1 rounded-xl px-4 py-3 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
+              className="flex-1 rounded-lg px-4 py-3 text-sm text-white/90 placeholder:text-white/25 focus:outline-none"
               style={{
-                background: "rgba(255,255,255,0.07)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
                 border: "1px solid rgba(255,255,255,0.1)",
                 transition: "border-color 0.2s, box-shadow 0.2s",
               }}
@@ -750,8 +756,8 @@ export function AiNameChat() {
                 }
               }}
               disabled={!textInput.trim() && !isSkippable}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all hover:-translate-y-0.5 disabled:opacity-35"
-              style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5 disabled:opacity-35"
+              style={{ background: "linear-gradient(135deg, #B8841F, #F5DD77)" }}
               title={isSkippable ? "Send or skip" : "Send"}
             >
               <Send className="h-4 w-4 text-black" />
@@ -761,7 +767,7 @@ export function AiNameChat() {
             {isSkippable && (
               <button
                 onClick={() => handleAnswer("")}
-                className="rounded-xl px-3 py-2.5 text-xs font-medium transition-all hover:text-white/70"
+                className="rounded-lg px-3 py-2.5 text-xs font-medium transition-all hover:text-white/70"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -774,6 +780,39 @@ export function AiNameChat() {
           </div>
         </div>
       )}
+      </div>
+
+      <aside
+        className="rounded-lg border p-4"
+        style={{
+          background: "linear-gradient(180deg, rgba(212,175,55,0.07), rgba(255,255,255,0.025))",
+          borderColor: "rgba(212,175,55,0.14)",
+        }}
+      >
+        <div className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]/65">Assistant profile</div>
+        <div className="mt-3 space-y-2">
+          {[
+            { label: "Brief", value: answers.description ? "captured" : "open" },
+            { label: "Vibe", value: answers.vibe || "modern" },
+            { label: "Industry", value: answers.industry || "adaptive" },
+            { label: "Length", value: `${answers.length || "9"} chars` },
+          ].map((item) => (
+            <div key={item.label} className="rounded-md border border-white/7 bg-black/18 px-3 py-2">
+              <div className="text-[10px] text-white/30">{item.label}</div>
+              <div className="mt-0.5 truncate text-xs font-semibold capitalize text-white/75">{item.value}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 rounded-md border border-emerald-400/15 bg-emerald-400/[0.045] px-3 py-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-200/90">
+            <CheckCircle className="h-3.5 w-3.5" />
+            Live availability
+          </div>
+          <div className="mt-2 text-[11px] leading-5 text-white/38">
+            .com, .io, .co, .ai, .app, .dev
+          </div>
+        </div>
+      </aside>
     </div>
   )
 }

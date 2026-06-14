@@ -5,7 +5,10 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
   const redirect = searchParams.get("redirect") || "/generate"
-  const next = searchParams.get("next") ?? redirect
+  const requestedNext = searchParams.get("next") ?? redirect
+  const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//")
+    ? requestedNext
+    : "/generate"
 
   if (code) {
     const supabase = await createClient()
@@ -57,4 +60,3 @@ export async function GET(request: Request) {
   // If there's an error or no code, redirect to sign-in with error
   return NextResponse.redirect(`${origin}/sign-in?error=auth_callback_error`)
 }
-

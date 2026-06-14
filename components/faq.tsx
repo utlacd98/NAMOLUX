@@ -1,5 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
+import { Reveal, SectionHeader } from "@/components/landing/reveal"
 
 const faqs = [
   {
@@ -50,31 +50,47 @@ const faqs = [
 ]
 
 export function FAQ() {
-  return (
-    <section id="faq" className="overflow-clip bg-muted/30 py-10 sm:py-16 lg:py-24" aria-labelledby="faq-heading">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 id="faq-heading" className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Frequently asked questions
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">Everything you need to know about NamoLux.</p>
-        </div>
+  // FAQPage rich-result schema generated from the same copy users read
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  }
 
-        <div
-          className={cn("mt-12 animate-fade-up")}
-          style={{ animationFillMode: "forwards" }}
-        >
-          <Accordion type="single" collapsible className="w-full">
+  return (
+    <section id="faq" className="overflow-clip bg-muted/20 py-16 sm:py-24 lg:py-32" aria-labelledby="faq-heading">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          kicker="Questions"
+          headingId="faq-heading"
+          heading="Frequently asked questions"
+          sub="Everything you need to know about NamoLux."
+        />
+
+        <Reveal delay={0.1} className="mt-12">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full rounded-2xl border border-border/60 bg-card/30 px-5 sm:px-7"
+          >
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="border-border">
+              <AccordionItem key={index} value={`item-${index}`} className="border-border/60 last:border-b-0">
                 <AccordionTrigger className="text-left text-foreground hover:text-primary hover:no-underline">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
+                <AccordionContent className="leading-relaxed text-muted-foreground">{faq.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

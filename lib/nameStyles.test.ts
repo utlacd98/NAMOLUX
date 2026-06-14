@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { generateNameStyleCandidates } from "@/lib/nameStyles"
+import { filterCandidates, generateNameStyleCandidates } from "@/lib/nameStyles"
 
 describe("nameStyles generator", () => {
   it("returns meaning for all results when meaning mode is on", () => {
@@ -99,6 +99,38 @@ describe("nameStyles generator", () => {
     expect(results.length).toBeGreaterThan(0)
     expect(results.every((item) => !/(dl|vt|cf|zx|rk|cl)$/.test(item.name))).toBe(true)
     expect(results.every((item) => !/[bcdfghjklmnpqrstvwxyz]{4,}/.test(item.name))).toBe(true)
+  })
+
+  it("filters awkward, broken, and low-fit names from test generator candidates", () => {
+    const results = filterCandidates(
+      [
+        { name: "havenqk", style: "Blend" },
+        { name: "xpressbot", style: "Invented" },
+        { name: "calmvv", style: "Metaphor" },
+        { name: "havendose", style: "Blend" },
+        { name: "mendora", style: "Invented" },
+      ],
+      10,
+    )
+
+    expect(results.map((item) => item.name)).toEqual(["mendora"])
+  })
+
+  it("keeps wellness test output away from dark, medical, robotic, or random cues", () => {
+    const results = generateNameStyleCandidates({
+      keywords: "mental wellness AI companion emotional support calm safe journaling",
+      industry: "Health & Wellness",
+      vibe: "Trustworthy",
+      maxLength: 8,
+      count: 16,
+      selectedStyle: "mix",
+      meaningMode: true,
+      seed: "wellness-tone-fit",
+    })
+
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.every((item) => !/(grim|doom|gloom|void|dark|rage|venom|blade|sick|pain|dose|pill|drug|rx|bot|robo|random|baby|giggle)/.test(item.name))).toBe(true)
+    expect(results.every((item) => !/(q[bcdfghjklmnpqrstvwxyz]|[bcdfghjklmnpqrstvwxyz]q|vv|lll|iii|kreat|xpress|ez[a-z])/.test(item.name))).toBe(true)
   })
 
   it("prioritises brandable endings and avoids obvious chopped output", () => {

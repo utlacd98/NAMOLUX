@@ -5,6 +5,10 @@ import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 
 const SUPPORTED_TLDS = ["com", "io", "co", "ai", "app", "dev"]
+const MAX_DOMAINS_PER_REQUEST = 25
+const MAX_TLDS_PER_REQUEST = 6
+const MAX_EXPANDED_CHECKS = 75
+const MAX_DOMAIN_LABEL_LENGTH = 63
 
 interface DomainScoreResult {
   /** Founder Signal score (0-100) */
@@ -51,6 +55,12 @@ function sanitiseName(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9-]/g, "")
 }
 
+function normaliseTld(input: unknown): string | null {
+  if (typeof input !== "string") return null
+  const tld = input.toLowerCase().replace(/^\./, "").replace(/[^a-z0-9-]/g, "")
+  return SUPPORTED_TLDS.includes(tld) ? tld : null
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check rate limit first - bulk check feature
@@ -67,17 +77,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { domains, tlds } = await request.json()
+    const { domains, tlds, vibe } = await request.json()
 
     if (!domains || !Array.isArray(domains)) {
       return NextResponse.json({ error: "Domains array is required" }, { status: 400 })
     }
 
-    const tldsToCheck: string[] = tlds && Array.isArray(tlds) ? tlds : SUPPORTED_TLDS
-    const cleanDomains = domains.map((domainName: string) => sanitiseName(String(domainName || ""))).filter(Boolean)
+    const requestedTlds = tlds && Array.isArray(tlds) ? tlds : SUPPORTED_TLDS
+    const tldsToCheck = Array.from(new Set(requestedTlds.map(normaliseTld).filter(Boolean) as string[])).slice(0, MAX_TLDS_PER_REQUEST)
+    const cleanDomains = Array.from(
+      new Set(
+        domains
+          .map((domainName: string) => sanitiseName(String(domainName || "")))
+          .filter((domainName: string) => domainName.length > 0 && domainName.length <= MAX_DOMAIN_LABEL_LENGTH)
+      )
+    ).slice(0, MAX_DOMAINS_PER_REQUEST)
 
     if (cleanDomains.length === 0) {
       return NextResponse.json({ error: "No valid domains supplied" }, { status: 400 })
+    }
+
+    if (tldsToCheck.length === 0) {
+      return NextResponse.json({ error: "No supported TLDs supplied" }, { status: 400 })
+    }
+
+    if (cleanDomains.length * tldsToCheck.length > MAX_EXPANDED_CHECKS) {
+      return NextResponse.json(
+        { error: `Too many checks requested. Limit requests to ${MAX_EXPANDED_CHECKS} domain/TLD combinations.` },
+        { status: 400 }
+      )
     }
 
     const fullDomains = cleanDomains.flatMap((domainName) => tldsToCheck.map((tld) => `${domainName}.${tld}`))
@@ -97,7 +125,7 @@ export async function POST(request: NextRequest) {
         const fullDomain = `${domainName}.${tld}`
         const availability = availabilityMap.get(fullDomain)
         // Pass TLD to scoring so extension strength is factored in
-        const metrics = scoreDomain(domainName, tld)
+        const metrics = scoreDomain(domainName, tld, typeof vibe === "string" ? (vibe as BrandVibe) : undefined)
 
         const tiered = availability?.tieredDetails
         return {

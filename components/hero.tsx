@@ -1,22 +1,25 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, Check } from "lucide-react"
+import { ScorecardDemo } from "@/components/landing/scorecard-demo"
 
 const editorialSerif =
-  '"Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Book Antiqua", Georgia, serif'
-const founderSignalMark = "Founder Signal\u2122"
+  'var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Book Antiqua", Georgia, serif'
 
 const supportingPoints = [
   "No account required",
   "Live availability across 6 TLDs",
-  `${founderSignalMark} score on every name`,
+  "Founder Signal score on every name",
 ]
 
-// Heavier particle set for desktop — dust stays decorative but dense.
-// On mobile we only render the first 4 so GPU load during scroll stays minimal.
+const heroProof = [
+  { value: "10,000+", label: "names scored" },
+  { value: "6", label: "TLDs checked" },
+  { value: "<60s", label: "shortlist verdict" },
+]
+
 const ambientParticles = [
   { left: "22%", top: "28%", size: 2, duration: 16, delay: 2 },
   { left: "47%", top: "14%", size: 2.5, duration: 18, delay: 1 },
@@ -29,59 +32,8 @@ const ambientParticles = [
   { left: "74%", top: "68%", size: 1.5, duration: 16, delay: 7 },
   { left: "90%", top: "60%", size: 1.5, duration: 18, delay: 8 },
 ]
-const MOBILE_PARTICLE_COUNT = 4
 
-// Headline parts — plain prefix + gold gradient suffix
-const HEADLINE_PREFIX = "A brand consultant for your "
-const HEADLINE_SUFFIX = "iconic name."
-const FULL_HEADLINE = HEADLINE_PREFIX + HEADLINE_SUFFIX
-
-// Typewriter timings (ms per character — subtle, professional pace)
-const TYPEWRITER_START_DELAY = 280
-const TYPEWRITER_CHAR_MS = 55
-
-function useTypewriter(text: string, enabled: boolean): {
-  typed: string
-  done: boolean
-} {
-  const [typed, setTyped] = useState(enabled ? "" : text)
-  const [done, setDone] = useState(!enabled)
-
-  useEffect(() => {
-    if (!enabled) {
-      setTyped(text)
-      setDone(true)
-      return
-    }
-    setTyped("")
-    setDone(false)
-    let charIndex = 0
-    let interval: ReturnType<typeof setInterval> | null = null
-    const startTimer = setTimeout(() => {
-      interval = setInterval(() => {
-        charIndex += 1
-        setTyped(text.slice(0, charIndex))
-        if (charIndex >= text.length) {
-          if (interval) clearInterval(interval)
-          setDone(true)
-        }
-      }, TYPEWRITER_CHAR_MS)
-    }, TYPEWRITER_START_DELAY)
-    return () => {
-      clearTimeout(startTimer)
-      if (interval) clearInterval(interval)
-    }
-  }, [text, enabled])
-
-  return { typed, done }
-}
-
-type RevealProps = {
-  delay: number
-  reducedMotion: boolean
-}
-
-function getReveal({ delay, reducedMotion }: RevealProps) {
+function getReveal(delay: number, reducedMotion: boolean) {
   return {
     initial: {
       opacity: 0,
@@ -101,31 +53,8 @@ function getReveal({ delay, reducedMotion }: RevealProps) {
   }
 }
 
-// Detects once on mount whether we're on a device wide enough for the heaviest
-// ambient animations. Avoids running gradient shimmer on small-screen GPUs.
-function useIsWideViewport(): boolean {
-  const [wide, setWide] = useState(false)
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return
-    const mq = window.matchMedia("(min-width: 640px)")
-    setWide(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setWide(e.matches)
-    mq.addEventListener("change", handler)
-    return () => mq.removeEventListener("change", handler)
-  }, [])
-  return wide
-}
-
 export function Hero() {
   const reducedMotion = useReducedMotion()
-  const isWideViewport = useIsWideViewport()
-  const { typed, done: typewriterDone } = useTypewriter(FULL_HEADLINE, !reducedMotion)
-
-  // Split the typed output back into (plain prefix | gold suffix)
-  const typedPrefix = typed.slice(0, Math.min(typed.length, HEADLINE_PREFIX.length))
-  const typedSuffix = typed.length > HEADLINE_PREFIX.length
-    ? typed.slice(HEADLINE_PREFIX.length)
-    : ""
 
   return (
     <section
@@ -147,7 +76,7 @@ export function Hero() {
       />
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.18]"
+        className="absolute inset-0 opacity-[0.16]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(212,175,55,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.06) 1px, transparent 1px)",
@@ -157,24 +86,21 @@ export function Hero() {
         }}
       />
 
-      {/* Gold radial glow — lighter blur on mobile to avoid scroll jank on GPU */}
       <motion.div
         aria-hidden="true"
         animate={
           reducedMotion
             ? undefined
             : {
-                opacity: [0.2, 0.32, 0.2],
+                opacity: [0.18, 0.32, 0.18],
                 scale: [1, 1.05, 1],
               }
         }
         transition={{ duration: 9, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         style={{ willChange: "transform, opacity" }}
-        className="absolute left-1/2 top-[20rem] h-[18rem] w-[18rem] -translate-x-1/2 rounded-full bg-[#d6aa52]/20 blur-[60px] sm:top-[17rem] sm:h-[22rem] sm:w-[22rem] sm:blur-[120px]"
+        className="absolute left-1/2 top-[20rem] h-[18rem] w-[18rem] -translate-x-1/2 rounded-full bg-[#d6aa52]/20 blur-[60px] sm:top-[17rem] sm:h-[24rem] sm:w-[24rem] sm:blur-[120px]"
       />
 
-      {/* Slow-moving gold light sweep — desktop only. The blur-2xl layer is
-          expensive during scroll on mobile GPUs. */}
       <motion.div
         aria-hidden="true"
         animate={
@@ -182,113 +108,57 @@ export function Hero() {
             ? undefined
             : {
                 x: ["-30%", "30%", "-30%"],
-                opacity: [0.12, 0.22, 0.12],
+                opacity: [0.1, 0.18, 0.1],
               }
         }
         transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         style={{ willChange: "transform, opacity" }}
-        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[120%] bg-[linear-gradient(115deg,transparent_38%,rgba(240,212,147,0.18)_50%,transparent_62%)] blur-2xl sm:block"
+        className="pointer-events-none absolute inset-y-0 left-0 hidden w-[120%] bg-[linear-gradient(115deg,transparent_38%,rgba(240,212,147,0.15)_50%,transparent_62%)] blur-2xl sm:block"
       />
 
-      {/* Ambient dust particles — full set on desktop, reduced set on mobile */}
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-        {ambientParticles.map((particle, index) => {
-          const isMobileParticle = index < MOBILE_PARTICLE_COUNT
-          return (
-            <span
-              key={`${particle.left}-${particle.top}-${index}`}
-              className={`absolute rounded-full bg-[radial-gradient(circle,rgba(241,220,170,0.75)_0%,rgba(241,220,170,0)_72%)] ${
-                isMobileParticle ? "" : "hidden sm:block"
-              }`}
-              style={{
-                left: particle.left,
-                top: particle.top,
-                width: particle.size,
-                height: particle.size,
-                opacity: reducedMotion ? 0.16 : 0.34,
-                willChange: reducedMotion ? "auto" : "transform, opacity",
-                animation: reducedMotion
-                  ? "none"
-                  : `heroDust ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
-              }}
-            />
-          )
-        })}
+        {ambientParticles.map((particle, index) => (
+          <span
+            key={`${particle.left}-${particle.top}-${index}`}
+            className={`absolute rounded-full bg-[radial-gradient(circle,rgba(241,220,170,0.75)_0%,rgba(241,220,170,0)_72%)] ${
+              index < 4 ? "" : "hidden sm:block"
+            }`}
+            style={{
+              left: particle.left,
+              top: particle.top,
+              width: particle.size,
+              height: particle.size,
+              opacity: reducedMotion ? 0.16 : 0.34,
+              willChange: reducedMotion ? "auto" : "transform, opacity",
+              animation: reducedMotion
+                ? "none"
+                : `heroDust ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
+            }}
+          />
+        ))}
       </div>
 
-      {/* SVG noise — desktop only. Soft-light blend mode is a mobile repaint hog. */}
-      <div className="hero-noise absolute inset-0 hidden opacity-[0.16] sm:block" aria-hidden="true" />
+      <div className="hero-noise absolute inset-0 hidden opacity-[0.14] sm:block" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-20 lg:pt-20 xl:pt-24">
-        <div className="lg:min-h-[calc(100svh-6.5rem)]">
-          <div className="relative z-10 min-w-0 max-w-4xl lg:flex lg:min-h-[calc(100svh-10rem)] lg:flex-col">
-            <motion.div
-              {...getReveal({ delay: 0.05, reducedMotion })}
-              className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#876628]/45 bg-[linear-gradient(180deg,rgba(20,16,11,0.92),rgba(10,8,6,0.9))] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[#d7be84] shadow-[0_14px_40px_rgba(0,0,0,0.35)] sm:text-[11px]"
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-20 sm:px-6 sm:pb-[4.5rem] sm:pt-24 lg:px-8 lg:pb-14 lg:pt-20 xl:pt-[5.5rem]">
+        <div className="grid min-h-[calc(100svh-5rem)] items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] lg:gap-12">
+          <div className="relative z-10 min-w-0">
+            <motion.h1
+              {...getReveal(0.1, Boolean(reducedMotion))}
+              id="hero-heading"
+              className="max-w-[12ch] text-5xl font-medium leading-[0.95] text-white sm:max-w-[12ch] sm:text-6xl lg:max-w-[11.5ch] lg:text-6xl xl:text-7xl"
+              style={{ fontFamily: editorialSerif }}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#d8b15b] shadow-[0_0_12px_rgba(216,177,91,0.85)]" />
-              <span>Brand Consultancy</span>
-              <span className="text-[#6a5330]">/</span>
-              <span>{founderSignalMark} Scoring</span>
-            </motion.div>
+              Choose a brand name{" "}
+              <span className="bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_28%,#f8ebcb_50%,#c3923b_75%,#74501c_100%)] bg-clip-text text-transparent">
+                with evidence.
+              </span>
+            </motion.h1>
 
-            <div className="lg:flex lg:flex-1 lg:items-center lg:py-8 xl:py-10">
-              <motion.h1
-                {...getReveal({ delay: 0.14, reducedMotion })}
-                id="hero-heading"
-                className="mt-6 max-w-[14ch] text-[clamp(2.6rem,9.5vw,6.2rem)] font-medium leading-[0.98] tracking-[-0.055em] text-white sm:max-w-none lg:mt-0"
-                style={{ fontFamily: editorialSerif }}
-                aria-label={FULL_HEADLINE}
-              >
-                {/* Screen readers get the full headline via aria-label; visual
-                    treatment types it in. */}
-                <span aria-hidden="true" className="block">
-                  <span className="text-white">{typedPrefix}</span>
-                  <motion.span
-                    animate={
-                      reducedMotion || !typewriterDone || !isWideViewport
-                        ? undefined
-                        : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
-                    }
-                    transition={{
-                      duration: 8,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                    }}
-                    className="bg-[linear-gradient(102deg,#8f6a28_0%,#dcbf86_26%,#f8ebcb_48%,#c3923b_70%,#74501c_100%)] bg-[length:180%_180%] bg-clip-text text-transparent"
-                  >
-                    {typedSuffix}
-                  </motion.span>
-                  {/* Cursor — blinks while typing, fades out when done */}
-                  <motion.span
-                    aria-hidden="true"
-                    animate={
-                      reducedMotion
-                        ? { opacity: 0 }
-                        : typewriterDone
-                          ? { opacity: [1, 0], transition: { delay: 0.6, duration: 0.5 } }
-                          : { opacity: [1, 1, 0, 0, 1] }
-                    }
-                    transition={
-                      typewriterDone
-                        ? undefined
-                        : { duration: 1.1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }
-                    }
-                    className="ml-[0.08em] inline-block h-[0.82em] w-[0.05em] translate-y-[0.12em] rounded-sm bg-[#f0d493] align-baseline shadow-[0_0_12px_rgba(240,212,147,0.55)]"
-                  />
-                </span>
-              </motion.h1>
-            </div>
-
-            <motion.div
-              {...getReveal({ delay: 0.25, reducedMotion })}
-              className="relative mt-8 flex flex-col items-start gap-5 lg:mt-0 lg:pb-3"
-            >
-              <p className="max-w-2xl text-[15px] leading-7 text-[#ddd6c5]/76 sm:text-lg">
-                NamoLux is a domain naming consultancy powered by {founderSignalMark}. Paste
-                your candidate names and we score each one on{" "}
-                <span className="text-[#f5ead0]">brand strength, availability, and founder fit</span>{" "}
-                so you choose the name with the evidence to back it.
+            <motion.div {...getReveal(0.22, Boolean(reducedMotion))} className="relative mt-6 flex flex-col items-start gap-4 lg:mt-7">
+              <p className="max-w-xl text-[15px] leading-7 text-[#ddd6c5]/78 sm:text-[17px]">
+                Paste your shortlist and see each name ranked by Founder Signal, live availability, and
+                brand-consultant reasoning across .com, .io, .co, .ai, .app, and .dev.
               </p>
 
               <motion.div
@@ -297,7 +167,7 @@ export function Hero() {
                   reducedMotion
                     ? undefined
                     : {
-                        opacity: [0.18, 0.3, 0.18],
+                        opacity: [0.16, 0.28, 0.16],
                         scale: [0.98, 1.04, 0.98],
                       }
                 }
@@ -305,47 +175,51 @@ export function Hero() {
                 className="absolute -left-3 top-0 h-24 w-56 rounded-full bg-[#d8a74b]/20 blur-[48px]"
               />
 
-              <motion.div
-                whileHover={reducedMotion ? undefined : { y: -2, scale: 1.015 }}
-                whileTap={reducedMotion ? undefined : { scale: 0.99 }}
-                className="relative z-10 w-full sm:w-auto"
-              >
-                {/* Ambient glow that breathes behind the CTA — desktop only.
-                    The blur-2xl animated scale is expensive on mobile scroll. */}
+              <div className="relative z-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                 <motion.div
-                  aria-hidden="true"
-                  animate={
-                    reducedMotion
-                      ? undefined
-                      : {
-                          opacity: [0.35, 0.55, 0.35],
-                          scale: [0.98, 1.04, 0.98],
-                        }
-                  }
-                  transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                  style={{ willChange: "transform, opacity" }}
-                  className="pointer-events-none absolute inset-0 -m-2 hidden rounded-full bg-[radial-gradient(ellipse_at_center,rgba(240,212,147,0.45)_0%,rgba(212,175,55,0.18)_40%,transparent_72%)] blur-2xl sm:block"
-                />
-                <Link
-                  href="/generate"
-                  className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-full border border-[#f0daaa]/60 bg-[linear-gradient(180deg,#f4dfb3_0%,#ddbe7a_42%,#b98838_100%)] px-7 py-4 text-[15px] font-semibold text-[#090705] shadow-[0_18px_60px_rgba(0,0,0,0.55),0_10px_24px_rgba(212,175,55,0.18)] transition-all duration-300 hover:border-[#f7e7c3] hover:shadow-[0_28px_80px_rgba(0,0,0,0.65),0_14px_40px_rgba(240,212,147,0.35)] sm:w-auto sm:px-8"
+                  whileHover={reducedMotion ? undefined : { y: -2, scale: 1.015 }}
+                  whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+                  className="relative w-full sm:w-auto"
                 >
-                  {/* Soft top-light sheen */}
-                  <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0)_42%)] opacity-70" />
-                  {/* Diagonal hover tint */}
-                  <span className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0)_22%,rgba(255,255,255,0.34)_50%,rgba(255,255,255,0)_78%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  {/* Traveling light sweep */}
-                  <span className="absolute inset-y-1 left-0 w-24 -translate-x-[180%] rotate-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-md transition-transform duration-[1100ms] ease-out group-hover:translate-x-[360%]" />
-                  <span className="relative">Score your shortlist free</span>
-                  <ArrowRight className="relative ml-3 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <motion.div
+                    aria-hidden="true"
+                    animate={
+                      reducedMotion
+                        ? undefined
+                        : {
+                            opacity: [0.35, 0.55, 0.35],
+                            scale: [0.98, 1.04, 0.98],
+                          }
+                    }
+                    transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                    style={{ willChange: "transform, opacity" }}
+                    className="pointer-events-none absolute inset-0 -m-2 hidden rounded-full bg-[radial-gradient(ellipse_at_center,rgba(240,212,147,0.45)_0%,rgba(212,175,55,0.18)_40%,transparent_72%)] blur-2xl sm:block"
+                  />
+                  <Link
+                    href="/generate"
+                    className="group relative inline-flex h-[52px] w-full items-center justify-center overflow-hidden rounded-full border border-[#f0daaa]/60 bg-[linear-gradient(180deg,#f4dfb3_0%,#ddbe7a_42%,#b98838_100%)] px-7 text-[15px] font-semibold text-[#090705] shadow-[0_18px_60px_rgba(0,0,0,0.55),0_10px_24px_rgba(212,175,55,0.18)] transition-all duration-300 hover:border-[#f7e7c3] hover:shadow-[0_28px_80px_rgba(0,0,0,0.65),0_14px_40px_rgba(240,212,147,0.35)] sm:w-auto sm:px-8"
+                  >
+                    <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0)_42%)] opacity-70" />
+                    <span className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0)_22%,rgba(255,255,255,0.34)_50%,rgba(255,255,255,0)_78%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <span className="absolute inset-y-1 left-0 w-24 -translate-x-[180%] rotate-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-md transition-transform duration-[1100ms] ease-out group-hover:translate-x-[360%]" />
+                    <span className="relative">Score your shortlist free</span>
+                    <ArrowRight className="relative ml-3 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
+                </motion.div>
+
+                <Link
+                  href="#product"
+                  className="inline-flex h-12 items-center justify-center rounded-full px-5 text-sm font-semibold text-[#e6d7b7]/70 transition-colors hover:text-[#f8ebcb]"
+                >
+                  See the scorecard
                 </Link>
-              </motion.div>
+              </div>
 
               <div className="flex w-full flex-wrap gap-2.5">
                 {supportingPoints.map((point, index) => (
                   <motion.div
                     key={point}
-                    {...getReveal({ delay: 0.46 + index * 0.08, reducedMotion })}
+                    {...getReveal(0.38 + index * 0.08, Boolean(reducedMotion))}
                     className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-sm text-[#e1d8c4]/75 sm:backdrop-blur-sm"
                   >
                     <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#7e622f]/45 bg-[#120f0a]">
@@ -357,6 +231,23 @@ export function Hero() {
               </div>
             </motion.div>
           </div>
+
+          <motion.div {...getReveal(0.3, Boolean(reducedMotion))} className="relative z-10 mx-auto w-full max-w-2xl lg:mx-0 lg:max-w-none">
+            <div className="absolute -inset-6 rounded-[2rem] border border-[#d6aa52]/10 bg-[#d6aa52]/[0.025] blur-2xl" aria-hidden="true" />
+            <ScorecardDemo />
+            <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-[#d6aa52]/14 bg-black/28 backdrop-blur-sm">
+              {heroProof.map((item, index) => (
+                <div
+                  key={item.label}
+                  className="px-3 py-4 text-center"
+                  style={index > 0 ? { borderLeft: "1px solid rgba(214,170,82,0.12)" } : undefined}
+                >
+                  <p className="font-display text-xl font-semibold text-[#f4dfb3] sm:text-2xl">{item.value}</p>
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/35">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
 

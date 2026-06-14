@@ -34,7 +34,6 @@ export async function checkAvailability(
   domain: string,
   options?: {
     signal?: AbortSignal
-    /** @deprecated providers override is ignored — tiered checker is always used */
     providers?: AvailabilityProvider[]
     ttlMs?: number
     maxRetries?: number
@@ -43,32 +42,77 @@ export async function checkAvailability(
     rdapTimeoutMs?: number
   },
 ): Promise<AvailabilityCheckResult> {
-  const cached = getCachedAvailability(domain)
+  const normalizedDomain = domain.toLowerCase()
+  const cached = getCachedAvailability(normalizedDomain)
   if (cached) return cached
 
   const started = Date.now()
+  const ttlMs = options?.ttlMs ?? DEFAULT_TTL_MS
+
+  if (options?.providers?.length) {
+    for (const provider of options.providers) {
+      const maxRetries = Math.max(0, options.maxRetries ?? 1)
+
+      for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+        if (options.signal?.aborted) {
+          throw new Error("aborted")
+        }
+
+        try {
+          const result = await provider.check(normalizedDomain, options.signal)
+          if (!result || result.error) {
+            break
+          }
+
+          const mapped = {
+            ...result,
+            domain: normalizedDomain,
+            latencyMs: Date.now() - started,
+          }
+          setCachedAvailability(normalizedDomain, mapped, ttlMs)
+          return mapped
+        } catch {
+          if (attempt >= maxRetries) break
+          if (options.backoffMs) {
+            await new Promise((resolve) => setTimeout(resolve, options.backoffMs))
+          }
+        }
+      }
+    }
+
+    const degraded: AvailabilityCheckResult = {
+      domain: normalizedDomain,
+      available: false,
+      provider: "none",
+      latencyMs: Date.now() - started,
+      confidence: "low",
+      error: "all_providers_failed",
+    }
+    setCachedAvailability(normalizedDomain, degraded, Math.min(ttlMs, 60_000))
+    return degraded
+  }
 
   try {
-    const result = await tieredCheck(domain, {
+    const result = await tieredCheck(normalizedDomain, {
       signal: options?.signal,
       dnsTimeoutMs: options?.dnsTimeoutMs,
       rdapTimeoutMs: options?.rdapTimeoutMs,
     })
 
     const mapped = mapToAvailabilityResult(result, Date.now() - started)
-    const ttl = result.status === "error" ? Math.min(options?.ttlMs ?? DEFAULT_TTL_MS, 60_000) : (options?.ttlMs ?? DEFAULT_TTL_MS)
-    setCachedAvailability(domain, mapped, ttl)
+    const ttl = result.status === "error" ? Math.min(ttlMs, 60_000) : ttlMs
+    setCachedAvailability(normalizedDomain, mapped, ttl)
     return mapped
   } catch (err: any) {
     const degraded: AvailabilityCheckResult = {
-      domain,
+      domain: normalizedDomain,
       available: false,
       provider: "none",
       latencyMs: Date.now() - started,
       confidence: "low",
       error: err?.message || "availability_unknown",
     }
-    setCachedAvailability(domain, degraded, 60_000)
+    setCachedAvailability(normalizedDomain, degraded, 60_000)
     return degraded
   }
 }
@@ -77,7 +121,6 @@ export async function checkAvailabilityBatch(
   domains: string[],
   options?: {
     signal?: AbortSignal
-    /** @deprecated providers override is ignored — tiered checker is always used */
     providers?: AvailabilityProvider[]
     ttlMs?: number
     maxRetries?: number
@@ -94,6 +137,9 @@ export async function checkAvailabilityBatch(
     checkAvailability(domain, {
       signal: options?.signal,
       ttlMs: options?.ttlMs,
+      providers: options?.providers,
+      maxRetries: options?.maxRetries,
+      backoffMs: options?.backoffMs,
       dnsTimeoutMs: options?.dnsTimeoutMs,
       rdapTimeoutMs: options?.rdapTimeoutMs,
     }),

@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "postinstall": "node -e \"const fs=require('fs'); if(fs.existsSync('prisma/schema.prisma')){require('child_process').execSync('prisma generate',{stdio:'inherit'})}else{console.log('Skipping prisma generate: prisma/schema.prisma not found')}\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

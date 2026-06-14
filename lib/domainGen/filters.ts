@@ -1,6 +1,13 @@
 ﻿import type { AutoFindControls, FilterDecision } from "@/lib/domainGen/types"
 
 const HARD_BANNED_CLUSTERS = ["qzx", "xq", "jjj", "zzz", "vvv", "kkk", "wq"]
+const AWKWARD_CLUSTER_PATTERNS = [
+  /q[bcdfghjklmnpqrstvwxyz]/,
+  /[bcdfghjklmnpqrstvwxyz]q/,
+  /x[bcdfghjklmnpqrstvwxyz]{2,}/,
+  /[bcdfghjklmnpqrstvwxyz]{2,}x/,
+  /(?:ptk|pdk|bdg|gdt|tdk|kpt|zv|vz|jq|qj|xj|jx)/,
+]
 const BANNED_AI_SMELL_SUFFIXES = [
   "ora",
   "ium",
@@ -37,16 +44,186 @@ const TRADEMARK_LIKE_FRAGMENTS = [
   "netflix",
 ]
 
+const LOW_FIT_TONE_TERMS = [
+  "grim",
+  "doom",
+  "gloom",
+  "void",
+  "dark",
+  "rage",
+  "venom",
+  "blade",
+  "kill",
+  "war",
+  "sick",
+  "pain",
+  "dose",
+  "pill",
+  "drug",
+  "rx",
+  "bot",
+  "robo",
+  "auto",
+  "random",
+  "boner",
+  "porn",
+  "sex",
+  "xxx",
+  "dick",
+  "cock",
+  "poop",
+  "poo",
+  "pee",
+  "fart",
+  "shit",
+  "fuck",
+]
+
+const STRONG_BRAND_ROOTS = [
+  "anchor",
+  "atlas",
+  "beam",
+  "birch",
+  "bloom",
+  "bond",
+  "bolt",
+  "books",
+  "bridge",
+  "cedar",
+  "clear",
+  "core",
+  "craft",
+  "crest",
+  "drift",
+  "ember",
+  "field",
+  "flint",
+  "flow",
+  "fold",
+  "forge",
+  "frame",
+  "fleet",
+  "grid",
+  "glen",
+  "gleam",
+  "grain",
+  "grove",
+  "guard",
+  "haven",
+  "hearth",
+  "helm",
+  "load",
+  "hinge",
+  "kind",
+  "ledger",
+  "invoice",
+  "receipt",
+  "lever",
+  "loom",
+  "lumen",
+  "mend",
+  "mint",
+  "nest",
+  "north",
+  "opal",
+  "path",
+  "pilot",
+  "pivot",
+  "prism",
+  "ridge",
+  "rally",
+  "sage",
+  "shore",
+  "signal",
+  "slate",
+  "solace",
+  "span",
+  "spark",
+  "still",
+  "stone",
+  "stride",
+  "sync",
+  "tend",
+  "team",
+  "tempo",
+  "thread",
+  "tide",
+  "time",
+  "slot",
+  "meet",
+  "mind",
+  "order",
+  "true",
+  "route",
+  "ship",
+  "solar",
+  "stock",
+  "terra",
+  "vault",
+  "balance",
+  "vector",
+  "vista",
+  "weave",
+]
+
+const ALLOWED_DOUBLE_O_WORDS = new Set(["bloom", "boost", "brook", "groom", "loom", "loop", "root", "room", "zoom"])
+
+const RANDOM_SYLLABLE_PATTERNS = [
+  /^ara/,
+  /^[bcdfghjklmnpqrstvwxyz](?:nest|glen|helm|span|drift|ridge|bloom)/,
+  /(?:roor|rour|loond|lumam|pivus|apav|quic|hinor|foroud|ageco|arac|tidember|mendrift|spansift|bondune|tendune|valad|nestrift)/,
+  /(?:aa|aea|eae|ioe|uio|oio|ou[aeiy]|uo|iu)/,
+  /(?:[bcdfghjklmnpqrstvwxyz]a(?:span|glen|helm|nest|drift|ridge)|(?:helm|span|drift|nest|glen)o$)/,
+  /(?:nore|vuse|pave|raas|raco|mame|gira|dira|viro|zora|xora)$/i,
+]
+
 function hasExcessiveRepeatedLetters(name: string): boolean {
   return /(.)\1\1/.test(name)
 }
 
 function hasAwkwardConsonantCluster(name: string): boolean {
-  return /[bcdfghjklmnpqrstvwxyz]{5,}/.test(name)
+  return /[bcdfghjklmnpqrstvwxyz]{5,}/.test(name) || AWKWARD_CLUSTER_PATTERNS.some((pattern) => pattern.test(name))
 }
 
 function hasVisualAmbiguity(name: string): boolean {
   return /(rnm|mrn|vv|lll|iii|rnm)/.test(name)
+}
+
+function hasBrokenSpellingSignal(name: string): boolean {
+  return /(?:kreat|qik|kwik|xpress|ez[a-z]|[a-z]z$|4|2|u4|gr8)/.test(name)
+}
+
+function hasLowEmotionalFit(name: string): boolean {
+  const clean = sanitiseCandidate(name)
+  return LOW_FIT_TONE_TERMS.some((term) => clean.includes(term))
+}
+
+export function hasRecognisableBrandRoot(name: string): boolean {
+  const clean = sanitiseCandidate(name)
+  return STRONG_BRAND_ROOTS.some((root) => clean === root || clean.includes(root))
+}
+
+export function hasUnsafeBrandMeaning(name: string): boolean {
+  const clean = sanitiseCandidate(name)
+  return LOW_FIT_TONE_TERMS.some((term) => term.length >= 3 && clean.includes(term))
+}
+
+export function hasRandomSyllablePattern(name: string): boolean {
+  const clean = sanitiseCandidate(name)
+  if (!clean) return true
+
+  if (/oo/.test(clean) && !ALLOWED_DOUBLE_O_WORDS.has(clean) && !hasRecognisableBrandRoot(clean)) return true
+  if (RANDOM_SYLLABLE_PATTERNS.some((pattern) => pattern.test(clean))) return true
+
+  const syllables = clean.match(/[aeiouy]+/g) || []
+  const isPureCvChain = /^([bcdfghjklmnpqrstvwxyz][aeiouy]){3,}[bcdfghjklmnpqrstvwxyz]?$/.test(clean)
+  if (isPureCvChain && syllables.length >= 3 && !hasRecognisableBrandRoot(clean)) return true
+
+  const vowelCount = (clean.match(/[aeiouy]/g) || []).length
+  const vowelRatio = vowelCount / clean.length
+  if (clean.length >= 5 && vowelRatio > 0.58 && !hasRecognisableBrandRoot(clean)) return true
+
+  return false
 }
 
 function hasReasonableVowelRatio(name: string, style: AutoFindControls["style"]): boolean {
@@ -191,13 +368,19 @@ export function evaluateCandidateFilters(
   if (!options.controls.allowHyphen && name.includes("-")) reasons.push("contains_hyphen")
   if (!options.controls.allowNumbers && /\d/.test(name)) reasons.push("contains_number")
 
-  if (HARD_BANNED_CLUSTERS.some((cluster) => name.includes(cluster))) reasons.push("awkward_cluster")
+  if (HARD_BANNED_CLUSTERS.some((cluster) => name.includes(cluster)) || hasAwkwardConsonantCluster(name)) reasons.push("awkward_cluster")
   if (hasVisualAmbiguity(name)) reasons.push("visual_ambiguity")
   if (hasExcessiveRepeatedLetters(name)) reasons.push("repeated_letters")
+  if (hasBrokenSpellingSignal(name)) reasons.push("broken_spelling")
+  if (hasLowEmotionalFit(name)) reasons.push("low_emotional_fit")
+  if (hasUnsafeBrandMeaning(name)) reasons.push("unsafe_brand_meaning")
+  if (hasRandomSyllablePattern(name)) reasons.push("random_syllables")
   if (!isPronounceable(name, options.controls.style)) reasons.push("low_pronounceability")
   if (TRADEMARK_LIKE_FRAGMENTS.some((fragment) => name.includes(fragment))) reasons.push("trademark_like_fragment")
-  if (containsKeywordRoot(name, options.keywordRoots || [])) reasons.push("keyword_mutation")
-  if (isKeywordAnchored(name, options.keywordRoots || [])) reasons.push("keyword_anchored")
+  if (options.controls.mustIncludeKeyword === "none") {
+    if (containsKeywordRoot(name, options.keywordRoots || [])) reasons.push("keyword_mutation")
+    if (isKeywordAnchored(name, options.keywordRoots || [])) reasons.push("keyword_anchored")
+  }
 
   // Reject AI-generated naming patterns (fake-Latin suffixes, meaningless tech prefixes)
   if (hasBannedSuffix(name)) reasons.push("ai_smell_suffix")
@@ -324,6 +507,10 @@ export function passesTasteGate(name: string): boolean {
 
   // Hard reject: weak endings
   if (WEAK_ENDINGS.test(clean)) return false
+
+  // Hard reject: unsafe, accidental, or random-syllable names.
+  if (hasUnsafeBrandMeaning(clean)) return false
+  if (hasRandomSyllablePattern(clean)) return false
 
   // Hard reject: awkward vowel pairings
   if (AWKWARD_VOWEL_PAIRS.test(clean)) return false

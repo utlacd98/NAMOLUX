@@ -17,6 +17,12 @@ export type AutoFindParams = {
   topNToCheck?: number
   poolSize?: number
   tlds?: string[]
+  /**
+   * Extra candidate names from an external creative source (e.g. LLM output).
+   * Treated like priority names: checked first, relaxed score floor, exempt
+   * from keyword-mutation rejection — but still must pass taste/hard gates.
+   */
+  seedNames?: string[]
 }
 
 export type AutoFindPick = {
@@ -26,6 +32,7 @@ export type AutoFindPick = {
   founderScore: number
   label: "Pronounceable" | "Brandable"
   reasons?: string[]
+  priority?: boolean
 }
 
 export type AutoFindResult = {
@@ -48,6 +55,7 @@ interface DomainCandidate {
   founderScore: number
   label: "Pronounceable" | "Brandable"
   reasons: string[]
+  priority: boolean
 }
 
 const DEFAULT_BANNED_TOKENS = [
@@ -129,6 +137,46 @@ function parseKeywords(keywords: string): string[] {
         .filter((token) => token.length >= 2),
     ),
   ).slice(0, 8)
+}
+
+function buildPriorityNames(params: { keywords: string; industry?: string; vibe: string; maxLen: number }): string[] {
+  const context = `${params.keywords} ${params.industry || ""}`.toLowerCase()
+  const names = new Set<string>()
+
+  if (/(bookkeep|accounting|accountant|invoice|invoicing|receipt|receipts|cashflow|cash flow|ledger|tax)/.test(context)) {
+    ;[
+      "ledgernest",
+      "cashridge",
+      "vaultflow",
+      "booksignal",
+      "frameledger",
+      "receiptflow",
+      "trustframe",
+    ].forEach((name) => names.add(name))
+  }
+
+  if (/(finance|fintech|banking|payments|payroll|wealth|capital|invest|budget|expense)/.test(context)) {
+    ;["vaultflow", "trustframe", "cashridge", "northvault", "clearvault", "anchor", "basis"].forEach((name) => names.add(name))
+  }
+
+  if (/(skin|beauty|botanical|skincare|wellness|refill|sensitive)/.test(context)) {
+    ;[
+      "sagemint",
+      "opalbloom",
+      "velasage",
+      "puregrove",
+      "bloomwell",
+      "glowfield",
+      "cedarglow",
+      "stillbloom",
+      "lumenleaf",
+      "maevaskin",
+    ].forEach((name) => names.add(name))
+  }
+
+  return Array.from(names)
+    .map((name) => normalise(name))
+    .filter((name) => name.length >= 4 && name.length <= params.maxLen)
 }
 
 function sanitiseTlds(input?: string[]): string[] {
@@ -254,10 +302,12 @@ function buildDomainCandidates(input: {
   vibeTerms: string[]
   bannedTokens: string[]
   scoreFloor: number
+  priorityNames: Set<string>
 }): DomainCandidate[] {
   const scored: DomainCandidate[] = []
 
   for (const name of input.names) {
+    const priority = input.priorityNames.has(name)
     for (const tld of input.tlds) {
       const score = scoreName({
         name,
@@ -268,7 +318,7 @@ function buildDomainCandidates(input: {
         bannedTokens: input.bannedTokens,
       })
 
-      if (score.score < input.scoreFloor) continue
+      if (score.score < (priority ? Math.min(65, input.scoreFloor) : input.scoreFloor)) continue
 
       scored.push({
         name,
@@ -277,6 +327,7 @@ function buildDomainCandidates(input: {
         founderScore: score.score,
         label: score.label,
         reasons: score.reasons,
+        priority,
       })
     }
   }
@@ -306,6 +357,13 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
   const pickedDomains = new Set<string>()
   const pickedNames = new Set<string>()
   const picked: AutoFindPick[] = []
+  const externalSeeds = (params.seedNames || [])
+    .map((name) => normalise(name))
+    .filter((name) => name.length >= 4 && name.length <= maxLen)
+  const priorityNames = new Set([
+    ...buildPriorityNames({ keywords: params.keywords, industry: params.industry, vibe, maxLen }),
+    ...externalSeeds,
+  ])
 
   let attempts = 0
   let generated = 0
@@ -331,7 +389,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
 
     generated += generatedPool.length
 
-    const filteredNames = generatedPool
+    const generatedNames = generatedPool
       .map((candidate) => normalise(candidate.name))
       .filter((name) => name.length > 0)
       .filter((name) => {
@@ -344,6 +402,11 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
       .filter((name) => !containsKeywordRoot(name, keywords))
       .filter((name) => !isKeywordAnchored(name, keywords))
 
+    const filteredNames = Array.from(new Set([...priorityNames, ...generatedNames]))
+      .filter((name) => passesHardRules(name, maxLen, bannedTokens))
+      .filter((name) => passesTasteGate(name))
+      .filter((name) => priorityNames.has(name) || (!containsKeywordRoot(name, keywords) && !isKeywordAnchored(name, keywords)))
+
     const domainCandidates = buildDomainCandidates({
       names: filteredNames,
       tlds,
@@ -352,6 +415,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
       vibeTerms: VIBE_TERMS[vibe] || VIBE_TERMS.minimal,
       bannedTokens,
       scoreFloor,
+      priorityNames,
     })
 
     passedQuality += domainCandidates.length
@@ -359,6 +423,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
     const sortedCandidates = domainCandidates
       .filter((candidate) => !pickedNames.has(candidate.name) && !pickedDomains.has(candidate.domain))
       .sort((a, b) => {
+        if (a.priority !== b.priority) return a.priority ? -1 : 1
         if (b.founderScore !== a.founderScore) return b.founderScore - a.founderScore
         const aPriority = tldPriority.get(a.tld) ?? 99
         const bPriority = tldPriority.get(b.tld) ?? 99
@@ -405,6 +470,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
         founderScore: candidate.founderScore,
         label: candidate.label,
         reasons: candidate.reasons,
+        priority: candidate.priority,
       })
 
       pickedDomains.add(candidate.domain)
@@ -417,6 +483,7 @@ export async function autoFind5DotComByFounderScore(params: AutoFindParams): Pro
 
   const found = picked
     .sort((a, b) => {
+      if (Boolean(a.priority) !== Boolean(b.priority)) return a.priority ? -1 : 1
       if (b.founderScore !== a.founderScore) return b.founderScore - a.founderScore
       const aPriority = tldPriority.get(a.tld) ?? 99
       const bPriority = tldPriority.get(b.tld) ?? 99

@@ -21,6 +21,16 @@ export default function ResetPasswordPage() {
   // Check if we have a valid session from the email link
   useEffect(() => {
     const checkSession = async () => {
+      const code = new URLSearchParams(window.location.search).get("code")
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (error) {
+          setError("This reset link is invalid or has expired. Please request a new one.")
+          return
+        }
+        window.history.replaceState({}, "", "/reset-password")
+      }
+
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
         // If no session, redirect to forgot-password
@@ -160,4 +170,3 @@ export default function ResetPasswordPage() {
     </div>
   )
 }
-
