@@ -29,7 +29,6 @@ import {
   Swords,
   LayoutGrid,
   Palette,
-  MessageCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -37,7 +36,6 @@ import { FounderSignalPanel } from "@/components/founder-signal"
 import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
 import { DeepSearch } from "@/components/deep-search"
-import { AiNameChat } from "@/components/ai-name-chat"
 import { useNamePreferences } from "@/hooks/useNamePreferences"
 import { NamePronunciation } from "@/components/name-pronunciation"
 import { NameStressTest } from "@/components/name-stress-test"
@@ -439,7 +437,6 @@ export function GenerateNames() {
 
   // Bulk check state
   const [isBulkMode, setIsBulkMode] = useState(false)
-  const [showAiChat, setShowAiChat] = useState(false)
   const [bulkInput, setBulkInput] = useState("")
   const [description, setDescription] = useState("")
   const [isExtracting, setIsExtracting] = useState(false)
@@ -1257,13 +1254,7 @@ export function GenerateNames() {
     .slice(0, 50)
 
   const descriptionCharacterCount = description.length
-  const activeWorkflowStats = showAiChat
-    ? [
-        { label: "Brief mode", value: "Guided" },
-        { label: "Checks", value: "6 TLDs" },
-        { label: "Output", value: "Scored" },
-      ]
-    : isBulkMode
+  const activeWorkflowStats = isBulkMode
       ? [
           { label: "Queued", value: `${bulkCandidates.length}/50` },
           { label: "Coverage", value: "6 TLDs" },
@@ -1409,11 +1400,10 @@ export function GenerateNames() {
               }}
             >
               {/* Mode Toggle */}
-              <div className="mb-4 grid gap-1 rounded-lg p-1 sm:mb-5 sm:grid-cols-3" style={{ background: "rgba(255,255,255,0.045)", border: "1px solid rgba(212,175,55,0.14)" }}>
+              <div className="mb-4 grid gap-1 rounded-lg p-1 sm:mb-5 sm:grid-cols-2" style={{ background: "rgba(255,255,255,0.045)", border: "1px solid rgba(212,175,55,0.14)" }}>
                 {[
-                  { label: "Generate", icon: Sparkles, active: !isBulkMode && !showAiChat, onClick: () => { setIsBulkMode(false); setShowAiChat(false) } },
-                  { label: "Bulk Check", icon: LayoutGrid, active: isBulkMode && !showAiChat, onClick: () => { setIsBulkMode(true); setShowAiChat(false) } },
-                  { label: "AI Chat", icon: MessageCircle, active: showAiChat, onClick: () => { setShowAiChat(true); setIsBulkMode(false) } },
+                  { label: "Generate", icon: Sparkles, active: !isBulkMode, onClick: () => setIsBulkMode(false) },
+                  { label: "Bulk Check", icon: LayoutGrid, active: isBulkMode, onClick: () => setIsBulkMode(true) },
                 ].map(({ label, icon: Icon, active, onClick }) => (
                   <button
                     key={label}
@@ -1450,11 +1440,8 @@ export function GenerateNames() {
                 ))}
               </div>
 
-              {/* AI Chat Mode */}
-              {showAiChat && <AiNameChat />}
-
               {/* Bulk Mode */}
-              {!showAiChat && isBulkMode ? (
+              {isBulkMode ? (
                 <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
                   <div>
                     <label htmlFor="bulk-input" className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]/65">
@@ -1527,7 +1514,7 @@ export function GenerateNames() {
                     </div>
                   </div>
                 </div>
-              ) : !showAiChat ? (
+              ) : (
               <>
               {/* ── STARTUP DESCRIPTION & KEYWORDS ── */}
               <div>
@@ -1904,9 +1891,9 @@ export function GenerateNames() {
               </div>
               )}
               </>
-              ) : null}
+              )}
 
-              {/* Generate / Bulk Check Button — hidden when AI Chat is active */}
+              {/* Generate / Bulk Check Button */}
               <button
                 onClick={isBulkMode ? handleBulkCheck : handleGenerate}
                 disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : ((!keyword.trim() && !description.trim()) || isGenerating)}
@@ -1917,7 +1904,6 @@ export function GenerateNames() {
                   !isGenerating && "hover:-translate-y-0.5"
                 )}
                 style={{
-                  display: showAiChat ? "none" : undefined,
                   background: "linear-gradient(135deg, #B8841F 0%, #F5DD77 48%, #C99A2E 100%)",
                   color: "#0a0800",
                   boxShadow: isGenerating
@@ -1980,7 +1966,7 @@ export function GenerateNames() {
               )}
 
               {/* Quick category pills — shown when no input yet and not generating */}
-              {!showAiChat && !isBulkMode && !description.trim() && !isGenerating && (
+              {!isBulkMode && !description.trim() && !isGenerating && (
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] text-white/25">Try:</span>
                   {QUICK_CATEGORIES.map((cat) => (
