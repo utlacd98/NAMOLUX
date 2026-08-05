@@ -1,0 +1,34 @@
+# NamoLux
+
+> NamoLux is a name decision workspace for founders. It helps people compare a shortlist of up to 50 candidate names, check availability across six domain extensions, review brand-footprint verification links, apply Founder Signal, and preserve the reasoning behind a final decision.
+
+NamoLux checks .com, .io, .co, .ai, .app, and .dev. Domain availability is best-effort and should be confirmed with a registrar before purchase. Social-profile, company-name, and official UK, US, and EU trade-mark links are research aids, not guarantees of availability or legal clearance. Founder Signal is decision support, not legal or trade-mark advice.
+
+## Product
+
+- [NamoLux home](https://www.namolux.com/): Overview of the name decision workspace and its workflow.
+- [Bulk Domain Checker](https://www.namolux.com/bulk-domain-check): Check up to 50 candidate names across six domain extensions and continue into comparison and verification.
+- [Founder Signal methodology](https://www.namolux.com/founder-signal): How NamoLux evaluates and explains naming candidates consistently.
+- [Pricing](https://www.namolux.com/pricing): Current Free and Pro allowances, decision-record features, and subscription terms.
+
+## Company
+
+- [About NamoLux](https://www.namolux.com/about): Product principles, scope, and limitations.
+- [Andrew Barrett, founder of NamoLux](https://www.namolux.com/journal/andrew-barrett): Founder biography and relationship to NamoLux.
+- [Contact NamoLux](https://www.namolux.com/contact): How to contact NamoLux.
+
+## Naming and domain guides
+
+- [NamoLux Journal](https://www.namolux.com/blog): Practical guidance about startup naming, domain strategy, and due diligence.
+- [Why I Built NamoLux](https://www.namolux.com/blog/why-i-built-namolux): Andrew Barrett's account of building a decision-focused naming product.
+- [How to check if a business name is taken](https://www.namolux.com/blog/how-to-check-if-business-name-is-taken): A practical name, domain, company, and trade-mark research workflow.
+- [Business name vs legal company name vs DBA](https://www.namolux.com/blog/business-name-vs-legal-company-name-vs-dba): The distinctions founders should understand before choosing a name.
+- [Best domain extensions in 2026](https://www.namolux.com/blog/best-domain-extensions-2026): A comparison of common startup domain extensions.
+- [Founder Signal score explained](https://www.namolux.com/blog/founder-signal-score-explained): Guidance for interpreting Founder Signal without treating it as a verdict.
+
+## Optional
+
+- [Sitemap](https://www.namolux.com/sitemap.xml): Index of public, canonical NamoLux pages.
+- [Robots policy](https://www.namolux.com/robots.txt): Search-crawler access rules and sitemap location.
+- [Privacy policy](https://www.namolux.com/privacy): How NamoLux handles personal information.
+- [Terms of service](https://www.namolux.com/terms): Terms governing use of NamoLux.
