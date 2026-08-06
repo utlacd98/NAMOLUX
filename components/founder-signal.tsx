@@ -1,349 +1,168 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useId, useState } from "react"
 import { ChevronDown, ChevronUp, Info } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
+import { getFounderSignalBand, type FounderSignalBand } from "@/lib/founderSignal/spec"
 
-interface FounderSignalResult {
+type FounderSignalRawScores = Partial<{
+  clarity: number
+  length: number
+  pronounceability: number
+  memorability: number
+  extension: number
+  characterQuality: number
+  brandRisk: number
+}>
+
+/**
+ * Presentation-only payload returned by an authorised server-side scoring
+ * request. This component deliberately does not accept a name or calculate a
+ * score in the browser, so entitlement and free-plan quota checks remain
+ * server-authoritative.
+ */
+export type ServerFounderSignal = {
   score: number
-  breakdown: {
-    lengthScore: number
-    pronounceScore: number
-    memorabilityScore: number
-    extensionScore: number
-    characterScore: number
-    brandRiskScore: number
-    vibeModifier: number
-  }
-  rawScores: {
-    length: number
-    pronounceability: number
-    memorability: number
-    extension: number
-    characterQuality: number
-    brandRisk: number
-  }
-  insights: {
-    type: "positive" | "warning" | "negative"
-    text: string
-  }[]
-  brutalVerdict: string
+  band?: FounderSignalBand
+  rawScores?: FounderSignalRawScores
+  reasons?: readonly string[]
+  version?: string
 }
 
-// Calculate Founder Signal score using the centralized scoring function
-export function calculateFounderSignal(
-  name: string,
-  tld: string,
-  vibe?: BrandVibe
-): FounderSignalResult {
-  const result = scoreName({ name, tld, vibe })
-  const insights: FounderSignalResult["insights"] = []
-
-  // Generate insights based on raw scores
-  const { rawScores } = result
-
-  // Length insights
-  if (rawScores.length >= 90) {
-    insights.push({ type: "positive", text: "Short & brandable (≤6 chars)" })
-  } else if (rawScores.length >= 60) {
-    insights.push({ type: "positive", text: "Good brand length" })
-  } else if (rawScores.length < 45) {
-    insights.push({ type: "warning", text: "Name is getting long" })
-  }
-
-  // Pronounceability insights
-  if (rawScores.pronounceability >= 80) {
-    insights.push({ type: "positive", text: "Easy to pronounce" })
-  } else if (rawScores.pronounceability < 50) {
-    insights.push({ type: "negative", text: "Hard to pronounce" })
-  } else if (rawScores.pronounceability < 70) {
-    insights.push({ type: "warning", text: "May be hard to say aloud" })
-  }
-
-  // Memorability insights
-  if (rawScores.memorability >= 80) {
-    insights.push({ type: "positive", text: "Highly memorable" })
-  } else if (rawScores.memorability < 50) {
-    insights.push({ type: "negative", text: "Low memorability — generic patterns" })
-  }
-
-  // Extension insights
-  if (rawScores.extension >= 100) {
-    insights.push({ type: "positive", text: "Premium extension (.com)" })
-  } else if (rawScores.extension >= 75) {
-    insights.push({ type: "positive", text: `Strong tech extension (.${tld})` })
-  } else if (rawScores.extension < 55) {
-    insights.push({ type: "warning", text: `Weaker extension (.${tld})` })
-  }
-
-  // Character quality insights
-  if (rawScores.characterQuality < 70) {
-    if (name.includes("-")) {
-      insights.push({ type: "warning", text: "Hyphens hurt word-of-mouth" })
-    }
-    if (/\d/.test(name)) {
-      insights.push({ type: "warning", text: "Numbers cause confusion" })
-    }
-  } else if (rawScores.characterQuality >= 95) {
-    insights.push({ type: "positive", text: "Clean characters" })
-  }
-
-  // Brand risk insights
-  if (rawScores.brandRisk < 50) {
-    insights.push({ type: "negative", text: "High brand risk — generic/conflict patterns" })
-  } else if (rawScores.brandRisk < 70) {
-    insights.push({ type: "warning", text: "Some brand risk concerns" })
-  } else if (rawScores.brandRisk >= 90) {
-    insights.push({ type: "positive", text: "Low brand risk — unique positioning" })
-  }
-
-  // Vibe modifier insight
-  if (result.breakdown.vibeModifier > 0) {
-    insights.push({ type: "positive", text: `Matches ${vibe} vibe (+${result.breakdown.vibeModifier})` })
-  } else if (result.breakdown.vibeModifier < 0) {
-    insights.push({ type: "warning", text: `Clashes with ${vibe} vibe (${result.breakdown.vibeModifier})` })
-  }
-
-  // Generate brutal verdict based on score
-  let brutalVerdict = ""
-  if (result.score >= 90) {
-    brutalVerdict = "Elite brand potential. This name can scale globally. Move fast."
-  } else if (result.score >= 80) {
-    brutalVerdict = "Strong foundation for a lasting brand. Minor optimizations possible."
-  } else if (result.score >= 65) {
-    brutalVerdict = "Solid choice with trade-offs. Could work well in the right niche."
-  } else if (result.score >= 50) {
-    brutalVerdict = "Forgettable and competes with dozens of similar brands. Consider alternatives."
-  } else if (result.score >= 35) {
-    brutalVerdict = "Weak long-term brandability. You'll fight for recognition."
-  } else {
-    brutalVerdict = "This name will hold you back. Generic patterns, brand conflicts, or unpronounceable. Start over."
-  }
-
-  return {
-    score: result.score,
-    breakdown: result.breakdown,
-    rawScores: result.rawScores,
-    insights: insights.slice(0, 6),
-    brutalVerdict,
-  }
+function normaliseScore(value: number): number {
+  return Math.round(Math.max(0, Math.min(100, value)))
 }
 
-interface FounderSignalBadgeProps {
-  name: string
-  tld: string
-  vibe?: BrandVibe
-  /** @deprecated - no longer used, scoring calculates internally */
-  pronounceable?: boolean
-  /** @deprecated - no longer used, scoring calculates internally */
-  memorability?: number
+function scoreColor(score: number): string {
+  if (score >= 90) return "#D4AF37"
+  if (score >= 75) return "#34d399"
+  if (score >= 60) return "#60a5fa"
+  return "#f87171"
 }
 
-export function FounderSignalBadge({ name, tld, vibe }: FounderSignalBadgeProps) {
+function verdictFor(band: FounderSignalBand): string {
+  if (band === "Elite") return "Elite signal across the scored dimensions. Confirm separate company, social, and trademark checks before committing."
+  if (band === "Strong") return "Strong overall signal with manageable trade-offs. Review the weakest dimension before deciding."
+  if (band === "Viable") return "Viable with notable trade-offs. Keep stronger alternatives in the shortlist."
+  return "Material weaknesses or collision risk. Reconsider this candidate before committing."
+}
+
+function detailRows(rawScores: FounderSignalRawScores | undefined) {
+  if (!rawScores) return []
+
+  return [
+    { label: "Clarity", value: rawScores.clarity ?? rawScores.length },
+    { label: "Pronunciation", value: rawScores.pronounceability },
+    { label: "Memorability", value: rawScores.memorability },
+    { label: "Extension strength", value: rawScores.extension },
+    { label: "Character quality", value: rawScores.characterQuality },
+    { label: "Brand risk", value: rawScores.brandRisk },
+  ].filter((row): row is { label: string; value: number } => typeof row.value === "number" && Number.isFinite(row.value))
+}
+
+function detailsFor(signal: ServerFounderSignal): string[] {
+  if (signal.reasons && signal.reasons.length > 0) return [...signal.reasons].slice(0, 6)
+
+  return detailRows(signal.rawScores)
+    .map((row) => `${row.label}: ${Math.round(row.value)}/100`)
+    .slice(0, 6)
+}
+
+function resolveBand(signal: ServerFounderSignal, score: number): FounderSignalBand {
+  return signal.band || getFounderSignalBand(score)
+}
+
+export function FounderSignalBadge({ signal }: { signal: ServerFounderSignal }) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const signal = calculateFounderSignal(name, tld, vibe)
-
-  // Color based on score
-  const getScoreColor = (score: number) => {
-    if (score >= 75) return "text-green-400 bg-green-500/15 border-green-500/30"
-    if (score >= 50) return "text-yellow-400 bg-yellow-500/15 border-yellow-500/30"
-    return "text-orange-400 bg-orange-500/15 border-orange-500/30"
-  }
-
-  const scoreColor = getScoreColor(signal.score)
+  const detailsId = useId()
+  const score = normaliseScore(signal.score)
+  const band = resolveBand(signal, score)
+  const color = scoreColor(score)
+  const details = detailsFor(signal)
 
   return (
-    <div className="mt-2">
-      {/* Compact Badge */}
+    <div className="mt-2" data-founder-signal-source="server">
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-[10px] font-medium transition-all hover:opacity-80 sm:px-2.5 sm:py-1.5 sm:text-xs",
-          scoreColor
-        )}
+        type="button"
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+        aria-expanded={isExpanded}
+        aria-controls={detailsId}
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-2 py-1 text-[10px] font-medium transition-all hover:opacity-80 sm:px-2.5 sm:py-1.5 sm:text-xs"
+        style={{ color, background: `${color}1f`, borderColor: `${color}55` }}
       >
-        <span className="font-semibold">Founder Signal™</span>
-        <span className="font-bold">{signal.score}</span>
-        <span className="opacity-60">/100</span>
-        {isExpanded ? (
-          <ChevronUp className="h-3 w-3 opacity-60" />
-        ) : (
-          <ChevronDown className="h-3 w-3 opacity-60" />
-        )}
+        <span className="font-semibold">Founder Signal</span>
+        <span className="font-bold">{score} · {band}</span>
+        {isExpanded ? <ChevronUp className="h-3 w-3 opacity-60" /> : <ChevronDown className="h-3 w-3 opacity-60" />}
       </button>
 
-      {/* Expanded Explanation */}
-      {isExpanded && (
-        <div className="mt-2 animate-fade-up rounded-lg border border-border/50 bg-background/80 p-3 text-xs sm:p-4">
-          {/* Brutal Verdict */}
-          <p className="mb-3 text-[11px] font-medium text-foreground/90 sm:text-xs">
-            {signal.brutalVerdict}
-          </p>
-
-          <div className="space-y-1.5">
-            {signal.insights.map((insight, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  "flex items-center gap-1.5 text-[11px] sm:text-xs",
-                  insight.type === "positive" && "text-green-400",
-                  insight.type === "warning" && "text-yellow-400",
-                  insight.type === "negative" && "text-red-400"
-                )}
-              >
-                <span>
-                  {insight.type === "positive" ? "✔" : insight.type === "negative" ? "✖" : "⚠"}
-                </span>
-                <span>{insight.text}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-3 flex items-start gap-1.5 border-t border-border/30 pt-2 text-[10px] text-muted-foreground sm:text-xs">
-            <Info className="mt-0.5 h-3 w-3 shrink-0" />
-            <span>Founder Signal™ estimates long-term brand strength. Not legal advice.</span>
-          </div>
+      {isExpanded ? (
+        <div id={detailsId} className="mt-2 rounded-lg border border-border/50 bg-background/80 p-3 text-xs">
+          <p className="mb-3 text-[11px] font-medium text-foreground/90 sm:text-xs">{verdictFor(band)}</p>
+          {details.length > 0 ? (
+            <div className="space-y-1.5">
+              {details.map((detail) => <p key={detail} className="text-[11px] text-muted-foreground sm:text-xs">{detail}</p>)}
+            </div>
+          ) : null}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getFsTierLabel(score: number): string {
-  if (score >= 95) return "Elite Brand Score"
-  if (score >= 85) return "Strong Brand Score"
-  if (score >= 70) return "Good Brand Score"
-  return "Starter Brand Score"
-}
-
-function getFsConfidenceLine(score: number): string {
-  if (score >= 95) return "Top 5% of generated names"
-  if (score >= 85) return "Highly brandable startup name"
-  if (score >= 70) return "Solid brand potential"
-  return "Decent early-stage brand name"
-}
-
-function getFsScoreColor(score: number): string {
-  if (score >= 95) return "#D4AF37"
-  if (score >= 85) return "#34d399"
-  if (score >= 70) return "#60a5fa"
-  return "rgba(255,255,255,0.35)"
-}
-
-// ─── FounderSignalPanel ───────────────────────────────────────────────────────
-
-interface FounderSignalPanelProps {
-  name: string
-  tld: string
-  vibe?: BrandVibe
-}
-
-export function FounderSignalPanel({ name, tld, vibe }: FounderSignalPanelProps) {
+export function FounderSignalPanel({ signal }: { signal: ServerFounderSignal }) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const signal = calculateFounderSignal(name, tld, vibe)
-  const [displayScore, setDisplayScore] = useState(0)
-
-  useEffect(() => {
-    setDisplayScore(0)
-    const target = signal.score
-    const steps = 28
-    const intervalMs = 800 / steps
-    let step = 0
-    const id = setInterval(() => {
-      step++
-      setDisplayScore(Math.round((step / steps) * target))
-      if (step >= steps) {
-        setDisplayScore(target)
-        clearInterval(id)
-      }
-    }, intervalMs)
-    return () => clearInterval(id)
-  }, [signal.score])
-
-  const scoreColor = getFsScoreColor(signal.score)
+  const detailsId = useId()
+  const score = normaliseScore(signal.score)
+  const band = resolveBand(signal, score)
+  const color = scoreColor(score)
+  const details = detailsFor(signal)
 
   return (
-    <div className="mt-2.5">
+    <section className="mt-2.5" data-founder-signal-source="server" aria-label={`Founder Signal ${score} out of 100, ${band}`}>
       <div className="flex items-start gap-3">
-        {/* Animated numeric score tile */}
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-base font-black tabular-nums"
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            border: `1px solid ${scoreColor}40`,
-            color: scoreColor,
-            boxShadow: `0 0 16px ${scoreColor}20`,
-          }}
+          style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${color}40`, color, boxShadow: `0 0 16px ${color}20` }}
         >
-          {displayScore}
+          {score}
         </div>
-
-        {/* Labels */}
         <div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-[11px] font-semibold tracking-wide text-white/50">
-              Founder Signal™
-            </span>
+            <span className="text-[11px] font-semibold tracking-wide text-white/50">Founder Signal™</span>
             <span className="text-[10px] text-white/25">/ 100</span>
           </div>
-          <div className="text-[11px] font-bold" style={{ color: scoreColor }}>
-            {getFsTierLabel(signal.score)}
-          </div>
-          <div className="mt-0.5 text-[10px] text-white/25">
-            {getFsConfidenceLine(signal.score)}
-          </div>
+          <div className="text-[11px] font-bold" style={{ color }}>{band}</div>
+          <div className="mt-0.5 text-[10px] text-white/25">Server-scored for this authorised shortlist</div>
         </div>
       </div>
 
-      {/* Verdict — always visible */}
-      <p className="mt-1.5 text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
-        {signal.brutalVerdict}
-      </p>
+      <p className="mt-1.5 text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>{verdictFor(band)}</p>
 
-      {/* Expand toggle */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="mt-1 flex items-center gap-1 text-[10px] text-white/25 transition-colors hover:text-white/50"
+        type="button"
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+        aria-expanded={isExpanded}
+        aria-controls={detailsId}
+        className="mt-1 flex min-h-11 items-center gap-1 text-[10px] text-white/40 transition-colors hover:text-white/70"
       >
         View breakdown
         {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
       </button>
 
-      {/* Expanded breakdown */}
-      {isExpanded && (
-        <div
-          className="mt-2 animate-fade-up rounded-xl p-3 text-xs"
-          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-        >
-          <p className="mb-3 text-[11px] font-medium text-white/70">{signal.brutalVerdict}</p>
-          <div className="space-y-1.5">
-            {signal.insights.map((insight, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  "flex items-center gap-1.5 text-[11px]",
-                  insight.type === "positive" && "text-emerald-400",
-                  insight.type === "warning" && "text-yellow-400",
-                  insight.type === "negative" && "text-red-400"
-                )}
-              >
-                <span>{insight.type === "positive" ? "✔" : insight.type === "negative" ? "✖" : "⚠"}</span>
-                <span>{insight.text}</span>
-              </div>
-            ))}
-          </div>
-          <div
-            className="mt-3 flex items-start gap-1.5 pt-2 text-[10px] text-white/25"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
-          >
+      {isExpanded ? (
+        <div id={detailsId} className="mt-2 rounded-xl p-3 text-xs" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          {details.length > 0 ? (
+            <div className="space-y-1.5">
+              {details.map((detail) => <p key={detail} className="text-[11px] text-white/60">{detail}</p>)}
+            </div>
+          ) : (
+            <p className="text-[11px] text-white/45">This score was approved by the Founder Signal service for the current shortlist.</p>
+          )}
+          <div className="mt-3 flex items-start gap-1.5 border-t border-white/10 pt-2 text-[10px] text-white/25">
             <Info className="mt-0.5 h-3 w-3 shrink-0" />
-            <span>Founder Signal™ estimates long-term brand strength. Not legal advice.</span>
+            <span>Founder Signal™ supports judgment. It is not legal or trademark advice.</span>
           </div>
         </div>
-      )}
-    </div>
+      ) : null}
+    </section>
   )
 }

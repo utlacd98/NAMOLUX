@@ -44,28 +44,28 @@ export const PLATFORMS: Record<PlatformId, PlatformConfig> = {
     height: 1080,
     label: "Instagram",
     caption:
-      "🚀 Stop wasting hours in Canva trying domain names that are already taken.\n\nNamoLux generates AI-scored domain names in seconds — with live .com availability, Founder Signal™ scoring, and name origin insights.\n\n✅ Free to try → namolux.com\n\n#startupnames #domainname #founderlife #saas #startup #branding",
+      "Bring your shortlist. Make the call with evidence.\n\nNamoLux checks up to 50 candidates across six domain extensions, then Founder Signal helps you compare the names worth pursuing.\n\nStart free → namolux.com/bulk-domain-check\n\n#startupnames #domainname #founderlife #saas #startup #branding",
   },
   facebook: {
     width: 1200,
     height: 630,
     label: "Facebook",
     caption:
-      "Looking for a domain name that actually converts? NamoLux scores every AI-generated name 0–100 using Founder Signal™ — checking memorability, brandability, SEO value, and more.\n\nFind your domain in seconds. Free to try at namolux.com",
+      "Looking for a business name you can defend? NamoLux turns a shortlist into a clear decision: check domains across six extensions, then use Founder Signal for an explained score.\n\nStart free at namolux.com/bulk-domain-check",
   },
   linkedin: {
     width: 1200,
     height: 1200,
     label: "LinkedIn",
     caption:
-      "Founders: your domain name is your first brand impression. Don't settle.\n\nNamoLux generates AI-scored startup names with live .com availability checks and Founder Signal™ analysis — so you know exactly how strong your name is before you register it.\n\n🔗 Try it free: namolux.com",
+      "Founders: your domain name is your first brand impression. Don't settle.\n\nNamoLux gives you one place to check a shortlist, see live domain states, and use Founder Signal when you are ready to compare the evidence.\n\nTry Bulk Check free: namolux.com/bulk-domain-check",
   },
   twitter: {
     width: 1200,
     height: 675,
     label: "X / Twitter",
     caption:
-      "Your domain name = your brand's first impression.\n\nNamoLux generates AI-scored .com names in seconds with live availability checks.\n\nFree → namolux.com",
+      "Your domain name = your brand's first impression.\n\nBring the candidates you already have, check domains in one view, then score the shortlist only when you choose.\n\nFree → namolux.com/bulk-domain-check",
   },
 }
 
@@ -74,8 +74,8 @@ export const PREVIEW_WIDTH = 520
 export const DEFAULT_CONFIG: PostConfig = {
   template: "A",
   platform: "instagram",
-  headline: "FIND A DOMAIN\nWORTH BUILDING\nA COMPANY ON.",
-  subtitle: "AI-powered startup names with live availability",
+  headline: "CHECK THE NAMES\nWORTH BUILDING\nA COMPANY ON.",
+  subtitle: "Bulk domain checks with Founder Signal decision support",
   ctaText: "TRY IT FREE →",
   ctaUrl: "NAMOLUX.COM",
   bgColor: "#080808",
@@ -84,9 +84,9 @@ export const DEFAULT_CONFIG: PostConfig = {
   bodyFontSize: 17,
   screenshots: [],
   features: [
-    "Generate startup names in seconds.",
-    "Founder Signal™ scoring.",
-    "Instant domain availability checks.",
+    "3 free Bulk Check runs each month.",
+    "1 free Founder Signal run each month.",
+    "Live checks across six domain extensions.",
   ],
   domainName: "CloudSync.io",
   score: 95,
@@ -100,29 +100,29 @@ export const DEFAULT_CONFIG: PostConfig = {
   ],
   competitor: "Namelix",
   ourFeatures: [
-    "Founder Signal™ 0–100 scoring",
-    "Live .com availability",
-    "Name origin & brand fit",
-    "SEO potential analysis",
+    "Founder Signal scoring",
+    "Live availability across six TLDs",
+    "Up to 50 candidates per check",
+    "Saved decision workspace",
+    "CSV exports and reports",
     "Bulk domain check",
-    "AI name meaning insights",
   ],
   theirFeatures: [
-    "No brand quality scoring",
-    "No real-time availability",
-    "No brand fit analysis",
-    "No SEO insights",
-    "No bulk check",
-    "No etymology insights",
+    "Compare the details on each tool",
+    "Confirm current availability",
+    "Review the scoring method",
+    "Check the available extensions",
+    "Bring a shortlist to compare",
+    "Use independent legal checks",
   ],
   statNumber: "10,000+",
-  statLabel: "startup names generated and scored",
+  statLabel: "startup names explored",
   tips: [
     "Keep it under 10 characters — shorter names stick.",
     "Avoid hyphens and numbers in .com domains.",
     "Check trademark conflicts before you register.",
     "Test pronunciation with 5 people before committing.",
-    "Use Founder Signal™ score to rank your shortlist.",
+    "Score only the shortlist you are ready to compare.",
   ],
 }
 

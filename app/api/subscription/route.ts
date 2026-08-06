@@ -1,36 +1,38 @@
 import { NextResponse } from "next/server"
-import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { anonymousEntitlements, getUserEntitlements } from "@/lib/entitlements"
+import { createClient } from "@/lib/supabase/server"
+
+const PRIVATE_NO_STORE = {
+  "Cache-Control": "private, no-store, max-age=0",
+  Vary: "Cookie",
+}
 
 export async function GET() {
-  try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
 
-    if (!user) {
-      return NextResponse.json({ isPro: false, subscriptionEnd: null, customerId: null })
-    }
-
-    const service = createServiceClient()
-    const { data: profile, error } = await service
-      .from("profiles")
-      .select("plan")
-      .eq("id", user.id)
-      .single()
-
-    if (error) {
-      console.error("Subscription lookup failed:", error)
-      return NextResponse.json({ isPro: false, subscriptionEnd: null, customerId: null })
-    }
-
-    return NextResponse.json({
-      isPro: profile?.plan === "pro",
-      subscriptionEnd: null,
-      customerId: null,
+  if (authError && authError.name !== "AuthSessionMissingError") {
+    return NextResponse.json(anonymousEntitlements({ adsEnabled: false }), {
+      headers: PRIVATE_NO_STORE,
+      status: 503,
     })
+  }
+
+  if (!user) {
+    return NextResponse.json(anonymousEntitlements(), { headers: PRIVATE_NO_STORE })
+  }
+
+  try {
+    const entitlements = await getUserEntitlements(user.id)
+    return NextResponse.json(entitlements, { headers: PRIVATE_NO_STORE })
   } catch (error) {
-    console.error("Subscription route failed:", error)
-    return NextResponse.json({ isPro: false, subscriptionEnd: null, customerId: null })
+    console.error("Subscription lookup failed:", error)
+    return NextResponse.json(anonymousEntitlements({ adsEnabled: false }), {
+      headers: PRIVATE_NO_STORE,
+      status: 503,
+    })
   }
 }

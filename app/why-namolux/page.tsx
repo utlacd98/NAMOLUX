@@ -7,13 +7,13 @@ import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Why NamoLux Exists | Built for Founders Who Ship",
-  description: "No accounts, no upsells, no friction. Here's why we built NamoLux differently — and what we believe founders actually need.",
+  description: "Why NamoLux gives solo founders a focused workspace to check, compare, and choose a name with evidence.",
 }
 
 const annoyances = [
   {
     problem: "Forced account creation",
-    take: "You want to check a domain. They want your email. We don't. Use the tool, get your answer, leave.",
+    take: "You should be able to start a Bulk Check before you commit. Accounts are for saving a decision and returning to it, not for creating friction at the first click.",
   },
   {
     problem: "Hidden availability",
@@ -21,11 +21,11 @@ const annoyances = [
   },
   {
     problem: "Affiliate-first results",
-    take: "Many generators push expensive premium domains because they get a cut. We show what's actually available.",
+    take: "Some domain tools push expensive premium inventory because they get a cut. We show the status returned by live checks.",
   },
   {
     problem: "Overwhelming options",
-    take: "100 mediocre suggestions aren't helpful. We generate fewer names, but each one is actually usable.",
+    take: "A shortlist spread across dozens of tabs is hard to compare. We put up to 50 names into one consistent view.",
   },
   {
     problem: "No signal, just noise",
@@ -37,7 +37,7 @@ const beliefs = [
   "Founders don't need more options. They need better filters.",
   "A name should be available, pronounceable, and memorable. In that order.",
   "Tools should work instantly. Loading spinners are a failure.",
-  "No signup means no friction. Friction kills momentum.",
+  "Saving a serious decision should be optional, clear, and worth the account.",
   "Simplicity isn't laziness. It's respect for your time.",
 ]
 
@@ -73,25 +73,25 @@ export default function WhyNamoluxPage() {
               Why simplicity matters
             </h2>
             <p className="mb-4 text-muted-foreground">
-              You're naming a company, not learning a new tool. The interface should disappear. Type, generate, decide.
+              You're naming a company, not learning a new tool. The interface should disappear. Paste, check, decide.
             </p>
             <p className="mb-4 text-muted-foreground">
-              Every feature we didn't add is intentional. Dashboards, saved searches, team collaboration — these add complexity without adding value for the core use case.
+              Every feature we did not add is intentional. We keep the workspace focused on the evidence a solo founder needs to choose a name, rather than expanding into a general brand suite.
             </p>
             <p className="text-muted-foreground">
-              You'll use this tool once or twice. It should work perfectly those times, then get out of your way.
+              You may return to a serious shortlist more than once. The workspace should preserve the evidence without turning a simple decision into a bloated suite.
             </p>
           </section>
 
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-semibold text-foreground">
-              Why no sign-up
+              Why an account is optional at the start
             </h2>
             <p className="mb-4 text-muted-foreground">
-              Sign-up forms exist to capture emails. We don't need your email. We need you to find a good name and go build your company.
+              You can start a Bulk Check without an account. Sign in only when you want to save a project, export the evidence, share a report, or use the higher Pro allowance.
             </p>
             <p className="text-muted-foreground">
-              If the tool is good, you'll remember it. If it's not, no amount of email nurturing will fix that.
+              The value is in a clearer decision, not in trapping you in another workflow.
             </p>
           </section>
 
@@ -116,9 +116,9 @@ export default function WhyNamoluxPage() {
           </section>
 
           <div className="text-center">
-            <Link href="/generate">
+            <Link href="/bulk-domain-check">
               <Button size="lg" className="gap-2">
-                Try it yourself
+                Check your shortlist
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -129,4 +129,3 @@ export default function WhyNamoluxPage() {
     </div>
   )
 }
-

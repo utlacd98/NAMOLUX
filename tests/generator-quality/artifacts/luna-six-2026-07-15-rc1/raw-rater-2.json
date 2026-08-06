@@ -1,0 +1,230 @@
+{
+  "raterId": "rater-2",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestwise": "shortlist",
+        "pennypath": "shortlist",
+        "brightbud": "usable",
+        "coinkind": "usable",
+        "pocketgrow": "usable",
+        "moneymate": "reject",
+        "homestead": "reject",
+        "safebloom": "usable",
+        "savorra": "usable",
+        "cashgarden": "usable",
+        "wiseplan": "reject",
+        "allowance": "usable",
+        "clearthrift": "usable",
+        "provision": "shortlist",
+        "headroom": "usable",
+        "margin": "usable"
+      },
+      "scores": {
+        "relevance": 7.1,
+        "pronounceabilityNaturalness": 8.1,
+        "distinctiveness": 5.2,
+        "vibeFit": 7.3
+      },
+      "topTwo": [
+        "nestwise",
+        "pennypath"
+      ],
+      "criticalDefects": [
+        "Several options are generic dictionary terms with weak ownability or searchability.",
+        "The most explicit money compounds often feel inexpensive, juvenile, or mechanically assembled rather than trustworthy."
+      ],
+      "mechanicalFamilies": [
+        "Money-or-pocket term plus a friendly growth or relationship word: pennypath, coinkind, pocketgrow, moneymate, cashgarden."
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "nestfold": "shortlist",
+        "glimmer": "usable",
+        "daydream": "usable",
+        "tactile": "usable",
+        "cosycraft": "reject",
+        "mindgarden": "shortlist",
+        "playmuse": "usable",
+        "quizzical": "shortlist",
+        "softspot": "usable",
+        "cozypuzzle": "reject",
+        "jigsaw": "reject",
+        "playfulplay": "reject",
+        "brainwave": "usable",
+        "rebus": "usable",
+        "willow": "usable",
+        "logicnest": "usable"
+      },
+      "scores": {
+        "relevance": 6.5,
+        "pronounceabilityNaturalness": 8.5,
+        "distinctiveness": 4.7,
+        "vibeFit": 7.4
+      },
+      "topTwo": [
+        "mindgarden",
+        "quizzical"
+      ],
+      "criticalDefects": [
+        "The set leans heavily on common dictionary words that convey atmosphere but not a defensible studio identity.",
+        "The most literal options are category descriptors or awkward tautologies rather than brands."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "montavelle": "shortlist",
+        "silvaris": "usable",
+        "elevane": "usable",
+        "everfrost": "reject",
+        "alpineveil": "shortlist",
+        "lucentia": "shortlist",
+        "springtide": "usable",
+        "snowmelt": "usable",
+        "pureascent": "usable",
+        "glacial": "reject",
+        "serenity": "reject",
+        "purealpine": "reject",
+        "purity": "reject",
+        "silken": "usable",
+        "floraritual": "usable",
+        "mineraldew": "shortlist"
+      },
+      "scores": {
+        "relevance": 7.0,
+        "pronounceabilityNaturalness": 7.8,
+        "distinctiveness": 5.8,
+        "vibeFit": 7.1
+      },
+      "topTwo": [
+        "montavelle",
+        "alpineveil"
+      ],
+      "criticalDefects": [
+        "Cold and frozen imagery sometimes suggests harshness or dryness, which conflicts with premium skincare benefits.",
+        "Generic purity and serenity language is crowded and lacks a proprietary point of view.",
+        "Some invented forms drift toward pharmaceutical naming or have uncertain stress and pronunciation."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "cadentra": "shortlist",
+        "foundry": "reject",
+        "orbitask": "shortlist",
+        "calendra": "usable",
+        "focusway": "usable",
+        "harbor": "reject",
+        "swayline": "usable",
+        "routina": "usable",
+        "headroom": "usable",
+        "northstar": "reject",
+        "flowstate": "reject",
+        "smartslot": "usable",
+        "slotmind": "reject",
+        "readyagenda": "reject",
+        "sequence": "usable",
+        "diary": "reject"
+      },
+      "scores": {
+        "relevance": 6.2,
+        "pronounceabilityNaturalness": 7.4,
+        "distinctiveness": 4.4,
+        "vibeFit": 5.9
+      },
+      "topTwo": [
+        "cadentra",
+        "orbitask"
+      ],
+      "criticalDefects": [
+        "Many names are overused startup or productivity metaphors with little scheduling specificity.",
+        "Several scheduling-explicit compounds feel dated, keyword-led, or syntactically awkward.",
+        "The batch rarely communicates a sharp founder-grade or intelligent-assistant character."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "cashbook": "usable",
+        "accrual": "usable",
+        "bookwork": "usable",
+        "bookkeep": "reject",
+        "receipt": "reject",
+        "balance": "usable",
+        "daybook": "shortlist",
+        "journal": "reject",
+        "reckoning": "reject",
+        "worksheet": "reject",
+        "invoicegrid": "shortlist",
+        "soloscope": "usable",
+        "invoicecore": "usable",
+        "invoicetax": "reject",
+        "wiseinvoice": "reject",
+        "simplebooks": "reject"
+      },
+      "scores": {
+        "relevance": 7.5,
+        "pronounceabilityNaturalness": 7.9,
+        "distinctiveness": 2.9,
+        "vibeFit": 5.4
+      },
+      "topTwo": [
+        "daybook",
+        "invoicegrid"
+      ],
+      "criticalDefects": [
+        "Most candidates are bare accounting nouns or keyword compounds, making the set unusually generic and difficult to own.",
+        "Several names sound like bookkeeping chores or document types rather than clean modern software.",
+        "Reckoning introduces an actively punitive tone for a freelancer-facing product."
+      ],
+      "mechanicalFamilies": [
+        "Book affix family: cashbook, bookwork, bookkeep, daybook, simplebooks.",
+        "Invoice affix family: invoicegrid, invoicecore, invoicetax, wiseinvoice."
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "nightwatch": "shortlist",
+        "threatloom": "shortlist",
+        "signalforge": "shortlist",
+        "intellic": "reject",
+        "vigilant": "usable",
+        "beaconry": "usable",
+        "shadowmap": "shortlist",
+        "riskweave": "usable",
+        "firebreak": "shortlist",
+        "sentrynet": "usable",
+        "detector": "reject",
+        "sharpthreat": "reject",
+        "spectrum": "reject",
+        "livethreat": "reject",
+        "firewall": "reject",
+        "vigilance": "usable"
+      },
+      "scores": {
+        "relevance": 8.1,
+        "pronounceabilityNaturalness": 8.3,
+        "distinctiveness": 5.7,
+        "vibeFit": 7.8
+      },
+      "topTwo": [
+        "shadowmap",
+        "signalforge"
+      ],
+      "criticalDefects": [
+        "Generic security category terms and vigilance synonyms are relevant but weakly ownable.",
+        "Some threat-explicit compounds read as feature labels or machine-generated keyword combinations.",
+        "Intellic appears truncated and visually unstable, while Sentrynet feels dated."
+      ],
+      "mechanicalFamilies": []
+    }
+  ]
+}

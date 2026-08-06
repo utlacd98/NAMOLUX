@@ -3,11 +3,12 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { AdBanner } from "@/components/ad-banner"
 import { ArrowRight, Search, Shield, Zap, AlertTriangle } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "SEO Domain Check: How Domains Affect Search Rankings | NamoLux",
-  description: "Learn why your domain choice affects SEO, what our audit checks, and how to interpret your domain's SEO score.",
+  description: "Learn how a domain choice can affect search visibility and what to review before you register a name.",
 }
 
 const seoFactors = [
@@ -76,6 +77,8 @@ export default function SeoDomainCheckPage() {
             Your domain is your foundation. A bad choice creates problems that content can't fix. Here's what actually matters.
           </p>
 
+          <AdBanner placement="guide-after-intro" />
+
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-semibold text-foreground">
               Why domains matter for SEO
@@ -93,7 +96,7 @@ export default function SeoDomainCheckPage() {
 
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-semibold text-foreground">
-              What our SEO audit checks
+              What to review before you buy
             </h2>
             <div className="rounded-xl border border-border/50 bg-card/30 p-5">
               <ul className="grid gap-2 sm:grid-cols-2">
@@ -106,7 +109,7 @@ export default function SeoDomainCheckPage() {
               </ul>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              We run these checks instantly and give you a clear score. No waiting, no account required.
+              Treat these as due-diligence prompts, not a guarantee of search performance. NamoLux&apos;s live product focuses on checking a shortlist and comparing the names that remain.
             </p>
           </section>
 
@@ -124,6 +127,8 @@ export default function SeoDomainCheckPage() {
             </div>
           </section>
 
+          <AdBanner placement="guide-before-conclusion" />
+
           <section className="mb-12 rounded-xl border border-border/50 bg-card/50 p-6">
             <p className="text-xl font-medium italic text-foreground">
               "SEO starts with the domain. Everything else builds on that foundation."
@@ -131,9 +136,9 @@ export default function SeoDomainCheckPage() {
           </section>
 
           <div className="text-center">
-            <Link href="/seo-audit">
+            <Link href="/bulk-domain-check">
               <Button size="lg" className="gap-2">
-                Run SEO domain audit
+                Check a shortlist
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -144,4 +149,3 @@ export default function SeoDomainCheckPage() {
     </div>
   )
 }
-

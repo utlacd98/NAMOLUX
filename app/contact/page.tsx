@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Mail, MessageSquare, Clock } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
+import { PUBLIC_PRODUCT_COPY } from "@/lib/site-content"
 
 export const metadata: Metadata = {
   title: "Contact Us | NamoLux",
@@ -19,7 +21,7 @@ export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 pt-24 pb-16">
+      <main id="main-content" className="flex-1 px-4 pt-24 pb-16">
         <div className="mx-auto max-w-3xl">
           <h1 className="mb-4 text-4xl font-bold text-foreground">Contact Us</h1>
           <p className="mb-12 text-lg text-muted-foreground">
@@ -79,16 +81,16 @@ export default function ContactPage() {
             
             <div className="space-y-6">
               <div className="rounded-xl border border-border/50 bg-card/50 p-6">
-                <h3 className="mb-2 font-semibold text-foreground">How do credits work?</h3>
+                <h3 className="mb-2 font-semibold text-foreground">What is included for free?</h3>
                 <p className="text-muted-foreground">
-                  Each domain generation costs 1 credit. Credits never expire and can be used anytime.
+                  The free plan includes {PRODUCT_OFFER.freeUsageLabel}. It is advertising-supported, and availability should always be confirmed with your registrar before purchase.
                 </p>
               </div>
               
               <div className="rounded-xl border border-border/50 bg-card/50 p-6">
-                <h3 className="mb-2 font-semibold text-foreground">Are refunds available?</h3>
+                <h3 className="mb-2 font-semibold text-foreground">How does NamoLux Pro work?</h3>
                 <p className="text-muted-foreground">
-                  Credits are non-refundable once purchased. Please start with a smaller package if you&apos;re unsure.
+                  Pro costs {PRODUCT_OFFER.paidPriceLabel} and includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved decisions, CSV exports, shareable reports, and an ad-free workspace. {PUBLIC_PRODUCT_COPY.renewalNote} {PRODUCT_OFFER.cancellationLabel}
                 </p>
               </div>
               

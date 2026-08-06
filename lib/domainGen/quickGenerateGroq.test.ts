@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { generateGroqQuickCandidates, resetGroqQuickCooldownsForTests } from "@/lib/domainGen/quickGenerateGroq"
+import { generateQuickEditorialWorkshop } from "@/lib/domainGen/quickGenerate"
 
 const originalGroqKey = process.env.GROQ_API_KEY
 const originalOpenAiKey = process.env.OPENAI_API_KEY
@@ -91,6 +92,36 @@ function successfulNamesResponse(names: readonly string[]) {
       choices: [{ message: { content: JSON.stringify({ names }) } }],
     }),
   }
+}
+
+type EditorialSelectorPrompt = {
+  task: string
+  approvedDraftNames: string[]
+  locallyPublishableCoreNames: string[]
+  previouslyReviewedNames: string[]
+  rules: string[]
+}
+
+function readEditorialSelectorPrompt(
+  body: Record<string, unknown>,
+): EditorialSelectorPrompt & { selectionTarget: number } {
+  const prompt = JSON.parse(
+    ((body.messages as Array<{ content: string }>)[1]?.content || "{}"),
+  ) as EditorialSelectorPrompt & { draftNames?: string[] }
+
+  expect(prompt).not.toHaveProperty("draftNames")
+  expect(prompt.approvedDraftNames.length).toBeGreaterThanOrEqual(24)
+  expect(prompt.approvedDraftNames.length).toBeLessThanOrEqual(32)
+  expect(new Set(prompt.approvedDraftNames).size).toBe(prompt.approvedDraftNames.length)
+  const selectionTarget = Math.min(prompt.approvedDraftNames.length - 4, 24)
+  expect(prompt.approvedDraftNames.length - selectionTarget).toBeGreaterThanOrEqual(4)
+  if (prompt.approvedDraftNames.length === 32) expect(selectionTarget).toBe(24)
+  expect(prompt.task).toContain(`Select exactly ${selectionTarget} approved drafts`)
+  expect(prompt.rules).toEqual(expect.arrayContaining([
+    expect.stringContaining(`Choose exactly ${selectionTarget} different names`),
+    "Every returned string must exactly match one approvedDraftNames value.",
+  ]))
+  return { ...prompt, selectionTarget }
 }
 
 beforeEach(() => {
@@ -229,20 +260,20 @@ describe("generateGroqQuickCandidates", () => {
     expect(new Set(result.candidates.map((candidate) => candidate.name)).size).toBe(16)
   })
 
-  it("publishes one GPT-OSS editorial call over a private deterministic workshop", async () => {
+  it("publishes one GPT-OSS selection from a meaningful private deterministic workshop", async () => {
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
     process.env.QUICK_GENERATE_PRIMARY_ONLY = "true"
     const requestBodies: Array<Record<string, unknown>> = []
     let privateDraftNames: string[] = []
+    let selectedNames: string[] = []
     const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requestBodies.push(body)
-      const editorialPrompt = JSON.parse(
-        ((body.messages as Array<{ content: string }>)[1]?.content),
-      ) as { draftNames: string[] }
-      privateDraftNames = editorialPrompt.draftNames
-      return successfulNamesResponse(COMPLETE_SCHEDULING_AUTO_NAMES)
+      const editorialPrompt = readEditorialSelectorPrompt(body)
+      privateDraftNames = editorialPrompt.approvedDraftNames
+      selectedNames = privateDraftNames.slice(0, editorialPrompt.selectionTarget)
+      return successfulNamesResponse(selectedNames)
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -261,33 +292,102 @@ describe("generateGroqQuickCandidates", () => {
     expect(requestBodies[0]?.model).toBe("openai/gpt-oss-120b")
     expect(JSON.stringify(requestBodies[0]?.messages)).toContain("final naming editor")
     expect(JSON.stringify(requestBodies[0]?.messages)).not.toContain("senior naming director")
-    expect(privateDraftNames).toHaveLength(16)
+    expect(privateDraftNames).toHaveLength(32)
+    expect(selectedNames).toHaveLength(24)
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
         model: "openai/gpt-oss-120b",
         stage: "editorial",
         outcome: "ready",
+        parsedCandidateCount: 24,
+        admittedCandidateCount: 24,
+        selectionPoolCandidateCount: privateDraftNames.length,
       }),
     ])
     expect(result.candidates).toHaveLength(16)
-    expect(result.candidates.every(({ name }) => COMPLETE_SCHEDULING_AUTO_NAMES.includes(name as typeof COMPLETE_SCHEDULING_AUTO_NAMES[number]))).toBe(true)
-    expect(result.candidates.filter(({ name }) => privateDraftNames.includes(name)).length).toBeLessThanOrEqual(8)
+    expect(result.candidates.every(({ name }) => selectedNames.includes(name))).toBe(true)
     expect(result.modelCandidateCount).toBe(16)
     expect(result.fallbackCandidateCount).toBe(0)
     expect(result.editoriallyReviewed).toBe(true)
     expect(result.editorialCandidateCount).toBe(16)
+    expect(result.modelGroundedCandidateCount + result.exploratoryCandidateCount).toBe(result.candidates.length)
   })
 
-  it("keeps configured Gateway in reserve when the primary editor succeeds in one call", async () => {
+  it("does not publish creative-audience contamination from the bookkeeping editor", async () => {
+    process.env.GROQ_API_KEY = "groq-test-key"
+    process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
+    process.env.QUICK_GENERATE_PRIMARY_ONLY = "true"
+    const description = "A privacy-first bookkeeping platform for independent creative freelancers"
+    const accountingNames = [
+      "ledger", "invoice", "daybook", "filing", "accrual", "receipt", "journal", "debits",
+    ] as const
+    const creativeAudienceNames = [
+      "indie", "canvas", "maker", "muse", "palette", "atelier", "craft", "studio",
+      "freelance", "creator", "workshop", "sketchbook", "portfolio", "briefcase", "bohemian", "artistry",
+      "gallery", "imprint", "motif", "medium", "folio", "draft", "abstract", "handwork",
+    ] as const
+    const requests: Array<Record<string, unknown>> = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>
+      requests.push(body)
+      return successfulNamesResponse([...accountingNames, ...creativeAudienceNames])
+    })
+    vi.stubGlobal("fetch", fetchMock)
+
+    const result = await generateGroqQuickCandidates({
+      description,
+      vibe: "clean",
+      style: "auto",
+      creativity: "balanced",
+      // Seven characters leaves only a genuinely sparse 19-name private pool,
+      // so this remains an ordinary creative-editor admission test rather
+      // than accidentally exercising the exact-pool selector path.
+      maxChars: 7,
+      count: 16,
+      seed: "bookkeeping-editor-contamination",
+      requireEditorialReview: true,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(requests[0]?.messages)).toContain("final naming editor")
+    const editorialPrompt = JSON.parse(
+      ((requests[0]?.messages as Array<{ content: string }>)[1]?.content),
+    ) as { brief: { description: string }; semanticTerrain: string[]; approvedDraftNames?: string[] }
+    expect(editorialPrompt).not.toHaveProperty("approvedDraftNames")
+    expect(editorialPrompt.brief.description).toBe(description)
+    expect(editorialPrompt.semanticTerrain).toEqual(expect.arrayContaining([
+      "invoice", "tax", "solo", "books", "ledger",
+    ]))
+    expect(editorialPrompt.semanticTerrain).not.toContain("indie")
+    expect(editorialPrompt.semanticTerrain).not.toContain("maker")
+    expect(editorialPrompt.semanticTerrain).not.toContain("studio")
+
+    const leakedNames = result.candidates
+      .map((candidate) => candidate.name)
+      .filter((name) => creativeAudienceNames.includes(name as typeof creativeAudienceNames[number]))
+    expect(leakedNames).toEqual([])
+    expect(
+      result.modelBacked
+        ? result.editoriallyReviewed && result.modelCandidateCount === 16
+        : result.provider === "deterministic" && result.editoriallyReviewed === false,
+    ).toBe(true)
+  })
+
+  it("keeps configured Gateway in reserve when the default 20B selector succeeds in one call", async () => {
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
     process.env.VERCEL_OIDC_TOKEN = "oidc-test-token"
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
+    let privateDraftNames: string[] = []
+    let selectedNames: string[] = []
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
-      return successfulNamesResponse(COMPLETE_SCHEDULING_AUTO_NAMES)
+      const prompt = readEditorialSelectorPrompt(body)
+      privateDraftNames = prompt.approvedDraftNames
+      selectedNames = privateDraftNames.slice(0, prompt.selectionTarget)
+      return successfulNamesResponse(selectedNames)
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -307,9 +407,11 @@ describe("generateGroqQuickCandidates", () => {
       "https://api.groq.com/openai/v1/chat/completions",
     ])
     expect(JSON.stringify(requests[0]?.body.messages)).toContain("final naming editor")
+    expect(privateDraftNames).toHaveLength(32)
+    expect(selectedNames).toHaveLength(24)
     expect(result).toMatchObject({
       provider: "groq",
-      model: "openai/gpt-oss-120b",
+      model: "openai/gpt-oss-20b",
       usedGroq: true,
       usedVercelGateway: false,
       modelBacked: true,
@@ -319,21 +421,30 @@ describe("generateGroqQuickCandidates", () => {
       editorialCandidateCount: 16,
     })
     expect(result.providerAttempts).toEqual([
-      expect.objectContaining({ provider: "groq", stage: "editorial", outcome: "ready" }),
+      expect.objectContaining({
+        provider: "groq",
+        model: "openai/gpt-oss-20b",
+        stage: "editorial",
+        outcome: "ready",
+        parsedCandidateCount: 24,
+        admittedCandidateCount: 24,
+        selectionPoolCandidateCount: privateDraftNames.length,
+      }),
     ])
     expect(result.candidates).toHaveLength(16)
-    expect(result.candidates.every(({ name }) => COMPLETE_SCHEDULING_AUTO_NAMES.includes(name as typeof COMPLETE_SCHEDULING_AUTO_NAMES[number]))).toBe(true)
+    expect(result.candidates.every(({ name }) => selectedNames.includes(name))).toBe(true)
   })
 
   it("falls back to the distinct Qwen editor when configured Gateway fails fast", async () => {
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
-    process.env.GROQ_QUICK_EDITOR_MODEL = "qwen/qwen3.6-27b"
     process.env.VERCEL_OIDC_TOKEN = "oidc-test-token"
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
+    let selectedNames: string[] = []
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
+      const prompt = readEditorialSelectorPrompt(body)
       if (requests.length === 1) return successfulNamesResponse([])
       if (requests.length === 2) {
         return {
@@ -343,7 +454,8 @@ describe("generateGroqQuickCandidates", () => {
           json: async () => ({ error: { type: "server_error" } }),
         }
       }
-      return successfulNamesResponse(COMPLETE_SCHEDULING_AUTO_NAMES)
+      selectedNames = prompt.approvedDraftNames.slice(0, prompt.selectionTarget)
+      return successfulNamesResponse(selectedNames)
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -381,7 +493,7 @@ describe("generateGroqQuickCandidates", () => {
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
-        model: "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-20b",
         stage: "editorial",
         outcome: "no_valid_names",
       }),
@@ -391,20 +503,26 @@ describe("generateGroqQuickCandidates", () => {
         model: "qwen/qwen3.6-27b",
         stage: "editorial",
         outcome: "ready",
+        parsedCandidateCount: 24,
       }),
     ])
+    expect(selectedNames).toHaveLength(24)
+    expect(result.candidates.every(({ name }) => selectedNames.includes(name))).toBe(true)
   })
 
-  it("never publishes when every editor returns the same incomplete reviewed batch", async () => {
+  it("rejects every incomplete selector response without carrying review provenance", async () => {
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
-    process.env.GROQ_QUICK_EDITOR_MODEL = "qwen/qwen3.6-27b"
     process.env.VERCEL_OIDC_TOKEN = "oidc-test-token"
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
+    let repeatedSelection: string[] = []
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
-      return successfulNamesResponse(COMPLETE_SCHEDULING_AUTO_NAMES.slice(0, 8))
+      const prompt = readEditorialSelectorPrompt(body)
+      expect(prompt.previouslyReviewedNames).toEqual([])
+      repeatedSelection = prompt.approvedDraftNames.slice(0, 8)
+      return successfulNamesResponse(repeatedSelection)
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -437,37 +555,57 @@ describe("generateGroqQuickCandidates", () => {
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
-        model: "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-20b",
         stage: "editorial",
         outcome: "no_valid_names",
         parsedCandidateCount: 8,
+        admittedCandidateCount: 0,
       }),
-      expect.objectContaining({ provider: "vercel_gateway", stage: "editorial", outcome: "no_valid_names", parsedCandidateCount: 8 }),
+      expect.objectContaining({
+        provider: "vercel_gateway",
+        stage: "editorial",
+        outcome: "no_valid_names",
+        parsedCandidateCount: 8,
+        admittedCandidateCount: 0,
+      }),
       expect.objectContaining({
         provider: "groq",
         model: "qwen/qwen3.6-27b",
         stage: "editorial",
         outcome: "no_valid_names",
         parsedCandidateCount: 8,
+        admittedCandidateCount: 0,
       }),
       expect.objectContaining({ provider: "openai", stage: "editorial", outcome: "missing_key" }),
     ])
   })
 
-  it("accumulates partial accepted candidates across editorial providers", async () => {
+  it("ignores partial selections and lets a later exact selector recover", async () => {
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "qwen/qwen3.6-27b"
     process.env.VERCEL_OIDC_TOKEN = "oidc-test-token"
-    const primaryReviewedNames = COMPLETE_SCHEDULING_AUTO_NAMES.slice(0, 8)
-    const gatewayReviewedNames = COMPLETE_SCHEDULING_AUTO_NAMES.slice(8, 16)
-    const independentReviewedNames = COMPLETE_SCHEDULING_AUTO_NAMES.slice(16)
+    let privateDraftNames: string[] = []
+    let invalidPrimaryNames: string[] = []
+    let invalidGatewayNames: string[] = []
+    let recoverySelectedNames: string[] = []
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
-      if (requests.length === 1) return successfulNamesResponse(primaryReviewedNames)
-      if (requests.length === 2) return successfulNamesResponse(gatewayReviewedNames)
-      return successfulNamesResponse(independentReviewedNames)
+      const prompt = readEditorialSelectorPrompt(body)
+      if (privateDraftNames.length === 0) privateDraftNames = prompt.approvedDraftNames
+      expect(prompt.approvedDraftNames).toEqual(privateDraftNames)
+      expect(prompt.previouslyReviewedNames).toEqual([])
+      if (requests.length === 1) {
+        invalidPrimaryNames = privateDraftNames.slice(0, 4)
+        return successfulNamesResponse(invalidPrimaryNames)
+      }
+      if (requests.length === 2) {
+        invalidGatewayNames = privateDraftNames.slice(4, 8)
+        return successfulNamesResponse(invalidGatewayNames)
+      }
+      recoverySelectedNames = privateDraftNames.slice(0, prompt.selectionTarget)
+      return successfulNamesResponse(recoverySelectedNames)
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -488,13 +626,13 @@ describe("generateGroqQuickCandidates", () => {
       "https://api.groq.com/openai/v1/chat/completions",
     ])
     expect(requests.every(({ body }) => JSON.stringify(body.messages).includes("final naming editor"))).toBe(true)
-    expect(requests[0]?.body.model).toBe("qwen/qwen3.6-27b")
-    expect(requests[2]?.body.model).toBe("openai/gpt-oss-120b")
+    expect(requests[0]?.body.model).toBe("openai/gpt-oss-20b")
+    expect(requests[2]?.body.model).toBe("qwen/qwen3.6-27b")
     expect(result).toMatchObject({
       provider: "groq",
-      model: "openai/gpt-oss-120b",
+      model: "qwen/qwen3.6-27b",
       usedGroq: true,
-      usedVercelGateway: true,
+      usedVercelGateway: false,
       modelCandidateCount: 16,
       fallbackCandidateCount: 0,
       editoriallyReviewed: true,
@@ -503,47 +641,56 @@ describe("generateGroqQuickCandidates", () => {
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
-        model: "qwen/qwen3.6-27b",
+        model: "openai/gpt-oss-20b",
         stage: "editorial",
         outcome: "no_valid_names",
-        parsedCandidateCount: 8,
+        parsedCandidateCount: 4,
+        admittedCandidateCount: 0,
+        selectionPoolCandidateCount: privateDraftNames.length,
       }),
       expect.objectContaining({
         provider: "vercel_gateway",
         stage: "editorial",
         outcome: "no_valid_names",
-        parsedCandidateCount: 8,
+        parsedCandidateCount: 4,
+        admittedCandidateCount: 0,
+        selectionPoolCandidateCount: privateDraftNames.length,
       }),
       expect.objectContaining({
         provider: "groq",
-        model: "openai/gpt-oss-120b",
+        model: "qwen/qwen3.6-27b",
         stage: "editorial",
         outcome: "ready",
-        parsedCandidateCount: 16,
+        parsedCandidateCount: 24,
+        admittedCandidateCount: 24,
+        selectionPoolCandidateCount: privateDraftNames.length,
       }),
     ])
-    expect(result.candidates.every(
-      ({ name }) => [...primaryReviewedNames, ...gatewayReviewedNames, ...independentReviewedNames]
-        .includes(name as typeof COMPLETE_SCHEDULING_AUTO_NAMES[number]),
-    )).toBe(true)
-    expect(result.candidates.some(
-      ({ name }) => primaryReviewedNames.includes(name as typeof primaryReviewedNames[number]),
-    )).toBe(true)
-    expect(result.candidates.some(
-      ({ name }) => gatewayReviewedNames.includes(name as typeof gatewayReviewedNames[number]),
-    )).toBe(true)
+    expect(recoverySelectedNames).toHaveLength(24)
+    expect(result.candidates.every(({ name }) => recoverySelectedNames.includes(name))).toBe(true)
+    expect(invalidPrimaryNames).toHaveLength(4)
+    expect(invalidGatewayNames).toHaveLength(4)
+    for (const root of ["slot", "agenda", "assist", "founder", "time"]) {
+      expect(
+        result.candidates.filter(({ name }) => name === root || name.startsWith(root) || name.endsWith(root)).length,
+        root,
+      ).toBeLessThanOrEqual(2)
+    }
   })
 
-  it("recovers from a primary editor timeout through Qwen review of the private workshop", async () => {
+  it("recovers from a 20B selector timeout through Qwen review of the private workshop", async () => {
     vi.useFakeTimers()
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
-    process.env.GROQ_QUICK_EDITOR_MODEL = "qwen/qwen3.6-27b"
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
     let privateSeedNames: string[] = []
+    let qwenSelectedNames: string[] = []
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
+      const editorialPrompt = readEditorialSelectorPrompt(body)
+      if (privateSeedNames.length === 0) privateSeedNames = editorialPrompt.approvedDraftNames
+      expect(editorialPrompt.approvedDraftNames).toEqual(privateSeedNames)
       if (requests.length === 1) {
         return new Promise((_resolve, reject) => {
           init?.signal?.addEventListener(
@@ -553,17 +700,8 @@ describe("generateGroqQuickCandidates", () => {
           )
         })
       }
-
-      const editorialPrompt = JSON.parse(
-        ((body.messages as Array<{ content: string }>)[1]?.content),
-      ) as { draftNames: string[] }
-      privateSeedNames = editorialPrompt.draftNames
-      const replacements = Array.from(new Set([
-        ...COMPLETE_SCHEDULING_AUTO_NAMES,
-        ...COMPLETE_BUDGETING_AUTO_NAMES,
-      ])).filter((name) => !privateSeedNames.includes(name)).slice(0, 32)
-      expect(replacements).toHaveLength(32)
-      return Promise.resolve(successfulNamesResponse(replacements))
+      qwenSelectedNames = privateSeedNames.slice(0, editorialPrompt.selectionTarget)
+      return Promise.resolve(successfulNamesResponse(qwenSelectedNames))
     })
     vi.stubGlobal("fetch", fetchMock)
 
@@ -577,7 +715,7 @@ describe("generateGroqQuickCandidates", () => {
       seed: "timeout-private-editor-seed",
       requireEditorialReview: true,
     })
-    await vi.advanceTimersByTimeAsync(3_401)
+    await vi.advanceTimersByTimeAsync(5_001)
     const result = await pending
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
@@ -587,7 +725,6 @@ describe("generateGroqQuickCandidates", () => {
     ])
     expect(requests[1]?.body.model).toBe("qwen/qwen3.6-27b")
     expect(requests.every(({ body }) => JSON.stringify(body.messages).includes("final naming editor"))).toBe(true)
-    expect(privateSeedNames).toHaveLength(16)
     expect(result).toMatchObject({
       provider: "groq",
       model: "qwen/qwen3.6-27b",
@@ -600,7 +737,7 @@ describe("generateGroqQuickCandidates", () => {
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
-        model: "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-20b",
         stage: "editorial",
         outcome: "timeout",
       }),
@@ -614,21 +751,25 @@ describe("generateGroqQuickCandidates", () => {
         model: "qwen/qwen3.6-27b",
         stage: "editorial",
         outcome: "ready",
+        parsedCandidateCount: 24,
+        selectionPoolCandidateCount: privateSeedNames.length,
       }),
     ])
-    expect(result.candidates.every(({ name }) => !privateSeedNames.includes(name))).toBe(true)
+    expect(qwenSelectedNames).toHaveLength(24)
+    expect(result.candidates).toHaveLength(16)
+    expect(result.candidates.every(({ name }) => qwenSelectedNames.includes(name))).toBe(true)
   })
 
   it("returns deterministic fallback when every editor fails over the private workshop", async () => {
     vi.useFakeTimers()
     process.env.GROQ_API_KEY = "groq-test-key"
     process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
-    process.env.GROQ_QUICK_EDITOR_MODEL = "qwen/qwen3.6-27b"
     process.env.VERCEL_OIDC_TOKEN = "oidc-test-token"
     const requests: Array<{ url: string; body: Record<string, unknown> }> = []
     const fetchMock = vi.fn((url: string, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)) as Record<string, unknown>
       requests.push({ url, body })
+      readEditorialSelectorPrompt(body)
       if (requests.length === 1) {
         return new Promise((_resolve, reject) => {
           init?.signal?.addEventListener(
@@ -657,7 +798,7 @@ describe("generateGroqQuickCandidates", () => {
       seed: "timeout-private-seed-all-editors-fail",
       requireEditorialReview: true,
     })
-    await vi.advanceTimersByTimeAsync(3_401)
+    await vi.advanceTimersByTimeAsync(5_001)
     const result = await pending
 
     expect(fetchMock).toHaveBeenCalledTimes(3)
@@ -667,7 +808,7 @@ describe("generateGroqQuickCandidates", () => {
       "https://api.groq.com/openai/v1/chat/completions",
     ])
     expect(requests.every(({ body }) => JSON.stringify(body.messages).includes("final naming editor"))).toBe(true)
-    expect(requests[0]?.body.model).toBe("openai/gpt-oss-120b")
+    expect(requests[0]?.body.model).toBe("openai/gpt-oss-20b")
     expect(requests[2]?.body.model).toBe("qwen/qwen3.6-27b")
     expect(result).toMatchObject({
       provider: "deterministic",
@@ -680,7 +821,7 @@ describe("generateGroqQuickCandidates", () => {
     expect(result.providerAttempts).toEqual([
       expect.objectContaining({
         provider: "groq",
-        model: "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-20b",
         stage: "editorial",
         outcome: "timeout",
       }),
@@ -885,6 +1026,291 @@ describe("generateGroqQuickCandidates", () => {
 
     expect(repeatedHead.length).toBeLessThanOrEqual(2)
     expect(result.candidates.map((candidate) => candidate.name)).not.toEqual(expect.arrayContaining(["upthrift", "upledger"]))
+  })
+
+  it("lets a reviewed Auto editor retain four members of a brief-owned family", async () => {
+    process.env.GROQ_API_KEY = "test-key"
+    process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
+    process.env.QUICK_GENERATE_PRIMARY_ONLY = "true"
+    const semantic = (
+      name: string,
+      territoryId: AutoCandidateFixture["territoryId"],
+    ): AutoCandidateFixture => autoCandidate(name, "semantic_word", [name], territoryId)
+    const compound = (
+      left: string,
+      right: string,
+      territoryId: AutoCandidateFixture["territoryId"],
+    ): AutoCandidateFixture => autoCandidate(`${left}${right}`, "visible_compound", [left, right], territoryId)
+    const editorialCandidates: AutoCandidateFixture[] = [
+      semantic("filigree", "core_job"),
+      semantic("precious", "audience_world"),
+      semantic("luminous", "desired_outcome"),
+      semantic("burnished", "distinctive_metaphor"),
+      semantic("auriferous", "core_job"),
+      semantic("enduring", "audience_world"),
+      semantic("treasured", "desired_outcome"),
+      semantic("reforged", "distinctive_metaphor"),
+      compound("carat", "stone", "core_job"),
+      compound("carat", "hearth", "audience_world"),
+      compound("carat", "haven", "desired_outcome"),
+      compound("carat", "crest", "distinctive_metaphor"),
+      compound("gold", "stone", "core_job"),
+      compound("gold", "ring", "audience_world"),
+      compound("gold", "haven", "desired_outcome"),
+      compound("gold", "leaf", "distinctive_metaphor"),
+    ]
+    const input = {
+      description: "fine jewellery made from recycled gold for modern heirlooms",
+      vibe: "premium" as const,
+      style: "auto" as const,
+      creativity: "balanced" as const,
+      maxChars: 12,
+      count: 16,
+      seed: "reviewed-family-cap",
+    }
+    const editorialNames = new Set(editorialCandidates.map(({ name }) => name))
+    const unrestrictedPool = generateQuickEditorialWorkshop(input).editorialPool
+    const sparseWorkshopBlacklist = unrestrictedPool
+      .filter(({ name }) => !editorialNames.has(name))
+      .slice(0, Math.max(0, unrestrictedPool.length - 23))
+      .map(({ name }) => name)
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>
+      const prompt = JSON.parse(
+        ((body.messages as Array<{ content: string }>)[1]?.content || "{}"),
+      ) as { draftNames?: string[]; approvedDraftNames?: string[] }
+      expect(prompt).not.toHaveProperty("approvedDraftNames")
+      expect(prompt.draftNames?.length).toBeLessThan(24)
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          choices: [{ message: { content: JSON.stringify({ candidates: editorialCandidates }) } }],
+        }),
+      }
+    })
+    vi.stubGlobal("fetch", fetchMock)
+
+    const result = await generateGroqQuickCandidates({
+      ...input,
+      // Deliberately thin only the deterministic workshop to 23 options. The
+      // provider fixture remains a normal 12-character authoring response, so
+      // this test still exercises the reviewed brief-owned family cap.
+      blacklist: sparseWorkshopBlacklist,
+      requireEditorialReview: true,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(result).toMatchObject({
+      provider: "groq",
+      modelBacked: true,
+      editoriallyReviewed: true,
+      editorialCandidateCount: 16,
+      modelCandidateCount: 16,
+      fallbackCandidateCount: 0,
+    })
+    expect(result.providerAttempts).toEqual([
+      expect.objectContaining({
+        provider: "groq",
+        stage: "editorial",
+        outcome: "ready",
+        parsedCandidateCount: 16,
+        admittedCandidateCount: 16,
+      }),
+    ])
+    expect(result.candidates).toHaveLength(16)
+    expect(result.candidates.filter(({ name }) => name.startsWith("carat"))).toHaveLength(4)
+    expect(result.candidates.filter(({ name }) => name.startsWith("gold"))).toHaveLength(4)
+  })
+
+  it("keeps only reviewed locale forms and safe English drafts in a locale editorial batch", async () => {
+    process.env.GROQ_API_KEY = "test-key"
+    process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
+    process.env.QUICK_GENERATE_PRIMARY_ONLY = "true"
+    const reviewedWelsh = [
+      "marchnadleol",
+      "ffermcymru",
+      "bwydlleol",
+      "ffermleol",
+      "bwydcymru",
+      "ysgolfferm",
+      "cnwdcymru",
+      "cynhaeaf",
+    ] as const
+    const pseudoWelsh = [
+      "cwrnfa",
+      "eirafarm",
+      "celynfield",
+      "torfaen",
+      "brithfarm",
+      "helygrow",
+      "telyntrade",
+      "drwmstead",
+    ] as const
+    const safeEnglishAlternates = [
+      "schoolmarket",
+      "producepath",
+      "marketfield",
+      "fieldschool",
+      "cropmarket",
+      "meadowlink",
+      "fieldtide",
+      "leafexchange",
+    ] as const
+    const sparseWorkshopBlacklist = [
+      "localharvest", "fairharvest", "sharedfarm", "localfarm", "fairfarm",
+      "farmexchange", "harvestlink", "fieldtable", "farmshare", "cropclass",
+      "harvestfield", "farmcircle", "farmnest", "harvestnest", "harvestmate",
+    ]
+    const safeDraftPreference = [
+      "seasonal", "provenance", "localism", "produce",
+      "farmtrade", "farmfield", "harvestbond", "harvesthaven",
+    ]
+    let safeDrafts: string[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { messages: Array<{ content: string }> }
+      const prompt = JSON.parse(body.messages[1]?.content || "{}") as {
+        draftNames?: string[]
+        approvedDraftNames?: string[]
+      }
+      expect(prompt).not.toHaveProperty("approvedDraftNames")
+      safeDrafts = safeDraftPreference.filter((name) => prompt.draftNames?.includes(name))
+      return successfulNamesResponse([
+        ...reviewedWelsh,
+        ...safeDrafts,
+        ...pseudoWelsh,
+        ...safeEnglishAlternates,
+      ])
+    })
+    vi.stubGlobal("fetch", fetchMock)
+
+    const result = await generateGroqQuickCandidates({
+      description: "Welsh language marketplace connecting family farms with local schools",
+      vibe: "friendly",
+      style: "auto",
+      creativity: "balanced",
+      maxChars: 12,
+      count: 16,
+      seed: "reviewed-welsh-editor",
+      // This removes only deterministic English workshop options and leaves a
+      // genuine 22-name pool, so locale admission (including pseudo-form
+      // rejection) is exercised instead of exact-pool selection.
+      blacklist: sparseWorkshopBlacklist,
+      requireEditorialReview: true,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(safeDrafts).toHaveLength(8)
+    expect(result).toMatchObject({
+      modelBacked: true,
+      editoriallyReviewed: true,
+      editorialCandidateCount: 16,
+      modelCandidateCount: 16,
+      fallbackCandidateCount: 0,
+    })
+    expect(result.candidates.filter(({ name }) => reviewedWelsh.includes(name as typeof reviewedWelsh[number]))).toHaveLength(8)
+    expect(result.candidates.map(({ name }) => name)).not.toEqual(expect.arrayContaining([...pseudoWelsh]))
+  })
+
+  it("gives an incomplete first selector zero provenance before exact Qwen recovery", async () => {
+    process.env.GROQ_API_KEY = "test-key"
+    process.env.GROQ_QUICK_MODEL = "openai/gpt-oss-120b"
+    let privateDraftNames: string[] = []
+    let invalidFirstSelection: string[] = []
+    let qwenSelection: string[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as {
+        model: string
+        messages: Array<{ content: string }>
+      }
+      const prompt = readEditorialSelectorPrompt(body as unknown as Record<string, unknown>)
+      if (privateDraftNames.length === 0) {
+        privateDraftNames = prompt.approvedDraftNames
+        const visibleRootCounts = new Map<string, number>()
+        const variedSelection: string[] = [...prompt.locallyPublishableCoreNames]
+        const variedSelectionSet = new Set(variedSelection)
+        const deferredRootRepeats: string[] = []
+        for (const name of privateDraftNames) {
+          if (variedSelection.length >= prompt.selectionTarget) break
+          if (variedSelectionSet.has(name)) continue
+          const visibleRoots = ["slot", "agenda", "assist", "founder", "time"].filter(
+            (root) => name === root || name.startsWith(root) || name.endsWith(root),
+          )
+          if (visibleRoots.some((root) => (visibleRootCounts.get(root) || 0) >= 2)) {
+            deferredRootRepeats.push(name)
+            continue
+          }
+          for (const root of visibleRoots) visibleRootCounts.set(root, (visibleRootCounts.get(root) || 0) + 1)
+          variedSelection.push(name)
+          variedSelectionSet.add(name)
+        }
+        for (const name of deferredRootRepeats) {
+          if (variedSelection.length >= prompt.selectionTarget) break
+          if (variedSelectionSet.has(name)) continue
+          variedSelection.push(name)
+          variedSelectionSet.add(name)
+        }
+        qwenSelection = variedSelection
+        expect(qwenSelection).toHaveLength(prompt.selectionTarget)
+        expect(qwenSelection).toHaveLength(24)
+      }
+      expect(prompt.approvedDraftNames).toEqual(privateDraftNames)
+      if (body.model === "openai/gpt-oss-20b") {
+        invalidFirstSelection = qwenSelection.slice(0, 8)
+        return successfulNamesResponse(invalidFirstSelection)
+      }
+
+      expect(body.model).toBe("qwen/qwen3.6-27b")
+      expect(prompt.previouslyReviewedNames).toEqual([])
+      return successfulNamesResponse(qwenSelection)
+    })
+    vi.stubGlobal("fetch", fetchMock)
+
+    const result = await generateGroqQuickCandidates({
+      description: "AI scheduling assistant for busy startup founders",
+      vibe: "tech",
+      style: "auto",
+      creativity: "balanced",
+      maxChars: 12,
+      count: 16,
+      seed: "qwen-private-recovery-only",
+      requireEditorialReview: true,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(result).toMatchObject({
+      provider: "groq",
+      model: "qwen/qwen3.6-27b",
+      modelBacked: true,
+      editoriallyReviewed: true,
+      modelCandidateCount: 16,
+      fallbackCandidateCount: 0,
+    })
+    expect(result.candidates).toHaveLength(16)
+    expect(result.candidates.every(({ name }) => qwenSelection.includes(name))).toBe(true)
+    expect(result.providerAttempts).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        model: "openai/gpt-oss-20b",
+        outcome: "no_valid_names",
+        parsedCandidateCount: 8,
+        admittedCandidateCount: 0,
+        selectionPoolCandidateCount: privateDraftNames.length,
+      }),
+      expect.objectContaining({
+        model: "qwen/qwen3.6-27b",
+        outcome: "ready",
+        parsedCandidateCount: 24,
+        admittedCandidateCount: 24,
+        selectionPoolCandidateCount: privateDraftNames.length,
+      }),
+    ]))
+    expect(privateDraftNames.length).toBeGreaterThanOrEqual(24)
+    for (const root of ["slot", "agenda", "assist", "founder", "time"]) {
+      expect(
+        result.candidates.filter(({ name }) => name === root || name.startsWith(root) || name.endsWith(root)).length,
+        root,
+      ).toBeLessThanOrEqual(2)
+    }
   })
 
   it("falls back to deterministic generation when GROQ_API_KEY is missing", async () => {

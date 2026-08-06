@@ -5,8 +5,8 @@ import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
 import { rankCandidates } from "@/lib/domainGen/scoreCandidates"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { buildGenerationPrompt, type DeepSearchStrategy } from "@/lib/brandExamples"
-import { checkSocialHandles, type SocialHandleResult } from "@/lib/socialChecker"
-import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
+import { getRateLimitState } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -159,27 +159,29 @@ function generateFallbackBatch(
 // SSE route
 // ---------------------------------------------------------------------------
 export async function GET(request: NextRequest) {
-  const rateLimit = await checkRateLimit(request, "deep-search")
-  if (!rateLimit.allowed) {
-    return new Response(
-      JSON.stringify({ error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" }),
-      { status: 429, headers: { "Content-Type": "application/json" } }
-    )
-  }
+  const labBlockResponse = getGeneratorLabApiBlockResponse(request)
+  if (labBlockResponse) return labBlockResponse
 
   const { searchParams } = new URL(request.url)
-  const keyword = (searchParams.get("keyword") || "").trim()
-  const vibe = searchParams.get("vibe") || "luxury"
-  const industry = searchParams.get("industry") || ""
-  const maxLength = Math.min(20, Math.max(4, parseInt(searchParams.get("maxLength") || "10", 10)))
+  const keyword = (searchParams.get("keyword") || "").trim().slice(0, 1_000)
+  const vibe = (searchParams.get("vibe") || "luxury").trim().slice(0, 32)
+  const industry = (searchParams.get("industry") || "").replace(/[<>]/g, "").trim().slice(0, 80)
+  const parsedMaxLength = Number.parseInt(searchParams.get("maxLength") || "10", 10)
+  const maxLength = Number.isFinite(parsedMaxLength) ? Math.min(15, Math.max(6, parsedMaxLength)) : 10
 
   if (!keyword) {
     return new Response(JSON.stringify({ error: "keyword is required" }), { status: 400 })
   }
 
-  // Log token spend upfront (deep search is expensive)
-  if (!rateLimit.isPro) {
-    logGeneration(request, rateLimit.userId, "deep-search", keyword).catch(() => {})
+  const entitlement = await getRateLimitState(request)
+  if (!entitlement.isPro) {
+    return new Response(
+      JSON.stringify({
+        error: "pro_required",
+        message: "Deep Search and its Founder Signal breakdown are included with NamoLux Pro.",
+      }),
+      { status: 403, headers: { "Content-Type": "application/json" } },
+    )
   }
 
   const encoder = new TextEncoder()
@@ -269,15 +271,13 @@ export async function GET(request: NextRequest) {
 
             found.push(r.domain)
 
-            // Run other TLD checks + social handle checks in parallel
+            // Social handles remain a separate manual check until the provider
+            // exposes a dependable available/taken/unknown tri-state.
             const otherTldDomains = OTHER_TLDS.map((tld) => `${name}.${tld}`)
-            const [otherTldResults, socialResults] = await Promise.all([
-              checkAvailabilityBatch(otherTldDomains, {
-                signal: abortController.signal,
-                concurrency: 5,
-              }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>),
-              checkSocialHandles(name).catch(() => [] as SocialHandleResult[]),
-            ])
+            const otherTldResults = await checkAvailabilityBatch(otherTldDomains, {
+              signal: abortController.signal,
+              concurrency: 5,
+            }).catch(() => [] as Awaited<ReturnType<typeof checkAvailabilityBatch>>)
 
             const otherTlds: Record<string, boolean | null> = {}
             for (const tld of OTHER_TLDS) {
@@ -297,7 +297,6 @@ export async function GET(request: NextRequest) {
                 reasons: scored.reasons,
                 breakdown: scored.breakdown,
                 otherTlds,
-                socials: socialResults,
               },
             })
 

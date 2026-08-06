@@ -1,0 +1,2696 @@
+﻿{
+    "schemaVersion":  1,
+    "audit":  "NamoLux frozen balanced-60 Quick model audit",
+    "runDate":  "2026-07-14",
+    "environment":  {
+                        "source":  ".env.local",
+                        "paidOpenAiFallbackDisabled":  true,
+                        "gatewayDisabled":  true,
+                        "batchSize":  1,
+                        "delayMs":  8000,
+                        "codeChangedDuringRun":  false
+                    },
+    "overallPass":  false,
+    "summary":  {
+                    "briefs":  60,
+                    "modelBackedBriefs":  60,
+                    "modelBackedRate":  100,
+                    "modelCandidates":  493,
+                    "fallbackCandidates":  467,
+                    "crossNicheDuplicateRate":  1.67,
+                    "p95DurationMs":  2787,
+                    "maxDurationMs":  3294,
+                    "providers":  {
+                                      "groq":  60
+                                  },
+                    "fallbackReasons":  {
+
+                                        },
+                    "topCrossNicheDuplicates":  [
+                                                    {
+                                                        "name":  "clinic",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "multilingual-french",
+                                                                       "nurse-recruitment"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "detecta",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "developer-observability",
+                                                                       "esports-analytics"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "detectio",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "developer-observability",
+                                                                       "esports-analytics"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "fundly",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "family-budgeting",
+                                                                       "nonprofit-donor-crm"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "greenly",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "balcony-gardening",
+                                                                       "climate-marketing-agency"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "heir",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "family-business-consulting",
+                                                                       "recycled-gold-jewellery"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "kindly",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "community-volunteers",
+                                                                       "nonprofit-donor-crm"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "kindr",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "community-volunteers",
+                                                                       "nonprofit-donor-crm"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "kindred",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "childcare-network",
+                                                                       "family-business-consulting"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "ledgergo",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "finance-newsletter",
+                                                                       "self-custody-wallet"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "market",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "finance-newsletter",
+                                                                       "india-solar-marketplace"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "rural",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "rural-auto-repair",
+                                                                       "rural-telehealth"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "tempo",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "ai-scheduling-founders",
+                                                                       "restaurant-booking"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "tenant",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "adaptive-architecture",
+                                                                       "berlin-renter-proptech"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "tracelyt",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "biotech-diagnostics",
+                                                                       "cyber-threat-analytics"
+                                                                   ]
+                                                    },
+                                                    {
+                                                        "name":  "tracify",
+                                                        "occurrences":  2,
+                                                        "briefs":  [
+                                                                       "biotech-diagnostics",
+                                                                       "esports-analytics"
+                                                                   ]
+                                                    }
+                                                ],
+                    "failures":  1
+                },
+    "modelDistribution":  [
+                              {
+                                  "model":  "openai/gpt-oss-120b",
+                                  "briefs":  18,
+                                  "modelCandidates":  127,
+                                  "fallbackCandidates":  161
+                              },
+                              {
+                                  "model":  "openai/gpt-oss-20b",
+                                  "briefs":  23,
+                                  "modelCandidates":  201,
+                                  "fallbackCandidates":  167
+                              },
+                              {
+                                  "model":  "qwen/qwen3.6-27b",
+                                  "briefs":  19,
+                                  "modelCandidates":  165,
+                                  "fallbackCandidates":  139
+                              }
+                          ],
+    "derived":  {
+                    "completedBriefs":  60,
+                    "totalCandidates":  960,
+                    "withinBatchDuplicateBriefs":  0,
+                    "minimumShortlistWorthy":  13,
+                    "minimumHarnessScore":  100,
+                    "modelCandidateSharePercent":  51.35,
+                    "fallbackCandidateSharePercent":  48.65
+                },
+    "gates":  [
+                  {
+                      "gate":  "60-case completion",
+                      "pass":  true,
+                      "actual":  "60/60",
+                      "target":  "60/60"
+                  },
+                  {
+                      "gate":  "at least eight unique usable names per brief",
+                      "pass":  true,
+                      "actual":  "minimum 16; 0 within-batch duplicates",
+                      "target":  "\u003e=8"
+                  },
+                  {
+                      "gate":  "at least two harness-shortlist-worthy candidates per brief",
+                      "pass":  true,
+                      "actual":  "minimum 13",
+                      "target":  "\u003e=2"
+                  },
+                  {
+                      "gate":  "independent harness score",
+                      "pass":  true,
+                      "actual":  "minimum 100/100",
+                      "target":  "\u003e=80/100"
+                  },
+                  {
+                      "gate":  "model-backed briefs",
+                      "pass":  true,
+                      "actual":  "100%",
+                      "target":  "\u003e=90%"
+                  },
+                  {
+                      "gate":  "cross-niche exact duplication",
+                      "pass":  false,
+                      "actual":  "1.67%",
+                      "target":  "\u003c=1%"
+                  },
+                  {
+                      "gate":  "direct generator p95",
+                      "pass":  true,
+                      "actual":  "2787ms",
+                      "target":  "\u003c=7000ms"
+                  },
+                  {
+                      "gate":  "no broken, copied, unsafe, or embarrassing names",
+                      "pass":  false,
+                      "actual":  "8 manually critical examples",
+                      "target":  "0"
+                  }
+              ],
+    "manualReview":  {
+                         "scope":  "Name-surface review only; not legal trademark clearance. Harness does not directly score blind distinctiveness or style fit.",
+                         "critical":  [
+                                          {
+                                              "name":  "fundly",
+                                              "cases":  [
+                                                            "family-budgeting",
+                                                            "nonprofit-donor-crm"
+                                                        ],
+                                              "reason":  "Exact established crowdfunding platform and cross-niche duplicate"
+                                          },
+                                          {
+                                              "name":  "paystack",
+                                              "cases":  [
+                                                            "freelance-accounting"
+                                                        ],
+                                              "reason":  "Exact established payments company"
+                                          },
+                                          {
+                                              "name":  "greenly",
+                                              "cases":  [
+                                                            "balcony-gardening",
+                                                            "climate-marketing-agency"
+                                                        ],
+                                              "reason":  "Exact established carbon-accounting platform and cross-niche duplicate"
+                                          },
+                                          {
+                                              "name":  "solaris",
+                                              "cases":  [
+                                                            "climate-marketing-agency"
+                                                        ],
+                                              "reason":  "Exact established banking-as-a-service company"
+                                          },
+                                          {
+                                              "name":  "frme",
+                                              "cases":  [
+                                                            "cozy-puzzle-studio"
+                                                        ],
+                                              "reason":  "Malformed missing-vowel fragment"
+                                          },
+                                          {
+                                              "name":  "kare4u",
+                                              "cases":  [
+                                                            "language-learning"
+                                                        ],
+                                              "reason":  "SMS/leetspeak construction unsuitable for a professional shortlist"
+                                          },
+                                          {
+                                              "name":  "alpen1",
+                                              "cases":  [
+                                                            "alpine-skincare"
+                                                        ],
+                                              "reason":  "Arbitrary numeric substitution"
+                                          },
+                                          {
+                                              "name":  "mot0r",
+                                              "cases":  [
+                                                            "rural-auto-repair"
+                                                        ],
+                                              "reason":  "Leetspeak zero substitution"
+                                          }
+                                      ],
+                         "weakMalformedOrForced":  [
+                                                       "agroki",
+                                                       "bondr",
+                                                       "bookso",
+                                                       "brieflyr",
+                                                       "cairnry",
+                                                       "cargify",
+                                                       "cargoxl",
+                                                       "chargd",
+                                                       "circl",
+                                                       "clausen",
+                                                       "clauset",
+                                                       "clausio",
+                                                       "complye",
+                                                       "counselr",
+                                                       "counselt",
+                                                       "crafto",
+                                                       "detecta",
+                                                       "detectio",
+                                                       "detekt",
+                                                       "diagnos",
+                                                       "drivolt",
+                                                       "eura",
+                                                       "familee",
+                                                       "filereign",
+                                                       "forgee",
+                                                       "franck",
+                                                       "giltgrean",
+                                                       "glowmin",
+                                                       "growi",
+                                                       "growlyn",
+                                                       "homespa",
+                                                       "invo",
+                                                       "kindr",
+                                                       "ledgeru",
+                                                       "mindtic",
+                                                       "mineralb",
+                                                       "mistryn",
+                                                       "morgin",
+                                                       "nursly",
+                                                       "orvert",
+                                                       "pawgle",
+                                                       "pawtic",
+                                                       "plannr",
+                                                       "privel",
+                                                       "pulselyt",
+                                                       "pulsevo",
+                                                       "purrhavn",
+                                                       "purrhjem",
+                                                       "quikcover",
+                                                       "raisr",
+                                                       "reco",
+                                                       "remoflow",
+                                                       "roasht",
+                                                       "routefy",
+                                                       "routiq",
+                                                       "ryokraft",
+                                                       "savvyfy",
+                                                       "shevoy",
+                                                       "sigmatr",
+                                                       "signtro",
+                                                       "sigtrac",
+                                                       "slotz",
+                                                       "solarr",
+                                                       "sonikly",
+                                                       "sprydo",
+                                                       "stocklyn",
+                                                       "studii",
+                                                       "terraest",
+                                                       "tracely",
+                                                       "tracelyt",
+                                                       "tradevo",
+                                                       "trailma",
+                                                       "trailsum",
+                                                       "travee",
+                                                       "trilluxe",
+                                                       "vowlio",
+                                                       "wayfeme"
+                                                   ],
+                         "weakGenericStandalone":  [
+                                                       "acre",
+                                                       "active",
+                                                       "agenda",
+                                                       "alpine",
+                                                       "artist",
+                                                       "balcony",
+                                                       "berlin",
+                                                       "brief",
+                                                       "campus",
+                                                       "carbon",
+                                                       "charge",
+                                                       "child",
+                                                       "chill",
+                                                       "civic",
+                                                       "climate",
+                                                       "clinic",
+                                                       "council",
+                                                       "crypto",
+                                                       "curl",
+                                                       "custody",
+                                                       "cyber",
+                                                       "cymru",
+                                                       "data",
+                                                       "debug",
+                                                       "dine",
+                                                       "drip",
+                                                       "drive",
+                                                       "ethical",
+                                                       "euro",
+                                                       "exact",
+                                                       "exam",
+                                                       "factory",
+                                                       "famille",
+                                                       "founder",
+                                                       "gilt",
+                                                       "giving",
+                                                       "heir",
+                                                       "interior",
+                                                       "japan",
+                                                       "launch",
+                                                       "ledger",
+                                                       "lingo",
+                                                       "lisbon",
+                                                       "mama",
+                                                       "market",
+                                                       "meal",
+                                                       "mentor",
+                                                       "mother",
+                                                       "motor",
+                                                       "near",
+                                                       "news",
+                                                       "night",
+                                                       "nurse",
+                                                       "parent",
+                                                       "plant",
+                                                       "press",
+                                                       "privacy",
+                                                       "private",
+                                                       "probe",
+                                                       "public",
+                                                       "puzzle",
+                                                       "quebec",
+                                                       "reach",
+                                                       "renter",
+                                                       "repair",
+                                                       "research",
+                                                       "review",
+                                                       "roast",
+                                                       "rural",
+                                                       "scholar",
+                                                       "score",
+                                                       "slots",
+                                                       "small",
+                                                       "solo",
+                                                       "sound",
+                                                       "speak",
+                                                       "story",
+                                                       "supper",
+                                                       "table",
+                                                       "talent",
+                                                       "team",
+                                                       "teen",
+                                                       "tenant",
+                                                       "tender",
+                                                       "texture",
+                                                       "threat",
+                                                       "trust",
+                                                       "water",
+                                                       "welcome",
+                                                       "wild"
+                                                   ]
+                     },
+    "cases":  [
+                  {
+                      "id":  "family-budgeting",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  12,
+                      "fallback":  4,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2586
+                                       }
+                                   ],
+                      "durationMs":  2741,
+                      "names":  [
+                                    "fundly",
+                                    "mintwell",
+                                    "savehaven",
+                                    "kindfund",
+                                    "homenest",
+                                    "famfund",
+                                    "casauno",
+                                    "ledgero",
+                                    "mintwise",
+                                    "carebudget",
+                                    "familybank",
+                                    "nestledger",
+                                    "budgetguard",
+                                    "budgethaven",
+                                    "guardbudget",
+                                    "thrift"
+                                ]
+                  },
+                  {
+                      "id":  "teen-therapy",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2522
+                                       }
+                                   ],
+                      "durationMs":  2583,
+                      "names":  [
+                                    "pulsevo",
+                                    "calmhug",
+                                    "mindhaven",
+                                    "mendcare",
+                                    "restmate",
+                                    "almacare",
+                                    "privaterest",
+                                    "teenprivate",
+                                    "private",
+                                    "teen",
+                                    "mindteen",
+                                    "restmind",
+                                    "restprivate",
+                                    "privatepath",
+                                    "pathprivate",
+                                    "privatewell"
+                                ]
+                  },
+                  {
+                      "id":  "urban-cat-sitting",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1111
+                                       }
+                                   ],
+                      "durationMs":  1198,
+                      "names":  [
+                                    "purrhome",
+                                    "catcare",
+                                    "purrnest",
+                                    "cathome",
+                                    "catstay",
+                                    "catpurr",
+                                    "homepurr",
+                                    "staycat",
+                                    "cityhaven",
+                                    "citynest",
+                                    "felinehaven",
+                                    "havenfeline",
+                                    "nestfeline",
+                                    "felinewell",
+                                    "purrhavn",
+                                    "purrhjem"
+                                ]
+                  },
+                  {
+                      "id":  "postpartum-fitness",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1936
+                                       }
+                                   ],
+                      "durationMs":  1972,
+                      "names":  [
+                                    "fitmuse",
+                                    "reco",
+                                    "momsfit",
+                                    "active",
+                                    "gentlefit",
+                                    "fitly",
+                                    "trainly",
+                                    "mamastride",
+                                    "mommove",
+                                    "mother",
+                                    "fitnow",
+                                    "motherguide",
+                                    "guidemother",
+                                    "mama",
+                                    "gentlemama",
+                                    "guidegentle"
+                                ]
+                  },
+                  {
+                      "id":  "nurse-recruitment",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  5,
+                      "fallback":  11,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2507
+                                       }
+                                   ],
+                      "durationMs":  2550,
+                      "names":  [
+                                    "tradevia",
+                                    "pilotethical",
+                                    "carecart",
+                                    "clinic",
+                                    "vitalaid",
+                                    "nursly",
+                                    "ethicalwell",
+                                    "ethicalnurse",
+                                    "wellethical",
+                                    "nurse",
+                                    "talent",
+                                    "talentwell",
+                                    "welltalent",
+                                    "ethical",
+                                    "ethicalguide",
+                                    "flowethical"
+                                ]
+                  },
+                  {
+                      "id":  "mortgage-comparison",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  14,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1280
+                                       }
+                                   ],
+                      "durationMs":  1319,
+                      "names":  [
+                                    "firstframe",
+                                    "morrow",
+                                    "frameup",
+                                    "buyerly",
+                                    "firstly",
+                                    "franck",
+                                    "morgin",
+                                    "framefirst",
+                                    "homerly",
+                                    "housefirst",
+                                    "buyerloan",
+                                    "loanbuyer",
+                                    "nestbuyer",
+                                    "firsthouse",
+                                    "firstnest",
+                                    "nestfirst"
+                                ]
+                  },
+                  {
+                      "id":  "childcare-network",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1364
+                                       }
+                                   ],
+                      "durationMs":  1408,
+                      "names":  [
+                                    "carebond",
+                                    "kindnest",
+                                    "circlenet",
+                                    "bonded",
+                                    "nearhome",
+                                    "careknot",
+                                    "kinder",
+                                    "childkind",
+                                    "havencare",
+                                    "childparent",
+                                    "homebond",
+                                    "parentchild",
+                                    "pathchild",
+                                    "parent",
+                                    "kindred",
+                                    "child"
+                                ]
+                  },
+                  {
+                      "id":  "nonprofit-donor-crm",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  15,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2256
+                                       }
+                                   ],
+                      "durationMs":  2286,
+                      "names":  [
+                                    "giverly",
+                                    "grain",
+                                    "givingdonor",
+                                    "causer",
+                                    "kindr",
+                                    "donorly",
+                                    "donorgiving",
+                                    "kindly",
+                                    "raisr",
+                                    "fundly",
+                                    "giving",
+                                    "causedonor",
+                                    "givecause",
+                                    "impactcause",
+                                    "givegiving",
+                                    "givingimpact"
+                                ]
+                  },
+                  {
+                      "id":  "multilingual-french",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  15,
+                      "model":  5,
+                      "fallback":  11,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2437
+                                       }
+                                   ],
+                      "durationMs":  2467,
+                      "names":  [
+                                    "famillewell",
+                                    "heartgrove",
+                                    "pulsefarm",
+                                    "clinic",
+                                    "vytalcare",
+                                    "bienetre",
+                                    "familleguide",
+                                    "maplebridge",
+                                    "maplefamille",
+                                    "wellfamille",
+                                    "quebecmaple",
+                                    "wellmaple",
+                                    "quebec",
+                                    "santequebec",
+                                    "famille",
+                                    "famillemaple"
+                                ]
+                  },
+                  {
+                      "id":  "welsh-farm-market",
+                      "vibe":  "friendly",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1024
+                                       }
+                                   ],
+                      "durationMs":  1079,
+                      "names":  [
+                                    "welshfarm",
+                                    "carehaven",
+                                    "sparkstudy",
+                                    "waterkind",
+                                    "learnfarm",
+                                    "mistryn",
+                                    "cairnry",
+                                    "farmkind",
+                                    "sparkcare",
+                                    "learnhaven",
+                                    "welshpath",
+                                    "cymruwelsh",
+                                    "pathwelsh",
+                                    "cymru",
+                                    "pathcymru",
+                                    "schoolpath"
+                                ]
+                  },
+                  {
+                      "id":  "student-meal-delivery",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2361
+                                       }
+                                   ],
+                      "durationMs":  2398,
+                      "names":  [
+                                    "roastly",
+                                    "studyeat",
+                                    "campus",
+                                    "learnlunch",
+                                    "tablenite",
+                                    "campushouse",
+                                    "brewbit",
+                                    "night",
+                                    "tabletap",
+                                    "sparkfuel",
+                                    "mentorbyte",
+                                    "fleetfood",
+                                    "sparkbite",
+                                    "nightcampus",
+                                    "mealnight",
+                                    "meal"
+                                ]
+                  },
+                  {
+                      "id":  "cozy-puzzle-studio",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  896
+                                       }
+                                   ],
+                      "durationMs":  944,
+                      "names":  [
+                                    "craftly",
+                                    "playframe",
+                                    "craftmind",
+                                    "formplay",
+                                    "mindpiece",
+                                    "frme",
+                                    "cozyhouse",
+                                    "museplay",
+                                    "playcraft",
+                                    "framefun",
+                                    "mindframe",
+                                    "cozymark",
+                                    "housecozy",
+                                    "markcozy",
+                                    "puzzle",
+                                    "puzzlehouse"
+                                ]
+                  },
+                  {
+                      "id":  "wedding-planner",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2672
+                                       }
+                                   ],
+                      "durationMs":  2774,
+                      "names":  [
+                                    "vowlio",
+                                    "gleefest",
+                                    "planvibe",
+                                    "vowjoy",
+                                    "vowday",
+                                    "plannr",
+                                    "joygather",
+                                    "festvow",
+                                    "joyvow",
+                                    "joyplan",
+                                    "joybeam",
+                                    "gatherjoy",
+                                    "joyskip",
+                                    "skipjoy",
+                                    "beamjoy",
+                                    "joyplay"
+                                ]
+                  },
+                  {
+                      "id":  "restaurant-booking",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2169
+                                       }
+                                   ],
+                      "durationMs":  2209,
+                      "names":  [
+                                    "tablo",
+                                    "nowtable",
+                                    "rushroast",
+                                    "tempo",
+                                    "lastbite",
+                                    "slotz",
+                                    "munchly",
+                                    "supperdine",
+                                    "slots",
+                                    "supperpath",
+                                    "dinesupper",
+                                    "pathsupper",
+                                    "dine",
+                                    "table",
+                                    "supper",
+                                    "suppergrid"
+                                ]
+                  },
+                  {
+                      "id":  "indie-music-discovery",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  5,
+                      "fallback":  11,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2762
+                                       }
+                                   ],
+                      "durationMs":  2787,
+                      "names":  [
+                                    "soundstage",
+                                    "beatquest",
+                                    "stagepulse",
+                                    "sound",
+                                    "playtune",
+                                    "sonikly",
+                                    "melodia",
+                                    "artistplay",
+                                    "artist",
+                                    "indiestage",
+                                    "tempoify",
+                                    "playify",
+                                    "stageify",
+                                    "indieartist",
+                                    "soundify",
+                                    "soundartist"
+                                ]
+                  },
+                  {
+                      "id":  "language-learning",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1193
+                                       }
+                                   ],
+                      "durationMs":  1221,
+                      "names":  [
+                                    "kindling",
+                                    "sparkling",
+                                    "learnnest",
+                                    "speak",
+                                    "kidspoke",
+                                    "kare4u",
+                                    "speakpath",
+                                    "learnjoy",
+                                    "studyhub",
+                                    "kidlearn",
+                                    "pathspeak",
+                                    "lingolearn",
+                                    "lingo",
+                                    "pathlingo",
+                                    "speaklearn",
+                                    "learnspeak"
+                                ]
+                  },
+                  {
+                      "id":  "artisan-gift-market",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  15,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2253
+                                       }
+                                   ],
+                      "durationMs":  2279,
+                      "names":  [
+                                    "makerflow",
+                                    "giftloom",
+                                    "giftcart",
+                                    "artisongifts",
+                                    "shopcraft",
+                                    "makerpath",
+                                    "artishelf",
+                                    "handtrade",
+                                    "craftcart",
+                                    "marketmade",
+                                    "flowmaker",
+                                    "pathmaker",
+                                    "craftgift",
+                                    "flowgift",
+                                    "handcraft",
+                                    "makertrove"
+                                ]
+                  },
+                  {
+                      "id":  "community-volunteers",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2485
+                                       }
+                                   ],
+                      "durationMs":  2523,
+                      "names":  [
+                                    "bondly",
+                                    "nearco",
+                                    "kindly",
+                                    "joinup",
+                                    "circl",
+                                    "circly",
+                                    "nearbond",
+                                    "kindnear",
+                                    "joiner",
+                                    "bondr",
+                                    "civicbond",
+                                    "civic",
+                                    "helpcivic",
+                                    "nearby",
+                                    "kindr",
+                                    "near"
+                                ]
+                  },
+                  {
+                      "id":  "curly-hair-beauty",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2673
+                                       }
+                                   ],
+                      "durationMs":  2719,
+                      "names":  [
+                                    "curlkin",
+                                    "curljoy",
+                                    "textura",
+                                    "bloomly",
+                                    "coilcare",
+                                    "glowkin",
+                                    "glowcoil",
+                                    "floracurl",
+                                    "joycoil",
+                                    "coilcurl",
+                                    "texture",
+                                    "curl",
+                                    "curlcoil",
+                                    "curlglow",
+                                    "glowcurl",
+                                    "curlcare"
+                                ]
+                  },
+                  {
+                      "id":  "balcony-gardening",
+                      "vibe":  "playful",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1186
+                                       }
+                                   ],
+                      "durationMs":  1229,
+                      "names":  [
+                                    "growi",
+                                    "sprouty",
+                                    "plantsmall",
+                                    "greenly",
+                                    "growkit",
+                                    "zeva",
+                                    "sprydo",
+                                    "smallplant",
+                                    "greenup",
+                                    "wiseplant",
+                                    "plantwise",
+                                    "small",
+                                    "balcony",
+                                    "balconywise",
+                                    "wisebalcony",
+                                    "plant"
+                                ]
+                  },
+                  {
+                      "id":  "alpine-skincare",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1497
+                                       }
+                                   ],
+                      "durationMs":  1538,
+                      "names":  [
+                                    "glowfield",
+                                    "mineralb",
+                                    "floraqua",
+                                    "glowherb",
+                                    "alpen1",
+                                    "wattio",
+                                    "waterglow",
+                                    "alpine",
+                                    "floraheal",
+                                    "alpinecare",
+                                    "carealpine",
+                                    "mineralcare",
+                                    "housemineral",
+                                    "wellmineral",
+                                    "glowmin",
+                                    "floracare"
+                                ]
+                  },
+                  {
+                      "id":  "coastal-coffee",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  3259
+                                       }
+                                   ],
+                      "durationMs":  3294,
+                      "names":  [
+                                    "shorvia",
+                                    "coastbrew",
+                                    "shorebite",
+                                    "roasttable",
+                                    "roasht",
+                                    "cafealto",
+                                    "tidalbake",
+                                    "coastroast",
+                                    "bloomroast",
+                                    "bloomshore",
+                                    "laneshore",
+                                    "tablebloom",
+                                    "roast",
+                                    "roastcoast",
+                                    "roastbloom",
+                                    "roastlane"
+                                ]
+                  },
+                  {
+                      "id":  "family-business-consulting",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2503
+                                       }
+                                   ],
+                      "durationMs":  2560,
+                      "names":  [
+                                    "kinvale",
+                                    "legacyhaven",
+                                    "familynest",
+                                    "kindred",
+                                    "careroute",
+                                    "familee",
+                                    "hogarcare",
+                                    "legacyguide",
+                                    "havenlegacy",
+                                    "heir",
+                                    "heirlegacy",
+                                    "futureheir",
+                                    "kinfuture",
+                                    "futureguide",
+                                    "guidefuture",
+                                    "legacyheir"
+                                ]
+                  },
+                  {
+                      "id":  "lisbon-real-estate",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1241
+                                       }
+                                   ],
+                      "durationMs":  1265,
+                      "names":  [
+                                    "terrace",
+                                    "homespa",
+                                    "rentique",
+                                    "terraest",
+                                    "luzterra",
+                                    "lisbonterra",
+                                    "lisbon",
+                                    "formlisbon",
+                                    "tejo",
+                                    "tejoalfama",
+                                    "alfamatejo",
+                                    "terrify",
+                                    "terralisbon",
+                                    "lisbonform",
+                                    "lisbonframe",
+                                    "framelisbon"
+                                ]
+                  },
+                  {
+                      "id":  "solo-women-travel",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2566
+                                       }
+                                   ],
+                      "durationMs":  2826,
+                      "names":  [
+                                    "wayfeme",
+                                    "herpath",
+                                    "solaire",
+                                    "travee",
+                                    "shevoy",
+                                    "hersolo",
+                                    "soloist",
+                                    "trailma",
+                                    "eura",
+                                    "solo",
+                                    "hersafe",
+                                    "hertrail",
+                                    "trailher",
+                                    "herhouse",
+                                    "househer",
+                                    "herpass"
+                                ]
+                  },
+                  {
+                      "id":  "kenya-eco-safari",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2306
+                                       }
+                                   ],
+                      "durationMs":  2341,
+                      "names":  [
+                                    "savannacore",
+                                    "safariloom",
+                                    "trailborn",
+                                    "kenyatrust",
+                                    "safaritrail",
+                                    "pathkeeper",
+                                    "wild",
+                                    "wildnest",
+                                    "trailsafari",
+                                    "housesafari",
+                                    "kenyawild",
+                                    "safariseed",
+                                    "safariwild",
+                                    "wildsafari",
+                                    "safarihouse",
+                                    "safaripass"
+                                ]
+                  },
+                  {
+                      "id":  "japan-ryokan",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1385
+                                       }
+                                   ],
+                      "durationMs":  1423,
+                      "names":  [
+                                    "staymuse",
+                                    "trilluxe",
+                                    "craftstay",
+                                    "timeform",
+                                    "stayzen",
+                                    "ryokraft",
+                                    "museguide",
+                                    "trailsum",
+                                    "timeguide",
+                                    "quietform",
+                                    "quietloom",
+                                    "ryokanquiet",
+                                    "formquiet",
+                                    "japanryokan",
+                                    "formryokan",
+                                    "japan"
+                                ]
+                  },
+                  {
+                      "id":  "interior-design",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  987
+                                       }
+                                   ],
+                      "durationMs":  1019,
+                      "names":  [
+                                    "craftzen",
+                                    "homecraft",
+                                    "framehub",
+                                    "craftnest",
+                                    "museart",
+                                    "interiornest",
+                                    "roomloom",
+                                    "homeglow",
+                                    "interior",
+                                    "loomroom",
+                                    "musebeam",
+                                    "roominterior",
+                                    "nestroom",
+                                    "renthouse",
+                                    "tenanthouse",
+                                    "craftloft"
+                                ]
+                  },
+                  {
+                      "id":  "adaptive-architecture",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2862
+                                       }
+                                   ],
+                      "durationMs":  2899,
+                      "names":  [
+                                    "reframer",
+                                    "oldnest",
+                                    "rentforge",
+                                    "tenant",
+                                    "newhome",
+                                    "framely",
+                                    "hausen",
+                                    "oldform",
+                                    "oldhearth",
+                                    "oldreuse",
+                                    "oldframe",
+                                    "hearthold",
+                                    "reuseold",
+                                    "formold",
+                                    "frameold",
+                                    "oldhouse"
+                                ]
+                  },
+                  {
+                      "id":  "recycled-gold-jewellery",
+                      "vibe":  "premium",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2328
+                                       }
+                                   ],
+                      "durationMs":  2377,
+                      "names":  [
+                                    "solarae",
+                                    "leafglow",
+                                    "threadgold",
+                                    "greenleaf",
+                                    "goldweave",
+                                    "giltgrean",
+                                    "orvert",
+                                    "heirworks",
+                                    "threadloom",
+                                    "heirgold",
+                                    "goldheir",
+                                    "worksheir",
+                                    "gilt",
+                                    "worksgilt",
+                                    "heir",
+                                    "heirfield"
+                                ]
+                  },
+                  {
+                      "id":  "ai-scheduling-founders",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1151
+                                       }
+                                   ],
+                      "durationMs":  1169,
+                      "names":  [
+                                    "slotscope",
+                                    "slotmind",
+                                    "pilotlog",
+                                    "tempo",
+                                    "meetup",
+                                    "logiq",
+                                    "mindtic",
+                                    "pilotlogy",
+                                    "agendaslot",
+                                    "scopeslot",
+                                    "agenda",
+                                    "scopeagenda",
+                                    "founder",
+                                    "founderflow",
+                                    "flowfounder",
+                                    "slotup"
+                                ]
+                  },
+                  {
+                      "id":  "biotech-diagnostics",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2039
+                                       }
+                                   ],
+                      "durationMs":  2071,
+                      "names":  [
+                                    "tracelyt",
+                                    "biopilot",
+                                    "earlygen",
+                                    "precept",
+                                    "scopenow",
+                                    "tracify",
+                                    "diagnos",
+                                    "sigmabio",
+                                    "pilotbio",
+                                    "mendtrace",
+                                    "pulselyt",
+                                    "careview",
+                                    "biotrace",
+                                    "biogrid",
+                                    "gridbio",
+                                    "biopath"
+                                ]
+                  },
+                  {
+                      "id":  "india-solar-marketplace",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2610
+                                       }
+                                   ],
+                      "durationMs":  2730,
+                      "names":  [
+                                    "tradevo",
+                                    "leafrise",
+                                    "carttrade",
+                                    "market",
+                                    "greenhub",
+                                    "solarr",
+                                    "sunpath",
+                                    "renewray",
+                                    "shelfgrid",
+                                    "leaflet",
+                                    "greenmart",
+                                    "sunwise",
+                                    "sunpilot",
+                                    "sunindia",
+                                    "indiasun",
+                                    "pathsun"
+                                ]
+                  },
+                  {
+                      "id":  "remote-onboarding",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2377
+                                       }
+                                   ],
+                      "durationMs":  2397,
+                      "names":  [
+                                    "remoflow",
+                                    "joinflow",
+                                    "welcome",
+                                    "onboardly",
+                                    "welcomecore",
+                                    "remotestack",
+                                    "team",
+                                    "teamtrace",
+                                    "flowcode",
+                                    "joinlogic",
+                                    "stackjoin",
+                                    "corewelcome",
+                                    "scoperemote",
+                                    "flowremote",
+                                    "teamflow",
+                                    "jointrace"
+                                ]
+                  },
+                  {
+                      "id":  "ev-charging",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2465
+                                       }
+                                   ],
+                      "durationMs":  2520,
+                      "names":  [
+                                    "parkel",
+                                    "spokeon",
+                                    "plugly",
+                                    "currant",
+                                    "parkit",
+                                    "amper",
+                                    "drivepilot",
+                                    "chargd",
+                                    "drive",
+                                    "kindcharge",
+                                    "pilotdrive",
+                                    "charge",
+                                    "kindpilot",
+                                    "nearbridge",
+                                    "drivecharge",
+                                    "chargedrive"
+                                ]
+                  },
+                  {
+                      "id":  "developer-observability",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  11,
+                      "fallback":  5,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  936
+                                       }
+                                   ],
+                      "durationMs":  960,
+                      "names":  [
+                                    "sigscope",
+                                    "tracewave",
+                                    "stackview",
+                                    "detectio",
+                                    "devscope",
+                                    "sigmatr",
+                                    "kodik",
+                                    "traceflow",
+                                    "stacklog",
+                                    "detecta",
+                                    "devlog",
+                                    "debugpilot",
+                                    "debug",
+                                    "devdebug",
+                                    "devtrace",
+                                    "devpilot"
+                                ]
+                  },
+                  {
+                      "id":  "privacy-saas",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2261
+                                       }
+                                   ],
+                      "durationMs":  2290,
+                      "names":  [
+                                    "privel",
+                                    "guardia",
+                                    "markshield",
+                                    "vaulted",
+                                    "wisetrust",
+                                    "complye",
+                                    "cordis",
+                                    "trustwise",
+                                    "cartlock",
+                                    "trust",
+                                    "wiseprivacy",
+                                    "codeshield",
+                                    "safemart",
+                                    "cybercart",
+                                    "privacy",
+                                    "euro"
+                                ]
+                  },
+                  {
+                      "id":  "research-data-collab",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2256
+                                       }
+                                   ],
+                      "durationMs":  2276,
+                      "names":  [
+                                    "truvia",
+                                    "proofpilot",
+                                    "provalab",
+                                    "codestudy",
+                                    "siglab",
+                                    "detekt",
+                                    "scholarview",
+                                    "pilotproof",
+                                    "scopework",
+                                    "scholar",
+                                    "datascope",
+                                    "viewscholar",
+                                    "research",
+                                    "proofgrid",
+                                    "gridproof",
+                                    "tracescope"
+                                ]
+                  },
+                  {
+                      "id":  "self-custody-wallet",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1088
+                                       }
+                                   ],
+                      "durationMs":  1125,
+                      "names":  [
+                                    "trustio",
+                                    "chainly",
+                                    "ledgergo",
+                                    "crypto",
+                                    "vaultpad",
+                                    "chainzap",
+                                    "ledgeru",
+                                    "cryptoguard",
+                                    "vaultio",
+                                    "custody",
+                                    "trustpad",
+                                    "guardcrypto",
+                                    "custodywise",
+                                    "wisecustody",
+                                    "chainbit",
+                                    "cryptowise"
+                                ]
+                  },
+                  {
+                      "id":  "berlin-renter-proptech",
+                      "vibe":  "tech",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2282
+                                       }
+                                   ],
+                      "durationMs":  2303,
+                      "names":  [
+                                    "klarkey",
+                                    "klarrent",
+                                    "berlin",
+                                    "tenantly",
+                                    "glashaus",
+                                    "berlinform",
+                                    "renter",
+                                    "rentview",
+                                    "clearnest",
+                                    "formberlin",
+                                    "formrenter",
+                                    "tenant",
+                                    "berlinten",
+                                    "berlintop",
+                                    "berlinframe",
+                                    "frameberlin"
+                                ]
+                  },
+                  {
+                      "id":  "freelance-accounting",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  13,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2303
+                                       }
+                                   ],
+                      "durationMs":  2353,
+                      "names":  [
+                                    "invo",
+                                    "paystack",
+                                    "filed",
+                                    "taxis",
+                                    "bookso",
+                                    "soloinvoice",
+                                    "trace",
+                                    "solostack",
+                                    "logic",
+                                    "ledger",
+                                    "taxed",
+                                    "invoicesolo",
+                                    "stacksolo",
+                                    "gridinvoice",
+                                    "stackindie",
+                                    "indiegrid"
+                                ]
+                  },
+                  {
+                      "id":  "contract-review-smb",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1313
+                                       }
+                                   ],
+                      "durationMs":  1436,
+                      "names":  [
+                                    "clausio",
+                                    "brieflyr",
+                                    "clausebrief",
+                                    "counselr",
+                                    "briefhub",
+                                    "counselt",
+                                    "wisebrief",
+                                    "reviewclause",
+                                    "guardclause",
+                                    "review",
+                                    "guardreview",
+                                    "clausen",
+                                    "briefclause",
+                                    "brief",
+                                    "briefguard",
+                                    "guardbrief"
+                                ]
+                  },
+                  {
+                      "id":  "rural-telehealth",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  5,
+                      "fallback":  11,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2632
+                                       }
+                                   ],
+                      "durationMs":  2669,
+                      "names":  [
+                                    "ruralguide",
+                                    "pulseway",
+                                    "cliniclink",
+                                    "kindcare",
+                                    "nearheal",
+                                    "cuidar",
+                                    "ruralpulse",
+                                    "reachguide",
+                                    "reachrural",
+                                    "guiderural",
+                                    "clinicreach",
+                                    "guidereach",
+                                    "rural",
+                                    "ruralreach",
+                                    "pulserural",
+                                    "reach"
+                                ]
+                  },
+                  {
+                      "id":  "exam-prep",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2500
+                                       }
+                                   ],
+                      "durationMs":  2527,
+                      "names":  [
+                                    "sparklet",
+                                    "mindglow",
+                                    "studyforge",
+                                    "mentor",
+                                    "learnup",
+                                    "studii",
+                                    "aprender",
+                                    "sparkiq",
+                                    "examspark",
+                                    "examstudy",
+                                    "wiseready",
+                                    "pathexam",
+                                    "readystudy",
+                                    "readyspark",
+                                    "exam",
+                                    "studyexam"
+                                ]
+                  },
+                  {
+                      "id":  "carbon-accounting",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1143
+                                       }
+                                   ],
+                      "durationMs":  1174,
+                      "names":  [
+                                    "ledgerleaf",
+                                    "leafaudit",
+                                    "filereign",
+                                    "leaflog",
+                                    "greenfile",
+                                    "payleaf",
+                                    "ledgerpay",
+                                    "renewfile",
+                                    "greenledger",
+                                    "solarbook",
+                                    "auditfield",
+                                    "auditledger",
+                                    "fieldaudit",
+                                    "carbon",
+                                    "carbonfield",
+                                    "fieldcarbon"
+                                ]
+                  },
+                  {
+                      "id":  "kenya-irrigation",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  15,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1740
+                                       }
+                                   ],
+                      "durationMs":  1769,
+                      "names":  [
+                                    "growlyn",
+                                    "soilwave",
+                                    "watertrail",
+                                    "greenery",
+                                    "growon",
+                                    "agroki",
+                                    "waterworks",
+                                    "greentrail",
+                                    "acrewater",
+                                    "workswater",
+                                    "acre",
+                                    "dripacre",
+                                    "drip",
+                                    "kenyadrip",
+                                    "watergrow",
+                                    "water"
+                                ]
+                  },
+                  {
+                      "id":  "ngo-water-quality",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2559
+                                       }
+                                   ],
+                      "durationMs":  2603,
+                      "names":  [
+                                    "waterguide",
+                                    "aqualens",
+                                    "verdant",
+                                    "wiseaid",
+                                    "waterwise",
+                                    "fieldpure",
+                                    "fieldguide",
+                                    "aquascope",
+                                    "clearroot",
+                                    "soilsense",
+                                    "flowcheck",
+                                    "greenvein",
+                                    "guidewater",
+                                    "pathwater",
+                                    "aidfield",
+                                    "guidefield"
+                                ]
+                  },
+                  {
+                      "id":  "finance-newsletter",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  894
+                                       }
+                                   ],
+                      "durationMs":  922,
+                      "names":  [
+                                    "fundbit",
+                                    "fundish",
+                                    "mintly",
+                                    "savvyfy",
+                                    "ledgergo",
+                                    "mintpad",
+                                    "plainpath",
+                                    "savvyhub",
+                                    "plainflow",
+                                    "marketplain",
+                                    "pathplain",
+                                    "market",
+                                    "newsmarket",
+                                    "news",
+                                    "investnews",
+                                    "fundtap"
+                                ]
+                  },
+                  {
+                      "id":  "insurance-claims",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2572
+                                       }
+                                   ],
+                      "durationMs":  2602,
+                      "names":  [
+                                    "coverbridge",
+                                    "clearaid",
+                                    "homeshield",
+                                    "clearcover",
+                                    "claimly",
+                                    "coversafe",
+                                    "fastfund",
+                                    "quikcover",
+                                    "homebridge",
+                                    "safeview",
+                                    "sureaid",
+                                    "openfund",
+                                    "swiftsafe",
+                                    "claimhome",
+                                    "guardhome",
+                                    "clearpath"
+                                ]
+                  },
+                  {
+                      "id":  "public-procurement",
+                      "vibe":  "clean",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2297
+                                       }
+                                   ],
+                      "durationMs":  2321,
+                      "names":  [
+                                    "civtrust",
+                                    "trustflow",
+                                    "supplygrid",
+                                    "council",
+                                    "briefpath",
+                                    "clauset",
+                                    "tenderpublic",
+                                    "tender",
+                                    "publictender",
+                                    "public",
+                                    "lenscouncil",
+                                    "counciltrust",
+                                    "tenderlens",
+                                    "lenstender",
+                                    "tendertrust",
+                                    "brieftender"
+                                ]
+                  },
+                  {
+                      "id":  "cyber-threat-analytics",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1199
+                                       }
+                                   ],
+                      "durationMs":  1249,
+                      "names":  [
+                                    "guardio",
+                                    "shieldiq",
+                                    "secureon",
+                                    "cyber",
+                                    "cybergo",
+                                    "tracelyt",
+                                    "guardon",
+                                    "shieldar",
+                                    "vaultiq",
+                                    "threat",
+                                    "tracely",
+                                    "threatwatch",
+                                    "dataworks",
+                                    "detectmax",
+                                    "datathreat",
+                                    "bravecyber"
+                                ]
+                  },
+                  {
+                      "id":  "working-dog-treats",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  9,
+                      "fallback":  7,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  902
+                                       }
+                                   ],
+                      "durationMs":  943,
+                      "names":  [
+                                    "pawgle",
+                                    "walkup",
+                                    "leashly",
+                                    "tailer",
+                                    "pawpad",
+                                    "walkin",
+                                    "leashup",
+                                    "pawtic",
+                                    "pawactive",
+                                    "pawbit",
+                                    "pawnest",
+                                    "activepaw",
+                                    "nestpaw",
+                                    "pawcare",
+                                    "pawtrail",
+                                    "trailpaw"
+                                ]
+                  },
+                  {
+                      "id":  "athlete-recovery",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2530
+                                       }
+                                   ],
+                      "durationMs":  2550,
+                      "names":  [
+                                    "fitvibe",
+                                    "recoil",
+                                    "trainpulse",
+                                    "endure",
+                                    "moveon",
+                                    "aktivo",
+                                    "endurerise",
+                                    "pulsefit",
+                                    "trainflow",
+                                    "physio",
+                                    "wellendure",
+                                    "physiorise",
+                                    "risephysio",
+                                    "stamina",
+                                    "risestamina",
+                                    "endurephysio"
+                                ]
+                  },
+                  {
+                      "id":  "climate-marketing-agency",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2511
+                                       }
+                                   ],
+                      "durationMs":  2529,
+                      "names":  [
+                                    "ecobold",
+                                    "solaris",
+                                    "boldleaf",
+                                    "greenly",
+                                    "wisegreen",
+                                    "greenpath",
+                                    "sunmark",
+                                    "foliage",
+                                    "wiselaunch",
+                                    "voltleaf",
+                                    "leafwave",
+                                    "launchgreen",
+                                    "launch",
+                                    "climate",
+                                    "climatepath",
+                                    "pathclimate"
+                                ]
+                  },
+                  {
+                      "id":  "cold-chain-logistics",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  14,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1027
+                                       }
+                                   ],
+                      "durationMs":  1059,
+                      "names":  [
+                                    "routefy",
+                                    "fleetgo",
+                                    "cargoxl",
+                                    "trackly",
+                                    "coldrun",
+                                    "cargify",
+                                    "routiq",
+                                    "chainpath",
+                                    "trackon",
+                                    "chaincold",
+                                    "coldgo",
+                                    "pathchain",
+                                    "chillcold",
+                                    "chill",
+                                    "pathchill",
+                                    "trackio"
+                                ]
+                  },
+                  {
+                      "id":  "esports-analytics",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  15,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-20b",
+                                           "outcome":  "ready",
+                                           "durationMs":  1045
+                                       }
+                                   ],
+                      "durationMs":  1065,
+                      "names":  [
+                                    "sigtrac",
+                                    "datasharp",
+                                    "scopepulse",
+                                    "detectio",
+                                    "realbeat",
+                                    "signtro",
+                                    "data",
+                                    "arenatrace",
+                                    "tracify",
+                                    "scopelog",
+                                    "detecta",
+                                    "arenagrid",
+                                    "scorearena",
+                                    "tracearena",
+                                    "score",
+                                    "esportscore"
+                                ]
+                  },
+                  {
+                      "id":  "investigative-podcast",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  8,
+                      "fallback":  8,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "qwen/qwen3.6-27b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2323
+                                       }
+                                   ],
+                      "durationMs":  2352,
+                      "names":  [
+                                    "voxcorps",
+                                    "deepfile",
+                                    "sourcefile",
+                                    "inquest",
+                                    "signalout",
+                                    "narratio",
+                                    "pressvoice",
+                                    "boldtype",
+                                    "press",
+                                    "probepress",
+                                    "probe",
+                                    "storyprobe",
+                                    "story",
+                                    "scopestory",
+                                    "pressline",
+                                    "pressprobe"
+                                ]
+                  },
+                  {
+                      "id":  "warehouse-robotics",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  10,
+                      "fallback":  6,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2558
+                                       }
+                                   ],
+                      "durationMs":  2581,
+                      "names":  [
+                                    "forgebit",
+                                    "stockflow",
+                                    "craftforge",
+                                    "buildout",
+                                    "stockrun",
+                                    "crafto",
+                                    "buildfire",
+                                    "forgegrid",
+                                    "factorypilot",
+                                    "factory",
+                                    "pilotfactory",
+                                    "pilotstock",
+                                    "gridstock",
+                                    "stocklyn",
+                                    "crafting",
+                                    "factorystock"
+                                ]
+                  },
+                  {
+                      "id":  "factory-quality",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  6,
+                      "fallback":  10,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2508
+                                       }
+                                   ],
+                      "durationMs":  2521,
+                      "names":  [
+                                    "forgeon",
+                                    "stockeye",
+                                    "buildgrid",
+                                    "craftsman",
+                                    "stockcheck",
+                                    "forgee",
+                                    "exactflow",
+                                    "exactpilot",
+                                    "gaugeflow",
+                                    "pilotexact",
+                                    "flowexact",
+                                    "flowgauge",
+                                    "gaugepilot",
+                                    "pilotgauge",
+                                    "qualitygrid",
+                                    "exact"
+                                ]
+                  },
+                  {
+                      "id":  "rural-auto-repair",
+                      "vibe":  "bold",
+                      "score":  100,
+                      "shortlistWorthy":  16,
+                      "model":  7,
+                      "fallback":  9,
+                      "reason":  null,
+                      "provider":  "groq",
+                      "attempts":  [
+                                       {
+                                           "provider":  "groq",
+                                           "model":  "openai/gpt-oss-120b",
+                                           "outcome":  "ready",
+                                           "durationMs":  2639
+                                       }
+                                   ],
+                      "durationMs":  2658,
+                      "names":  [
+                                    "voltify",
+                                    "fieldrun",
+                                    "drivefield",
+                                    "charged",
+                                    "mot0r",
+                                    "drivolt",
+                                    "fieldspark",
+                                    "ruralmotor",
+                                    "rural",
+                                    "pilotrural",
+                                    "motor",
+                                    "motorpilot",
+                                    "repair",
+                                    "repairpilot",
+                                    "pilotrepair",
+                                    "ruralpilot"
+                                ]
+                  }
+              ]
+}

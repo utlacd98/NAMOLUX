@@ -11,7 +11,7 @@ const editorialSerif =
 const supportingPoints = [
   "No account required",
   "Live availability across 6 TLDs",
-  "Founder Signal score on every name",
+  "One free Founder Signal batch monthly",
 ]
 
 const heroProof = [
@@ -157,8 +157,9 @@ export function Hero() {
 
             <motion.div {...getReveal(0.22, Boolean(reducedMotion))} className="relative mt-6 flex flex-col items-start gap-4 lg:mt-7">
               <p className="max-w-xl text-[15px] leading-7 text-[#ddd6c5]/78 sm:text-[17px]">
-                Paste your shortlist and see each name ranked by Founder Signal, live availability, and
-                brand-consultant reasoning across .com, .io, .co, .ai, .app, and .dev.
+                Explore freely with Quick, or use three Advanced batches each month. Live domain checks
+                update without blocking your shortlist; run one complete Founder Signal batch free when
+                you are ready to compare the evidence.
               </p>
 
               <motion.div
@@ -202,7 +203,7 @@ export function Hero() {
                     <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0)_42%)] opacity-70" />
                     <span className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0)_22%,rgba(255,255,255,0.34)_50%,rgba(255,255,255,0)_78%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <span className="absolute inset-y-1 left-0 w-24 -translate-x-[180%] rotate-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-md transition-transform duration-[1100ms] ease-out group-hover:translate-x-[360%]" />
-                    <span className="relative">Score your shortlist free</span>
+                    <span className="relative">Generate names free</span>
                     <ArrowRight className="relative ml-3 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </motion.div>

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "artifactType": "quick-generator-blind-names-pack",
+  "cases": [
+    {
+      "id": "family-budgeting",
+      "brief": "simple household budgeting and savings app for young families",
+      "vibe": "friendly",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 11
+      },
+      "names": [
+        "nestwise",
+        "pennypath",
+        "brightbud",
+        "coinkind",
+        "pocketgrow",
+        "moneymate",
+        "homestead",
+        "safebloom",
+        "savorra",
+        "cashgarden",
+        "wiseplan",
+        "allowance",
+        "clearthrift",
+        "provision",
+        "headroom",
+        "margin"
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "brief": "cozy puzzle game studio making thoughtful games for adults",
+      "vibe": "playful",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 11
+      },
+      "names": [
+        "nestfold",
+        "glimmer",
+        "daydream",
+        "tactile",
+        "cosycraft",
+        "mindgarden",
+        "playmuse",
+        "quizzical",
+        "softspot",
+        "cozypuzzle",
+        "jigsaw",
+        "playfulplay",
+        "brainwave",
+        "rebus",
+        "willow",
+        "logicnest"
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "brief": "premium skincare made with alpine botanicals and mineral water",
+      "vibe": "premium",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 12
+      },
+      "names": [
+        "montavelle",
+        "silvaris",
+        "elevane",
+        "everfrost",
+        "alpineveil",
+        "lucentia",
+        "springtide",
+        "snowmelt",
+        "pureascent",
+        "glacial",
+        "serenity",
+        "purealpine",
+        "purity",
+        "silken",
+        "floraritual",
+        "mineraldew"
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "brief": "AI scheduling assistant for busy startup founders",
+      "vibe": "tech",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 11
+      },
+      "names": [
+        "cadentra",
+        "foundry",
+        "orbitask",
+        "calendra",
+        "focusway",
+        "harbor",
+        "swayline",
+        "routina",
+        "headroom",
+        "northstar",
+        "flowstate",
+        "smartslot",
+        "slotmind",
+        "readyagenda",
+        "sequence",
+        "diary"
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "brief": "invoice and tax accounting software for independent freelancers",
+      "vibe": "clean",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 11
+      },
+      "names": [
+        "cashbook",
+        "accrual",
+        "bookwork",
+        "bookkeep",
+        "receipt",
+        "balance",
+        "daybook",
+        "journal",
+        "reckoning",
+        "worksheet",
+        "invoicegrid",
+        "soloscope",
+        "invoicecore",
+        "invoicetax",
+        "wiseinvoice",
+        "simplebooks"
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "brief": "cybersecurity analytics platform for enterprise threat detection teams",
+      "vibe": "bold",
+      "controls": {
+        "style": "auto",
+        "creativity": "balanced",
+        "maxLength": 11
+      },
+      "names": [
+        "nightwatch",
+        "threatloom",
+        "signalforge",
+        "intellic",
+        "vigilant",
+        "beaconry",
+        "shadowmap",
+        "riskweave",
+        "firebreak",
+        "sentrynet",
+        "detector",
+        "sharpthreat",
+        "spectrum",
+        "livethreat",
+        "firewall",
+        "vigilance"
+      ]
+    }
+  ]
+}

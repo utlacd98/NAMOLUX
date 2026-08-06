@@ -85,8 +85,8 @@ The extension is a detail, not a strategy. A memorable, brandable name on a seco
 
 ---
 
-✨ *Not sure which domain works best for your startup? NamoLux generates brandable names with instant availability checks across .com, .io, and .ai — with Founder Signal™ scores to help you choose with confidence.*
+✨ *Not sure which domain works best for your startup? Bring your candidates to NamoLux for best-effort availability checks across .com, .io, .co, .ai, .app, and .dev, then use Founder Signal™ to compare the strongest options.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

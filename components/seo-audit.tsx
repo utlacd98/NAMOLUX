@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   Search,
@@ -13,8 +12,6 @@ import {
   AlertCircle,
   Globe,
   FileText,
-  Zap,
-  Shield,
   Smartphone,
   ImageIcon,
   Link2,
@@ -66,6 +63,7 @@ interface PageInfo {
 
 interface AuditResult {
   success: boolean
+  message?: string
   url: string
   categories: AuditCategory[]
   summary: AuditSummary
@@ -73,128 +71,10 @@ interface AuditResult {
   timestamp: string
 }
 
-const generateMockAudit = (url: string): AuditCategory[] => {
-  return [
-    {
-      name: "Meta Tags",
-      icon: <FileText className="h-5 w-5" />,
-      score: 75,
-      items: [
-        {
-          title: "Title Tag",
-          status: "pass",
-          description: "Title tag is present and within optimal length (60 chars)",
-        },
-        {
-          title: "Meta Description",
-          status: "warning",
-          description: "Meta description is too short (95 chars)",
-          recommendation: "Aim for 150-160 characters to maximize SERP visibility",
-        },
-        { title: "Open Graph Tags", status: "pass", description: "All essential OG tags are present" },
-        {
-          title: "Twitter Cards",
-          status: "fail",
-          description: "Twitter card meta tags are missing",
-          recommendation: "Add twitter:card, twitter:title, and twitter:description tags",
-        },
-        { title: "Canonical URL", status: "pass", description: "Canonical URL is properly set" },
-      ],
-    },
-    {
-      name: "Performance",
-      icon: <Zap className="h-5 w-5" />,
-      score: 68,
-      items: [
-        {
-          title: "Page Load Time",
-          status: "warning",
-          description: "Page loads in 3.2s",
-          recommendation: "Target under 2.5s for optimal user experience",
-        },
-        { title: "First Contentful Paint", status: "pass", description: "FCP is 1.1s (Good)" },
-        {
-          title: "Largest Contentful Paint",
-          status: "warning",
-          description: "LCP is 3.8s",
-          recommendation: "Optimize images and reduce server response time",
-        },
-        { title: "Cumulative Layout Shift", status: "pass", description: "CLS is 0.05 (Good)" },
-      ],
-    },
-    {
-      name: "Mobile Friendliness",
-      icon: <Smartphone className="h-5 w-5" />,
-      score: 90,
-      items: [
-        { title: "Viewport Meta Tag", status: "pass", description: "Viewport is properly configured" },
-        { title: "Responsive Design", status: "pass", description: "Page adapts to different screen sizes" },
-        {
-          title: "Touch Targets",
-          status: "warning",
-          description: "Some buttons may be too small",
-          recommendation: "Ensure touch targets are at least 48x48 pixels",
-        },
-        { title: "Font Sizes", status: "pass", description: "Text is readable without zooming" },
-      ],
-    },
-    {
-      name: "Security",
-      icon: <Shield className="h-5 w-5" />,
-      score: 85,
-      items: [
-        { title: "HTTPS", status: "pass", description: "Site is served over HTTPS" },
-        { title: "Mixed Content", status: "pass", description: "No mixed content issues detected" },
-        {
-          title: "Security Headers",
-          status: "warning",
-          description: "Some security headers are missing",
-          recommendation: "Add X-Content-Type-Options and X-Frame-Options headers",
-        },
-      ],
-    },
-    {
-      name: "Images",
-      icon: <ImageIcon className="h-5 w-5" />,
-      score: 60,
-      items: [
-        {
-          title: "Alt Text",
-          status: "warning",
-          description: "3 images are missing alt text",
-          recommendation: "Add descriptive alt text for accessibility and SEO",
-        },
-        {
-          title: "Image Optimization",
-          status: "fail",
-          description: "5 images are not optimized",
-          recommendation: "Use WebP format and compress images",
-        },
-        { title: "Lazy Loading", status: "pass", description: "Images use lazy loading" },
-      ],
-    },
-    {
-      name: "Links",
-      icon: <Link2 className="h-5 w-5" />,
-      score: 80,
-      items: [
-        { title: "Broken Links", status: "pass", description: "No broken links detected" },
-        { title: "Internal Links", status: "pass", description: "Good internal linking structure" },
-        {
-          title: "External Links",
-          status: "warning",
-          description: "2 external links don't have rel='noopener'",
-          recommendation: "Add rel='noopener noreferrer' to external links",
-        },
-      ],
-    },
-  ]
-}
-
 export function SeoAudit() {
-  const router = useRouter()
   const [url, setUrl] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [auditError, setAuditError] = useState<string | null>(null)
   const [results, setResults] = useState<AuditCategory[] | null>(null)
   const [auditData, setAuditData] = useState<AuditResult | null>(null)
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
@@ -202,6 +82,7 @@ export function SeoAudit() {
   const handleAnalyze = async () => {
     if (!url.trim()) return
     setIsAnalyzing(true)
+    setAuditError(null)
     setResults(null)
     setAuditData(null)
 
@@ -216,20 +97,17 @@ export function SeoAudit() {
         }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuditResult
 
       if (!response.ok) {
-        if (response.status === 429 && (data.error === "rate_limit_exceeded" || data.error === "token_limit_reached")) {
-          router.push("/pricing?reason=limit_exceeded")
-          return
-        }
+        if (response.status === 429) throw new Error(data.message || "NamoLux is busy right now. Please try again in a moment.")
         throw new Error("Failed to analyze website")
       }
 
       setAuditData(data as AuditResult)
 
       // Transform API response to match component structure
-      const categories = data.categories.map((cat: any) => ({
+      const categories = data.categories.map((cat) => ({
         name: cat.name,
         icon: getIconForCategory(cat.name),
         score: cat.score,
@@ -241,9 +119,11 @@ export function SeoAudit() {
       setExpandedCategories(["Meta Tags"])
     } catch (error) {
       console.error("Error analyzing website:", error)
-      // Fallback to mock data if API fails
-      setResults(generateMockAudit(url))
-      setExpandedCategories(["Meta Tags"])
+      setAuditError(
+        error instanceof Error
+          ? error.message
+          : "The audit could not be completed. Check the URL and try again.",
+      )
     } finally {
       setIsAnalyzing(false)
     }
@@ -471,7 +351,7 @@ export function SeoAudit() {
   }
 
   return (
-    <div className="noise-overlay relative min-h-screen bg-background">
+    <main id="main-content" className="noise-overlay relative min-h-screen bg-background">
       {/* Background - Subtle, restrained */}
       <div className="pointer-events-none absolute inset-0 overflow-clip" aria-hidden="true">
         <div className="animate-luxury-aura absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-gradient-to-bl from-primary/10 via-secondary/5 to-transparent blur-[120px]" />
@@ -494,8 +374,9 @@ export function SeoAudit() {
         </div>
 
         <div className="mb-8 text-center">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Secondary tool</p>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">SEO Audit Tool</h1>
-          <p className="mt-2 text-muted-foreground">Analyze any website and get actionable SEO insights in seconds.</p>
+          <p className="mt-2 text-muted-foreground">Analyse a public page and review the checks NamoLux can verify.</p>
         </div>
 
         {/* URL Input */}
@@ -503,7 +384,9 @@ export function SeoAudit() {
           <div className="flex gap-3">
             <div className="relative flex-1">
               <Globe className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <label htmlFor="seo-audit-url" className="sr-only">Public website URL</label>
               <input
+                id="seo-audit-url"
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -530,11 +413,20 @@ export function SeoAudit() {
               )}
             </Button>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Results come from the live audit response. If a page cannot be checked, NamoLux reports an error rather than estimated data.
+          </p>
         </div>
+
+        {auditError && (
+          <div role="alert" className="mx-auto mb-8 max-w-2xl rounded-lg border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+            {auditError} <button type="button" onClick={handleAnalyze} className="ml-2 min-h-8 font-semibold underline underline-offset-4">Try again</button>
+          </div>
+        )}
 
         {/* Loading State */}
         {isAnalyzing && (
-          <div className="flex flex-col items-center justify-center py-16">
+          <div className="flex flex-col items-center justify-center py-16" role="status" aria-live="polite">
             <div className="relative mb-6">
               <div className="h-20 w-20 rounded-full border-4 border-muted" />
               <div className="absolute inset-0 h-20 w-20 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -611,7 +503,7 @@ export function SeoAudit() {
               )}
 
               {/* Top Issues */}
-              {auditData?.summary?.topIssues?.length > 0 && (
+              {(auditData?.summary?.topIssues?.length || 0) > 0 && auditData && (
                 <div className="mt-6 mx-auto max-w-2xl rounded-xl bg-yellow-500/10 border border-yellow-500/20 p-4">
                   <h3 className="font-semibold text-yellow-400 mb-2">Top Issues to Fix</h3>
                   <ul className="space-y-2">
@@ -739,6 +631,6 @@ export function SeoAudit() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }

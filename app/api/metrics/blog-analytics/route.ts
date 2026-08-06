@@ -24,7 +24,7 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
 
 export async function GET(request: NextRequest) {
   try {
-    const unauthorized = requireAdminRequest(request)
+    const unauthorized = await requireAdminRequest(request)
     if (unauthorized) return unauthorized
 
     const { searchParams } = new URL(request.url)

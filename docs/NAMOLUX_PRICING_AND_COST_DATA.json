@@ -1,0 +1,77 @@
+{
+  "research_date": "2026-08-02",
+  "currency": "GBP",
+  "usd_to_gbp_assumption": 0.79,
+  "method": "Repository audit plus official public pricing; estimates are not observed billing data. UK consumer margin examples assume displayed prices include 20% VAT when VAT is chargeable.",
+  "current_ai_models": [
+    {"provider":"Groq","model":"openai/gpt-oss-120b","input_usd_per_million":0.15,"output_usd_per_million":0.6,"source_url":"https://console.groq.com/docs/model/openai/gpt-oss-120b","confidence":"high"},
+    {"provider":"Groq","model":"openai/gpt-oss-20b","input_usd_per_million":0.075,"output_usd_per_million":0.3,"source_url":"https://console.groq.com/docs/models","confidence":"high"},
+    {"provider":"Groq","model":"qwen/qwen3.6-27b","input_usd_per_million":0.6,"output_usd_per_million":3,"source_url":"https://console.groq.com/docs/models","confidence":"high"},
+    {"provider":"OpenAI","model":"gpt-4.1-mini","input_usd_per_million":0.4,"output_usd_per_million":1.6,"source_url":"https://openai.com/index/gpt-4-1/","confidence":"high"},
+    {"provider":"OpenAI","model":"gpt-4o-mini","input_usd_per_million":0.15,"output_usd_per_million":0.6,"source_url":"https://openai.com/api/pricing/","confidence":"medium"},
+    {"provider":"OpenAI","model":"gpt-4o","input_usd_per_million":2.5,"output_usd_per_million":10,"source_url":"https://openai.com/api/pricing/","confidence":"medium"},
+    {"provider":"Vercel AI Gateway","model":"google/gemini-2.5-flash","input_usd_per_million":null,"output_usd_per_million":null,"source_url":"https://vercel.com/ai-gateway","confidence":"low"}
+  ],
+  "ai_call_locations": [
+    {"feature":"quick generation","file":"lib/domainGen/quickGenerateGroq.ts","models":["openai/gpt-oss-120b","qwen/qwen3.6-27b","openai/gpt-oss-20b","google/gemini-2.5-flash","gpt-4.1-mini"],"availability":"lab/flag gated","calls_per_action":"1 primary plus bounded recovery/editor attempts","cost_gbp":{"low":0.001,"expected":0.006,"high":0.05}},
+    {"feature":"lab naming","file":"lib/lab-name-generator.ts","models":["gpt-4.1-mini"],"availability":"lab only","calls_per_action":"1","cost_gbp":{"low":0.001,"expected":0.003,"high":0.006}},
+    {"feature":"legacy generation","file":"app/api/generate-domains/route.ts","models":["OPENAI_NAMING_MODEL/gpt-4.1-mini"],"availability":"legacy/experimental","calls_per_action":"1+","cost_gbp":{"low":0.002,"expected":0.012,"high":0.08}},
+    {"feature":"description analysis","file":"app/api/analyze-description/route.ts","models":["gpt-4o-mini"],"availability":"implemented","calls_per_action":"1; deterministic fallback","cost_gbp":{"low":0.0005,"expected":0.002,"high":0.006}},
+    {"feature":"brand palette","file":"app/api/brand-palette/route.ts","models":["gpt-4o-mini"],"availability":"implemented but not currently entitled","calls_per_action":"1","cost_gbp":{"low":0.001,"expected":0.003,"high":0.01}},
+    {"feature":"deep search","file":"app/api/deep-search/route.ts","models":["gpt-4o"],"availability":"implemented/unclear public exposure","calls_per_action":"up to 5","cost_gbp":{"low":0.02,"expected":0.06,"high":0.15}},
+    {"feature":"marketing admin","file":"lib/marketing-agent-engine.ts","models":["gpt-4o-mini"],"availability":"admin only","calls_per_action":"internal","cost_gbp":{"low":0.001,"expected":0.004,"high":0.02}}
+  ],
+  "feature_level_costs_gbp": {
+    "founder_signal_50_names":{"low":0.0003,"expected":0.001,"high":0.005,"confidence":"medium"},
+    "domain_check_one":{"low":0.00002,"expected":0.00008,"high":0.0005,"confidence":"low"},
+    "bulk_check_10x6":{"low":0.001,"expected":0.005,"high":0.03,"confidence":"medium"},
+    "bulk_check_50x6":{"low":0.004,"expected":0.02,"high":0.12,"confidence":"medium"},
+    "seo_audit":{"low":0.002,"expected":0.012,"high":0.08,"confidence":"low"},
+    "weekly_monitored_site":{"low":0.01,"expected":0.05,"high":0.32,"confidence":"low"},
+    "daily_monitored_site":{"low":0.06,"expected":0.32,"high":2.4,"confidence":"low"},
+    "email_notification":{"low":0,"expected":0,"high":0.003,"confidence":"low"}
+  },
+  "infrastructure_services": [
+    {"service":"Vercel Pro","type":"fixed","usd_monthly":20,"gbp_monthly":15.8,"source_url":"https://vercel.com/pricing","confidence":"medium"},
+    {"service":"Supabase Pro","type":"fixed","usd_monthly":25,"gbp_monthly":19.75,"source_url":"https://supabase.com/pricing","confidence":"medium"},
+    {"service":"Stripe domestic UK card","type":"variable","formula":"1.5% + £0.20; add estimated 0.7% Stripe Billing","source_url":"https://stripe.com/gb/pricing","confidence":"medium"},
+    {"service":"PageSpeed Insights","type":"variable/free quota","gbp_monthly":0,"source_url":"https://developers.google.com/speed/docs/insights/v5/get-started?hl=en","confidence":"medium"},
+    {"service":"RDAP/DNS public providers","type":"variable/free","gbp_monthly":0,"source_url":"https://www.iana.org/domains/rdap","confidence":"low"}
+  ],
+  "fixed_monthly_costs_gbp":{"low":0,"expected":35.55,"high":60},
+  "user_level_costs_gbp": {
+    "visitor":{"low":0.001,"expected":0.005,"high":0.03},
+    "registered_free":{"low":0.01,"expected":0.03,"high":0.12},
+    "average_paid_current_surface":{"low":0.07,"expected":0.16,"high":0.65},
+    "heavy_paid_recommended_limits":{"low":0.55,"expected":1.35,"high":3.5}
+  },
+  "recommended_plans": [
+    {"name":"Free","monthly_price_gbp":0,"annual_price_gbp":0,"entitlements":{"bulk_checks":1,"bulk_names_per_run":10,"founder_signal_runs":1,"founder_signal_names_per_run":10,"saved_projects":0,"csv":false,"reports":false},"fair_use":"signup required for AI; 4 bulk and 6 scoring starts/minute"},
+    {"name":"NamoLux Pro","monthly_price_gbp":9.99,"annual_price_gbp":99,"annual_discount_percent":17.4,"entitlements":{"bulk_checks":20,"bulk_names_per_run":50,"founder_signal_runs":20,"founder_signal_names_per_run":50,"saved_projects":10,"reports":10,"csv":true,"revocable_shares":true},"fair_use":"no unlimited AI; exact rechecks free within cache window"},
+    {"name":"Future Launch Monitor add-on","monthly_price_gbp":9,"annual_price_gbp":90,"entitlements":{"weekly_monitored_sites":1},"status":"do not sell until monitoring and delivery verified"}
+  ],
+  "competitor_prices": [
+    {"name":"Namelix","price":"free UI; no subscription price displayed","source_url":"https://namelix.com/","directness":"direct"},
+    {"name":"Brandmark","price":"$35/$95/$195 one-time","source_url":"https://brandmark.io/pricing/","directness":"adjacent"},
+    {"name":"Looka","price":"$20 basic, $65 premium logo; $96/year Brand Kit, $129/year Web Brand Kit","source_url":"https://looka.com/pricing/","directness":"adjacent"},
+    {"name":"Atom","price":"naming contests from $299","source_url":"https://www.atom.com/how-it-works?amp=1&wvideo=l2bhtku7e6","directness":"premium alternative"},
+    {"name":"Semrush SEO Toolkit","price":"$139.95/$249.95/$499.95 per month","source_url":"https://www.semrush.com/kb/1547-seo-toolkit-pricing-limits","directness":"SEO benchmark"},
+    {"name":"Namecheap Business Name Generator","price":"free, unlimited ideas; domain sold separately","source_url":"https://www.namecheap.com/visual/business-name-generator/","directness":"direct free alternative"},
+    {"name":"GoDaddy Business Name Generator","price":"free AI name/domain suggestions","source_url":"https://www.godaddy.com/de/business-name-generator","directness":"direct free alternative"},
+    {"name":"Shopify Business Name Generator","price":"free, unlimited searches","source_url":"https://www.shopify.com/ca/tools/business-name-generator","directness":"direct free alternative"},
+    {"name":"Durable","price":"Starter $12, Business $20, Mogul $80/month; regional display varies","source_url":"https://help.durable.co/es/articles/8583507-preguntas-mas-frecuentes","directness":"adjacent launch platform"},
+    {"name":"GoDaddy Airo","price":"Free 50 AI credits/month; UK Starter £7.49/month annual, Professional £17.99/month annual","source_url":"https://www.godaddy.com/en-uk/airo/ai-builder","directness":"adjacent launch platform"}
+  ],
+  "conversion_assumptions":[0.01,0.02,0.03,0.05,0.08],
+  "gross_margin_at_999":{"displayed_price_including_vat_gbp":9.99,"assumed_vat_rate":0.2,"revenue_excluding_vat_gbp":8.325,"estimated_stripe_and_billing_gbp":0.41978,"net_before_cogs_gbp":7.90522,"expected_variable_cost_gbp":0.16,"contribution_gbp":7.74522,"margin_percent":93.04,"heavy_cost_gbp":1.35,"heavy_margin_percent":78.74,"margin_after_fixed_allocation_at_100_payers_percent":88.77,"heavy_margin_after_fixed_allocation_at_100_payers_percent":74.47},
+  "break_even":{"expected_fixed_cost_gbp":35.55,"expected_payers":5,"high_contingency_payers":8},
+  "risk_ratings":[
+    {"risk":"Deep Search five GPT-4o batches","rating":"high"},
+    {"risk":"legacy unlimited generator semantics","rating":"high"},
+    {"risk":"public RDAP/DNS provider reliability and limits","rating":"high"},
+    {"risk":"SEO daily crawl scale and SSRF","rating":"high"},
+    {"risk":"missing notification delivery","rating":"medium"},
+    {"risk":"anonymous abuse","rating":"medium"}
+  ],
+  "unresolved_questions":["Actual provider invoices and token consumption","Live generator/lab flags","Stripe price IDs, Billing fees and VAT registration","Actual Vercel/Supabase plans and usage","SEO notification delivery provider","Contractual availability-provider SLA"]
+}

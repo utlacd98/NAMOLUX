@@ -24,6 +24,9 @@ const BANNED_AI_SMELL_SUFFIXES = [
   "vix",
   "oxa",
   "exa",
+  "ify",
+  "io",
+  "ly",
 ]
 
 // AI-generated name patterns — hard reject these before scoring
@@ -42,7 +45,122 @@ const TRADEMARK_LIKE_FRAGMENTS = [
   "tesla",
   "spotify",
   "netflix",
+  "lyft",
 ]
+
+// Keep substring blocking deliberately narrow. Most famous-brand words are
+// ordinary morphemes inside unrelated names, while this short distinctive
+// spelling is safe to reject wherever it appears.
+const HARD_PROTECTED_FRAGMENTS = ["lyft"] as const
+
+/**
+ * A deliberately small set of distinctive public-facing marks used for a
+ * conservative confusion screen. This is a product-safety heuristic, not a
+ * trademark search, legal opinion, or clearance workflow. It only blocks
+ * very close surfaces that are likely to make a generated suggestion look
+ * copied (for example, `tessla` beside `tesla`).
+ *
+ * Keep ordinary dictionary words out of this list. Exact matches and the
+ * existing narrow substring rules still handle the wider protected examples
+ * elsewhere in the generator without turning normal language into collateral
+ * damage.
+ */
+const NEAR_COLLISION_PROTECTED_SURFACES = [
+  "adidas",
+  "airbnb",
+  "amazon",
+  "chatgpt",
+  "google",
+  "instagram",
+  "microsoft",
+  "namelix",
+  "namolux",
+  "netflix",
+  "openai",
+  "paypal",
+  "shopify",
+  "spotify",
+  "tesla",
+  "tiktok",
+  "vercel",
+  "youtube",
+] as const
+
+// These are long and distinctive enough that adding a suffix does not create
+// an independent ordinary word. Short marks remain exact-only unless they
+// are protected by the stricter fragment list above.
+const PROTECTED_SUBSTRING_SURFACES = [
+  "airbnb",
+  "chatgpt",
+  "namelix",
+  "namolux",
+  "openai",
+  "shopify",
+  "spotify",
+  "tesla",
+  "tiktok",
+] as const
+
+// Confirmed active brands or same-category examples found during the manual
+// naming audit. These are exact, normalised surfaces rather than fragments:
+// `sunworkspro`, for example, must not be rejected just because `sunworks` is
+// on this list.
+const VERIFIED_EXACT_COLLISION_SURFACES = new Set([
+  "sunworks",
+  "chargegrid",
+  "privacywise",
+  "invoiceflow",
+  "carbonledger",
+  "cyberwatch",
+  "coldtrack",
+  "pharmatrack",
+  "motorworks",
+  "pledgeit",
+  "wellchild",
+  "bitstream",
+  "bellcore",
+  "tradeindia",
+  "teamflow",
+  "chainguard",
+  "mindpath",
+  "hirebridge",
+  "talentbridge",
+  "carebridge",
+  "guestjoy",
+  "simplepay",
+  "dripworks",
+  "assurance",
+  "defender",
+  "tripwire",
+  "wrench",
+  "edelweiss",
+  "arabica",
+  "wilderness",
+  "portico",
+  "clockwise",
+  "sentinel",
+  "heartbeat",
+  "openscholar",
+  "keyring",
+  "openrenter",
+  "routine",
+  "parkade",
+  "goldsmith",
+])
+
+// Confirmed malformed or meaning-dangerous outputs from the same audit. Keep
+// this deliberately narrow: speculative terms belong in scoring, not a global
+// admission gate.
+const VERIFIED_CRITICAL_SURFACES = new Set([
+  "tabloc",
+  "roameat",
+  "riglet",
+  "coilwhisp",
+  "civik",
+  "publik",
+  "aidsignal",
+  "stillborn",
+])
 
 const LOW_FIT_TONE_TERMS = [
   "grim",
@@ -167,6 +285,7 @@ const STRONG_BRAND_ROOTS = [
 ]
 
 const ALLOWED_DOUBLE_O_WORDS = new Set(["bloom", "boost", "brook", "groom", "loom", "loop", "root", "room", "zoom"])
+const ALLOWED_REPEATED_BIGRAMS = new Set(["at", "ba", "bo", "co", "ha", "ma", "na", "yo"])
 
 const RANDOM_SYLLABLE_PATTERNS = [
   /^ara/,
@@ -179,6 +298,27 @@ const RANDOM_SYLLABLE_PATTERNS = [
 
 function hasExcessiveRepeatedLetters(name: string): boolean {
   return /(.)\1\1/.test(name)
+}
+
+/** Rejects stuttered joins and damaged compound starts such as `stst`,
+ * `partnerer`, or `nrtr...`, while allowing a few natural forms like cocoa. */
+export function hasMalformedCompoundPattern(rawName: string): boolean {
+  const name = sanitiseCandidate(rawName).replace(/-/g, "")
+  if (!name) return true
+  if (/^[bcdfghjklmnpqrstvwxyz]{4}/.test(name)) return true
+  if (
+    /^[bcdfghjklmnpqrstvwxyz]{3}/.test(name) &&
+    !/^(?:chr|phr|sch|scr|shr|spl|spr|str|thr)/.test(name)
+  ) return true
+  if (/([a-z]{3,5})\1/.test(name)) return true
+
+  for (let index = 0; index <= name.length - 4; index += 1) {
+    const pair = name.slice(index, index + 2)
+    if (ALLOWED_REPEATED_BIGRAMS.has(pair)) continue
+    if (name.slice(index + 2, index + 4) === pair) return true
+  }
+
+  return false
 }
 
 function hasAwkwardConsonantCluster(name: string): boolean {
@@ -195,7 +335,18 @@ function hasBrokenSpellingSignal(name: string): boolean {
 
 function hasLowEmotionalFit(name: string): boolean {
   const clean = sanitiseCandidate(name)
-  return LOW_FIT_TONE_TERMS.some((term) => clean.includes(term))
+  return LOW_FIT_TONE_TERMS.some((term) => containsLowFitToneTerm(clean, term))
+}
+
+function containsLowFitToneTerm(clean: string, term: string): boolean {
+  // `war` is a severe standalone or compound cue, but a raw substring match
+  // also blocks ordinary, positive words such as homeward and forward. Keep
+  // the hard safety gate for war/cyberwar/warzone without laundering that
+  // false positive into Quick's creative admission.
+  if (term === "war") {
+    return clean === "war" || clean.endsWith("war") || /^war(?![dmr])/.test(clean)
+  }
+  return clean.includes(term)
 }
 
 export function hasRecognisableBrandRoot(name: string): boolean {
@@ -205,7 +356,12 @@ export function hasRecognisableBrandRoot(name: string): boolean {
 
 export function hasUnsafeBrandMeaning(name: string): boolean {
   const clean = sanitiseCandidate(name)
-  return LOW_FIT_TONE_TERMS.some((term) => term.length >= 3 && clean.includes(term))
+  return (
+    hasVerifiedExactNameRisk(clean) ||
+    hasProtectedBrandCollision(clean) ||
+    HARD_PROTECTED_FRAGMENTS.some((fragment) => clean.includes(fragment)) ||
+    LOW_FIT_TONE_TERMS.some((term) => term.length >= 3 && containsLowFitToneTerm(clean, term))
+  )
 }
 
 export function hasRandomSyllablePattern(name: string): boolean {
@@ -253,6 +409,109 @@ function isPronounceable(name: string, style: AutoFindControls["style"]): boolea
 
 export function sanitiseCandidate(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9-]/g, "")
+}
+
+function normaliseExactSurface(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function isSingleEditOrAdjacentTransposition(left: string, right: string): boolean {
+  if (left === right || Math.abs(left.length - right.length) > 1) return false
+
+  if (left.length === right.length) {
+    const differences: number[] = []
+    for (let index = 0; index < left.length; index += 1) {
+      if (left[index] !== right[index]) differences.push(index)
+      if (differences.length > 2) return false
+    }
+
+    if (differences.length === 1) return true
+    return differences.length === 2
+      && differences[1] === differences[0] + 1
+      && left[differences[0]] === right[differences[1]]
+      && left[differences[1]] === right[differences[0]]
+  }
+
+  const [shorter, longer] = left.length < right.length ? [left, right] : [right, left]
+  let shortIndex = 0
+  let longIndex = 0
+  let skipped = false
+  while (shortIndex < shorter.length && longIndex < longer.length) {
+    if (shorter[shortIndex] === longer[longIndex]) {
+      shortIndex += 1
+      longIndex += 1
+      continue
+    }
+    if (skipped) return false
+    skipped = true
+    longIndex += 1
+  }
+  return true
+}
+
+/**
+ * Deliberately conservative pronunciation key for a last-line collision
+ * screen. It normalises only common sound-preserving variations and repeated
+ * letters; it is not a general phonetic matcher. Callers pair it with the
+ * curated protected list below so ordinary words are not broadly rejected.
+ */
+function protectedBrandSoundKey(value: string): string {
+  const surface = normaliseExactSurface(value)
+  if (!surface) return ""
+
+  const soundSpelling = surface
+    .replace(/ph/g, "f")
+    .replace(/qu/g, "k")
+    .replace(/ck/g, "k")
+    .replace(/c/g, "k")
+    .replace(/x/g, "ks")
+    .replace(/z/g, "s")
+    .replace(/v/g, "f")
+    .replace(/y/g, "i")
+    .replace(/(.)\1+/g, "$1")
+    .replace(/h$/g, "")
+
+  const first = soundSpelling[0] || ""
+  return `${first}${soundSpelling.slice(1).replace(/[aeiou]/g, "")}`
+}
+
+/**
+ * Returns true for an exact, embedded, one-edit/transposed, or narrowly
+ * phonetic collision with a curated protected example. This protects product
+ * quality; it does not determine trademark availability or replace legal
+ * clearance before a name is used commercially.
+ */
+export function hasProtectedBrandCollision(rawName: string): boolean {
+  const surface = normaliseExactSurface(rawName)
+  if (!surface) return false
+
+  if (PROTECTED_SUBSTRING_SURFACES.some((brand) => surface.includes(brand))) return true
+
+  return NEAR_COLLISION_PROTECTED_SURFACES.some((brand) => {
+    if (surface === brand) return true
+    if (isSingleEditOrAdjacentTransposition(surface, brand)) return true
+
+    // Equal conservative keys are only actionable for a curated distinctive
+    // mark and closely sized labels. This catches forms such as `teslah`
+    // without treating unrelated ordinary words as a global phonetic clash.
+    return (
+      surface.length >= 5
+      && Math.abs(surface.length - brand.length) <= 2
+      && protectedBrandSoundKey(surface) === protectedBrandSoundKey(brand)
+    )
+  })
+}
+
+/**
+ * Reject only an exact normalised match to a verified collision or critical
+ * audit surface. Punctuation and spacing do not evade the check, while longer
+ * legitimate names that merely contain one of the terms remain admissible.
+ */
+export function hasVerifiedExactNameRisk(rawName: string): boolean {
+  const surface = normaliseExactSurface(rawName)
+  if (!surface) return false
+
+  return VERIFIED_EXACT_COLLISION_SURFACES.has(surface) || VERIFIED_CRITICAL_SURFACES.has(surface)
 }
 
 function normaliseKeywordRoot(root: string): string {
@@ -371,17 +630,13 @@ export function evaluateCandidateFilters(
   if (HARD_BANNED_CLUSTERS.some((cluster) => name.includes(cluster)) || hasAwkwardConsonantCluster(name)) reasons.push("awkward_cluster")
   if (hasVisualAmbiguity(name)) reasons.push("visual_ambiguity")
   if (hasExcessiveRepeatedLetters(name)) reasons.push("repeated_letters")
+  if (hasMalformedCompoundPattern(name)) reasons.push("malformed_compound")
   if (hasBrokenSpellingSignal(name)) reasons.push("broken_spelling")
   if (hasLowEmotionalFit(name)) reasons.push("low_emotional_fit")
   if (hasUnsafeBrandMeaning(name)) reasons.push("unsafe_brand_meaning")
   if (hasRandomSyllablePattern(name)) reasons.push("random_syllables")
   if (!isPronounceable(name, options.controls.style)) reasons.push("low_pronounceability")
   if (TRADEMARK_LIKE_FRAGMENTS.some((fragment) => name.includes(fragment))) reasons.push("trademark_like_fragment")
-  if (options.controls.mustIncludeKeyword === "none") {
-    if (containsKeywordRoot(name, options.keywordRoots || [])) reasons.push("keyword_mutation")
-    if (isKeywordAnchored(name, options.keywordRoots || [])) reasons.push("keyword_anchored")
-  }
-
   // Reject AI-generated naming patterns (fake-Latin suffixes, meaningless tech prefixes)
   if (hasBannedSuffix(name)) reasons.push("ai_smell_suffix")
   if (AI_SMELL_PREFIX_RE.test(name)) reasons.push("ai_smell_prefix")

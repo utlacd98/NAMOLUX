@@ -3,12 +3,31 @@ const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, "")
 const isProduction = process.env.NODE_ENV === "production"
 const localDistDir = process.env.NEXT_DIST_DIR?.trim()
 
+export function buildContentSecurityPolicy(production = isProduction) {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${production ? "" : " 'unsafe-eval'"} https://va.vercel-scripts.com https://vercel.live https://*.stripe.com https://js.stripe.com https://ko-fi.com https://pagead2.googlesyndication.com https://fundingchoicesmessages.google.com`,
+    "script-src-attr 'none'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "media-src 'self' data: blob:",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "connect-src 'self' https://api.openai.com https://*.vercel-insights.com https://*.stripe.com https://api.stripe.com https://ko-fi.com https://storage.ko-fi.com https://*.supabase.co https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://adservice.google.com",
+    "frame-src 'self' https://*.stripe.com https://js.stripe.com https://hooks.stripe.com https://ko-fi.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://fundingchoicesmessages.google.com",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    ...(production ? ["upgrade-insecure-requests"] : []),
+  ].join("; ")
+}
+
 const nextConfig = {
   ...(cdnUrl ? { assetPrefix: cdnUrl } : {}),
   ...(localDistDir ? { distDir: localDistDir } : {}),
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 7,
@@ -107,10 +126,6 @@ const nextConfig = {
             value: "on",
           },
           {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
-          {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin",
           },
@@ -136,37 +151,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live https://*.stripe.com https://js.stripe.com https://ko-fi.com",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https: http:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://api.openai.com https://*.vercel-insights.com https://*.stripe.com https://api.stripe.com https://ko-fi.com https://storage.ko-fi.com https://*.supabase.co",
-              "frame-src 'self' https://*.stripe.com https://js.stripe.com https://hooks.stripe.com https://ko-fi.com",
-              "frame-ancestors 'none'",
-              "form-action 'self'",
-              "base-uri 'self'",
-              "object-src 'none'",
-            ].join("; "),
-          },
-        ],
-      },
-      {
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: isProduction ? "public, max-age=31536000, immutable" : "no-store, must-revalidate",
-          },
-        ],
-      },
-      {
-        source: "/_next/image",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: isProduction ? "public, max-age=604800, stale-while-revalidate=86400" : "no-store, must-revalidate",
+            value: buildContentSecurityPolicy(),
           },
         ],
       },

@@ -1,47 +1,47 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter, Geist_Mono, Fraunces } from "next/font/google"
+import Script from "next/script"
 import { LazyAnalytics } from "@/components/lazy-analytics"
+import { EngagementTracker } from "@/components/engagement-tracker"
+import { AdProviderGate } from "@/components/ad-provider-gate"
+import { implicitRecoveryRedirectScript } from "@/lib/supabase/recovery-redirect"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap", preload: false })
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
-  display: "swap",
+  display: "optional",
   weight: ["400", "500", "600", "700"],
 })
 
+const defaultDescription =
+  "Check up to 50 candidate names across six domain extensions and add Founder Signal scoring when you are ready to choose."
+
 export const metadata: Metadata = {
-  title: "NamoLux - AI Domain Name Generator",
-  description:
-    "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
+  title: "Bulk Domain Checker & Founder Signal | NamoLux",
+  description: defaultDescription,
   keywords: [
-    "AI domain name generator",
-    "domain name finder",
+    "bulk domain checker",
+    "bulk domain availability checker",
     "domain availability checker",
     "brandable domain names",
     "founder signal scoring",
     "free domain search",
     ".com domain search",
-    "brand name ideas",
-    "startup naming tool",
-    "business name generator",
-    "seo audit tool",
+    "name shortlist scoring",
+    "startup name evaluation",
     "namolux",
   ],
   authors: [{ name: "NamoLux", url: "https://www.namolux.com" }],
   creator: "NamoLux",
   publisher: "NamoLux",
   metadataBase: new URL("https://www.namolux.com"),
-  alternates: {
-    canonical: "https://www.namolux.com/",
-  },
   openGraph: {
-    title: "NamoLux - AI Domain Name Generator",
-    description:
-      "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
+    title: "Bulk Domain Checker & Founder Signal | NamoLux",
+    description: defaultDescription,
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
     locale: "en_US",
@@ -51,15 +51,14 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux - AI Domain Name Generator",
+        alt: "NamoLux bulk domain checker and Founder Signal workspace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux - AI Domain Name Generator",
-    description:
-      "Generate brandable startup names with AI. Check live domain availability, compare six TLDs, and rank every name with Founder Signal scoring.",
+    title: "Bulk Domain Checker & Founder Signal | NamoLux",
+    description: defaultDescription,
     images: ["/opengraph-image"],
     site: "@namolux",
     creator: "@namolux",
@@ -75,7 +74,15 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // Icons resolve via App Router file conventions (app/favicon.ico, app/icon.png)
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   verification: {
     google: "uVmOSk70-MXXHfGoKOBYS7d5qzW3bxRlVzj-I91Gv_A",
   },
@@ -102,10 +109,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} ${fraunces.variable} font-sans antialiased`}>
-        {children}
-        <LazyAnalytics />
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`dark ${inter.variable} ${geistMono.variable} ${fraunces.variable}`}>
+      <head>
+        <Script
+          id="supabase-implicit-recovery-redirect"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: implicitRecoveryRedirectScript }}
+        />
+      </head>
+      <body className="font-sans antialiased">
+        <AdProviderGate>
+          {children}
+          <EngagementTracker />
+          <LazyAnalytics />
+        </AdProviderGate>
       </body>
     </html>
   )

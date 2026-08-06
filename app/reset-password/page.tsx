@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -14,31 +14,83 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
+  const [hasRecoverySession, setHasRecoverySession] = useState(false)
   const [success, setSuccess] = useState(false)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // Check if we have a valid session from the email link
   useEffect(() => {
+    let cancelled = false
+
     const checkSession = async () => {
-      const code = new URLSearchParams(window.location.search).get("code")
+      setCheckingSession(true)
+
+      const searchParams = new URLSearchParams(window.location.search)
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""))
+      const code = searchParams.get("code")
+      const accessToken = hashParams.get("access_token")
+      const refreshToken = hashParams.get("refresh_token")
+
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (error) {
-          setError("This reset link is invalid or has expired. Please request a new one.")
+          if (!cancelled) {
+            setError("This reset link is invalid or has expired. Please request a new one.")
+            setHasRecoverySession(false)
+            setCheckingSession(false)
+          }
           return
         }
-        window.history.replaceState({}, "", "/reset-password")
+        window.history.replaceState({}, "", "/reset-password?recovery=1")
+      } else if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        })
+
+        if (error) {
+          if (!cancelled) {
+            setError("This reset link is invalid or has expired. Please request a new one.")
+            setHasRecoverySession(false)
+            setCheckingSession(false)
+          }
+          return
+        }
+
+        window.history.replaceState({}, "", "/reset-password?recovery=1")
       }
 
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        // If no session, redirect to forgot-password
-        router.push("/forgot-password")
+      if (cancelled) return
+
+      if (session) {
+        setHasRecoverySession(true)
+        setError(null)
+      } else {
+        setHasRecoverySession(false)
+        setError("This reset link is invalid or has expired. Please request a new one.")
       }
+
+      setCheckingSession(false)
     }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (session && window.location.search.includes("recovery=1"))) {
+        setHasRecoverySession(true)
+        setCheckingSession(false)
+        setError(null)
+      }
+    })
+
     checkSession()
-  }, [router, supabase.auth])
+
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
+  }, [supabase.auth])
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,7 +118,7 @@ export default function ResetPasswordPage() {
 
       setSuccess(true)
       setTimeout(() => {
-        router.push("/generate")
+        router.push("/bulk-domain-check")
       }, 2000)
     } catch {
       setError("An unexpected error occurred")
@@ -89,7 +141,47 @@ export default function ResetPasswordPage() {
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
             <h1 className="text-2xl font-semibold text-white mb-2">Password updated</h1>
-            <p className="text-[#888]">Redirecting you to generate names...</p>
+            <p className="text-[#888]">Redirecting you to Bulk Check...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-8">
+            <div className="flex min-h-48 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-[#D4A843]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!hasRecoverySession) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="flex justify-center mb-8">
+            <Link href="/">
+              <Image src="/logo.svg" alt="NamoLux" width={140} height={36} className="h-9 w-auto" priority />
+            </Link>
+          </div>
+          <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-8 text-center">
+            <h1 className="text-2xl font-semibold text-white mb-2">Reset link expired</h1>
+            <p className="text-[#888] mb-6">
+              {error || "Please request a new password reset email."}
+            </p>
+            <Link
+              href="/forgot-password"
+              className="inline-flex items-center justify-center rounded-lg bg-[#D4A843] px-5 py-3 font-medium text-black transition hover:bg-[#c49a3d]"
+            >
+              Send a new reset link
+            </Link>
           </div>
         </div>
       </div>

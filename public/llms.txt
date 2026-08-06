@@ -1,6 +1,8 @@
 # NamoLux
 
-> NamoLux is a name decision workspace for founders. It helps people compare a shortlist of up to 50 candidate names, check availability across six domain extensions, review brand-footprint verification links, apply Founder Signal, and preserve the reasoning behind a final decision.
+> NamoLux is a startup naming and domain decision workspace for founders, startup teams, indie hackers, and agencies. Its core differentiator is Founder Signal: a structured way to compare candidate names alongside evidence-based domain evaluation, social-profile and company-name research links, official trade-mark search links, and decision records.
+
+Unlike simple name generators, NamoLux helps users compare candidates using Founder Signal, domain checks, brand-footprint research, and structured decision records. AI-assisted name exploration is developed separately in the NamoLux lab; generated candidates enter the same evidence-based decision workflow before they are scored.
 
 NamoLux checks .com, .io, .co, .ai, .app, and .dev. Domain availability is best-effort and should be confirmed with a registrar before purchase. Social-profile, company-name, and official UK, US, and EU trade-mark links are research aids, not guarantees of availability or legal clearance. Founder Signal is decision support, not legal or trade-mark advice.
 

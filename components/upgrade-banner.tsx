@@ -51,12 +51,10 @@ export function UpgradeBanner() {
         </div>
 
         {/* Banner text */}
-        <div className="flex items-center gap-2 text-[13px] text-[#a0a0a0]">
-          <span className="text-base">✨</span>
-          <span>
-            We're{" "}
-            <span className="text-amber-500 font-medium">upgrading NamoLux</span>
-            {" "}— new features & Pro accounts dropping soon. Stay tuned.
+        <div className="mx-10 min-w-0 truncate text-center text-[12px] text-[#a0a0a0] sm:text-[13px]">
+          <span className="truncate">
+            Quick is <span className="text-amber-500 font-medium">free without a monthly quota</span>. Pro adds unlimited fair-use tools for{" "}
+            <span className="text-amber-500 font-medium">{"\u00a3"}7.99/month</span>.
           </span>
         </div>
 
@@ -93,4 +91,3 @@ export function UpgradeBanner() {
     </div>
   )
 }
-

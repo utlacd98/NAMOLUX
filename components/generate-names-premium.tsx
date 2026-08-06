@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { namecheapLink } from "@/lib/affiliateLink"
 import Link from "next/link"
-import { usePathname, useSearchParams, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import {
   ArrowLeft,
   Check,
@@ -23,29 +24,75 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Eye,
   Lock,
   Lightbulb,
   Swords,
   LayoutGrid,
   Palette,
+  ThumbsDown,
+  ThumbsUp,
+  WandSparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { FounderSignalPanel } from "@/components/founder-signal"
-import { SeoPotentialCheck } from "@/components/seo-potential"
 import { buildResultCardView } from "@/lib/domainGen/resultCard"
-import { DeepSearch } from "@/components/deep-search"
 import { useNamePreferences } from "@/hooks/useNamePreferences"
-import { NamePronunciation } from "@/components/name-pronunciation"
-import { NameStressTest } from "@/components/name-stress-test"
-import { BrandPalette } from "@/components/brand-palette"
-import { NameBattleDialog } from "@/components/name-battle-dialog"
-import { NamesLikeSearch } from "@/components/names-like-search"
-import { SavedNamesBoard } from "@/components/saved-names-board"
 import { getTrendAge } from "@/lib/nameCreativity"
 import { setCachedBatch, clearExpired } from "@/lib/domainCache"
 import { RefineResults, getRefinementOverrides, type RefinementMode } from "@/components/refine-results"
+import { getSessionId, trackAffiliateClick, trackEvent } from "@/lib/analytics"
+import { QUICK_GENERATE_TLDS } from "@/lib/domainGen/quickTlds"
+import { AdBanner } from "@/components/ad-banner"
+import { DomainStatusChip } from "@/components/domain-status-chip"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
+import { getFounderSignalBand } from "@/lib/founderSignal/spec"
+import type { ServerFounderSignal } from "@/components/founder-signal"
+import { formatContentLabel, type GeneratorSource } from "@/lib/generator-attribution"
+import { withPricingAttribution } from "@/lib/pricing-attribution"
+import {
+  GENERATOR_HISTORY_STORAGE_KEY,
+  GENERATOR_PREFERENCE_STORAGE_KEY,
+  applyCandidateDislikes,
+  collectFailedAvailabilityTlds,
+  createEmptyPreferenceProfile,
+  getQuickStyleMinimumLength,
+  isFounderSignalAllowanceExhaustedResponse,
+  learnFromCandidate,
+  markAvailabilityFailed,
+  markAvailabilityTldsFailed,
+  markFailedAvailabilityChecking,
+  mergeAvailability,
+  mergeFounderSignal,
+  normalisePreferenceProfile,
+  parseBlacklist,
+  parseGeneratedCandidates,
+  parseQuickGenerationShortfall,
+  planAvailabilityTldChunks,
+  orderCandidatesForDecision,
+  resolveGeneratorResultsAdPosition,
+  selectVerifiedAvailableDomain,
+  sortCandidatesByFounderSignal,
+  type AvailabilityState,
+  type CreativityLevel,
+  type GeneratedName,
+  type GenerationPhase,
+  type NameStyle,
+  type NamingPreferenceProfile,
+  type QuickGenerationShortfall,
+} from "@/components/generator-exploration-model"
+import type { DislikeReason, NameFeedbackType } from "@/lib/name-feedback"
+
+const DeepSearch = dynamic(() => import("@/components/deep-search").then((module) => module.DeepSearch), { ssr: false })
+const FounderSignalPanel = dynamic(() => import("@/components/founder-signal").then((module) => module.FounderSignalPanel), { ssr: false })
+const SeoPotentialCheck = dynamic(() => import("@/components/seo-potential").then((module) => module.SeoPotentialCheck), { ssr: false })
+const NamePronunciation = dynamic(() => import("@/components/name-pronunciation").then((module) => module.NamePronunciation), { ssr: false })
+const NameStressTest = dynamic(() => import("@/components/name-stress-test").then((module) => module.NameStressTest), { ssr: false })
+const NameBattleDialog = dynamic(() => import("@/components/name-battle-dialog").then((module) => module.NameBattleDialog), { ssr: false })
+const NamesLikeSearch = dynamic(() => import("@/components/names-like-search").then((module) => module.NamesLikeSearch), { ssr: false })
+const SavedNamesBoard = dynamic(() => import("@/components/saved-names-board").then((module) => module.SavedNamesBoard), { ssr: false })
+const GenerationSplash = dynamic(() => import("@/components/generator-exploration").then((module) => module.GenerationSplash), { ssr: false })
+const GeneratorExplorationResults = dynamic(() => import("@/components/generator-exploration").then((module) => module.GeneratorExplorationResults), { ssr: false })
+const QuickExplorationControls = dynamic(() => import("@/components/generator-exploration").then((module) => module.QuickExplorationControls), { ssr: false })
 
 // SEO micro-signal calculator (lightweight, inline)
 function getSeoMicroSignal(name: string): { icon: string; text: string; type: "positive" | "warning" | "neutral" } | null {
@@ -79,6 +126,38 @@ const vibeOptions = [
   { id: "trustworthy", label: "Trustworthy", description: "Reliable, professional" },
   { id: "minimal", label: "Minimal", description: "Clean, simple, modern" },
 ]
+
+type GenerateMode = "quick" | "advanced" | "bulk"
+
+const quickVibeOptions = [
+  { id: "friendly", label: "Friendly" },
+  { id: "playful", label: "Playful" },
+  { id: "premium", label: "Premium" },
+  { id: "tech", label: "Tech" },
+  { id: "clean", label: "Clean" },
+  { id: "bold", label: "Bold" },
+] as const
+
+type QuickVibeId = (typeof quickVibeOptions)[number]["id"]
+
+const generatorExampleBriefs = [
+  "A privacy-first fintech platform for independent consultants",
+  "A premium sustainable skincare brand for sensitive skin",
+  "An AI operations assistant for small logistics teams",
+] as const
+
+const DISLIKE_REASON_OPTIONS = [
+  { id: "too_generic", label: "Too generic" },
+  { id: "hard_to_pronounce", label: "Hard to pronounce" },
+  { id: "does_not_fit_business", label: "Does not fit the business" },
+  { id: "feels_ai_generated", label: "Feels AI-generated" },
+  { id: "too_long", label: "Too long" },
+  { id: "wrong_tone", label: "Wrong tone" },
+  { id: "similar_to_another_brand", label: "Similar to another brand" },
+  { id: "domain_problem", label: "Domain problem" },
+  { id: "other", label: "Other" },
+  { id: "skip", label: "Skip" },
+] as const satisfies readonly { id: DislikeReason; label: string }[]
 
 const industryOptions = [
   "Technology",
@@ -114,9 +193,10 @@ interface DomainResult {
   tld: string
   fullDomain: string
   available: boolean
-  score: number
-  pronounceable: boolean
-  memorability: number
+  score?: number
+  pronounceable?: boolean
+  memorability?: number
+  founderSignal?: ServerFounderSignal
   length: number
   strategy?: string
   scoreBreakdown?: Record<string, number>
@@ -126,6 +206,11 @@ interface DomainResult {
   meaningScore?: number
   meaningBreakdown?: string
   whyItWorks?: string
+  personalDescription?: string
+  styleRationale?: string
+  slogan?: string
+  personality?: string
+  registerUrl?: string
   brandableScore?: number
   pronounceabilityScore?: number
   meaning?: string
@@ -187,6 +272,15 @@ interface SocialResult {
   color: string
 }
 
+interface DomainInsight {
+  meaning?: string
+  meaningShort?: string
+  reasoning?: string
+  personalDescription?: string
+  styleRationale?: string
+  slogan?: string
+}
+
 // TLD badge colors
 const tldColors: Record<string, string> = {
   com: "bg-blue-500/20 text-blue-400",
@@ -206,44 +300,6 @@ const socialIcons: Record<string, string> = {
   youtube: "\u25B6",
 }
 
-const generateMockResults = (keyword: string): DomainResult[] => {
-  const prefixes = ["", "go", "get", "try", "my", "use"]
-  const suffixes = ["ly", "io", "ify", "hub", "lab", "ware", "base", "spot", "zone", ""]
-  const results: DomainResult[] = []
-
-  const baseNames = [
-    keyword.slice(0, 4) + "ora",
-    keyword.slice(0, 3) + "evo",
-    keyword.slice(0, 4) + "ix",
-    keyword.slice(0, 3) + "ova",
-    keyword.slice(0, 4) + "ify",
-    keyword.slice(0, 3) + "well",
-    keyword.slice(0, 4) + "mint",
-    keyword.slice(0, 3) + "nest",
-  ]
-
-  baseNames.forEach((name, i) => {
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]
-    const fullName = prefix + name.charAt(0).toUpperCase() + name.slice(1) + suffix
-    const cleanName = fullName.length > 12 ? fullName.slice(0, 10) : fullName
-    const tld = ALL_TLDS[i % ALL_TLDS.length]
-
-    results.push({
-      name: cleanName,
-      tld,
-      fullDomain: `${cleanName.toLowerCase()}.${tld}`,
-      available: Math.random() > 0.35,
-      score: Number((7 + Math.random() * 2.5).toFixed(1)),
-      pronounceable: Math.random() > 0.2,
-      memorability: Number((7 + Math.random() * 2.5).toFixed(1)),
-      length: cleanName.length,
-    })
-  })
-
-  return results.sort((a, b) => (b.available ? 1 : 0) - (a.available ? 1 : 0) || b.score - a.score)
-}
-
 // Available TLDs for filtering
 const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"]
 const TLD_PRIORITY = ["com", "io", "co", "ai", "app", "dev"]
@@ -252,6 +308,7 @@ const TLD_PRIORITY = ["com", "io", "co", "ai", "app", "dev"]
 const STORAGE_KEYS = {
   SHORTLIST: "namolux_shortlist",
   SEARCH_HISTORY: "namolux_search_history",
+  WORKFLOW_DRAFT: "namolux_workflow_draft",
 }
 
 const LOADING_STEPS = [
@@ -259,6 +316,64 @@ const LOADING_STEPS = [
   "Checking availability…",
   "Calculating Founder Signal™…",
 ]
+
+const QUICK_LOADING_STEPS = [
+  "Building word patterns...",
+  "Checking multiple TLDs...",
+  "Preparing Namecheap links...",
+]
+
+const QUICK_TLD_LABEL = QUICK_GENERATE_TLDS.map((tld) => `.${tld}`).join(" ")
+
+function resultScore(result: DomainResult): number {
+  return typeof result.score === "number" ? result.score : 0
+}
+
+function createPricingRedirectError() {
+  const error = new Error("Redirecting to pricing")
+  error.name = "PricingRedirect"
+  return error
+}
+
+function LockedFounderSignalCard() {
+  return (
+    <div
+      className="relative mt-3 overflow-hidden rounded-xl px-3 py-3 sm:px-4"
+      style={{
+        background: "linear-gradient(135deg, rgba(212,175,55,0.08), rgba(255,255,255,0.025))",
+        border: "1px solid rgba(212,175,55,0.14)",
+      }}
+    >
+      <div className="pointer-events-none select-none opacity-45 blur-[2px]" aria-hidden="true">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37]">Founder Signal</span>
+          <span className="h-5 w-14 rounded-full bg-white/12" />
+        </div>
+        <div className="grid gap-1.5 sm:grid-cols-3">
+          <div className="h-2 rounded-full bg-white/18" />
+          <div className="h-2 rounded-full bg-white/12" />
+          <div className="h-2 rounded-full bg-white/16" />
+        </div>
+        <div className="mt-2 h-3 w-4/5 rounded-full bg-white/10" />
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/42 px-4 text-center backdrop-blur-[1px]">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#F6E27A]">
+          <Lock className="h-3.5 w-3.5" />
+          Founder Signal locked
+        </div>
+        <p className="max-w-sm text-[11px] leading-relaxed text-white/62">
+          Pro unlocks brand scores, ranked comparisons, score filters, stress tests, and scored exports.
+        </p>
+        <Link
+          href="/pricing?reason=bulk-founder-signal#plans"
+          className="rounded-lg bg-[#D4A843] px-3 py-1.5 text-[11px] font-bold text-black transition hover:bg-[#c49a3d]"
+        >
+          Unlock scoring
+        </Link>
+      </div>
+    </div>
+  )
+}
 
 const SAMPLE_KEYWORDS = ["luxury brand", "fintech", "wellness app"]
 
@@ -281,6 +396,10 @@ const AUTO_FIND_V2_MAX_ATTEMPTS = 8
 const AUTO_FIND_V2_ENABLED = process.env.NEXT_PUBLIC_AUTO_FIND_V2 !== "false"
 // Keep auto-find UI local-first: hidden in production unless explicitly enabled.
 const AUTO_FIND_UI_ENABLED = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_ENABLE_AUTO_FIND_UI === "true"
+// Social checks stay out of the public workflow until the endpoint exposes a
+// reliable available / unavailable / unknown tri-state instead of treating
+// provider errors as a confirmed collision.
+const SOCIAL_HANDLE_CHECK_ENABLED = false
 
 const AUTO_FIND_PREFIXES = ["get", "try", "go", "hq"]
 const AUTO_FIND_SUFFIXES = ["labs", "kit", "hub", "forge"]
@@ -387,12 +506,41 @@ function delay(ms: number, signal: AbortSignal): Promise<void> {
   })
 }
 
-export function GenerateNames() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
+interface GenerateNamesProps {
+  initialBrief?: string
+  initialMode?: GenerateMode
+  initialNames?: string
+  hasInitialMode?: boolean
+  initialSource?: GeneratorSource | null
+  initialContentSlug?: string | null
+  redesignEnabled?: boolean
+  generatorToolsEnabled?: boolean
+}
+
+export function GenerateNames({
+  initialBrief = "",
+  initialMode = "quick",
+  initialNames = "",
+  hasInitialMode = false,
+  initialSource = null,
+  initialContentSlug = null,
+  redesignEnabled = false,
+  generatorToolsEnabled = true,
+}: GenerateNamesProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const isTestEnvironment = pathname === "/preview-gen"
-  const [keyword, setKeyword] = useState("")
+  const journeyContextLabel = initialSource ? formatContentLabel(initialSource, initialContentSlug) : null
+  const journeyMetadata = {
+    source: initialSource || "direct",
+    ...(initialContentSlug ? { contentSlug: initialContentSlug } : {}),
+  }
+  const attributedCheckoutHref = withPricingAttribution(PRODUCT_OFFER.paidCheckoutHref, {
+    source: initialSource || "generator",
+    ...(initialContentSlug ? { content: initialContentSlug } : {}),
+    returnPath: generatorToolsEnabled ? "/generate" : "/bulk-domain-check/workspace",
+  })
+  const [keyword, setKeyword] = useState(initialBrief.slice(0, 160))
   const [selectedVibe, setSelectedVibe] = useState("luxury")
   const [selectedIndustry, setSelectedIndustry] = useState("")
   const [maxLength, setMaxLength] = useState(10)
@@ -435,12 +583,45 @@ export function GenerateNames() {
   const [socialResults, setSocialResults] = useState<SocialResult[]>([])
   const [isCheckingSocials, setIsCheckingSocials] = useState(false)
 
+  // Workflow state
+  const [generateMode, setGenerateMode] = useState<GenerateMode>(generatorToolsEnabled ? initialMode : "bulk")
+  const isQuickMode = generateMode === "quick"
+  const isAdvancedMode = generateMode === "advanced"
+  const isBulkMode = generateMode === "bulk"
+  const [quickRhymeWith, setQuickRhymeWith] = useState("")
+  const [quickVibe, setQuickVibe] = useState<QuickVibeId>("friendly")
+  const [quickStyle, setQuickStyle] = useState<NameStyle>("auto")
+  const [quickCreativity, setQuickCreativity] = useState<CreativityLevel>("balanced")
+  const [quickBlacklist, setQuickBlacklist] = useState("")
+  const [preferenceProfile, setPreferenceProfile] = useState<NamingPreferenceProfile>(createEmptyPreferenceProfile)
+  const [explorationResults, setExplorationResults] = useState<GeneratedName[]>([])
+  const [generationPhase, setGenerationPhase] = useState<GenerationPhase>("idle")
+  const [previousBatchCount, setPreviousBatchCount] = useState(0)
+  const [dislikedCandidateIds, setDislikedCandidateIds] = useState<Set<string>>(() => new Set())
+  const [likedCandidateIds, setLikedCandidateIds] = useState<Set<string>>(() => new Set())
+  const [dislikeReasonTarget, setDislikeReasonTarget] = useState<string | null>(null)
+  const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null)
+  const [selectedExplorationCandidateId, setSelectedExplorationCandidateId] = useState<string | null>(null)
+  const [advancedWorkflowToken, setAdvancedWorkflowToken] = useState<string | null>(null)
+  const [explorationAvailabilityToken, setExplorationAvailabilityToken] = useState<string | null>(null)
+  const [isScoringFounderSignal, setIsScoringFounderSignal] = useState(false)
+  const [scoreAllowanceExhausted, setScoreAllowanceExhausted] = useState(false)
+  const [scoringError, setScoringError] = useState<string | null>(null)
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null)
+  const [sortByFounderSignal, setSortByFounderSignal] = useState(false)
+  const [generationUpgradeHref, setGenerationUpgradeHref] = useState<string | null>(null)
+  const [advancedAllowanceRemaining, setAdvancedAllowanceRemaining] = useState<number | null>(null)
+  const [quickGenerationShortfall, setQuickGenerationShortfall] = useState<QuickGenerationShortfall | null>(null)
+  const [currentGenerationMeta, setCurrentGenerationMeta] = useState<{ provider?: string | null; model?: string | null; promptVersion?: string | null }>({})
+
   // Bulk check state
-  const [isBulkMode, setIsBulkMode] = useState(false)
-  const [bulkInput, setBulkInput] = useState("")
-  const [description, setDescription] = useState("")
+  const [bulkInput, setBulkInput] = useState(initialNames.slice(0, 5000))
+  const [description, setDescription] = useState(initialBrief.slice(0, 1000))
   const [isExtracting, setIsExtracting] = useState(false)
   const [extractError, setExtractError] = useState<string | null>(null)
+  const [bulkFounderSignalUnlocked, setBulkFounderSignalUnlocked] = useState(false)
+  const [bulkFounderSignalRequested, setBulkFounderSignalRequested] = useState(false)
+  const [isProUser, setIsProUser] = useState(false)
 
   // Mobile UI state
   const [isMobileShortlistOpen, setIsMobileShortlistOpen] = useState(false)
@@ -457,6 +638,14 @@ export function GenerateNames() {
 
   // Bulk sort state
   const [bulkSortKey, setBulkSortKey] = useState<"score" | "length" | "availability">("score")
+  const founderSignalUnlockedForCurrentMode = isBulkMode ? bulkFounderSignalUnlocked : isProUser
+  const canUseScoreControls = founderSignalUnlockedForCurrentMode
+  const quickMinimumLength = getQuickStyleMinimumLength(quickStyle)
+
+  const handleQuickStyleChange = (style: NameStyle) => {
+    setQuickStyle(style)
+    setMaxLength((current) => Math.max(current, getQuickStyleMinimumLength(style)))
+  }
 
   // ── Creativity features state ────────────────────────────────────────────
   const [battleQueue, setBattleQueue] = useState<{ name: string; tld?: string }[]>([])
@@ -470,6 +659,15 @@ export function GenerateNames() {
 
   // Refs for UX scroll behaviour
   const resultsRef = useRef<HTMLDivElement>(null)
+  const generateButtonRef = useRef<HTMLButtonElement>(null)
+
+  const restoreGenerateButtonFocus = () => {
+    // React still has the primary action disabled in the event-handler frame.
+    // Wait until the idle/error state has committed before restoring focus.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => generateButtonRef.current?.focus({ preventScroll: true }))
+    })
+  }
 
   // Preference memory hook
   const { recordSearch, recordLike, recordUnlike } = useNamePreferences()
@@ -477,31 +675,138 @@ export function GenerateNames() {
   // SEO Potential Check modal state
   const [seoCheckDomain, setSeoCheckDomain] = useState<{ name: string; tld: string } | null>(null)
   const generationAbortRef = useRef<AbortController | null>(null)
+  const scoringAbortRef = useRef<AbortController | null>(null)
+  const advancedGenerationRetryRef = useRef<{ fingerprint: string; requestId: string } | null>(null)
+  const activeGenerationRef = useRef(0)
+  const explorationResultsRef = useRef<GeneratedName[]>([])
+  const scoringInFlightRef = useRef(false)
+  const preferenceLoadedRef = useRef(false)
+  const preferenceSaveReadyRef = useRef(false)
+  const positivePreferenceProfileRef = useRef<NamingPreferenceProfile>(createEmptyPreferenceProfile())
+  const activeDislikedCandidatesRef = useRef<Map<string, GeneratedName>>(new Map())
+  const draftRestoredRef = useRef(false)
+  const draftSaveReadyRef = useRef(false)
+  const shortlistSaveReadyRef = useRef(false)
   const generationStoppedRef = useRef(false)
 
-  // Freemium state: track if user is pro and which premium domain they've revealed
-  const [isPro, setIsPro] = useState(false)
-  const [revealedPremiumDomain, setRevealedPremiumDomain] = useState<string | null>(null)
+  // Engagement impressions are deduplicated per generated batch. Keeping the
+  // mutation inside the owning effects avoids writing refs from event handlers
+  // while still allowing a fresh batch to emit the same impression once.
+  const resultsSeenTrackedRef = useRef<number | null>(null)
+  const partnerCtaSeenTrackedRef = useRef<number | null>(null)
+  const proOfferSeenTrackedRef = useRef<number | null>(null)
 
-  // Token tracking
-  const [tokens, setTokens] = useState({ used: 0, total: 10, remaining: 10 })
-
-  // Score threshold for premium domains (75+)
+  // Score threshold for high-quality domains.
   const PREMIUM_SCORE_THRESHOLD = 75
 
-  // Initialise keyword from query string for schema.org SearchAction support.
-  useEffect(() => {
-    const query = (searchParams.get("q") || searchParams.get("keyword") || "").trim()
-    if (query && !keyword) {
-      setKeyword(query)
-    }
-  }, [searchParams, keyword])
+  const redirectToPricingForLimit = (source: "generate" | "bulk_check" | "availability_check" | "refine") => {
+    const from = source === "bulk_check" || isBulkMode ? "bulk-check" : "generate"
+
+    trackEvent({
+      action: "rate_limit_seen",
+      metadata: { source, mode: from === "bulk-check" ? "bulk_check" : "generate", redirect: "pricing" },
+    })
+    trackEvent({
+      action: "upgrade_clicked",
+      metadata: { source, reason: "monthly_limit_redirect", destination: "pricing" },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "pricing", ctaId: "monthly-limit" },
+    })
+
+    setError(null)
+    router.push(`/pricing?reason=monthly-limit&from=${from}#plans`)
+  }
+
+  const redirectToCheckoutForProFeature = (source: string) => {
+    trackEvent({
+      action: "upgrade_clicked",
+      metadata: { source, reason: "pro_feature_locked", destination: "checkout" },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "pricing", ctaId: source },
+    })
+    trackEvent({
+      action: "checkout_intent",
+      metadata: { ...journeyMetadata, ctaId: source },
+    })
+    router.push(attributedCheckoutHref)
+  }
 
   useEffect(() => {
     return () => {
       generationAbortRef.current?.abort()
+      scoringAbortRef.current?.abort()
     }
   }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void fetch("/api/subscription", {
+      credentials: "include",
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => response.ok ? response.json() as Promise<{ isPro?: boolean }> : null)
+      .then((entitlements) => {
+        if (!controller.signal.aborted) {
+          setIsProUser(entitlements?.isPro === true)
+        }
+      })
+      .catch((failure: unknown) => {
+        if (!(failure instanceof DOMException && failure.name === "AbortError")) {
+          // Fail closed: uncertain billing state must never unlock paid tools.
+          setIsProUser(false)
+        }
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    if (!redesignEnabled || preferenceLoadedRef.current) return
+    preferenceLoadedRef.current = true
+    try {
+      const savedProfile = localStorage.getItem(GENERATOR_PREFERENCE_STORAGE_KEY)
+      if (savedProfile) {
+        const restoredProfile = normalisePreferenceProfile(JSON.parse(savedProfile))
+        positivePreferenceProfileRef.current = restoredProfile
+        setPreferenceProfile(restoredProfile)
+      } else {
+        positivePreferenceProfileRef.current = createEmptyPreferenceProfile()
+      }
+
+      const savedHistory = localStorage.getItem(GENERATOR_HISTORY_STORAGE_KEY)
+      if (savedHistory) {
+        const parsed = JSON.parse(savedHistory) as { candidates?: unknown[] }
+        setPreviousBatchCount(Array.isArray(parsed.candidates) ? parsed.candidates.length : 0)
+      }
+    } catch {
+      const emptyProfile = createEmptyPreferenceProfile()
+      positivePreferenceProfileRef.current = emptyProfile
+      setPreferenceProfile(emptyProfile)
+    }
+    const readyTimer = window.setTimeout(() => {
+      preferenceSaveReadyRef.current = true
+    }, 0)
+    return () => window.clearTimeout(readyTimer)
+  }, [redesignEnabled])
+
+  useEffect(() => {
+    if (!redesignEnabled || !preferenceSaveReadyRef.current) return
+    try {
+      localStorage.setItem(GENERATOR_PREFERENCE_STORAGE_KEY, JSON.stringify(preferenceProfile))
+    } catch {
+      // Storage can be unavailable in privacy modes; preferences stay in memory.
+    }
+  }, [preferenceProfile, redesignEnabled])
+
+  useEffect(() => {
+    explorationResultsRef.current = explorationResults
+  }, [explorationResults])
 
   useEffect(() => {
     if (hasCustomTwoWordPreference) return
@@ -509,47 +814,68 @@ export function GenerateNames() {
     const shouldPreferTwoWord =
       (selectedVibe === "luxury" || selectedVibe === "trustworthy") && maxLength >= 9
 
-    setAutoFindControls((prev) =>
-      prev.preferTwoWordBrands === shouldPreferTwoWord
-        ? prev
-        : {
-            ...prev,
-            preferTwoWordBrands: shouldPreferTwoWord,
-          },
-    )
+    const frame = window.requestAnimationFrame(() => {
+      setAutoFindControls((prev) =>
+        prev.preferTwoWordBrands === shouldPreferTwoWord
+          ? prev
+          : {
+              ...prev,
+              preferTwoWordBrands: shouldPreferTwoWord,
+            },
+      )
+    })
+    return () => window.cancelAnimationFrame(frame)
   }, [selectedVibe, maxLength, hasCustomTwoWordPreference])
 
   // Clean expired domain cache entries on mount
   useEffect(() => { clearExpired() }, [])
 
-  // Fetch token count on mount and after generations finish
-  const refreshTokens = () => {
-    fetch("/api/tokens").then(r => r.json()).then(t => {
-      setTokens({ used: t.used ?? 0, total: t.total ?? 3, remaining: t.remaining ?? 3 })
-      if (t.isPro) setIsPro(true)
-    }).catch(() => {})
-  }
-  useEffect(() => { refreshTokens() }, [])
-  useEffect(() => { if (!isGenerating) refreshTokens() }, [isGenerating])
-
-  // Load shortlist and search history from localStorage on mount
+  // Restore the shortlist and in-progress brief after auth or navigation.
   useEffect(() => {
-    try {
-      const savedShortlist = localStorage.getItem(STORAGE_KEYS.SHORTLIST)
-      if (savedShortlist) {
-        setShortlist(JSON.parse(savedShortlist))
+    if (draftRestoredRef.current) return
+    draftRestoredRef.current = true
+    const restoreFrame = window.requestAnimationFrame(() => {
+      try {
+        const savedShortlist = localStorage.getItem(STORAGE_KEYS.SHORTLIST)
+        if (savedShortlist) {
+          setShortlist(JSON.parse(savedShortlist))
+        }
+        const savedHistory = localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY)
+        if (savedHistory) {
+          setSearchHistory(JSON.parse(savedHistory))
+        }
+        const savedDraft = localStorage.getItem(STORAGE_KEYS.WORKFLOW_DRAFT)
+        if (savedDraft) {
+          const draft = JSON.parse(savedDraft) as {
+            mode?: GenerateMode
+            keyword?: string
+            description?: string
+            bulkInput?: string
+          }
+          const hasInitialBrief = Boolean(initialBrief)
+          const hasInitialNames = Boolean(initialNames)
+          if (
+            generatorToolsEnabled
+            && !hasInitialMode
+            && (draft.mode === "quick" || draft.mode === "advanced" || draft.mode === "bulk")
+          ) setGenerateMode(draft.mode)
+          if (!hasInitialBrief && typeof draft.keyword === "string") setKeyword(draft.keyword.slice(0, 160))
+          if (!hasInitialBrief && typeof draft.description === "string") setDescription(draft.description.slice(0, 1000))
+          if (!hasInitialNames && typeof draft.bulkInput === "string") setBulkInput(draft.bulkInput.slice(0, 5000))
+        }
+      } catch (e) {
+        console.error("Error loading from localStorage:", e)
       }
-      const savedHistory = localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY)
-      if (savedHistory) {
-        setSearchHistory(JSON.parse(savedHistory))
-      }
-    } catch (e) {
-      console.error("Error loading from localStorage:", e)
-    }
-  }, [])
+    })
+    return () => window.cancelAnimationFrame(restoreFrame)
+  }, [generatorToolsEnabled, hasInitialMode, initialBrief, initialNames])
 
   // Save shortlist to localStorage whenever it changes
   useEffect(() => {
+    if (!shortlistSaveReadyRef.current) {
+      shortlistSaveReadyRef.current = true
+      return
+    }
     try {
       localStorage.setItem(STORAGE_KEYS.SHORTLIST, JSON.stringify(shortlist))
     } catch (e) {
@@ -557,19 +883,60 @@ export function GenerateNames() {
     }
   }, [shortlist])
 
-  // AI hint: debounced "analyzing…" hint while typing
   useEffect(() => {
-    if (!keyword.trim() || keyword.length < 3) { setAiHint(null); return }
-    const t = setTimeout(() => setAiHint("⚡ AI analyzing keyword structure…"), 600)
-    return () => { clearTimeout(t); setAiHint(null) }
-  }, [keyword])
+    if (!draftSaveReadyRef.current) {
+      draftSaveReadyRef.current = true
+      return
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.WORKFLOW_DRAFT, JSON.stringify({
+        mode: generateMode,
+        keyword,
+        description,
+        bulkInput,
+      }))
+    } catch (e) {
+      console.error("Error saving naming draft:", e)
+    }
+  }, [bulkInput, description, generateMode, keyword])
+
+  // Input hint: debounced mode-aware hint while typing
+  useEffect(() => {
+    const hasEnoughInput = keyword.trim().length >= 3
+    const t = window.setTimeout(
+      () => setAiHint(
+        hasEnoughInput
+          ? isQuickMode
+            ? redesignEnabled
+              ? "Quick Generate is ready for free creative exploration."
+              : "Quick Generate is ready and counts toward your monthly allowance."
+            : "Analysing keyword structure..."
+          : null,
+      ),
+      hasEnoughInput ? 600 : 0,
+    )
+    return () => window.clearTimeout(t)
+  }, [keyword, isQuickMode, redesignEnabled])
 
   // Loading step cycle
   useEffect(() => {
-    if (!isGenerating) { setLoadingStep(0); return }
+    if (!isGenerating || (redesignEnabled && !isBulkMode)) return
+    const reset = window.setTimeout(() => setLoadingStep(0), 0)
     const t = setInterval(() => setLoadingStep((s) => (s + 1) % LOADING_STEPS.length), 1200)
-    return () => clearInterval(t)
-  }, [isGenerating])
+    return () => {
+      window.clearTimeout(reset)
+      clearInterval(t)
+    }
+  }, [isBulkMode, isGenerating, redesignEnabled])
+
+  useEffect(() => {
+    if (!isBulkMode || bulkFounderSignalUnlocked) return
+    const frame = window.requestAnimationFrame(() => {
+      if (bulkSortKey === "score") setBulkSortKey("availability")
+      if (minScore > 0) setMinScore(0)
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [bulkFounderSignalUnlocked, bulkSortKey, isBulkMode, minScore])
 
   // Save search history to localStorage
   const addToSearchHistory = (term: string) => {
@@ -582,12 +949,180 @@ export function GenerateNames() {
     }
   }
 
-  // Filtered results based on TLD and availability filters
-  const filteredResults = results.filter((result) => {
-    if (selectedTldFilter && result.tld !== selectedTldFilter) return false
-    if (showOnlyAvailable && !result.available) return false
-    return true
-  })
+  const retainCurrentExplorationBatch = () => {
+    if (!redesignEnabled || explorationResults.length === 0) return
+    const candidates = explorationResults.map((candidate) => ({
+      id: candidate.id,
+      name: candidate.name,
+      rationale: candidate.rationale,
+      style: candidate.style,
+      generationRank: candidate.generationRank,
+    }))
+    try {
+      localStorage.setItem(
+        GENERATOR_HISTORY_STORAGE_KEY,
+        JSON.stringify({ version: 2, savedAt: Date.now(), candidates }),
+      )
+    } catch {
+      // Keep generation functional if local storage is unavailable.
+    }
+    setPreviousBatchCount(candidates.length)
+  }
+
+  const syncLegacyExplorationResults = (candidates: GeneratedName[]) => {
+    const next: DomainResult[] = candidates.flatMap((candidate) =>
+      Object.entries(candidate.availability).map(([tld, availability]) => ({
+        name: candidate.name,
+        tld,
+        fullDomain: availability.fullDomain || `${candidate.name.toLowerCase()}.${tld}`,
+        available: availability.available === true,
+        score:
+          candidate.founderSignal?.status === "ready" && typeof candidate.founderSignal.score === "number"
+            ? candidate.founderSignal.score
+            : 0,
+        pronounceable: true,
+        memorability: 0,
+        length: candidate.name.length,
+        personality: candidate.rationale,
+        personalDescription: candidate.rationale,
+        styleRationale: candidate.style,
+        registerUrl: availability.registerUrl,
+        availabilityConfidence: availability.confidence ?? undefined,
+        checkStatus:
+          availability.status === "checking"
+            ? "needs_verification"
+            : availability.status,
+      })),
+    )
+    setResults(next)
+  }
+
+  const preferredExplorationDomain = (candidate: GeneratedName): string => {
+    const entries = Object.entries(candidate.availability)
+    const preferred =
+      entries.find(([, state]) => state.status === "available") ||
+      entries.find(([, state]) => state.status === "likely_available" || state.status === "needs_verification") ||
+      entries.find(([tld]) => tld === "com") ||
+      entries[0]
+    return preferred?.[1].fullDomain || `${candidate.name.toLowerCase()}.com`
+  }
+
+  const focusExplorationResults = () => {
+    window.setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      resultsRef.current?.focus({ preventScroll: true })
+    }, 80)
+  }
+
+  const startExplorationRequest = () => {
+    retainCurrentExplorationBatch()
+    generationAbortRef.current?.abort()
+    scoringAbortRef.current?.abort()
+    const requestId = activeGenerationRef.current + 1
+    activeGenerationRef.current = requestId
+    const abortController = new AbortController()
+    generationAbortRef.current = abortController
+
+    setExplorationResults([])
+    setResults([])
+    setDislikedCandidateIds(new Set())
+    setSelectedExplorationCandidateId(null)
+    setAdvancedWorkflowToken(null)
+    setExplorationAvailabilityToken(null)
+    setGenerationPhase("generating_names")
+    setIsGenerating(true)
+    setIsScoringFounderSignal(false)
+    scoringInFlightRef.current = false
+    setSortByFounderSignal(false)
+    setScoringError(null)
+    setAvailabilityError(null)
+    setQuickGenerationShortfall(null)
+    setGenerationUpgradeHref(null)
+    setError(null)
+    setSelectedTldFilter(null)
+    setShowOnlyAvailable(false)
+    setAvailableComPicks([])
+    setAutoFindSummary(null)
+    setAutoFindStatus(null)
+    return { requestId, abortController }
+  }
+
+  const requestExplorationAvailability = async (
+    candidates: GeneratedName[],
+    tlds: readonly string[],
+    workflowToken: string | null,
+    signal: AbortSignal,
+  ) => {
+    if (!workflowToken) {
+      throw new Error("Availability continuation is unavailable for this batch")
+    }
+    // check-domain caps expanded checks at 75. Keep the exact signed name set
+    // in every request and split only the TLD dimension (Quick is 16 x 6).
+    const chunks = planAvailabilityTldChunks(candidates.length, tlds)
+
+    const settled = await Promise.allSettled(
+      chunks.map(async (tldChunk) => {
+        const response = await fetch("/api/check-domain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal,
+          body: JSON.stringify({
+            domains: candidates.map((candidate) => candidate.name),
+            tlds: tldChunk,
+            vibe: selectedVibe,
+            workflowToken,
+          }),
+        })
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.message || data.error || "Domain checks are temporarily unavailable")
+        return { tldChunk, data }
+      }),
+    )
+
+    const successful = settled.filter(
+      (result): result is PromiseFulfilledResult<{ tldChunk: string[]; data: any }> => result.status === "fulfilled",
+    )
+    if (successful.length === 0) throw new Error("Domain checks are temporarily unavailable")
+    const failedTlds = settled.flatMap((result, index) => result.status === "rejected" ? chunks[index] : [])
+    return {
+      payload: { results: successful.flatMap((result) => Array.isArray(result.value.data.results) ? result.value.data.results : []) },
+      failedTlds,
+    }
+  }
+
+  const selectGenerateMode = (mode: GenerateMode) => {
+    if (!generatorToolsEnabled && mode !== "bulk") return
+    if (mode === generateMode) return
+    if (redesignEnabled) {
+      retainCurrentExplorationBatch()
+      activeGenerationRef.current += 1
+      generationAbortRef.current?.abort()
+      scoringAbortRef.current?.abort()
+      generationAbortRef.current = null
+      scoringAbortRef.current = null
+      scoringInFlightRef.current = false
+      explorationResultsRef.current = []
+      setExplorationResults([])
+      setResults([])
+      setSelectedExplorationCandidateId(null)
+      setAdvancedWorkflowToken(null)
+      setExplorationAvailabilityToken(null)
+      advancedGenerationRetryRef.current = null
+      setGenerationPhase("idle")
+      setIsGenerating(false)
+      setIsScoringFounderSignal(false)
+      setScoringError(null)
+      setAvailabilityError(null)
+      setQuickGenerationShortfall(null)
+      setSortByFounderSignal(false)
+      setError(null)
+    }
+    setMaxLength((current) => {
+      const minimum = mode === "quick" ? getQuickStyleMinimumLength(quickStyle) : 6
+      return Math.min(15, Math.max(minimum, current))
+    })
+    setGenerateMode(mode)
+  }
 
   // Group all results by name — one card per name, all checked TLDs shown as badges
   const groupedResults = useMemo(() => {
@@ -613,9 +1148,9 @@ export function GenerateNames() {
         // Availability filter
         if (showOnlyAvailable && !tldList.some((r) => r.available)) return false
         // Min score filter
-        if (minScore > 0) {
-          const best = tldList.reduce((b, r) => (r.score > b.score ? r : b), tldList[0])
-          if (best.score < minScore) return false
+        if (canUseScoreControls && minScore > 0) {
+          const best = tldList.reduce((b, r) => (resultScore(r) > resultScore(b) ? r : b), tldList[0])
+          if (resultScore(best) < minScore) return false
         }
         // Include word filter
         if (includeTerms.length > 0 && !includeTerms.some((t) => lowerName.includes(t))) return false
@@ -632,22 +1167,49 @@ export function GenerateNames() {
         const available = sorted.filter((r) => r.available)
         const best =
           available.length > 0
-            ? available.reduce((b, r) => (r.score > b.score ? r : b))
+            ? available.reduce((b, r) => (resultScore(r) > resultScore(b) ? r : b))
             : sorted[0]
         return { name, tlds: sorted, best, hasAvailable: available.length > 0 }
       })
-  }, [results, selectedTldFilter, showOnlyAvailable, minScore, includeWord, excludeWord])
+  }, [results, selectedTldFilter, showOnlyAvailable, minScore, includeWord, excludeWord, canUseScoreControls])
 
   // "Founder Favourite" — name with highest score among groups that have an available TLD
   const topPickName = useMemo(() => {
+    if (isBulkMode && !bulkFounderSignalUnlocked) return null
     const withAvail = groupedResults.filter((g) => g.hasAvailable)
     if (!withAvail.length) return null
-    return withAvail.reduce((best, g) => (g.best.score > best.best.score ? g : best)).name
-  }, [groupedResults])
+    return withAvail.reduce((best, g) => (resultScore(g.best) > resultScore(best.best) ? g : best)).name
+  }, [bulkFounderSignalUnlocked, groupedResults, isBulkMode])
+
+  useEffect(() => {
+    if (isGenerating || groupedResults.length === 0 || resultsSeenTrackedRef.current === generationId) return
+
+    resultsSeenTrackedRef.current = generationId
+    trackEvent({
+      action: "results_seen",
+      metadata: {
+        mode: isBulkMode ? "bulk_check" : isQuickMode ? "quick_generate" : "advanced_generate",
+        resultCount: groupedResults.length,
+        vibe: selectedVibe,
+        industry: selectedIndustry,
+      },
+    })
+  }, [generationId, groupedResults.length, isBulkMode, isGenerating, isQuickMode, selectedIndustry, selectedVibe])
 
   const stopAutoFindSearch = () => {
     generationStoppedRef.current = true
     generationAbortRef.current?.abort()
+    if (redesignEnabled && !isBulkMode) {
+      activeGenerationRef.current += 1
+      generationAbortRef.current = null
+      setExplorationResults([])
+      setResults([])
+      setSelectedExplorationCandidateId(null)
+      setQuickGenerationShortfall(null)
+      setGenerationPhase("idle")
+      setIsGenerating(false)
+      restoreGenerateButtonFocus()
+    }
   }
 
   const handleRerollFlair = () => {
@@ -694,43 +1256,52 @@ export function GenerateNames() {
     return suggestion
   }
 
-  const extractDomainNames = (domains: any[]): string[] => {
+  const extractDomainData = (domains: any[]): { names: string[]; insights: Record<string, DomainInsight> } => {
     const uniqueNames = new Set<string>()
+    const insights: Record<string, DomainInsight> = {}
     for (const domain of domains || []) {
       const rawName = typeof domain?.name === "string" ? domain.name : ""
       const normalised = normaliseDomainName(rawName)
       if (normalised.length >= 3 && normalised.length <= 63) {
         uniqueNames.add(normalised)
-      }
-    }
-    return Array.from(uniqueNames)
-  }
-
-  const extractDomainData = (domains: any[]): { names: string[]; meanings: Record<string, string> } => {
-    const uniqueNames = new Set<string>()
-    const meanings: Record<string, string> = {}
-    for (const domain of domains || []) {
-      const rawName = typeof domain?.name === "string" ? domain.name : ""
-      const normalised = normaliseDomainName(rawName)
-      if (normalised.length >= 3 && normalised.length <= 63) {
-        uniqueNames.add(normalised)
+        const insight: DomainInsight = {}
         if (typeof domain?.meaning === "string" && domain.meaning.trim().length > 0) {
-          meanings[normalised] = domain.meaning.trim()
+          insight.meaning = domain.meaning.trim()
         } else if (typeof domain?.meaningShort === "string" && domain.meaningShort.trim().length > 0) {
-          meanings[normalised] = domain.meaningShort.trim()
+          insight.meaning = domain.meaningShort.trim()
         } else if (typeof domain?.reasoning === "string" && domain.reasoning.trim().length > 0) {
-          meanings[normalised] = domain.reasoning.trim()
+          insight.meaning = domain.reasoning.trim()
+        }
+
+        if (typeof domain?.meaningShort === "string" && domain.meaningShort.trim().length > 0) {
+          insight.meaningShort = domain.meaningShort.trim()
+        }
+        if (typeof domain?.reasoning === "string" && domain.reasoning.trim().length > 0) {
+          insight.reasoning = domain.reasoning.trim()
+        }
+        if (typeof domain?.personalDescription === "string" && domain.personalDescription.trim().length > 0) {
+          insight.personalDescription = domain.personalDescription.trim()
+        }
+        if (typeof domain?.styleRationale === "string" && domain.styleRationale.trim().length > 0) {
+          insight.styleRationale = domain.styleRationale.trim()
+        }
+        if (typeof domain?.slogan === "string" && domain.slogan.trim().length > 0) {
+          insight.slogan = domain.slogan.trim()
+        }
+
+        if (Object.keys(insight).length > 0) {
+          insights[normalised] = insight
         }
       }
     }
-    return { names: Array.from(uniqueNames), meanings }
+    return { names: Array.from(uniqueNames), insights }
   }
 
   const requestGeneratedNames = async (
     seedKeyword: string,
     count: number | null,
     signal: AbortSignal,
-  ): Promise<{ names: string[]; meanings: Record<string, string> }> => {
+  ): Promise<{ names: string[]; insights: Record<string, DomainInsight>; isPro: boolean; availabilityToken?: string }> => {
     const payload: Record<string, unknown> = {
       keyword: seedKeyword,
       vibe: selectedVibe,
@@ -761,38 +1332,49 @@ export function GenerateNames() {
 
     const responseData = await response.json()
     if (!response.ok) {
-      if (response.status === 429 && (responseData.error === "rate_limit_exceeded" || responseData.error === "token_limit_reached")) {
-        router.push("/pricing?reason=limit_exceeded")
-        throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+      if (response.status === 429) {
+        redirectToPricingForLimit("generate")
+        throw createPricingRedirectError()
       }
       throw new Error(responseData.error || "Failed to generate domain names")
     }
+    setCurrentGenerationMeta({
+      provider: typeof responseData.generation === "string" ? responseData.generation : null,
+      model: typeof responseData.generationMeta?.model === "string" ? responseData.generationMeta.model : null,
+      promptVersion: "generate-domains-v2",
+    })
 
-    return extractDomainData(responseData.domains || [])
+    return {
+      ...extractDomainData(responseData.domains || []),
+      isPro: Boolean(responseData.isPro),
+      availabilityToken: typeof responseData.availabilityToken === "string" ? responseData.availabilityToken : undefined,
+    }
   }
 
   const requestAvailability = async (
     domainNames: string[],
     tlds: string[] | undefined,
     signal: AbortSignal,
+    workflowToken?: string,
   ): Promise<DomainResult[]> => {
     const response = await fetch("/api/check-domain", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal,
-      body: JSON.stringify({ domains: domainNames, tlds, vibe: selectedVibe }),
+      body: JSON.stringify({ domains: domainNames, tlds, vibe: selectedVibe, workflowToken }),
     })
 
     const responseData = await response.json()
     if (!response.ok) {
-      if (response.status === 429 && (responseData.error === "rate_limit_exceeded" || responseData.error === "token_limit_reached")) {
-        router.push("/pricing?reason=limit_exceeded")
-        throw new Error("Rate limit exceeded. Redirecting to upgrade page...")
+      if (response.status === 429) {
+        redirectToPricingForLimit("availability_check")
+        throw createPricingRedirectError()
       }
       throw new Error("Failed to check domain availability")
     }
 
     const apiResults: DomainResult[] = responseData.results || []
+    setIsProUser(Boolean(responseData.founderSignalUnlocked))
 
     setCachedBatch(
       apiResults.map((r) => ({
@@ -803,6 +1385,21 @@ export function GenerateNames() {
     )
 
     return apiResults
+  }
+
+  const applyDomainInsight = (result: DomainResult, insights: Record<string, DomainInsight>): DomainResult => {
+    const insight = insights[result.name]
+    if (!insight) return result
+
+    return {
+      ...result,
+      meaning: insight.meaning ?? result.meaning,
+      meaningBreakdown: insight.meaningShort ?? result.meaningBreakdown,
+      whyItWorks: insight.reasoning ?? result.whyItWorks,
+      personalDescription: insight.personalDescription ?? result.personalDescription,
+      styleRationale: insight.styleRationale ?? result.styleRationale,
+      slogan: insight.slogan ?? result.slogan,
+    }
   }
 
   const requestAutoFindV2 = async (
@@ -852,7 +1449,7 @@ export function GenerateNames() {
     const responseData = await response.json()
 
     if (!response.ok) {
-      throw new Error(responseData.error || "Failed to auto-find top domains")
+      throw new Error(responseData.message || responseData.error || "Failed to auto-find top domains")
     }
 
     return {
@@ -893,7 +1490,7 @@ export function GenerateNames() {
     }
 
     return Array.from(picked.values())
-      .sort((a, b) => b.score - a.score || a.length - b.length)
+      .sort((a, b) => resultScore(b) - resultScore(a) || a.length - b.length)
       .slice(0, AUTO_FIND_TARGET_COM_COUNT)
   }
 
@@ -921,6 +1518,49 @@ export function GenerateNames() {
     }
   }
 
+  const scoreBulkResults = async (availabilityResults: DomainResult[]) => {
+    if (availabilityResults.length === 0) return availabilityResults
+    setIsScoringFounderSignal(true)
+    setScoringError(null)
+    setGenerationUpgradeHref(null)
+
+    try {
+      const response = await fetch("/api/founder-signal/shortlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domains: availabilityResults.map(({ name, tld }) => ({ name, tld })),
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setGenerationUpgradeHref(typeof data.upgradeUrl === "string" ? data.upgradeUrl : null)
+        throw new Error(data.message || data.error || "Founder Signal could not score this shortlist")
+      }
+
+      const scores = new Map<string, DomainResult>(
+        (Array.isArray(data.results) ? data.results : []).map((result: DomainResult) => [result.fullDomain, result]),
+      )
+      const scoredResults = availabilityResults.map((result) => ({
+        ...result,
+        ...(scores.get(result.fullDomain) || {}),
+      }))
+      setResults(scoredResults)
+      setBulkFounderSignalUnlocked(true)
+      setIsProUser(Boolean(data.isPro))
+      setBulkSortKey("score")
+      setError(null)
+      return scoredResults
+    } catch (failure) {
+      const message = failure instanceof Error ? failure.message : "Founder Signal could not score this shortlist"
+      setScoringError(message)
+      setError(message)
+      return availabilityResults
+    } finally {
+      setIsScoringFounderSignal(false)
+    }
+  }
+
   // Bulk check handler
   const handleBulkCheck = async () => {
     if (!bulkInput.trim()) return
@@ -941,27 +1581,40 @@ export function GenerateNames() {
     setError(null)
     setSelectedTldFilter(null)
     setShowOnlyAvailable(false)
+    setBulkFounderSignalUnlocked(false)
+    setScoringError(null)
+    setGenerationUpgradeHref(null)
+    setGenerationId((value) => value + 1)
+    trackEvent({
+      action: "bulk_check",
+      metadata: { source: "generate_page", count: domains.length },
+    })
 
     try {
       const response = await fetch("/api/check-domain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domains }),
+        body: JSON.stringify({ domains, includeFounderSignal: false }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        if (response.status === 429 && (data.error === "rate_limit_exceeded" || data.error === "token_limit_reached")) {
-          router.push("/pricing?reason=limit_exceeded")
+        if (response.status === 429) {
+          redirectToPricingForLimit("bulk_check")
           return
         }
         throw new Error("Failed to check domains")
       }
 
-      setResults(data.results)
+      setBulkFounderSignalUnlocked(false)
+      setIsProUser(Boolean(data.isPro))
+      const availabilityResults = Array.isArray(data.results) ? data.results as DomainResult[] : []
+      setResults(availabilityResults)
+      if (bulkFounderSignalRequested) await scoreBulkResults(availabilityResults)
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
     } catch (error: any) {
+      if (error?.name === "AbortError") return
       console.error("Error checking domains:", error)
       setError(error.message || "Failed to check domains")
     } finally {
@@ -969,7 +1622,402 @@ export function GenerateNames() {
     }
   }
 
+  const completeCandidateGeneration = (
+    candidates: GeneratedName[],
+    requestId: number,
+    isPro: boolean,
+  ) => {
+    if (activeGenerationRef.current !== requestId) return false
+    explorationResultsRef.current = candidates
+    setExplorationResults(candidates)
+    setSelectedExplorationCandidateId(candidates[0]?.id ?? null)
+    syncLegacyExplorationResults(candidates)
+    setIsProUser(isPro)
+    if (isPro) {
+      setScoreAllowanceExhausted(false)
+    }
+    setGenerationPhase("names_ready")
+    setIsGenerating(false)
+    focusExplorationResults()
+    trackEvent({
+      action: "names_visible",
+      metadata: { source: "generator", experiment: "generator_redesign_v2" },
+    })
+    window.setTimeout(() => {
+      if (activeGenerationRef.current === requestId && !scoringInFlightRef.current) {
+        setGenerationPhase("checking_domains")
+      }
+    }, 0)
+    return true
+  }
+
+  const finishExplorationAvailability = (
+    requestId: number,
+    availabilityPayload: unknown,
+    failedTlds: readonly string[] = [],
+  ) => {
+    if (activeGenerationRef.current !== requestId) return
+    const withSuccessfulChecks = mergeAvailability(explorationResultsRef.current, availabilityPayload)
+    const merged = failedTlds.length > 0
+      ? markAvailabilityTldsFailed(withSuccessfulChecks, failedTlds)
+      : withSuccessfulChecks
+    explorationResultsRef.current = merged
+    setExplorationResults(merged)
+    syncLegacyExplorationResults(merged)
+    if (failedTlds.length > 0) {
+      setAvailabilityError(`Names are ready. Checks for ${failedTlds.map((tld) => `.${tld}`).join(", ")} could not finish; verify those favourites with the registrar.`)
+    }
+    if (!scoringInFlightRef.current) setGenerationPhase("ready")
+    generationAbortRef.current = null
+  }
+
+  const failExplorationAvailability = (requestId: number) => {
+    if (activeGenerationRef.current !== requestId) return
+    const failed = markAvailabilityFailed(explorationResultsRef.current)
+    explorationResultsRef.current = failed
+    setExplorationResults(failed)
+    syncLegacyExplorationResults(failed)
+    setAvailabilityError("Names are ready, but live domain checks could not finish. Verify any favourite directly with the registrar.")
+    if (!scoringInFlightRef.current) setGenerationPhase("ready")
+    generationAbortRef.current = null
+  }
+
+  const handleRedesignedQuickGenerate = async () => {
+    const resolvedDescription = description.trim() || keyword.trim()
+    if (!resolvedDescription) return
+    if (description.trim()) setKeyword(description.trim().slice(0, 160))
+
+    const { requestId, abortController } = startExplorationRequest()
+    setGenerationId((value) => value + 1)
+    addToSearchHistory(resolvedDescription)
+    trackEvent({
+      action: "brief_submitted",
+      metadata: { ...journeyMetadata, mode: "quick", ctaId: "generator-primary", experiment: "generator_redesign_v2" },
+    })
+    trackEvent({
+      action: "quick_generate_started",
+      metadata: { source: "generator", experiment: "generator_redesign_v2" },
+    })
+
+    try {
+      const response = await fetch("/api/quick-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
+        body: JSON.stringify({
+          description: resolvedDescription,
+          rhymeWith: quickRhymeWith.trim() || undefined,
+          vibe: quickVibe,
+          style: quickStyle,
+          creativity: quickCreativity,
+          maxChars: maxLength,
+          count: 16,
+          blacklist: parseBlacklist(quickBlacklist),
+          preferences: {
+            likedStyles: preferenceProfile.likedStyles,
+            dislikedStyles: preferenceProfile.dislikedStyles,
+            preferredLength: preferenceProfile.preferredLength,
+            preferredSounds: preferenceProfile.preferredSounds,
+            avoidedSounds: preferenceProfile.avoidedSounds,
+          },
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message || data.error || "Could not generate names")
+      setCurrentGenerationMeta({
+        provider: typeof data.generation === "string" ? data.generation : null,
+        model: typeof data.generationMeta?.model === "string" ? data.generationMeta.model : null,
+        promptVersion: "quick-candidate-first-v2",
+      })
+
+      const candidates = parseGeneratedCandidates(data, QUICK_GENERATE_TLDS, 16)
+      if (candidates.length === 0) throw new Error("No usable names came back. Please try another creative direction.")
+      if (quickStyle === "auto" && candidates.length < 16) {
+        throw new Error("We could not complete a full 16-name batch safely. Please retry or adjust the brief.")
+      }
+      const shortfall = parseQuickGenerationShortfall(data, quickStyle, candidates.length, 16)
+      if (quickStyle !== "auto" && candidates.length < 16 && !shortfall) {
+        throw new Error("The selected style returned an incomplete batch without a safe explanation. Please retry.")
+      }
+      const availabilityToken = typeof data.availabilityToken === "string" ? data.availabilityToken : null
+      setExplorationAvailabilityToken(availabilityToken)
+      if (!completeCandidateGeneration(candidates, requestId, Boolean(data.isPro))) return
+      setQuickGenerationShortfall(shortfall)
+
+      trackEvent({
+        action: "quick_generate_results",
+        metadata: { source: "generator", experiment: "generator_redesign_v2" },
+      })
+
+      try {
+        const availability = await requestExplorationAvailability(
+          candidates,
+          QUICK_GENERATE_TLDS,
+          availabilityToken,
+          abortController.signal,
+        )
+        finishExplorationAvailability(requestId, availability.payload, availability.failedTlds)
+      } catch (availabilityFailure: unknown) {
+        if (availabilityFailure instanceof DOMException && availabilityFailure.name === "AbortError") return
+        failExplorationAvailability(requestId)
+      }
+
+    } catch (failure: unknown) {
+      if (failure instanceof DOMException && failure.name === "AbortError") return
+      if (activeGenerationRef.current !== requestId) return
+      setError(failure instanceof Error ? failure.message : "Could not generate names")
+      setGenerationPhase("idle")
+      setIsGenerating(false)
+      generationAbortRef.current = null
+      restoreGenerateButtonFocus()
+    }
+  }
+
+  const handleRedesignedAdvancedGenerate = async () => {
+    const resolvedKeyword = description.trim() || keyword.trim()
+    if (!resolvedKeyword) return
+    if (description.trim()) setKeyword(description.trim().slice(0, 160))
+
+    // Keep the id only across a failed/lost response for the exact same in-memory
+    // settings. A successful batch clears it so an intentional rerun consumes a
+    // new Advanced allowance. The raw brief is never persisted.
+    const requestFingerprint = JSON.stringify([resolvedKeyword, selectedVibe, selectedIndustry, maxLength])
+    const priorRequest = advancedGenerationRetryRef.current
+    const workflowRequestId = priorRequest?.fingerprint === requestFingerprint
+      ? priorRequest.requestId
+      : globalThis.crypto.randomUUID()
+    advancedGenerationRetryRef.current = { fingerprint: requestFingerprint, requestId: workflowRequestId }
+
+    const { requestId, abortController } = startExplorationRequest()
+    setGenerationId((value) => value + 1)
+    addToSearchHistory(resolvedKeyword)
+    recordSearch(selectedVibe, selectedIndustry, maxLength)
+    trackEvent({
+      action: "brief_submitted",
+      metadata: { ...journeyMetadata, mode: "advanced", ctaId: "generator-primary", experiment: "generator_redesign_v2" },
+    })
+    trackEvent({
+      action: "advanced_started",
+      metadata: { source: "generator", experiment: "generator_redesign_v2" },
+    })
+
+    try {
+      const response = await fetch("/api/generate-domains", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
+        body: JSON.stringify({
+          keyword: resolvedKeyword,
+          vibe: selectedVibe,
+          industry: selectedIndustry,
+          maxLength,
+          count: 12,
+          generatorV2: true,
+          requestId: workflowRequestId,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        if (response.status === 429 && typeof data.upgradeUrl === "string") {
+          setGenerationUpgradeHref(data.upgradeUrl)
+        }
+        throw new Error(data.message || data.error || "Could not generate names")
+      }
+      setCurrentGenerationMeta({
+        provider: typeof data.generation === "string" ? data.generation : null,
+        model: typeof data.generationMeta?.model === "string" ? data.generationMeta.model : null,
+        promptVersion: "advanced-candidate-first-v2",
+      })
+
+      const candidates = parseGeneratedCandidates(data, ALL_TLDS, 12)
+      if (candidates.length === 0) throw new Error("No usable names came back. Please refine the brief and try again.")
+      if (typeof data.advancedGenerationAllowance?.remaining === "number") {
+        setAdvancedAllowanceRemaining(data.advancedGenerationAllowance.remaining)
+      }
+      setAdvancedWorkflowToken(typeof data.workflowToken === "string" ? data.workflowToken : null)
+      const availabilityToken = typeof data.availabilityToken === "string" ? data.availabilityToken : null
+      setExplorationAvailabilityToken(availabilityToken)
+      if (!completeCandidateGeneration(candidates, requestId, Boolean(data.isPro))) return
+      advancedGenerationRetryRef.current = null
+
+      trackEvent({
+        action: "name_generation",
+        metadata: { source: "generator", experiment: "generator_redesign_v2" },
+      })
+
+      try {
+        const availability = await requestExplorationAvailability(
+          candidates,
+          ALL_TLDS,
+          availabilityToken,
+          abortController.signal,
+        )
+        finishExplorationAvailability(requestId, availability.payload, availability.failedTlds)
+      } catch (availabilityFailure: unknown) {
+        if (availabilityFailure instanceof DOMException && availabilityFailure.name === "AbortError") return
+        failExplorationAvailability(requestId)
+      }
+
+      if (autoFindComMode) {
+        if (!Boolean(data.isPro)) {
+          setAutoFindStatus("Auto-find is included with Pro. Your 12-name shortlist is ready above.")
+        } else if (!AUTO_FIND_V2_ENABLED) {
+          setAutoFindStatus("Auto-find is temporarily unavailable. Your 12-name shortlist is ready above.")
+        } else {
+          setIsAutoFindingComs(true)
+          setAutoFindAttempt(1)
+          setAutoFindStatus(`Scanning highest Founder Signal domains... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
+          try {
+            const autoFindV2Result = await requestAutoFindV2(resolvedKeyword, abortController.signal)
+            setIsProUser(autoFindV2Result.isPro)
+            setAvailableComPicks(autoFindV2Result.picks)
+            setAutoFindSummary(autoFindV2Result.summary)
+            setAutoFindAttempt(Math.max(1, autoFindV2Result.summary.attempts))
+            setAutoFindStatus(
+              `${autoFindV2Result.summary.checkingProgress} (Attempt ${autoFindV2Result.summary.attempts}/${autoFindV2Result.summary.maxAttempts})`,
+            )
+          } catch (autoFindFailure: unknown) {
+            if (autoFindFailure instanceof DOMException && autoFindFailure.name === "AbortError") return
+            setAutoFindStatus(
+              autoFindFailure instanceof Error
+                ? `Auto-find paused: ${autoFindFailure.message}`
+                : "Auto-find paused. Your 12-name shortlist is still ready above.",
+            )
+          } finally {
+            setIsAutoFindingComs(false)
+          }
+        }
+      }
+    } catch (failure: unknown) {
+      if (failure instanceof DOMException && failure.name === "AbortError") return
+      if (activeGenerationRef.current !== requestId) return
+      setError(failure instanceof Error ? failure.message : "Could not generate names")
+      setGenerationPhase("idle")
+      setIsGenerating(false)
+      generationAbortRef.current = null
+      restoreGenerateButtonFocus()
+    }
+  }
+
+  const handleQuickGenerate = async () => {
+    if (redesignEnabled) {
+      await handleRedesignedQuickGenerate()
+      return
+    }
+    const resolvedDescription = description.trim() || keyword.trim()
+    if (!resolvedDescription) return
+
+    generationAbortRef.current?.abort()
+    const abortController = new AbortController()
+    generationAbortRef.current = abortController
+
+    if (description.trim()) setKeyword(description.trim().slice(0, 160))
+
+    setIsGenerating(true)
+    setError(null)
+    setSelectedTldFilter(null)
+    setShowOnlyAvailable(false)
+    setGenerationId((n) => n + 1)
+    // A failed or paused generation must never leave an earlier shortlist on
+    // screen as if it belonged to the new brief. The redesigned flow already
+    // clears both stores in startExplorationRequest; retain the same safety
+    // guarantee if a rollout flag ever routes this page through legacy mode.
+    setResults([])
+    setAvailableComPicks([])
+    setAutoFindSummary(null)
+    setAutoFindStatus(null)
+
+    trackEvent({
+      action: "brief_submitted",
+      metadata: { ...journeyMetadata, mode: "quick", ctaId: "generator-primary" },
+    })
+    trackEvent({
+      action: "quick_generate_started",
+      metadata: {
+        ...journeyMetadata,
+        vibe: quickVibe,
+        maxLength,
+        hasRhyme: Boolean(quickRhymeWith.trim()),
+      },
+    })
+
+    addToSearchHistory(resolvedDescription)
+
+    try {
+      const response = await fetch("/api/quick-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
+        body: JSON.stringify({
+          description: resolvedDescription,
+          rhymeWith: quickRhymeWith.trim(),
+          vibe: quickVibe,
+          maxChars: maxLength,
+          count: 12,
+          preferences: {
+            likedStyles: preferenceProfile.likedStyles,
+            dislikedStyles: preferenceProfile.dislikedStyles,
+            preferredLength: preferenceProfile.preferredLength,
+            preferredSounds: preferenceProfile.preferredSounds,
+            avoidedSounds: preferenceProfile.avoidedSounds,
+          },
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to generate free names")
+      }
+      setCurrentGenerationMeta({
+        provider: typeof data.generation === "string" ? data.generation : null,
+        model: typeof data.generationMeta?.model === "string" ? data.generationMeta.model : null,
+        promptVersion: "quick-legacy",
+      })
+
+      const quickResults: DomainResult[] = (data.results || []).map((result: any) => ({
+        name: result.name,
+        tld: result.tld || "com",
+        fullDomain: result.fullDomain,
+        available: Boolean(result.available),
+        score: result.available ? 1 : 0,
+        pronounceable: true,
+        memorability: 0,
+        length: result.name.length,
+        personality: result.personality,
+        registerUrl: result.registerUrl,
+        availabilityConfidence: result.availabilityConfidence || "low",
+        checkStatus: result.checkStatus || (result.available ? "available" : "taken"),
+      }))
+
+      setIsProUser(Boolean(data.isPro))
+      setResults(quickResults)
+      trackEvent({
+        action: "quick_generate_results",
+        metadata: {
+          ...journeyMetadata,
+          resultCount: new Set(quickResults.map((result) => result.name)).size,
+          availableCount: quickResults.filter((result) => result.available).length,
+          vibe: quickVibe,
+          modelCandidateCount: data.quality?.modelCandidateCount,
+          fallbackCandidateCount: data.quality?.fallbackCandidateCount,
+        },
+      })
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
+    } catch (error: any) {
+      if (error?.name === "AbortError") return
+      console.error("Error in quick generate:", error)
+      setError(error.message || "Failed to generate free names")
+    } finally {
+      setIsGenerating(false)
+      generationAbortRef.current = null
+    }
+  }
+
   const handleGenerate = async () => {
+    if (redesignEnabled) {
+      await handleRedesignedAdvancedGenerate()
+      return
+    }
     // Accept either keyword or description as the input
     const resolvedKeyword = description.trim() || keyword.trim()
     if (!resolvedKeyword) return
@@ -991,6 +2039,19 @@ export function GenerateNames() {
     setSelectedTldFilter(null) // Reset filters on new search
     setShowOnlyAvailable(false)
     setGenerationId((n) => n + 1) // Reset Deep Search on new generation
+    trackEvent({
+      action: "brief_submitted",
+      metadata: { ...journeyMetadata, mode: "advanced", ctaId: "generator-primary" },
+    })
+    trackEvent({
+      action: "generate_started",
+      metadata: {
+        ...journeyMetadata,
+        vibe: selectedVibe,
+        industry: selectedIndustry,
+        maxLength,
+      },
+    })
 
     // Add to search history and record preference signal
     const baseKeyword = resolvedKeyword
@@ -998,27 +2059,37 @@ export function GenerateNames() {
     recordSearch(selectedVibe, selectedIndustry, maxLength)
 
     try {
-      const { names: initialNames, meanings: initialMeanings } = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      const { names: initialNames, insights: initialInsights, isPro, availabilityToken } = await requestGeneratedNames(baseKeyword, null, abortController.signal)
+      setIsProUser(isPro)
       if (initialNames.length === 0) {
         throw new Error("No domain candidates were generated. Please try again.")
       }
 
-      const initialResults = (await requestAvailability(initialNames, undefined, abortController.signal))
-        .map(r => ({ ...r, meaning: initialMeanings[r.name] ?? r.meaning }))
+      const initialResults = (await requestAvailability(initialNames, undefined, abortController.signal, availabilityToken))
+        .map((result) => applyDomainInsight(result, initialInsights))
       const availableNames = new Set(initialResults.filter((r) => r.available).map((r) => r.name))
-      setResults(availableNames.size > 0 ? initialResults.filter((r) => availableNames.has(r.name)) : initialResults)
+      setResults(initialResults)
+      trackEvent({
+        action: "name_generation",
+        metadata: {
+          ...journeyMetadata,
+          resultCount: initialResults.length,
+          availableCount: availableNames.size,
+          vibe: selectedVibe,
+          industry: selectedIndustry,
+        },
+      })
       // Smooth-scroll to results after first batch arrives
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
 
-      if (autoFindComMode) {
+      if (autoFindComMode && isPro) {
         if (AUTO_FIND_V2_ENABLED) {
           setIsAutoFindingComs(true)
           setAutoFindAttempt(1)
           setAutoFindStatus(`Scanning highest Founder Signal domains... (Attempt 1/${AUTO_FIND_V2_MAX_ATTEMPTS})`)
 
           const autoFindV2Result = await requestAutoFindV2(baseKeyword, abortController.signal)
-          setIsPro(autoFindV2Result.isPro)
-          setRevealedPremiumDomain(null) // Reset reveal state on new generation
+          setIsProUser(autoFindV2Result.isPro)
           setAvailableComPicks(autoFindV2Result.picks)
           setAutoFindSummary(autoFindV2Result.summary)
           setAutoFindAttempt(Math.max(1, autoFindV2Result.summary.attempts))
@@ -1044,15 +2115,16 @@ export function GenerateNames() {
               setAutoFindStatus(`Searching for available .coms... (Attempt ${attempt}/${AUTO_FIND_MAX_ATTEMPTS})`)
 
               const remixSeed = buildRemixSeed(baseKeyword, selectedVibe, selectedIndustry, attempt)
-              const { names: remixedNames, meanings: remixMeanings } = await requestGeneratedNames(
+              const { names: remixedNames, insights: remixInsights, isPro: remixIsPro, availabilityToken: remixAvailabilityToken } = await requestGeneratedNames(
                 remixSeed,
                 AUTO_FIND_BATCH_SIZE,
                 abortController.signal,
               )
+              setIsProUser(remixIsPro)
 
               if (remixedNames.length > 0) {
-                const comResults = (await requestAvailability(remixedNames, ["com"], abortController.signal))
-                  .map(r => ({ ...r, meaning: remixMeanings[r.name] ?? r.meaning }))
+                const comResults = (await requestAvailability(remixedNames, ["com"], abortController.signal, remixAvailabilityToken))
+                  .map((result) => applyDomainInsight(result, remixInsights))
                 comPicks = mergeAvailableComResults(comPicks, comResults)
                 setAvailableComPicks(comPicks)
               }
@@ -1078,8 +2150,13 @@ export function GenerateNames() {
             setAutoFindStatus(`Found ${comPicks.length} available .com domains within the attempt/time cap.`)
           }
         }
+      } else if (autoFindComMode && !isPro) {
+        setAutoFindStatus("Auto-find is included with Pro. Your initial name set is ready below.")
       }
     } catch (error: any) {
+      if (error?.name === "PricingRedirect") {
+        return
+      }
       console.error("Error generating domains:", error)
       if (error?.name === "AbortError" && generationStoppedRef.current) {
         setAutoFindStatus("Search stopped.")
@@ -1101,14 +2178,655 @@ export function GenerateNames() {
   const toggleShortlist = (fullDomain: string) => {
     const isAdding = !shortlist.includes(fullDomain)
     setShortlist((prev) => (prev.includes(fullDomain) ? prev.filter((n) => n !== fullDomain) : [...prev, fullDomain]))
-    if (isAdding) recordLike(fullDomain)
-    else recordUnlike(fullDomain)
+    if (isAdding) {
+      recordLike(fullDomain)
+      if (shortlist.length === 0) {
+        trackEvent({
+          action: "shortlist_created",
+          metadata: { ...journeyMetadata, ctaId: "result-shortlist" },
+        })
+      }
+      trackEvent({
+        action: "decision_action",
+        metadata: { ...journeyMetadata, decisionAction: "shortlist", ctaId: "result-shortlist" },
+      })
+    } else {
+      recordUnlike(fullDomain)
+    }
+  }
+
+  const saveBestResultToShortlist = () => {
+    const topGroup = topPickName
+      ? groupedResults.find((group) => group.name === topPickName)
+      : groupedResults[0]
+    const bestDomain = topGroup?.best.fullDomain
+    if (!bestDomain) return
+
+    if (!shortlist.includes(bestDomain)) {
+      toggleShortlist(bestDomain)
+    }
+    setShowSavedBoard(true)
+  }
+
+  const compareTopResults = () => {
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "compare", ctaId: "results-action-row" },
+    })
+
+    if (!isProUser) {
+      redirectToCheckoutForProFeature("results_compare")
+      return
+    }
+
+    const comparison = groupedResults.slice(0, 2).map((group) => ({
+      name: group.name,
+      tld: group.best.tld,
+    }))
+    if (comparison.length < 2) return
+    setBattleQueue(comparison)
+    setShowBattle(true)
+  }
+
+  const handleResultsUpgradeClick = () => {
+    trackEvent({
+      action: "upgrade_clicked",
+      metadata: { ...journeyMetadata, ctaId: "results-decision-panel", destination: "checkout" },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "pricing", ctaId: "results-decision-panel" },
+    })
+    trackEvent({
+      action: "checkout_intent",
+      metadata: { ...journeyMetadata, ctaId: "results-decision-panel" },
+    })
+  }
+
+  const handleNamecheapClick = (domain: string, source: string, metadata: Record<string, unknown> = {}) => {
+    const candidateName = typeof metadata.name === "string" ? metadata.name : domain.split(".")[0]
+    if (candidateName && metadata.skipFeedback !== true) {
+      submitNameFeedback({
+        candidateId: `${candidateName.toLowerCase()}:${generationId}`,
+        candidateName,
+        candidateDescription: null,
+        namingStyle: typeof metadata.style === "string" ? metadata.style : null,
+        domainAvailabilitySnapshot: { domain },
+      }, "domain_check")
+    }
+    trackAffiliateClick(domain, { source, ...metadata })
+    trackEvent({
+      action: "domain_register_clicked",
+      metadata: { source, ...metadata },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "register", ctaId: source },
+    })
+  }
+
+  const handleLaunchKitStarted = (source: string, _brandName?: string) => {
+    void _brandName
+    trackEvent({
+      action: "launch_kit_started",
+      metadata: { source, vibe: isQuickMode ? quickVibe : selectedVibe, industry: selectedIndustry },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "brand_kit", ctaId: source },
+    })
   }
 
   const copyToClipboard = (fullDomain: string) => {
     navigator.clipboard.writeText(fullDomain)
     setCopiedName(fullDomain)
     setTimeout(() => setCopiedName(null), 2000)
+  }
+
+  const currentBriefText = () => (description.trim() || keyword.trim()).slice(0, 1000)
+
+  const currentBriefId = () => {
+    const source = initialContentSlug || initialSource || "generator"
+    const brief = currentBriefText().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)
+    return `${source}:${brief || "empty"}`
+  }
+
+  const availabilitySnapshotFromDomain = (result: DomainResult) => ({
+    [result.tld]: {
+      status: result.checkStatus || (result.available ? "available" : "taken"),
+      available: result.available,
+      confidence: result.availabilityConfidence || null,
+      fullDomain: result.fullDomain,
+    },
+  })
+
+  const availabilitySnapshotFromCandidate = (candidate: GeneratedName) =>
+    Object.fromEntries(
+      Object.entries(candidate.availability).map(([tld, state]) => [
+        tld,
+        {
+          status: state.status,
+          available: state.available,
+          confidence: state.confidence,
+          fullDomain: state.fullDomain,
+        },
+      ]),
+    )
+
+  const submitNameFeedback = async (
+    input: {
+      candidateId: string
+      candidateName: string
+      candidateDescription?: string | null
+      candidatePosition?: number | null
+      namingStyle?: string | null
+      displayedScores?: Record<string, unknown> | null
+      domainAvailabilitySnapshot?: Record<string, unknown> | null
+    },
+    feedbackType: NameFeedbackType,
+    feedbackReason?: DislikeReason | null,
+  ) => {
+    const anonymousSessionId = getSessionId()
+    if (!anonymousSessionId) return
+    try {
+      const response = await fetch("/api/name-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          anonymousSessionId,
+          briefId: currentBriefId(),
+          briefTextSnapshot: currentBriefText(),
+          candidateId: input.candidateId,
+          candidateName: input.candidateName,
+          candidateDescription: input.candidateDescription,
+          candidatePosition: input.candidatePosition,
+          generationId: `generation-${generationId}`,
+          modelProvider: currentGenerationMeta.provider || null,
+          modelName: currentGenerationMeta.model || null,
+          promptVersion: currentGenerationMeta.promptVersion || (redesignEnabled ? "generator_redesign_v2" : "legacy"),
+          namingStyle: input.namingStyle || (isQuickMode ? quickStyle : "advanced"),
+          vibe: isQuickMode ? quickVibe : selectedVibe,
+          creativityLevel: isQuickMode ? quickCreativity : null,
+          displayedScores: input.displayedScores,
+          domainAvailabilitySnapshot: input.domainAvailabilitySnapshot,
+          feedbackType,
+          feedbackReason,
+          isFounderFeedback: isTestEnvironment || pathname.includes("namo-curator"),
+        }),
+      })
+      if (!response.ok) throw new Error("Feedback save failed")
+    } catch {
+      setFeedbackNotice("Feedback could not be saved. Your local preference still updated.")
+      window.setTimeout(() => setFeedbackNotice(null), 3000)
+    }
+  }
+
+  const removeNameFeedback = async (candidateId: string, feedbackType: NameFeedbackType) => {
+    const anonymousSessionId = getSessionId()
+    if (!anonymousSessionId) return
+    await fetch("/api/name-feedback", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        anonymousSessionId,
+        candidateId,
+        generationId: `generation-${generationId}`,
+        feedbackType,
+      }),
+    }).catch(() => {})
+  }
+
+  const legacyFeedbackInput = (result: DomainResult, candidatePosition?: number) => ({
+    candidateId: `${result.name.toLowerCase()}:${generationId}`,
+    candidateName: result.name,
+    candidateDescription: result.personalDescription || result.personality || result.whyItWorks || result.meaning || null,
+    candidatePosition,
+    namingStyle: result.strategy || null,
+    displayedScores: typeof result.score === "number" ? { founderSignal: result.score } : null,
+    domainAvailabilitySnapshot: availabilitySnapshotFromDomain(result),
+  })
+
+  const legacyPseudoCandidate = (result: DomainResult, candidatePosition?: number): GeneratedName => ({
+    id: `${result.name.toLowerCase()}:${generationId}`,
+    name: result.name,
+    rationale: result.personalDescription || result.personality || result.whyItWorks || result.meaning || "A generated naming direction.",
+    style: quickStyle === "auto" ? "brandable" : quickStyle,
+    generationRank: candidatePosition || 1,
+    availability: {
+      [result.tld]: {
+        status: result.checkStatus || (result.available ? "available" : "taken"),
+        available: result.available,
+        confidence: result.availabilityConfidence || null,
+        fullDomain: result.fullDomain,
+        registerUrl: result.registerUrl,
+      },
+    },
+    founderSignal: null,
+  })
+
+  const handleLegacyLike = (result: DomainResult, candidatePosition?: number) => {
+    const input = legacyFeedbackInput(result, candidatePosition)
+    const isUndo = likedCandidateIds.has(input.candidateId)
+    setLikedCandidateIds((current) => {
+      const next = new Set(current)
+      if (next.has(input.candidateId)) next.delete(input.candidateId)
+      else next.add(input.candidateId)
+      return next
+    })
+    if (isUndo) {
+      removeNameFeedback(input.candidateId, "like")
+      return
+    }
+    updateLocalPreference(legacyPseudoCandidate(result, candidatePosition), "save")
+    submitNameFeedback(input, "like")
+  }
+
+  const handleLegacyDislike = (result: DomainResult, candidatePosition?: number, reason?: DislikeReason | null) => {
+    const input = legacyFeedbackInput(result, candidatePosition)
+    const isReasonUpdate = dislikedCandidateIds.has(input.candidateId) && Boolean(reason)
+    const isUndo = dislikedCandidateIds.has(input.candidateId) && !reason
+    if (!isReasonUpdate) {
+      setDislikedCandidateIds((current) => {
+        const next = new Set(current)
+        if (next.has(input.candidateId)) next.delete(input.candidateId)
+        else next.add(input.candidateId)
+        return next
+      })
+    }
+    if (isUndo) {
+      activeDislikedCandidatesRef.current.delete(input.candidateId)
+      setPreferenceProfile(applyActiveDislikes(positivePreferenceProfileRef.current))
+      removeNameFeedback(input.candidateId, "dislike")
+      setDislikeReasonTarget(null)
+      return
+    }
+    activeDislikedCandidatesRef.current.set(input.candidateId, legacyPseudoCandidate(result, candidatePosition))
+    setPreferenceProfile(applyActiveDislikes(positivePreferenceProfileRef.current))
+    submitNameFeedback(input, "dislike", reason || "skip")
+    setDislikeReasonTarget(input.candidateId)
+    trackEvent({ action: "dislike", metadata: { source: "generator", ctaId: "legacy-result-dislike" } })
+  }
+
+  const handleLegacyMoreLikeThis = (result: DomainResult, candidatePosition?: number) => {
+    const pseudo = legacyPseudoCandidate(result, candidatePosition)
+    updateLocalPreference(pseudo, "more_like_this")
+    submitNameFeedback(legacyFeedbackInput(result, candidatePosition), "more_like_this")
+    setFeedbackNotice("Next generation will lean toward this direction without copying it.")
+    window.setTimeout(() => setFeedbackNotice(null), 2800)
+    trackEvent({ action: "more_like_this", metadata: { source: "generator", ctaId: "legacy-result-more-like-this" } })
+  }
+
+  const renderLegacyFeedbackControls = (result: DomainResult, candidatePosition?: number) => {
+    const input = legacyFeedbackInput(result, candidatePosition)
+    const liked = likedCandidateIds.has(input.candidateId)
+    const disliked = dislikedCandidateIds.has(input.candidateId)
+    return (
+      <div className="mt-3 rounded-xl border border-white/8 bg-black/15 p-2">
+        <div className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap">
+          <button
+            type="button"
+            aria-pressed={liked}
+            onClick={() => handleLegacyLike(result, candidatePosition)}
+            className={cn(
+              "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border px-2 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]",
+              liked ? "border-emerald-300/25 bg-emerald-300/[0.08] text-emerald-200" : "border-white/9 bg-white/[0.03] text-white/52 hover:text-white",
+            )}
+          >
+            {liked ? <Check className="h-3.5 w-3.5" /> : <ThumbsUp className="h-3.5 w-3.5" />}
+            Good fit
+          </button>
+          <button
+            type="button"
+            aria-pressed={disliked}
+            onClick={() => handleLegacyDislike(result, candidatePosition)}
+            className={cn(
+              "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border px-2 text-[11px] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]",
+              disliked ? "border-red-300/20 bg-red-300/[0.07] text-red-200/75" : "border-white/9 bg-white/[0.03] text-white/52 hover:text-white",
+            )}
+          >
+            {disliked ? <RefreshCw className="h-3.5 w-3.5" /> : <ThumbsDown className="h-3.5 w-3.5" />}
+            {disliked ? "Undo" : "Not right"}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleLegacyMoreLikeThis(result, candidatePosition)}
+            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] px-2 text-[11px] font-semibold text-[#F6E27A]/80 transition hover:bg-[#D4AF37]/10 hover:text-[#F6E27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+          >
+            <WandSparkles className="h-3.5 w-3.5" />
+            More like this
+          </button>
+        </div>
+        {dislikeReasonTarget === input.candidateId && disliked ? (
+          <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label={`Optional dislike reason for ${result.name}`}>
+            {DISLIKE_REASON_OPTIONS.map((reason) => (
+              <button
+                key={reason.id}
+                type="button"
+                onClick={() => {
+                  handleLegacyDislike(result, candidatePosition, reason.id)
+                  setDislikeReasonTarget(null)
+                }}
+                className="rounded-full border border-white/8 bg-white/[0.025] px-2.5 py-1 text-[10px] font-medium text-white/48 transition hover:border-red-200/25 hover:text-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+              >
+                {reason.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
+  const applyActiveDislikes = (base: NamingPreferenceProfile): NamingPreferenceProfile =>
+    applyCandidateDislikes(base, activeDislikedCandidatesRef.current.values())
+
+  const updateLocalPreference = (
+    candidate: GeneratedName,
+    signal: "save" | "more_like_this",
+  ) => {
+    const positiveProfile = learnFromCandidate(positivePreferenceProfileRef.current, candidate, signal)
+    positivePreferenceProfileRef.current = positiveProfile
+    setPreferenceProfile(applyActiveDislikes(positiveProfile))
+  }
+
+  const resetLocalPreferences = () => {
+    const emptyProfile = createEmptyPreferenceProfile()
+    positivePreferenceProfileRef.current = emptyProfile
+    activeDislikedCandidatesRef.current.clear()
+    setDislikedCandidateIds(new Set())
+    setPreferenceProfile(emptyProfile)
+  }
+
+  const handleExplorationSave = (candidate: GeneratedName) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    const savedDomain = Object.values(candidate.availability)
+      .map((state) => state.fullDomain)
+      .find((domain): domain is string => Boolean(domain && shortlist.includes(domain)))
+    if (savedDomain) {
+      submitNameFeedback({
+        candidateId: candidate.id,
+        candidateName: candidate.name,
+        candidateDescription: candidate.rationale,
+        candidatePosition: candidate.generationRank,
+        namingStyle: candidate.style,
+        displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+        domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+      }, "unsave")
+      toggleShortlist(savedDomain)
+      return
+    }
+    const domain = selectVerifiedAvailableDomain(candidate)
+    if (!domain) {
+      const checksPending = Object.values(candidate.availability).some((state) => state.status === "checking")
+      setAiHint(
+        checksPending
+          ? "Domain checks are still running. Save unlocks when an option is verified available."
+          : "No verified available domain was saved. You can verify a favourite directly with the registrar.",
+      )
+      return
+    }
+    toggleShortlist(domain)
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "save")
+    updateLocalPreference(candidate, "save")
+    trackEvent({
+      action: "save",
+      metadata: { source: "generator", ctaId: "candidate-save", experiment: "generator_redesign_v2" },
+    })
+  }
+
+  const handleExplorationLike = (candidate: GeneratedName) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    const isUndo = likedCandidateIds.has(candidate.id)
+    setLikedCandidateIds((current) => {
+      const next = new Set(current)
+      if (next.has(candidate.id)) next.delete(candidate.id)
+      else next.add(candidate.id)
+      return next
+    })
+    if (isUndo) {
+      removeNameFeedback(candidate.id, "like")
+      return
+    }
+    updateLocalPreference(candidate, "save")
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "like")
+  }
+
+  const handleExplorationDislike = (candidate: GeneratedName, reason?: DislikeReason | null) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    const isReasonUpdate = dislikedCandidateIds.has(candidate.id) && Boolean(reason)
+    const isUndo = dislikedCandidateIds.has(candidate.id) && !reason
+    if (isUndo) activeDislikedCandidatesRef.current.delete(candidate.id)
+    else if (!isReasonUpdate) activeDislikedCandidatesRef.current.set(candidate.id, candidate)
+    if (!isReasonUpdate) {
+      setDislikedCandidateIds((current) => {
+        const next = new Set(current)
+        if (next.has(candidate.id)) next.delete(candidate.id)
+        else next.add(candidate.id)
+        return next
+      })
+      setPreferenceProfile(applyActiveDislikes(positivePreferenceProfileRef.current))
+    }
+    if (isUndo) {
+      removeNameFeedback(candidate.id, "dislike")
+      return
+    }
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "dislike", reason || "skip")
+    if (!isUndo) {
+      trackEvent({
+        action: "dislike",
+        metadata: { source: "generator", ctaId: "candidate-dislike", experiment: "generator_redesign_v2" },
+      })
+    }
+  }
+
+  const handleExplorationMoreLikeThis = (candidate: GeneratedName) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    handleQuickStyleChange(candidate.style)
+    setQuickCreativity("exploratory")
+    updateLocalPreference(candidate, "more_like_this")
+    setAiHint("Preference saved. The next batch will lean toward this shape without copying the name.")
+    setFeedbackNotice("Next generation will lean toward this direction without copying it.")
+    window.setTimeout(() => setFeedbackNotice(null), 2800)
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "more_like_this")
+    trackEvent({
+      action: "more_like_this",
+      metadata: { source: "generator", ctaId: "candidate-more-like-this", experiment: "generator_redesign_v2" },
+    })
+  }
+
+  const handleExplorationCopy = (candidate: GeneratedName) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    copyToClipboard(preferredExplorationDomain(candidate))
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "copy")
+  }
+
+  const handleExplorationRegistrarClick = (
+    candidate: GeneratedName,
+    tld: string,
+    availability: AvailabilityState,
+  ) => {
+    setSelectedExplorationCandidateId(candidate.id)
+    submitNameFeedback({
+      candidateId: candidate.id,
+      candidateName: candidate.name,
+      candidateDescription: candidate.rationale,
+      candidatePosition: candidate.generationRank,
+      namingStyle: candidate.style,
+      displayedScores: candidate.founderSignal?.status === "ready" ? { founderSignal: candidate.founderSignal.score, ...candidate.founderSignal.breakdown } : null,
+      domainAvailabilitySnapshot: availabilitySnapshotFromCandidate(candidate),
+    }, "domain_check")
+    handleNamecheapClick(
+      availability.fullDomain || `${candidate.name.toLowerCase()}.${tld}`,
+      "generator_v2_result",
+      { tld, style: candidate.style, skipFeedback: true },
+    )
+  }
+
+  const handleRetryExplorationAvailability = async () => {
+    const token = explorationAvailabilityToken
+    const current = explorationResultsRef.current
+    if (!token || current.length === 0) {
+      setAvailabilityError("This availability session has expired. Generate a fresh batch to check domains again.")
+      return
+    }
+    const failedTlds = collectFailedAvailabilityTlds(current)
+    if (failedTlds.length === 0) {
+      setAvailabilityError(null)
+      setGenerationPhase("ready")
+      return
+    }
+
+    generationAbortRef.current?.abort()
+    const abortController = new AbortController()
+    generationAbortRef.current = abortController
+    const requestId = activeGenerationRef.current
+    const checking = markFailedAvailabilityChecking(current)
+    explorationResultsRef.current = checking
+    setExplorationResults(checking)
+    syncLegacyExplorationResults(checking)
+    setAvailabilityError(null)
+    setGenerationPhase("checking_domains")
+
+    try {
+      const availability = await requestExplorationAvailability(
+        checking,
+        failedTlds,
+        token,
+        abortController.signal,
+      )
+      finishExplorationAvailability(requestId, availability.payload, availability.failedTlds)
+    } catch (failure: unknown) {
+      if (failure instanceof DOMException && failure.name === "AbortError") return
+      failExplorationAvailability(requestId)
+    }
+  }
+
+  const handleFounderSignalBatch = async () => {
+    if (!advancedWorkflowToken || explorationResults.length === 0 || isScoringFounderSignal) {
+      setScoringError("This scoring session has expired. Generate a fresh Advanced batch and try again.")
+      return
+    }
+
+    const requestId = activeGenerationRef.current
+    scoringAbortRef.current?.abort()
+    const abortController = new AbortController()
+    scoringAbortRef.current = abortController
+    scoringInFlightRef.current = true
+    setIsScoringFounderSignal(true)
+    setGenerationPhase("scoring_founder_signal")
+    setScoringError(null)
+    trackEvent({
+      action: "founder_signal_clicked",
+      metadata: { source: "generator", ctaId: "score-advanced-batch", experiment: "generator_redesign_v2" },
+    })
+
+    try {
+      const response = await fetch("/api/founder-signal/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortController.signal,
+        body: JSON.stringify({
+          workflowToken: advancedWorkflowToken,
+          candidates: explorationResults.map((candidate) => ({ id: candidate.id, name: candidate.name })),
+          vibe: selectedVibe,
+          tld: "com",
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        if (isFounderSignalAllowanceExhaustedResponse(response.status, data)) {
+          setScoreAllowanceExhausted(true)
+        }
+        throw new Error(data.message || data.error || "Founder Signal could not score this batch")
+      }
+      if (activeGenerationRef.current !== requestId) return
+
+      const scored = mergeFounderSignal(explorationResultsRef.current, data)
+      explorationResultsRef.current = scored
+      setExplorationResults(scored)
+      syncLegacyExplorationResults(scored)
+      if (!isProUser && data.allowance?.remaining === 0) {
+        setScoreAllowanceExhausted(true)
+      }
+      trackEvent({
+        action: "batch_scored",
+        metadata: { source: "generator", experiment: "generator_redesign_v2" },
+      })
+    } catch (failure: unknown) {
+      if (failure instanceof DOMException && failure.name === "AbortError") return
+      if (activeGenerationRef.current !== requestId) return
+      setScoringError(failure instanceof Error ? failure.message : "Founder Signal could not score this batch")
+    } finally {
+      if (activeGenerationRef.current === requestId) {
+        scoringInFlightRef.current = false
+        setIsScoringFounderSignal(false)
+        setGenerationPhase("ready")
+        scoringAbortRef.current = null
+      }
+    }
+  }
+
+  const handleFounderSignalSort = () => {
+    const nextSort = !sortByFounderSignal
+    setSortByFounderSignal(nextSort)
+    const nextOrder = sortCandidatesByFounderSignal(explorationResultsRef.current, nextSort)
+    setSelectedExplorationCandidateId(nextOrder[0]?.id ?? null)
+    trackEvent({
+      action: "score_sort_used",
+      metadata: { source: "generator", ctaId: "score-sort", experiment: "generator_redesign_v2" },
+    })
+  }
+
+  const handleFounderSignalUpgrade = () => {
+    trackEvent({
+      action: "pricing_clicked",
+      metadata: { source: "generator", ctaId: "founder-signal-upgrade", experiment: "generator_redesign_v2" },
+    })
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "pricing", ctaId: "founder-signal-upgrade" },
+    })
+    router.push("/pricing?from=founder-signal-batch#plans")
   }
 
   const handleRefine = async (mode: RefinementMode) => {
@@ -1144,22 +2862,32 @@ export function GenerateNames() {
       })
 
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error ?? "Failed to refine")
+      if (!response.ok) {
+        if (response.status === 429) {
+          redirectToPricingForLimit("refine")
+          throw createPricingRedirectError()
+        }
+        throw new Error(data.error ?? "Failed to refine")
+      }
 
-      const names: string[] = data.names ?? extractDomainData(data.domains || []).names
+      const generatedData = extractDomainData(data.domains || [])
+      const names: string[] = data.names ?? generatedData.names
       if (names.length === 0) throw new Error("No names generated. Try a different refinement.")
 
-      const refined = await requestAvailability(names, undefined, abortController.signal)
+      setIsProUser(Boolean(data.isPro))
+      const refined = (await requestAvailability(names, undefined, abortController.signal, data.availabilityToken))
+        .map((result) => applyDomainInsight(result, generatedData.insights))
       // Merge: keep existing results, prepend refined ones that aren't duplicates
       const existingNames = new Set(results.map((r) => r.name))
-      const availableNames = new Set(refined.filter((r) => r.available).map((r) => r.name))
       const newResults = refined
-        .filter((r) => (availableNames.size > 0 ? availableNames.has(r.name) : true))
         .filter((r) => !existingNames.has(r.name))
       setResults((prev) => [...newResults, ...prev])
 
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200)
     } catch (e: unknown) {
+      if (e instanceof Error && e.name === "PricingRedirect") {
+        return
+      }
       if (e instanceof Error && e.name !== "AbortError") {
         setError(e.message)
       }
@@ -1169,6 +2897,10 @@ export function GenerateNames() {
   }
 
   const exportShortlist = () => {
+    if (!isProUser) {
+      redirectToCheckoutForProFeature("shortlist_export")
+      return
+    }
     const shortlistedDomains = results.filter((r) => shortlist.includes(r.fullDomain))
     if (shortlistedDomains.length === 0) return
 
@@ -1179,13 +2911,22 @@ export function GenerateNames() {
     a.href = url
     a.download = "domain-shortlist.txt"
     a.click()
+    trackEvent({
+      action: "brand_export_clicked",
+      metadata: { source: "shortlist_txt", count: shortlistedDomains.length },
+    })
   }
 
   // CSV Export functionality
   const exportToCSV = () => {
+    if (!isProUser) {
+      redirectToCheckoutForProFeature("results_csv_export")
+      return
+    }
     if (results.length === 0) return
 
     // CSV headers
+    const scoreLocked = isBulkMode && !bulkFounderSignalUnlocked
     const headers = ["Domain Name", "TLD", "Full Domain", "Available", "Score", "Pronounceable", "Memorability", "Length"]
 
     // CSV rows
@@ -1194,9 +2935,9 @@ export function GenerateNames() {
       r.tld,
       r.fullDomain,
       r.available ? "Yes" : "No",
-      r.score.toString(),
-      r.pronounceable ? "Yes" : "No",
-      r.memorability.toString(),
+      scoreLocked ? "Locked" : String(r.score ?? ""),
+      scoreLocked ? "Locked" : r.pronounceable ? "Yes" : "No",
+      scoreLocked ? "Locked" : String(r.memorability ?? ""),
       r.length.toString(),
     ])
 
@@ -1219,6 +2960,10 @@ export function GenerateNames() {
     // Show success feedback
     setCopiedName("csv-exported")
     setTimeout(() => setCopiedName(null), 2000)
+    trackEvent({
+      action: "brand_export_clicked",
+      metadata: { source: "results_csv", count: results.length },
+    })
   }
 
   // Extract keywords from description via AI
@@ -1239,7 +2984,11 @@ export function GenerateNames() {
       setKeyword(a.keywords.join(" "))
       setSelectedIndustry(a.industry)
       setSelectedVibe(a.brandVibe)
-      setMaxLength(a.maxLength)
+      const analysedMaxLength = Number(a.maxLength)
+      const minimum = isQuickMode ? quickMinimumLength : 6
+      setMaxLength(Number.isFinite(analysedMaxLength)
+        ? Math.min(15, Math.max(minimum, analysedMaxLength))
+        : Math.max(minimum, 10))
     } catch (err: unknown) {
       setExtractError(err instanceof Error ? err.message : "Could not analyze description")
     } finally {
@@ -1255,22 +3004,153 @@ export function GenerateNames() {
 
   const descriptionCharacterCount = description.length
   const activeWorkflowStats = isBulkMode
+    ? [
+        { label: "Queued", value: `${bulkCandidates.length}/50` },
+        { label: "Coverage", value: "6 TLDs" },
+        { label: "Signal", value: bulkFounderSignalUnlocked ? "Scored" : bulkFounderSignalRequested ? "Requested" : "Optional" },
+      ]
+    : isQuickMode
       ? [
-          { label: "Queued", value: `${bulkCandidates.length}/50` },
-          { label: "Coverage", value: "6 TLDs" },
-          { label: "Sort", value: bulkSortKey },
+          {
+            label: redesignEnabled ? "Access" : "Allowance",
+            value: redesignEnabled ? "Free exploration" : `${PRODUCT_OFFER.freeMonthlyUses}/month`,
+          },
+          { label: redesignEnabled ? "Batch" : "Check", value: redesignEnabled ? "16 names" : `${QUICK_GENERATE_TLDS.length} TLDs` },
+          {
+            label: redesignEnabled ? "Style" : "Vibe",
+            value: redesignEnabled
+              ? quickStyle.replace(/_/g, " ")
+              : quickVibeOptions.find((vibe) => vibe.id === quickVibe)?.label || "Friendly",
+          },
         ]
       : [
-          {
-            label: "Brief depth",
-            value: descriptionCharacterCount > 120 ? "Rich" : descriptionCharacterCount > 20 ? "Ready" : "Open",
-          },
+          redesignEnabled
+            ? {
+                label: "Access",
+                value: isProUser
+                  ? "Pro fair use"
+                  : advancedAllowanceRemaining === null
+                    ? "3 free / month"
+                    : `${advancedAllowanceRemaining} of 3 left`,
+              }
+            : {
+                label: "Brief depth",
+                value: descriptionCharacterCount > 120 ? "Rich" : descriptionCharacterCount > 20 ? "Ready" : "Open",
+              },
           { label: "Length", value: `${maxLength} chars` },
           { label: "Vibe", value: vibeOptions.find((vibe) => vibe.id === selectedVibe)?.label || "Luxury" },
         ]
 
+  const hasResultsReady = redesignEnabled && !isBulkMode
+    ? explorationResults.length > 0 && !isGenerating
+    : groupedResults.length > 0 && !isGenerating
+  const topResultGroup = topPickName
+    ? groupedResults.find((group) => group.name === topPickName)
+    : groupedResults[0]
+  const brandKitHref = topResultGroup
+    ? `/dashboard?palette=${encodeURIComponent(topResultGroup.name)}&vibe=${encodeURIComponent(isQuickMode ? quickVibe : selectedVibe || "modern")}`
+    : "/dashboard"
+  const topRegisterDomain =
+    topResultGroup?.tlds.find((result) => result.available)?.fullDomain || topResultGroup?.best.fullDomain || null
+  const topFounderScore = topResultGroup ? resultScore(topResultGroup.best) : 0
+  const topFounderBand = topFounderScore > 0 ? getFounderSignalBand(topFounderScore) : null
+  const orderedExplorationResults = useMemo(
+    () => sortCandidatesByFounderSignal(explorationResults, isAdvancedMode && sortByFounderSignal),
+    [explorationResults, isAdvancedMode, sortByFounderSignal],
+  )
+  const explorationDecisionOrder = useMemo(
+    () => orderCandidatesForDecision(
+      explorationResults,
+      isAdvancedMode && sortByFounderSignal,
+      selectedExplorationCandidateId,
+    ),
+    [explorationResults, isAdvancedMode, selectedExplorationCandidateId, sortByFounderSignal],
+  )
+  const explorationDecisionCandidate = explorationDecisionOrder[0]
+  const explorationDecisionDomain = explorationDecisionCandidate
+    ? selectVerifiedAvailableDomain(explorationDecisionCandidate)
+    : null
+  const explorationDecisionSavedDomain = explorationDecisionCandidate
+    ? Object.values(explorationDecisionCandidate.availability)
+        .map((state) => state.fullDomain)
+        .find((domain): domain is string => Boolean(domain && shortlist.includes(domain))) ?? null
+    : null
+  const explorationBrandKitHref = explorationDecisionCandidate
+    ? `/dashboard?palette=${encodeURIComponent(explorationDecisionCandidate.name)}&vibe=${encodeURIComponent(isQuickMode ? quickVibe : selectedVibe || "modern")}`
+    : "/dashboard"
+  const generatorResultsAdPosition = resolveGeneratorResultsAdPosition({
+    hasResultsReady,
+    redesignEnabled,
+    isQuickMode,
+    isProUser,
+  })
+
+  const liveStatusMessage = redesignEnabled && !isBulkMode
+    ? generationPhase === "generating_names"
+      ? "Generating candidates."
+      : generationPhase === "names_ready"
+        ? `${explorationResults.length} candidates are ready.`
+        : generationPhase === "checking_domains"
+          ? `${explorationResults.length} candidates are ready. Checking domain availability.`
+          : generationPhase === "scoring_founder_signal"
+            ? `Scoring ${explorationResults.length} candidates across Founder Signal.`
+            : generationPhase === "ready"
+              ? `${explorationResults.length} candidates are ready. Domain availability status has been updated.`
+              : ""
+    : isGenerating
+      ? "Generating and checking candidates."
+      : results.length > 0
+        ? `${groupedResults.length} candidate groups are ready.`
+        : ""
+
+  const compareExplorationResults = () => {
+    trackEvent({
+      action: "decision_action",
+      metadata: { ...journeyMetadata, decisionAction: "compare", ctaId: "generator-v2-decision-rail" },
+    })
+    if (!isProUser) {
+      redirectToCheckoutForProFeature("results_compare")
+      return
+    }
+    const comparison = explorationDecisionOrder.slice(0, 2).map((candidate) => {
+      const domain = preferredExplorationDomain(candidate)
+      const tld = Object.entries(candidate.availability).find(([, state]) => state.fullDomain === domain)?.[0] || "com"
+      return { name: candidate.name, tld }
+    })
+    if (comparison.length < 2) return
+    setBattleQueue(comparison)
+    setShowBattle(true)
+  }
+
+  useEffect(() => {
+    if (!hasResultsReady || partnerCtaSeenTrackedRef.current === generationId) return
+    partnerCtaSeenTrackedRef.current = generationId
+    trackEvent({
+      action: "partner_cta_seen",
+      metadata: {
+        source: isQuickMode ? "quick_generate_results" : "generate_results",
+        topDomain: topRegisterDomain,
+        resultCount: groupedResults.length,
+        vibe: isQuickMode ? quickVibe : selectedVibe,
+        industry: selectedIndustry,
+      },
+    })
+  }, [generationId, groupedResults.length, hasResultsReady, isQuickMode, quickVibe, selectedIndustry, selectedVibe, topRegisterDomain])
+
+  useEffect(() => {
+    if (!hasResultsReady || isProUser || proOfferSeenTrackedRef.current === generationId) return
+    proOfferSeenTrackedRef.current = generationId
+    trackEvent({
+      action: "upgrade_offer_seen",
+      metadata: {
+        source: isQuickMode ? "quick_results_decision_panel" : "advanced_results_decision_panel",
+        resultCount: groupedResults.length,
+      },
+    })
+  }, [generationId, groupedResults.length, hasResultsReady, isProUser, isQuickMode])
+
   return (
-    <div className="namolux-generate-page noise-overlay relative min-h-screen overflow-clip text-white">
+    <main id="main-content" className="namolux-generate-page noise-overlay relative min-h-screen overflow-clip text-white">
       {/* Luxury background – layered gold radial glows */}
       <div
         className="pointer-events-none absolute inset-0 hidden"
@@ -1302,30 +3182,18 @@ export function GenerateNames() {
         <div className="mb-4 flex items-center justify-between sm:mb-6 md:mb-8">
           <Link
             href="/"
+            prefetch={false}
             className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/55 transition-colors hover:border-[#D4AF37]/35 hover:text-white sm:gap-2 sm:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Back
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
-            {!isPro && (
-              <div
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-semibold shadow-[0_12px_30px_rgba(0,0,0,0.28)] sm:text-xs"
-                style={{
-                  background: tokens.remaining > 3 ? "linear-gradient(180deg, rgba(212,175,55,0.14), rgba(255,255,255,0.035))" : tokens.remaining > 0 ? "rgba(245,158,11,0.12)" : "rgba(239,68,68,0.12)",
-                  border: `1px solid ${tokens.remaining > 3 ? "rgba(212,175,55,0.25)" : tokens.remaining > 0 ? "rgba(245,158,11,0.3)" : "rgba(239,68,68,0.3)"}`,
-                  color: tokens.remaining > 3 ? "#D4AF37" : tokens.remaining > 0 ? "#f59e0b" : "#ef4444",
-                }}
-              >
-                <Zap className="h-3 w-3" />
-                {tokens.remaining} / {tokens.total} tokens
-              </div>
-            )}
             {shortlist.length > 0 && (
               <>
                 <Button variant="outline" size="sm" onClick={exportShortlist} className="h-8 gap-1.5 bg-transparent px-2 text-xs sm:h-auto sm:gap-2 sm:px-3 sm:text-sm">
-                  <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Export</span> ({shortlist.length})
+                  {isProUser ? <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                  <span className="hidden sm:inline">{isProUser ? "Export" : "Export · Pro"}</span> ({shortlist.length})
                 </Button>
                 <Button
                   variant="outline"
@@ -1348,7 +3216,7 @@ export function GenerateNames() {
             <div className="mb-5 grid gap-4 sm:mb-7 lg:grid-cols-[1fr_280px] lg:items-end">
               <div>
               <h1 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl md:text-4xl">
-                Discover a domain{" "}
+                {generatorToolsEnabled ? "Discover a domain" : "Check every name"}{" "}
                 <span
                   style={{
                     backgroundImage: "linear-gradient(90deg, #D4AF37 0%, #F6E27A 50%, #D4AF37 100%)",
@@ -1361,7 +3229,15 @@ export function GenerateNames() {
                 </span>
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-white/55 sm:text-base">
-                AI-generated names, live availability checks, and Founder Signal™ scoring in seconds.
+                {isQuickMode
+                  ? redesignEnabled
+                    ? "Sixteen creative directions first, with domain checks continuing in the background."
+                    : "Name ideas with multiple TLDs checked live."
+                  : isBulkMode
+                    ? "Paste names, check availability, and sort the strongest options."
+                    : redesignEnabled
+                      ? "Twelve creative candidates first. Run Founder Signal only when you are ready to evaluate."
+                      : "AI-generated names, live availability checks, and Founder Signal scoring in seconds."}
               </p>
               </div>
               <div
@@ -1377,10 +3253,10 @@ export function GenerateNames() {
                     <span className="absolute inline-flex h-full w-full animate-live-ping rounded-full bg-emerald-400 opacity-50" />
                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
                   </span>
-                  All systems live
+                  Workspace ready
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                  {["WHOIS", "DNS", "Signal"].map((label) => (
+                  {["DNS", "RDAP", "Signal"].map((label) => (
                     <div key={label} className="rounded-md border border-white/8 bg-black/20 px-2 py-2">
                       <div className="text-[10px] font-bold uppercase text-[#D4AF37]/75">{label}</div>
                       <div className="mt-0.5 text-[10px] text-white/35">ready</div>
@@ -1390,9 +3266,18 @@ export function GenerateNames() {
               </div>
             </div>
 
+            {journeyContextLabel ? (
+              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/[0.07] px-3 py-2 text-xs text-white/60 sm:mb-5 sm:px-4">
+                <span className="inline-flex h-2 w-2 rounded-full bg-[#D4AF37]" aria-hidden="true" />
+                <span>{journeyContextLabel}</span>
+                <span className="text-white/35">Your brief is ready to edit; generation starts only when you choose it.</span>
+              </div>
+            ) : null}
+
             <>
             <div
-              className="premium-workbench mb-6 overflow-hidden rounded-lg border p-4 backdrop-blur-xl sm:mb-8 sm:p-5 md:p-6"
+              className="premium-workbench relative mb-6 overflow-hidden rounded-lg border p-4 backdrop-blur-xl sm:mb-8 sm:p-5 md:p-6"
+              aria-busy={redesignEnabled && !isBulkMode ? isGenerating : undefined}
               style={{
                 background: "linear-gradient(145deg, rgba(22,22,18,0.88), rgba(7,8,8,0.94) 48%, rgba(4,5,6,0.96))",
                 borderColor: "rgba(212,175,55,0.2)",
@@ -1400,14 +3285,19 @@ export function GenerateNames() {
               }}
             >
               {/* Mode Toggle */}
-              <div className="mb-4 grid gap-1 rounded-lg p-1 sm:mb-5 sm:grid-cols-2" style={{ background: "rgba(255,255,255,0.045)", border: "1px solid rgba(212,175,55,0.14)" }}>
-                {[
-                  { label: "Generate", icon: Sparkles, active: !isBulkMode, onClick: () => setIsBulkMode(false) },
-                  { label: "Bulk Check", icon: LayoutGrid, active: isBulkMode, onClick: () => setIsBulkMode(true) },
-                ].map(({ label, icon: Icon, active, onClick }) => (
+              <div className={cn("mb-4 grid gap-1 rounded-lg p-1 sm:mb-5", generatorToolsEnabled && "sm:grid-cols-3")} style={{ background: "rgba(255,255,255,0.045)", border: "1px solid rgba(212,175,55,0.14)" }}>
+                {(generatorToolsEnabled
+                  ? [
+                      { label: "Quick Generate", icon: Zap, active: isQuickMode, mode: "quick" as const },
+                      { label: "Advanced Generate", icon: Sparkles, active: isAdvancedMode, mode: "advanced" as const },
+                      { label: "Bulk Check", icon: LayoutGrid, active: isBulkMode, mode: "bulk" as const },
+                    ]
+                  : [{ label: "Bulk Check + Founder Signal", icon: LayoutGrid, active: true, mode: "bulk" as const }]
+                ).map(({ label, icon: Icon, active, mode }) => (
                   <button
                     key={label}
-                    onClick={onClick}
+                    onClick={() => selectGenerateMode(mode)}
+                    aria-pressed={active}
                     className={cn(
                       "relative flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-md px-3 py-2 text-xs font-semibold transition-all sm:text-sm",
                       active ? "text-[#0A0800] shadow-[0_10px_24px_rgba(212,175,55,0.18)]" : "text-white/45 hover:bg-white/[0.035] hover:text-white/78",
@@ -1508,10 +3398,214 @@ export function GenerateNames() {
                       ))}
                     </div>
                     <div className="mt-4 h-px bg-white/8" />
-                    <div className="mt-4 flex items-center justify-between text-xs">
-                      <span className="text-white/35">Bulk scoring</span>
-                      <span className="font-semibold text-[#D4AF37]">Founder Signal</span>
+                    <label htmlFor="bulk-founder-signal" className="mt-4 flex cursor-pointer items-start gap-3 rounded-md border border-[#D4AF37]/18 bg-[#D4AF37]/[0.055] p-3">
+                      <input
+                        id="bulk-founder-signal"
+                        type="checkbox"
+                        checked={bulkFounderSignalRequested}
+                        onChange={(event) => setBulkFounderSignalRequested(event.target.checked)}
+                        className="mt-0.5 h-4 w-4 accent-[#D4AF37]"
+                      />
+                      <span>
+                        <strong className="block text-xs font-semibold text-[#D4AF37]">Add Founder Signal</strong>
+                        <span className="mt-1 block text-[10px] leading-4 text-white/38">One free scored batch each month. Pro is unlimited under fair use.</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              ) : isQuickMode ? (
+                <div className="grid gap-4">
+                  <div>
+                    <label
+                      htmlFor="quick-description"
+                      className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                      style={{ color: "rgba(212,175,55,0.55)" }}
+                    >
+                      Keywords or description
+                    </label>
+                    <textarea
+                      id="quick-description"
+                      value={description}
+                      onChange={(e) => {
+                        const val = e.target.value.slice(0, 1000)
+                        setDescription(val)
+                        setKeyword(val.trim().slice(0, 160))
+                      }}
+                      placeholder="e.g. A friendly invoicing tool for freelancers..."
+                      rows={4}
+                      className="min-h-[138px] w-full resize-none rounded-lg p-4 text-sm leading-6 text-white/90 placeholder:text-white/25 focus:outline-none"
+                      style={{
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035))",
+                        border: "1px solid rgba(255,255,255,0.105)",
+                        transition: "border-color 0.2s, box-shadow 0.2s",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(212,175,55,0.45)"
+                        e.currentTarget.style.boxShadow = "0 0 0 3px rgba(212,175,55,0.12)"
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"
+                        e.currentTarget.style.boxShadow = "none"
+                      }}
+                    />
+                    {!description.trim() ? (
+                      <div className="mt-3">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Try an example brief</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {generatorExampleBriefs.map((brief) => (
+                            <button
+                              key={brief}
+                              type="button"
+                              onClick={() => {
+                                setDescription(brief)
+                                setKeyword(brief.slice(0, 160))
+                              }}
+                              className="min-h-9 rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-left text-[11px] leading-4 text-white/48 transition hover:border-[#D4AF37]/35 hover:text-white/78"
+                            >
+                              {brief}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                    <div className="mt-2 flex items-center justify-between gap-3 text-[10px] tabular-nums text-white/25">
+                      <span>{redesignEnabled ? "Free creative exploration" : PRODUCT_OFFER.freeUsageLabel}; checks {QUICK_TLD_LABEL}.</span>
+                      <span>{descriptionCharacterCount} / 1000</span>
                     </div>
+                    {searchHistory.length > 0 && (
+                      <div className="mt-2 flex max-w-full flex-wrap items-center gap-1.5">
+                        <span className="flex shrink-0 items-center gap-1 text-[10px] text-white/25">
+                          <Clock className="h-2.5 w-2.5" /> Recent:
+                        </span>
+                        {searchHistory.slice(0, 3).map((term) => (
+                          <button
+                            key={term}
+                            onClick={() => { setKeyword(term); setDescription(term) }}
+                            className="max-w-[120px] truncate rounded-full px-2 py-0.5 text-[10px] text-white/35 transition-colors hover:text-white/70"
+                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
+                          >
+                            {term}
+                          </button>
+                        ))}
+                        {aiHint && (
+                          <span className="ml-auto text-[11px] text-[#D4AF37]/60 animate-fade-up">{aiHint}</span>
+                        )}
+                      </div>
+                    )}
+                    {!searchHistory.length && aiHint && (
+                      <p className="mt-1.5 text-[11px] text-[#D4AF37]/60 animate-fade-up">{aiHint}</p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-[1fr_220px]">
+                    <div>
+                      <label
+                        htmlFor="quick-rhyme"
+                        className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                        style={{ color: "rgba(255,255,255,0.35)" }}
+                      >
+                        Rhyme or sound like
+                      </label>
+                      <input
+                        id="quick-rhyme"
+                        value={quickRhymeWith}
+                        onChange={(e) => setQuickRhymeWith(e.target.value.slice(0, 80))}
+                        placeholder="Optional, e.g. Spotify or Uber Eats"
+                        className="h-12 w-full rounded-lg px-4 text-sm text-white/85 placeholder:text-white/25 focus:outline-none"
+                        style={{
+                          background: "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
+                          border: "1px solid rgba(255,255,255,0.09)",
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        className="mb-2 block text-[10px] font-bold uppercase tracking-widest"
+                        style={{ color: "rgba(255,255,255,0.35)" }}
+                      >
+                        Max chars - <span style={{ color: "#D4AF37" }}>{maxLength}</span>
+                      </label>
+                      <div className="flex h-12 items-center gap-3 rounded-lg px-4" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))", border: "1px solid rgba(255,255,255,0.09)" }}>
+                        <input
+                          type="range"
+                          aria-label="Maximum quick-generate name length"
+                          aria-describedby={quickStyle === "non_english" ? "quick-max-length-help" : undefined}
+                          min={quickMinimumLength}
+                          max={15}
+                          value={maxLength}
+                          onChange={(e) => setMaxLength(Math.max(quickMinimumLength, Number(e.target.value)))}
+                          className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
+                          style={{ background: "rgba(255,255,255,0.08)" }}
+                        />
+                        <span className="w-6 shrink-0 text-center text-sm font-bold" style={{ color: "#D4AF37" }}>{maxLength}</span>
+                      </div>
+                      {quickStyle === "non_english" ? (
+                        <p id="quick-max-length-help" className="mt-1.5 text-[10px] leading-4 text-white/38">
+                          Reviewed French (Québec) and Welsh forms need 12–15 characters.
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <fieldset>
+                    <legend
+                      className="mb-2.5 block text-[10px] font-bold uppercase tracking-widest"
+                      style={{ color: "rgba(255,255,255,0.35)" }}
+                    >
+                      Vibe
+                    </legend>
+                    <div className="flex flex-wrap gap-2">
+                      {quickVibeOptions.map((vibe) => (
+                        <button
+                          key={vibe.id}
+                          type="button"
+                          aria-pressed={quickVibe === vibe.id}
+                          onClick={() => setQuickVibe(vibe.id)}
+                          className={cn(
+                            "min-h-[36px] rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4",
+                            quickVibe === vibe.id
+                              ? "text-black shadow-[0_10px_24px_rgba(212,175,55,0.22)] hover:-translate-y-0.5"
+                              : "text-white/45 hover:text-white/80 hover:-translate-y-0.5",
+                          )}
+                          style={quickVibe === vibe.id ? {
+                            background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                          } : {
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.07)",
+                          }}
+                        >
+                          {vibe.label}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  {redesignEnabled ? (
+                    <QuickExplorationControls
+                      style={quickStyle}
+                      creativity={quickCreativity}
+                      blacklist={quickBlacklist}
+                      preferences={preferenceProfile}
+                      onStyleChange={handleQuickStyleChange}
+                      onCreativityChange={setQuickCreativity}
+                      onBlacklistChange={setQuickBlacklist}
+                      onResetPreferences={resetLocalPreferences}
+                    />
+                  ) : null}
+
+                  <div className="grid gap-2 border-t border-white/8 pt-4 sm:grid-cols-4">
+                    {[
+                      { label: redesignEnabled ? "Access" : "Allowance", value: redesignEnabled ? "Free" : `${PRODUCT_OFFER.freeMonthlyUses} uses / month` },
+                      { label: "Method", value: redesignEnabled ? "16 creative candidates" : "AI + quality filters" },
+                      { label: "Check", value: "Google DNS + RDAP" },
+                      { label: "Register", value: "Namecheap links" },
+                    ].map((item) => (
+                      <div key={item.label} className="rounded-lg border border-white/7 bg-black/18 px-3 py-3">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]/55">{item.label}</div>
+                        <div className="mt-1 truncate text-xs text-white/55">{item.value}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ) : (
@@ -1653,7 +3747,8 @@ export function GenerateNames() {
                   <div className="flex h-12 items-center gap-3 rounded-lg px-4" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))", border: "1px solid rgba(255,255,255,0.09)" }}>
                     <input
                       type="range"
-                      min={5}
+                      aria-label="Maximum advanced-generate name length"
+                      min={6}
                       max={15}
                       value={maxLength}
                       onChange={(e) => setMaxLength(Number(e.target.value))}
@@ -1666,17 +3761,19 @@ export function GenerateNames() {
               </div>
 
               {/* ── BRAND VIBE ── */}
-              <div className="mt-4">
-                <label
+              <fieldset className="mt-4">
+                <legend
                   className="mb-2.5 block text-[10px] font-bold uppercase tracking-widest"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
                   Brand Vibe
-                </label>
+                </legend>
                 <div className="flex flex-wrap gap-2">
                   {vibeOptions.map((vibe) => (
                     <button
                       key={vibe.id}
+                      type="button"
+                      aria-pressed={selectedVibe === vibe.id}
                       onClick={() => setSelectedVibe(vibe.id)}
                       className={cn(
                         "min-h-[36px] rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4",
@@ -1695,12 +3792,12 @@ export function GenerateNames() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
               <div className="mt-5 grid gap-2 border-t border-white/8 pt-4 sm:grid-cols-4">
                 {[
-                  { label: "Live availability", value: "WHOIS + DNS" },
-                  { label: "Founder Signal", value: "Quality model" },
+                  { label: "Live availability", value: "DNS + RDAP" },
+                  { label: "Founder Signal", value: redesignEnabled ? "Run when ready" : "Quality model" },
                   { label: "TLD sweep", value: ALL_TLDS.map((tld) => `.${tld}`).join(" ") },
                   { label: "Shortlist", value: `${shortlist.length} saved` },
                 ].map((item) => (
@@ -1713,15 +3810,18 @@ export function GenerateNames() {
 
               {AUTO_FIND_UI_ENABLED && (
               <div className="mt-3 rounded-lg border border-border/40 bg-background/40 p-3 sm:mt-5 sm:rounded-xl sm:p-4">
-                <label className="flex cursor-pointer items-start gap-3">
+                <label className={cn("flex items-start gap-3", isProUser ? "cursor-pointer" : "cursor-not-allowed opacity-70")}>
                   <input
                     type="checkbox"
                     checked={autoFindComMode}
                     onChange={(e) => setAutoFindComMode(e.target.checked)}
+                    disabled={!isProUser}
                     className="mt-0.5 h-4 w-4 rounded border-border bg-background accent-primary"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-foreground">Auto-find premium domains across all TLDs</span>
+                    <span className="block text-sm font-medium text-foreground">
+                      Auto-find premium domains across all TLDs{isProUser ? "" : " · Pro"}
+                    </span>
                     <span className="mt-1 block text-xs text-muted-foreground">
                       We only show premium names (score &gt;= 80). If fewer are found, we won't show low-quality results.
                     </span>
@@ -1895,7 +3995,8 @@ export function GenerateNames() {
 
               {/* Generate / Bulk Check Button */}
               <button
-                onClick={isBulkMode ? handleBulkCheck : handleGenerate}
+                ref={generateButtonRef}
+                onClick={isBulkMode ? handleBulkCheck : isQuickMode ? handleQuickGenerate : handleGenerate}
                 disabled={isBulkMode ? (!bulkInput.trim() || isGenerating) : ((!keyword.trim() && !description.trim()) || isGenerating)}
                 className={cn(
                   "mt-5 h-[52px] w-full rounded-lg text-sm font-bold tracking-wide transition-all duration-200 sm:mt-7 sm:h-14 sm:text-base",
@@ -1914,12 +4015,17 @@ export function GenerateNames() {
                 {isGenerating ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin sm:h-5 sm:w-5" />
-                    {isBulkMode ? "Checking…" : "Generating…"}
+                    {isBulkMode ? "Checking..." : isQuickMode ? "Generating free names..." : "Generating..."}
                   </>
                 ) : isBulkMode ? (
                   <>
                     <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
                     Check Domains
+                  </>
+                ) : isQuickMode ? (
+                  <>
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Generate candidates
                   </>
                 ) : (
                   <>
@@ -1929,10 +4035,16 @@ export function GenerateNames() {
                 )}
               </button>
 
+              {feedbackNotice ? (
+                <p className="mt-3 rounded-lg border border-[#D4AF37]/18 bg-[#D4AF37]/[0.055] px-3 py-2 text-center text-xs text-[#F6E27A]/75" role="status" aria-live="polite">
+                  {feedbackNotice}
+                </p>
+              ) : null}
+
               {/* Cinematic loading steps */}
-              {isGenerating && (
-                <div className="mt-4 flex flex-col items-center gap-1.5">
-                  {LOADING_STEPS.map((step, i) => (
+              {isGenerating && !(redesignEnabled && !isBulkMode) && (
+                <div className="mt-4 flex flex-col items-center gap-1.5" role="status" aria-live="polite">
+                  {(isQuickMode ? QUICK_LOADING_STEPS : LOADING_STEPS).map((step, i) => (
                     <div
                       key={step}
                       className={cn(
@@ -1953,17 +4065,56 @@ export function GenerateNames() {
                       {step}
                     </div>
                   ))}
+                  <button
+                    type="button"
+                    onClick={stopAutoFindSearch}
+                    className="mt-2 inline-flex min-h-11 items-center justify-center rounded-md border border-white/15 px-4 text-xs font-semibold text-white/62 transition hover:border-white/30 hover:text-white"
+                  >
+                    Cancel
+                  </button>
                 </div>
               )}
 
+              {redesignEnabled && !isBulkMode && isGenerating && generationPhase === "generating_names" ? (
+                <GenerationSplash
+                  mode={isQuickMode ? "quick" : "advanced"}
+                  phase={generationPhase}
+                  brief={(description.trim() || keyword.trim()).slice(0, 240)}
+                  style={isQuickMode ? quickStyle : "auto"}
+                  creativity={isQuickMode ? quickCreativity : "balanced"}
+                  maxLength={maxLength}
+                  previousBatchCount={previousBatchCount}
+                  onCancel={stopAutoFindSearch}
+                />
+              ) : null}
+
               {/* Error Message */}
               {error && (
-                <div className="mt-4 flex items-center gap-2 rounded-xl p-4 text-red-400"
+                <div role="alert" className="mt-4 flex flex-wrap items-center gap-2 rounded-xl p-4 text-red-400"
                   style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <p className="text-xs sm:text-sm">{error}</p>
+                  <p className="min-w-0 flex-1 text-xs sm:text-sm">{error}</p>
+                  <button
+                    type="button"
+                    onClick={generationUpgradeHref
+                      ? () => router.push(generationUpgradeHref)
+                    : isBulkMode
+                        ? results.length > 0 && bulkFounderSignalRequested
+                          ? () => { void scoreBulkResults(results) }
+                          : handleBulkCheck
+                        : isQuickMode
+                          ? handleQuickGenerate
+                          : handleGenerate}
+                    className="min-h-10 rounded-md border border-red-300/30 px-3 text-xs font-semibold text-red-100 hover:bg-red-300/10"
+                  >
+                    {generationUpgradeHref ? "View Pro" : "Retry"}
+                  </button>
                 </div>
               )}
+
+              <p className="sr-only" aria-live="polite" aria-atomic="true">
+                {liveStatusMessage}
+              </p>
 
               {/* Quick category pills — shown when no input yet and not generating */}
               {!isBulkMode && !description.trim() && !isGenerating && (
@@ -1990,7 +4141,7 @@ export function GenerateNames() {
               )}
             </div>
 
-            {AUTO_FIND_UI_ENABLED && autoFindComMode && !isBulkMode && (isAutoFindingComs || availableComPicks.length > 0 || autoFindStatus) && (
+            {AUTO_FIND_UI_ENABLED && autoFindComMode && isAdvancedMode && (isAutoFindingComs || availableComPicks.length > 0 || autoFindStatus) && (
               <div className="mb-4 rounded-xl border border-border/40 bg-card/60 p-3 sm:mb-6 sm:rounded-2xl sm:p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -2034,24 +4185,13 @@ export function GenerateNames() {
                         whyItWorks: result.whyItWorks,
                         meaningBreakdown: result.meaningBreakdown,
                         meaningScore: result.meaningScore,
-                        brandableScore: result.brandableScore ?? result.score,
+                        brandableScore: result.brandableScore ?? resultScore(result),
                         pronounceable: result.pronounceable,
                         available: result.available,
                       })
 
-                      // Freemium blur logic: premium domains (score >= 75) are blurred for free users
-                      const isPremiumDomain = result.score >= PREMIUM_SCORE_THRESHOLD
-                      const isRevealed = result.fullDomain === revealedPremiumDomain
-                      const canReveal = isPremiumDomain && !isPro && revealedPremiumDomain === null
-                      const isBlurred = isPremiumDomain && !isPro && !isRevealed
-                      const showUpgradeCTA = isPremiumDomain && !isPro && revealedPremiumDomain !== null && !isRevealed
-
-                      // Handle click to reveal premium domain
-                      const handleRevealClick = () => {
-                        if (canReveal) {
-                          setRevealedPremiumDomain(result.fullDomain)
-                        }
-                      }
+                      const isPremiumDomain = resultScore(result) >= PREMIUM_SCORE_THRESHOLD
+                      const isBlurred = false
 
                       return (
                         <div
@@ -2062,7 +4202,6 @@ export function GenerateNames() {
                               ? "border-amber-500/30 bg-amber-500/5 cursor-pointer hover:border-amber-400/50"
                               : "border-green-500/20 bg-green-500/5"
                           )}
-                          onClick={canReveal ? handleRevealClick : undefined}
                         >
                           {/* Premium badge for high-scoring domains */}
                           {isPremiumDomain && (
@@ -2071,48 +4210,27 @@ export function GenerateNames() {
                             </div>
                           )}
 
-                          {/* Blur overlay for locked premium domains */}
-                          {isBlurred && (
-                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
-                              {canReveal ? (
-                                <>
-                                  <div className="mb-2 rounded-full bg-amber-500/20 p-2">
-                                    <Eye className="h-5 w-5 text-amber-400" />
-                                  </div>
-                                  <p className="text-sm font-medium text-amber-400">Click to Reveal</p>
-                                  <p className="mt-1 text-[11px] text-muted-foreground">Score: {result.score}/100</p>
-                                  <p className="mt-0.5 text-[10px] text-amber-500/80">1 free reveal available</p>
-                                </>
-                              ) : showUpgradeCTA ? (
-                                <>
-                                  <div className="mb-2 rounded-full bg-primary/20 p-2">
-                                    <Lock className="h-5 w-5 text-primary" />
-                                  </div>
-                                  <p className="text-sm font-medium text-foreground">Premium Domain</p>
-                                  <p className="mt-1 text-[11px] text-muted-foreground">Score: {result.score}/100</p>
-                                  <a
-                                    href="/pricing"
-                                    className="mt-2 rounded-full bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    Unlock All Premium
-                                  </a>
-                                </>
-                              ) : null}
-                            </div>
-                          )}
-
                           <div className={cn("flex items-start justify-between gap-2", isBlurred && "select-none")}>
                             <div className="min-w-0">
                               <p className={cn("truncate font-display text-base font-semibold tracking-tight text-foreground", isBlurred && "blur-sm")}>{resultCardView.title}</p>
                               <p className={cn("mt-1 text-xs text-muted-foreground", isBlurred && "blur-sm")}>
-                                Score {result.score} | {result.pronounceable ? "Pronounceable" : "Brandable"}
+                                {resultScore(result)} · {getFounderSignalBand(resultScore(result))} | {result.pronounceable ? "Pronounceable" : "Brandable"}
                               </p>
                               <p className={cn("mt-1 text-[11px] text-muted-foreground", isBlurred && "blur-sm")}>{resultCardView.whyItWorks}</p>
                               <p className={cn("mt-1 text-[11px] text-primary/90", isBlurred && "blur-sm")}>{resultCardView.meaningBreakdown}</p>
                               {result.whyTag && (
                                 <p className={cn("mt-1 text-[11px] text-primary/90", isBlurred && "blur-sm")}>
                                   {result.whyTag}
+                                </p>
+                              )}
+                              {result.personalDescription && (
+                                <p className={cn("mt-2 text-[11px] leading-relaxed text-muted-foreground", isBlurred && "blur-sm")}>
+                                  {result.personalDescription}
+                                </p>
+                              )}
+                              {result.slogan && (
+                                <p className={cn("mt-1 text-[11px] font-semibold text-primary", isBlurred && "blur-sm")}>
+                                  Slogan: {result.slogan}
                                 </p>
                               )}
                               <div className={cn("mt-1.5 flex flex-wrap gap-1.5", isBlurred && "blur-sm")}>
@@ -2181,14 +4299,17 @@ export function GenerateNames() {
                               )}
                             </button>
                             <a
-                              href={namecheapLink(result.fullDomain)}
+                              href={namecheapLink(result.fullDomain, { source: "top_pick", content: result.fullDomain })}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="ml-auto flex items-center gap-1 rounded-md bg-pink-500/15 px-2 py-1 text-[11px] font-medium text-pink-400 transition-colors hover:bg-pink-500/25"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleNamecheapClick(result.fullDomain, "top_pick", { score: resultScore(result) })
+                              }}
                             >
                               <ExternalLink className="h-3 w-3" />
-                              Buy
+                              Register
                             </a>
                           </div>
                         </div>
@@ -2302,14 +4423,146 @@ export function GenerateNames() {
             )}
 
             {/* Results */}
-            {results.length > 0 && (
-              <div ref={resultsRef} className="min-w-0 scroll-mt-4">
+            {(results.length > 0 || (redesignEnabled && explorationResults.length > 0)) && (
+              <div ref={resultsRef} tabIndex={-1} className="min-w-0 scroll-mt-4 outline-none">
+                {redesignEnabled && !isBulkMode ? (
+                  <>
+                    {isQuickMode && quickGenerationShortfall ? (
+                      <div
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className="mb-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.07] px-4 py-3 text-amber-50"
+                      >
+                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-200">
+                          Partial style batch · {quickGenerationShortfall.resultCount} of {quickGenerationShortfall.requestedCount} names
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-amber-50/75 sm:text-sm">
+                          {quickGenerationShortfall.reason}
+                        </p>
+                      </div>
+                    ) : null}
+                    <GeneratorExplorationResults
+                      mode={isQuickMode ? "quick" : "advanced"}
+                      candidates={orderedExplorationResults}
+                      phase={isScoringFounderSignal ? "scoring_founder_signal" : generationPhase}
+                      isPro={isProUser}
+                      shortlist={shortlist}
+                      dislikedIds={dislikedCandidateIds}
+                      likedIds={likedCandidateIds}
+                      copiedValue={copiedName}
+                      selectedCandidateId={selectedExplorationCandidateId}
+                      scoreAllowanceExhausted={scoreAllowanceExhausted}
+                      scoringError={scoringError}
+                      availabilityError={availabilityError}
+                      sortByScore={sortByFounderSignal}
+                      onSave={handleExplorationSave}
+                      onLike={handleExplorationLike}
+                      onDislike={handleExplorationDislike}
+                      onMoreLikeThis={handleExplorationMoreLikeThis}
+                      onCopy={handleExplorationCopy}
+                      onSelectCandidate={(candidate) => setSelectedExplorationCandidateId(candidate.id)}
+                      onRegistrarClick={handleExplorationRegistrarClick}
+                      onRetryAvailability={handleRetryExplorationAvailability}
+                      onRunFounderSignal={handleFounderSignalBatch}
+                      onToggleSort={handleFounderSignalSort}
+                      onUpgradeScoring={handleFounderSignalUpgrade}
+                    />
+
+                    {generatorResultsAdPosition === "inline_after_quick_results" ? (
+                      <>
+                        <AdBanner placement="generator-after-results" className="mt-7" />
+                        <p className="mx-auto mt-5 max-w-2xl text-center text-xs leading-5 text-white/36">
+                          Domain checks are advisory until registration. Save only a verified option, or keep exploring before choosing your next step.
+                        </p>
+                      </>
+                    ) : null}
+
+                    {explorationDecisionCandidate ? (
+                      <section
+                        aria-label="Shortlist decision actions"
+                        className="sticky bottom-3 z-20 mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#090909]/95 p-3 shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-4"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="mr-auto min-w-full text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]/70 sm:min-w-0">
+                            Next actions for <span className="text-[#F6E27A]">{explorationDecisionCandidate.name}</span>
+                          </p>
+                          <button
+                            type="button"
+                            disabled={!explorationDecisionSavedDomain && !explorationDecisionDomain}
+                            onClick={() => handleExplorationSave(explorationDecisionCandidate)}
+                            title={!explorationDecisionSavedDomain && !explorationDecisionDomain
+                              ? "Save unlocks when a domain is verified available"
+                              : undefined}
+                            className={cn(
+                              "inline-flex min-h-10 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold",
+                              !explorationDecisionSavedDomain && !explorationDecisionDomain
+                                ? "cursor-not-allowed border-white/6 text-white/25"
+                                : "border-white/10 text-white/65 hover:text-white",
+                            )}
+                          >
+                            {explorationDecisionSavedDomain ? <BookmarkCheck className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}
+                            {explorationDecisionSavedDomain
+                              ? `Saved ${explorationDecisionCandidate.name}`
+                              : explorationDecisionDomain
+                                ? `Save ${explorationDecisionCandidate.name}`
+                                : `Checking ${explorationDecisionCandidate.name}…`}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={compareExplorationResults}
+                            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-white/10 px-3 text-xs font-semibold text-white/65 hover:text-white"
+                          >
+                            {isProUser ? <Swords className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                            {isProUser ? "Compare two" : "Compare two · Pro"}
+                          </button>
+                          {explorationDecisionDomain ? (
+                            <a
+                              href={namecheapLink(explorationDecisionDomain, { source: "generator_v2_decision_rail" })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => handleNamecheapClick(explorationDecisionDomain, "generator_v2_decision_rail")}
+                              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-emerald-300/20 bg-emerald-300/[0.06] px-3 text-xs font-semibold text-emerald-200/80 hover:text-emerald-100"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" /> Check / register
+                            </a>
+                          ) : null}
+                          {isProUser ? (
+                            <Link
+                              href={explorationBrandKitHref}
+                              onClick={() => handleLaunchKitStarted("generator_v2_decision_rail", explorationDecisionCandidate.name)}
+                              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[#D4AF37] px-3 text-xs font-bold text-black"
+                            >
+                              <Palette className="h-3.5 w-3.5" /> Brand tools
+                            </Link>
+                          ) : (
+                            <Link
+                              href={attributedCheckoutHref}
+                              onClick={handleResultsUpgradeClick}
+                              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[#D4AF37] px-3 text-xs font-bold text-black"
+                            >
+                              <Sparkles className="h-3.5 w-3.5" /> View Pro
+                            </Link>
+                          )}
+                        </div>
+                        {!isQuickMode && isProUser && explorationDecisionCandidate.founderSignal?.status === "ready" ? (
+                          <NameStressTest
+                            name={explorationDecisionCandidate.name}
+                            founderScore={explorationDecisionCandidate.founderSignal.score ?? undefined}
+                          />
+                        ) : null}
+                      </section>
+                    ) : null}
+                  </>
+                ) : (
+                <>
                 {/* Results summary strip */}
                 {(() => {
                   const allNames = Array.from(new Map(results.map(r => [r.name, r])).values())
-                  const comFreeCount = results.filter(r => r.tld === "com" && r.available).length
-                  const anyFreeCount = results.filter(r => r.available).length
-                  const topScore = results.reduce((m, r) => Math.max(m, r.score), 0)
+                  const comFreeCount = results.filter(r => r.tld === "com" && r.checkStatus === "available").length
+                  const likelyFreeCount = results.filter(r => r.checkStatus === "likely_available").length
+                  const topScore = results.reduce((m, r) => Math.max(m, resultScore(r)), 0)
+                  const showTopScore = !isQuickMode && founderSignalUnlockedForCurrentMode
                   return (
                     <div
                       className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl px-4 py-2.5"
@@ -2322,14 +4575,18 @@ export function GenerateNames() {
                           {comFreeCount} .com free
                         </span>
                       )}
-                      {anyFreeCount > comFreeCount && (
+                      {likelyFreeCount > 0 && (
                         <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(52,211,153,0.7)" }}>
                           <span className="h-1.5 w-1.5 rounded-full" style={{ background: "rgba(52,211,153,0.7)" }} />
-                          {anyFreeCount} any TLD free
+                          {likelyFreeCount} likely free · confirm with registrar
                         </span>
                       )}
                       <span className="ml-auto text-xs" style={{ color: "#D4AF37" }}>
-                        Top score: {topScore}
+                        {isQuickMode
+                          ? `${QUICK_GENERATE_TLDS.length} TLDs checked`
+                          : showTopScore
+                            ? `Top score: ${topScore}`
+                            : "Founder Signal locked"}
                       </span>
                     </div>
                   )
@@ -2341,24 +4598,26 @@ export function GenerateNames() {
                   </h2>
                   <div className="flex items-center justify-between gap-2 sm:gap-4">
                     {/* CSV Export Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={exportToCSV}
-                      className="flex h-8 min-h-0 items-center gap-1.5 px-2 text-xs sm:h-10 sm:min-h-[40px] sm:gap-2 sm:px-3"
-                    >
-                      {copiedName === "csv-exported" ? (
-                        <>
-                          <CheckCircle className="h-3.5 w-3.5 text-green-400 sm:h-4 sm:w-4" />
-                          <span className="hidden sm:inline">Exported!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                          <span className="hidden sm:inline">Export CSV</span>
-                        </>
-                      )}
-                    </Button>
+                    {!isQuickMode && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={exportToCSV}
+                        className="flex h-8 min-h-0 items-center gap-1.5 px-2 text-xs sm:h-10 sm:min-h-[40px] sm:gap-2 sm:px-3"
+                      >
+                        {copiedName === "csv-exported" ? (
+                          <>
+                            <CheckCircle className="h-3.5 w-3.5 text-green-400 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Exported!</span>
+                          </>
+                        ) : (
+                          <>
+                            {isProUser ? <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                            <span className="hidden sm:inline">{isProUser ? "Export CSV" : "Export · Pro"}</span>
+                          </>
+                        )}
+                      </Button>
+                    )}
                     <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground sm:gap-2 sm:text-sm">
                       <span className="flex items-center gap-1" title="Confirmed unregistered via RDAP">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-500 sm:h-2 sm:w-2" />
@@ -2377,6 +4636,7 @@ export function GenerateNames() {
                 </div>
 
                 {/* Filter Bar */}
+                {!isQuickMode && (
                 <div className="-mx-3 mb-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-2 scrollbar-hide sm:mx-0 sm:mb-4 sm:gap-2 sm:px-0">
                   <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground sm:text-sm">
                     <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -2423,7 +4683,10 @@ export function GenerateNames() {
                   </button>
                 </div>
 
+                )}
+
                 {/* Advanced filters — min score, include/exclude words */}
+                {!isQuickMode && (
                 <div className="mb-3">
                   <button
                     onClick={() => setShowAdvancedFilters((p) => !p)}
@@ -2445,26 +4708,37 @@ export function GenerateNames() {
                       style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
                     >
                       {/* Min Founder Signal score */}
-                      <div>
-                        <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(212,175,55,0.6)" }}>
-                          Min Score {minScore > 0 ? `(≥ ${minScore})` : "(off)"}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="range"
-                            min={0}
-                            max={90}
-                            step={5}
-                            value={minScore}
-                            onChange={(e) => setMinScore(Number(e.target.value))}
-                            className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
-                            style={{ background: "rgba(255,255,255,0.08)" }}
-                          />
-                          <span className="w-7 shrink-0 text-center text-[11px] font-bold" style={{ color: minScore > 0 ? "#D4AF37" : "rgba(255,255,255,0.3)" }}>
-                            {minScore || "—"}
-                          </span>
+                      {canUseScoreControls ? (
+                        <div>
+                          <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(212,175,55,0.6)" }}>
+                            Min Score {minScore > 0 ? `(≥ ${minScore})` : "(off)"}
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range"
+                              aria-label="Minimum Founder Signal score"
+                              min={0}
+                              max={90}
+                              step={5}
+                              value={minScore}
+                              onChange={(e) => setMinScore(Number(e.target.value))}
+                              className="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#D4AF37]"
+                              style={{ background: "rgba(255,255,255,0.08)" }}
+                            />
+                            <span className="w-7 shrink-0 text-center text-[11px] font-bold" style={{ color: minScore > 0 ? "#D4AF37" : "rgba(255,255,255,0.3)" }}>
+                              {minScore || "—"}
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="rounded-lg border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-3 py-2">
+                          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-[#D4AF37]">
+                            <Lock className="h-3 w-3" />
+                            Founder Signal filter locked
+                          </div>
+                          <p className="mt-1 text-[11px] text-white/35">Upgrade to filter bulk checks by brand score.</p>
+                        </div>
+                      )}
 
                       {/* Include word */}
                       <div>
@@ -2516,8 +4790,10 @@ export function GenerateNames() {
                   )}
                 </div>
 
+                )}
+
                 {/* Deep Search for .com — only shown in keyword-driven mode */}
-                {!isBulkMode && (
+                {isAdvancedMode && founderSignalUnlockedForCurrentMode && !redesignEnabled && (
                   <DeepSearch
                     key={generationId}
                     keyword={keyword}
@@ -2531,7 +4807,10 @@ export function GenerateNames() {
                 {isBulkMode && groupedResults.length > 1 && (
                   <div className="mb-3 flex items-center gap-2">
                     <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>Sort:</span>
-                    {(["score", "length", "availability"] as const).map((key) => (
+                    {(canUseScoreControls
+                      ? (["score", "length", "availability"] as const)
+                      : (["length", "availability"] as const)
+                    ).map((key) => (
                       <button
                         key={key}
                         onClick={() => setBulkSortKey(key)}
@@ -2552,19 +4831,292 @@ export function GenerateNames() {
                   </div>
                 )}
 
+                {hasResultsReady && !(redesignEnabled && !isBulkMode) && (
+                  <div
+                    className="mb-4 rounded-2xl p-4 sm:p-5"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(212,175,55,0.12), rgba(255,255,255,0.035) 44%, rgba(5,5,5,0.72))",
+                      border: "1px solid rgba(212,175,55,0.24)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: "rgba(212,175,55,0.78)" }}>
+                          {isQuickMode
+                            ? "Top brief-fit recommendation"
+                            : founderSignalUnlockedForCurrentMode
+                              ? "Top Founder Signal recommendation"
+                              : "Top available recommendation"}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2.5">
+                          <h3 className="truncate font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                            {topResultGroup?.name}
+                          </h3>
+                          {isQuickMode ? (
+                            <span className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-2.5 py-1 text-[11px] font-bold text-[#F6E27A]">
+                              Brief-fit lead
+                            </span>
+                          ) : founderSignalUnlockedForCurrentMode && topFounderBand ? (
+                            <span
+                              aria-label={`Founder Signal score ${topFounderScore} out of 100, ${topFounderBand}`}
+                              className="rounded-full border px-2.5 py-1 text-[11px] font-bold tabular-nums"
+                              style={{
+                                background: "rgba(212,175,55,0.1)",
+                                borderColor: "rgba(212,175,55,0.28)",
+                                color: "#F6E27A",
+                              }}
+                            >
+                              {topFounderScore}/100 · {topFounderBand}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[11px] font-semibold text-white/45">
+                              <Lock className="h-3 w-3" />
+                              Founder Signal locked
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 max-w-2xl text-xs leading-relaxed text-white/45 sm:text-sm">
+                          {isQuickMode && topResultGroup?.best.personality
+                            ? topResultGroup.best.personality
+                            : topRegisterDomain
+                              ? generatorToolsEnabled
+                                ? `${topRegisterDomain} leads this batch. Save it, build its brand palette, or verify its current status with the registrar.`
+                                : `${topRegisterDomain} leads this batch. Save it or verify its current status with the registrar.`
+                              : generatorToolsEnabled
+                                ? "This name leads the current shortlist. Save it or build its brand palette before choosing your next step."
+                                : "This name leads the current shortlist. Save it while you review the rest of the batch."}
+                        </p>
+                      </div>
+                      <div
+                        className={cn(
+                          "grid gap-2 sm:grid-cols-2",
+                          generatorToolsEnabled ? "lg:min-w-[560px] lg:grid-cols-4" : "lg:min-w-[360px]",
+                        )}
+                      >
+                        <button
+                          type="button"
+                          onClick={saveBestResultToShortlist}
+                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 text-sm font-semibold text-white/78 transition-all hover:-translate-y-0.5 hover:border-[#D4AF37]/35 hover:text-white"
+                        >
+                          <Bookmark className="h-4 w-4" />
+                          Save shortlist
+                        </button>
+                        {generatorToolsEnabled ? (
+                          <button
+                            type="button"
+                            onClick={compareTopResults}
+                            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 text-sm font-semibold text-white/78 transition-all hover:-translate-y-0.5 hover:border-[#D4AF37]/35 hover:text-white"
+                          >
+                            {isProUser ? <Swords className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                            {isProUser ? "Compare" : "Compare · Pro"}
+                          </button>
+                        ) : null}
+                        {generatorToolsEnabled ? (
+                          <Link
+                            href={isProUser ? brandKitHref : "/pricing?from=generate-results&feature=brand-palette#plans"}
+                            onClick={() => handleLaunchKitStarted("generate_results_action_row", topResultGroup?.name)}
+                            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 py-2 text-sm font-semibold text-[#F6E27A] transition-all hover:-translate-y-0.5 hover:bg-[#D4AF37]/15"
+                          >
+                            <Palette className="h-4 w-4" />
+                            {isProUser ? "Brand palette" : "Unlock palette"}
+                          </Link>
+                        ) : null}
+                        {topRegisterDomain ? (
+                          <a
+                            href={namecheapLink(topRegisterDomain, { source: "generate_results_action_row", content: "top_domain" })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => handleNamecheapClick(topRegisterDomain, "generate_results_action_row", { name: topResultGroup?.name })}
+                            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-[#0a0800] transition-all hover:-translate-y-0.5"
+                            style={{
+                              background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                              boxShadow: "0 14px 30px rgba(212,175,55,0.2)",
+                            }}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Register top pick
+                          </a>
+                        ) : generatorToolsEnabled ? (
+                          <Link
+                            href={brandKitHref}
+                            onClick={() => handleLaunchKitStarted("generate_results_action_row_no_available", topResultGroup?.name)}
+                            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-[#0a0800] transition-all hover:-translate-y-0.5"
+                            style={{
+                              background: "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)",
+                              boxShadow: "0 14px 30px rgba(212,175,55,0.2)",
+                            }}
+                          >
+                            <Sparkles className="h-4 w-4" />
+                            Open brand palette
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-white/38">
+                      <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                        {PRODUCT_OFFER.freeUsageLabel}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1">
+                        Domain availability checked live
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-2.5">
                   {(isBulkMode
                     ? [...groupedResults].sort((a, b) => {
-                        if (bulkSortKey === "score") return b.best.score - a.best.score
+                        if (bulkSortKey === "score" && canUseScoreControls) return resultScore(b.best) - resultScore(a.best)
                         if (bulkSortKey === "length") return a.name.length - b.name.length
-                        // availability: available first, then by score
+                        // availability: available first, then by score when unlocked
                         if (a.hasAvailable !== b.hasAvailable) return a.hasAvailable ? -1 : 1
-                        return b.best.score - a.best.score
+                        return canUseScoreControls ? resultScore(b.best) - resultScore(a.best) : a.name.localeCompare(b.name)
                       })
                     : groupedResults
                   ).map(({ name, tlds, best, hasAvailable }, index) => {
                     const isTopPick = name === topPickName
                     const availableTlds = tlds.filter((r) => r.available)
+                    if (isQuickMode) {
+                      const registerHref = best.registerUrl || namecheapLink(best.fullDomain, { source: "quick_generate_result", content: best.tld })
+                      return (
+                        <div
+                          key={name}
+                          className={cn(
+                            "group rounded-2xl transition-all duration-200",
+                            "animate-fade-up opacity-0",
+                            "hover:-translate-y-0.5 hover:shadow-[0_16px_48px_rgba(0,0,0,0.45)]",
+                            !hasAvailable && "opacity-70",
+                          )}
+                          style={{
+                            background: hasAvailable ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.025)",
+                            border: hasAvailable ? "1px solid rgba(212,175,55,0.16)" : "1px solid rgba(255,255,255,0.07)",
+                            animationDelay: `${Math.min(index * 0.02, 0.5)}s`,
+                            animationFillMode: "forwards",
+                          }}
+                        >
+                          <div className="p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-3">
+                                  <span
+                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                                    style={{
+                                      background: hasAvailable ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.05)",
+                                      border: hasAvailable ? "1px solid rgba(52,211,153,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                                      color: hasAvailable ? "#34d399" : "rgba(255,255,255,0.3)",
+                                    }}
+                                  >
+                                    {hasAvailable ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <div className="truncate font-display text-lg font-semibold tracking-tight text-white sm:text-xl">{name}</div>
+                                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                      {tlds.map((r) => (
+                                        <DomainStatusChip
+                                          key={r.tld}
+                                          tld={r.tld}
+                                          status={r.checkStatus}
+                                          available={r.available}
+                                          href={r.registerUrl || namecheapLink(r.fullDomain, { source: "quick_generate_tld_badge", content: r.tld })}
+                                          onClick={() => handleNamecheapClick(r.fullDomain, "quick_generate_tld_badge", { tld: r.tld, name })}
+                                        />
+                                      ))}
+                                      <span className="text-[10px] text-white/25">
+                                        Best: .{best.tld} ({best.availabilityConfidence || "low"} confidence)
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex shrink-0 items-center gap-1.5">
+                                <button
+                                  onClick={() => {
+                                    copyToClipboard(best.fullDomain)
+                                    submitNameFeedback(legacyFeedbackInput(best, index + 1), "copy")
+                                  }}
+                                  className="flex h-11 w-11 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                  style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
+                                  title="Copy domain"
+                                  aria-label={`Copy ${best.fullDomain}`}
+                                >
+                                  {copiedName === best.fullDomain ? (
+                                    <CheckCircle className="h-4 w-4 text-emerald-400" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    submitNameFeedback(legacyFeedbackInput(best, index + 1), shortlist.includes(best.fullDomain) ? "unsave" : "save")
+                                    toggleShortlist(best.fullDomain)
+                                  }}
+                                  className="flex h-11 w-11 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                  style={{
+                                    background: shortlist.includes(best.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
+                                    color: shortlist.includes(best.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
+                                  }}
+                                  title={shortlist.includes(best.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                                  aria-label={shortlist.includes(best.fullDomain) ? `Remove ${best.fullDomain} from shortlist` : `Add ${best.fullDomain} to shortlist`}
+                                >
+                                  {shortlist.includes(best.fullDomain) ? (
+                                    <BookmarkCheck className="h-4 w-4" />
+                                  ) : (
+                                    <Bookmark className="h-4 w-4" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+
+                            {best.personality && (
+                              <div
+                                className="mt-3 rounded-xl px-3 py-3 sm:px-4"
+                                style={{
+                                  background: "linear-gradient(135deg, rgba(212,175,55,0.075), rgba(255,255,255,0.025))",
+                                  border: "1px solid rgba(212,175,55,0.12)",
+                                }}
+                              >
+                                <div className="mb-1 flex items-center gap-1.5">
+                                  <Lightbulb className="h-3 w-3 shrink-0" style={{ color: "#D4AF37" }} />
+                               <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#D4AF37" }}>
+                                     Why it fits your brief
+                                  </span>
+                                </div>
+                                <p className="text-[12px] leading-relaxed text-white/62">{best.personality}</p>
+                              </div>
+                            )}
+
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              <a
+                                href={registerHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() =>
+                                  handleNamecheapClick(best.fullDomain, "quick_generate_result_button", {
+                                    name,
+                                    status: best.checkStatus,
+                                  })
+                                }
+                                className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
+                                style={{
+                                  background: hasAvailable
+                                    ? "linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)"
+                                    : "rgba(255,255,255,0.055)",
+                                  color: hasAvailable ? "#0a0800" : "rgba(255,255,255,0.52)",
+                                  border: hasAvailable ? "none" : "1px solid rgba(255,255,255,0.08)",
+                                  boxShadow: hasAvailable ? "0 4px 20px rgba(212,175,55,0.25)" : undefined,
+                                }}
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                {hasAvailable ? `Verify .${best.tld} at registrar` : "Check with registrar"}
+                              </a>
+                            </div>
+                            {renderLegacyFeedbackControls(best, index + 1)}
+                          </div>
+                        </div>
+                      )
+                    }
                     return (
                       <div
                         key={name}
@@ -2586,7 +5138,7 @@ export function GenerateNames() {
                           animationFillMode: "forwards",
                         }}
                       >
-                        {/* Founder Favourite banner */}
+                        {/* Recommendation banner */}
                         {isTopPick && (
                           <div
                             className="flex items-center gap-2 rounded-t-2xl px-4 py-2"
@@ -2594,9 +5146,11 @@ export function GenerateNames() {
                           >
                             <span className="text-sm">⭐</span>
                             <span className="text-[11px] font-bold tracking-wide" style={{ color: "#D4AF37" }}>
-                              Founder Favourite
+                              {founderSignalUnlockedForCurrentMode ? "Founder Favourite" : "Top available recommendation"}
                             </span>
-                            <span className="text-[10px] text-white/30">— highest Founder Signal™ in this batch</span>
+                            <span className="text-[10px] text-white/30">
+                              {founderSignalUnlockedForCurrentMode ? "— highest Founder Signal™ in this batch" : "— first quality-ordered available name"}
+                            </span>
                           </div>
                         )}
 
@@ -2621,56 +5175,30 @@ export function GenerateNames() {
 
                               {/* TLD badges — green (verified) or emerald (likely free) if available, gray + strikethrough if taken */}
                               <div className="ml-11 flex flex-wrap gap-1.5">
-                                {tlds.map((r) =>
-                                  r.available ? (
-                                    <a
-                                      key={r.tld}
-                                      href={namecheapLink(r.fullDomain)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold transition-all hover:-translate-y-0.5 sm:text-xs"
-                                      style={r.checkStatus === "likely_available" ? {
-                                        background: "rgba(16,185,129,0.08)",
-                                        color: "#6ee7b7",
-                                        border: "1px solid rgba(16,185,129,0.18)",
-                                      } : {
-                                        background: "rgba(52,211,153,0.1)",
-                                        color: "#34d399",
-                                        border: "1px solid rgba(52,211,153,0.2)",
-                                      }}
-                                      title={r.checkStatus === "available"
-                                        ? `Confirmed free via RDAP - buy ${r.fullDomain} on Namecheap`
-                                        : r.checkStatus === "likely_available"
-                                        ? `DNS says available - buy ${r.fullDomain} on Namecheap`
-                                        : `Buy ${r.fullDomain} on Namecheap`}
-                                    >
-                                      .{r.tld} {r.checkStatus === "likely_available" ? "~" : "✓"}
-                                    </a>
-                                  ) : (
-                                    <span
-                                      key={r.tld}
-                                      className="rounded-md px-1.5 py-0.5 text-[10px] font-semibold sm:text-xs"
-                                      style={{
-                                        background: "rgba(255,255,255,0.03)",
-                                        color: "rgba(255,255,255,0.18)",
-                                        border: "1px solid rgba(255,255,255,0.05)",
-                                        textDecoration: "line-through",
-                                      }}
-                                    >
-                                      .{r.tld}
-                                    </span>
-                                  )
-                                )}
+                                {tlds.map((r) => (
+                                  <DomainStatusChip
+                                    key={r.tld}
+                                    tld={r.tld}
+                                    status={r.checkStatus}
+                                    available={r.available}
+                                    href={namecheapLink(r.fullDomain, { source: "result_tld_badge", content: r.tld })}
+                                    onClick={() => handleNamecheapClick(r.fullDomain, "result_tld_badge", { tld: r.tld, name })}
+                                  />
+                                ))}
                               </div>
                             </div>
 
                             {/* Copy + Bookmark */}
                             <div className="flex shrink-0 items-center gap-1.5">
                               <button
-                                onClick={() => copyToClipboard(best.fullDomain)}
-                                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                  onClick={() => {
+                                    copyToClipboard(best.fullDomain)
+                                    submitNameFeedback(legacyFeedbackInput(best, index + 1), "copy")
+                                  }}
+                                className="flex h-11 w-11 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
                                 style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
                                 title="Copy best domain"
+                                aria-label={`Copy ${best.fullDomain}`}
                               >
                                 {copiedName === best.fullDomain ? (
                                   <CheckCircle className="h-4 w-4 text-emerald-400" />
@@ -2679,13 +5207,17 @@ export function GenerateNames() {
                                 )}
                               </button>
                               <button
-                                onClick={() => toggleShortlist(best.fullDomain)}
-                                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+                                onClick={() => {
+                                  submitNameFeedback(legacyFeedbackInput(best, index + 1), shortlist.includes(best.fullDomain) ? "unsave" : "save")
+                                  toggleShortlist(best.fullDomain)
+                                }}
+                                className="flex h-11 w-11 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
                                 style={{
                                   background: shortlist.includes(best.fullDomain) ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.06)",
                                   color: shortlist.includes(best.fullDomain) ? "#D4AF37" : "rgba(255,255,255,0.5)",
                                 }}
                                 title={shortlist.includes(best.fullDomain) ? "Remove from shortlist" : "Add to shortlist"}
+                                aria-label={shortlist.includes(best.fullDomain) ? `Remove ${best.fullDomain} from shortlist` : `Add ${best.fullDomain} to shortlist`}
                               >
                                 {shortlist.includes(best.fullDomain) ? (
                                   <BookmarkCheck className="h-4 w-4" />
@@ -2697,27 +5229,43 @@ export function GenerateNames() {
                           </div>
 
                           {/* Name Meaning — shown once per name */}
-                          {best.meaning && (
+                          {(best.personalDescription || best.styleRationale || best.slogan || best.meaning) && (
                             <div
-                              className="mt-3 rounded-lg px-3 py-2.5"
-                              style={{ background: "rgba(255,255,255,0.025)", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+                              className="mt-3 rounded-xl px-3 py-3 sm:px-4"
+                              style={{
+                                background: "linear-gradient(135deg, rgba(212,175,55,0.08), rgba(255,255,255,0.025))",
+                                border: "1px solid rgba(212,175,55,0.12)",
+                              }}
                             >
                               <div className="mb-1 flex items-center gap-1.5">
                                 <Lightbulb className="h-3 w-3 shrink-0" style={{ color: "#D4AF37" }} />
                                 <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#D4AF37" }}>
-                                  Name Origin
+                                  Why this fits your brief
                                 </span>
                               </div>
-                              <p className="text-[11px] leading-relaxed text-white/45">{best.meaning}</p>
+                              <p className="text-[12px] leading-relaxed text-white/62">{best.personalDescription || best.meaning}</p>
+                              {best.styleRationale && (
+                                <p className="mt-2 text-[11px] leading-relaxed text-white/45">
+                                  {best.styleRationale}
+                                </p>
+                              )}
+                              {best.slogan && (
+                                <div
+                                  className="mt-3 rounded-lg px-3 py-2 text-[12px] font-semibold"
+                                  style={{ background: "rgba(0,0,0,0.22)", color: "#F6E27A", border: "1px solid rgba(212,175,55,0.16)" }}
+                                >
+                                  Slogan: {best.slogan}
+                                </div>
+                              )}
                             </div>
                           )}
 
                           {/* Founder Signal Panel — shown once per name */}
-                          <FounderSignalPanel
-                            name={best.name}
-                            tld={best.tld}
-                            vibe={selectedVibe as "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""}
-                          />
+                          {founderSignalUnlockedForCurrentMode && typeof best.score === "number" ? (
+                            <FounderSignalPanel signal={best.founderSignal ?? { score: best.score }} />
+                          ) : (
+                            <LockedFounderSignalCard />
+                          )}
 
                           {/* Register buttons — curated fallback framing */}
                           {hasAvailable && (() => {
@@ -2734,12 +5282,12 @@ export function GenerateNames() {
                                     <span className="text-[10px] font-semibold" style={{ color: "#60a5fa" }}>
                                       Best available: {bestTld.fullDomain}
                                     </span>
-                                    {bestTld.score > 0 && (
+                                    {founderSignalUnlockedForCurrentMode && resultScore(bestTld) > 0 && (
                                       <span
                                         className="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
                                         style={{ background: "rgba(96,165,250,0.12)", color: "#60a5fa" }}
                                       >
-                                        Score {bestTld.score}
+                                        {resultScore(bestTld)} · {getFounderSignalBand(resultScore(bestTld))}
                                       </span>
                                     )}
                                   </div>
@@ -2748,9 +5296,16 @@ export function GenerateNames() {
                                   {availableTlds.map((r, i) => (
                                     <a
                                       key={r.tld}
-                                      href={namecheapLink(r.fullDomain)}
+                                      href={namecheapLink(r.fullDomain, { source: isTopPick ? "top_pick_register_button" : "result_register_button", content: r.tld })}
                                       target="_blank"
                                       rel="noopener noreferrer"
+                                      onClick={() =>
+                                        handleNamecheapClick(
+                                          r.fullDomain,
+                                          isTopPick ? "top_pick_register_button" : "result_register_button",
+                                          { tld: r.tld, name, rank: i + 1 },
+                                        )
+                                      }
                                       className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5"
                                       style={{
                                         background:
@@ -2781,7 +5336,7 @@ export function GenerateNames() {
                                       }}
                                     >
                                       <ExternalLink className="h-3.5 w-3.5" />
-                                      Namecheap .{r.tld}
+                                      Verify .{r.tld} at registrar
                                     </a>
                                   ))}
                                   {availableTlds.length === 1 && comAvailable && (
@@ -2793,16 +5348,19 @@ export function GenerateNames() {
                           })()}
 
                           {/* Metrics */}
-                          <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
-                            <span>Memorability: {best.memorability}</span>
-                            {best.pronounceable && (
-                              <span className="flex items-center gap-1 text-emerald-400/80">
-                                <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
-                              </span>
-                            )}
-                          </div>
+                          {founderSignalUnlockedForCurrentMode && (
+                            <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] text-white/30 sm:gap-3 sm:text-xs">
+                              <span>Memorability: {best.memorability ?? "—"}</span>
+                              {best.pronounceable && (
+                                <span className="flex items-center gap-1 text-emerald-400/80">
+                                  <CheckCircle className="h-3 w-3" /> <span className="hidden sm:inline">Pronounceable</span>
+                                </span>
+                              )}
+                            </div>
+                          )}
 
-                          {/* SEO Micro-Signal & Action Bar */}
+                          {/* Secondary analysis and creative tools stay inside the generator lab. */}
+                          {generatorToolsEnabled ? (
                           <div className="mt-1.5 flex flex-wrap items-center gap-2">
                             {(() => {
                               const signal = getSeoMicroSignal(name)
@@ -2855,7 +5413,7 @@ export function GenerateNames() {
                               Names Like
                             </button>
                             {/* Battle */}
-                            <button
+                            {founderSignalUnlockedForCurrentMode ? <button
                               onClick={() => {
                                 const entry = { name, tld: best.tld }
                                 setBattleQueue((q) => {
@@ -2885,39 +5443,91 @@ export function GenerateNames() {
                             >
                               <Swords className="h-2.5 w-2.5" />
                               {battleQueue.some((e) => e.name === name) ? "In Battle" : "Battle"}
-                            </button>
+                            </button> : (
+                              <button
+                                type="button"
+                                onClick={() => redirectToCheckoutForProFeature("name_battle")}
+                                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
+                                style={{ background: "rgba(212,175,55,0.08)", color: "rgba(212,175,55,0.72)" }}
+                                title="Unlock side-by-side name comparison with Pro"
+                              >
+                                <Lock className="h-2.5 w-2.5" />
+                                Compare · Pro
+                              </button>
+                            )}
                             {/* Brand Palette — link to Brand Studio */}
                             <a
-                              href={`/dashboard?palette=${encodeURIComponent(name)}&vibe=${encodeURIComponent(selectedVibe || "modern")}`}
+                              href={isProUser
+                                ? `/dashboard?palette=${encodeURIComponent(name)}&vibe=${encodeURIComponent(isQuickMode ? quickVibe : selectedVibe || "modern")}`
+                                : attributedCheckoutHref}
+                              onClick={() => handleLaunchKitStarted("result_palette_link", name)}
                               className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all hover:opacity-80"
                               style={{ background: "rgba(212,175,55,0.1)", color: "#D4AF37" }}
                               title="Generate a brand colour palette for this name"
                             >
-                              <Palette className="h-2.5 w-2.5" />
-                              Palette
+                              {isProUser ? <Palette className="h-2.5 w-2.5" /> : <Lock className="h-2.5 w-2.5" />}
+                              {isProUser ? "Palette" : "Palette · Pro"}
                             </a>
                           </div>
+                          ) : null}
 
-                          {/* Brand Palette — user picks brand type, gets 3 palette variants */}
-                          <BrandPalette
-                            initialName={name}
-                            initialKeywords={keyword}
-                            initialVibe={selectedVibe}
-                            lockName
-                          />
+                          {generatorToolsEnabled ? renderLegacyFeedbackControls(best, index + 1) : null}
 
                           {/* Stress Test */}
-                          <NameStressTest name={name} founderScore={best.score} />
+                          {generatorToolsEnabled && founderSignalUnlockedForCurrentMode ? (
+                            <NameStressTest name={name} founderScore={resultScore(best)} />
+                          ) : null}
                         </div>
                       </div>
                     )
                   })}
                 </div>
+                </>
+                )}
               </div>
             )}
 
+            {generatorResultsAdPosition === "after_results" ? (
+              <AdBanner
+                placement={isQuickMode ? "generator-after-results" : "founder-result-after-primary"}
+                className="mt-6"
+              />
+            ) : null}
+
+            {hasResultsReady && !isProUser && !redesignEnabled ? (
+              <section
+                aria-labelledby="results-pro-heading"
+                className="mt-6 overflow-hidden rounded-2xl border border-[#D4AF37]/20 bg-[linear-gradient(135deg,rgba(212,175,55,0.11),rgba(255,255,255,0.025)_52%,rgba(5,5,5,0.72))] p-5 sm:p-6"
+              >
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="max-w-2xl">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#D4AF37]/75">Turn the list into a decision</p>
+                    <h3 id="results-pro-heading" className="mt-2 font-display text-xl font-semibold text-white sm:text-2xl">
+                      See which name is strongest, not just available.
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-white/52">
+                      {generatorToolsEnabled
+                        ? "Pro unlocks unlimited fair-use bulk checks and Founder Signal scoring, plus complete ranking, comparison, stress-test and export tools in an ad-free workspace."
+                        : "Pro unlocks unlimited fair-use bulk checks and Founder Signal scoring in an ad-free workspace."}
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <Link
+                      href={attributedCheckoutHref}
+                      onClick={handleResultsUpgradeClick}
+                      className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#D4AF37,#F6E27A,#D4AF37)] px-5 py-3 text-sm font-bold text-[#0a0800] shadow-[0_14px_35px_rgba(212,175,55,0.2)] transition-transform hover:-translate-y-0.5"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Upgrade for {PRODUCT_OFFER.paidPrice}/month
+                    </Link>
+                    <p className="mt-2 text-center text-[10px] text-white/30">Cancel through the billing portal.</p>
+                  </div>
+                </div>
+              </section>
+            ) : null}
+
             {/* ── Refine Results — keyword-driven generation only ── */}
-            {results.length > 0 && !isGenerating && !isBulkMode && (
+            {results.length > 0 && !isGenerating && isAdvancedMode && !redesignEnabled && (
               <RefineResults
                 onRefine={handleRefine}
                 isRefining={isRefining}
@@ -2926,7 +5536,7 @@ export function GenerateNames() {
             )}
 
             {/* Social Handle Checker */}
-            {results.length > 0 && (
+            {generatorToolsEnabled && SOCIAL_HANDLE_CHECK_ENABLED && results.length > 0 && !isQuickMode && (
               <div
                 className="mt-6 rounded-2xl p-5 backdrop-blur-xl sm:mt-8 sm:p-6"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
@@ -3009,7 +5619,7 @@ export function GenerateNames() {
             )}
 
             {/* Skeleton loading cards — shown while generating with no results yet */}
-            {isGenerating && results.length === 0 && (
+            {isGenerating && results.length === 0 && !(redesignEnabled && !isBulkMode) && (
               <div className="space-y-2.5" aria-label="Loading results…">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <div
@@ -3056,11 +5666,21 @@ export function GenerateNames() {
                     boxShadow: "0 0 40px rgba(212,175,55,0.15)",
                   }}
                 >
-                  <Sparkles className="h-7 w-7 text-[#D4AF37] sm:h-9 sm:w-9" />
+                  {isQuickMode ? (
+                    <Zap className="h-7 w-7 text-[#D4AF37] sm:h-9 sm:w-9" />
+                  ) : (
+                    <Sparkles className="h-7 w-7 text-[#D4AF37] sm:h-9 sm:w-9" />
+                  )}
                 </div>
                 <h3 className="text-base font-semibold text-white sm:text-xl">Your results will appear here</h3>
                 <p className="mt-2 max-w-[260px] text-xs text-white/40 sm:max-w-sm sm:text-sm">
-                  Enter a keyword above and let AI surface brandable domains with live availability and Founder Signal™ scores.
+                  {isQuickMode
+                    ? redesignEnabled
+                      ? "Describe the business to explore 16 free creative directions with domain checks that never block the names."
+                      : "Enter keywords above to generate free multi-TLD ideas with live availability and Namecheap links."
+                    : redesignEnabled
+                      ? "Build a 12-name creative shortlist, then run Founder Signal only when you want decision support."
+                      : "Enter a keyword above and let AI surface brandable domains with live availability and Founder Signal scores."}
                 </p>
                 {/* Sample keyword pills */}
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -3068,7 +5688,7 @@ export function GenerateNames() {
                   {SAMPLE_KEYWORDS.map((kw) => (
                     <button
                       key={kw}
-                      onClick={() => setKeyword(kw)}
+                      onClick={() => { setKeyword(kw); setDescription(kw) }}
                       className="rounded-full px-3 py-1.5 text-xs font-medium text-[#D4AF37]/80 transition-all hover:text-[#D4AF37] hover:-translate-y-0.5"
                       style={{ background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)" }}
                     >
@@ -3112,14 +5732,15 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={namecheapLink(fullDomain)}
+                          href={namecheapLink(fullDomain, { source: "shortlist_sidebar", content: fullDomain })}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => handleNamecheapClick(fullDomain, "shortlist_sidebar")}
                           className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold transition-all hover:-translate-y-0.5"
                           style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
                         >
                           <ExternalLink className="h-3 w-3" />
-                          Buy
+                          Register
                         </a>
                         <button
                           onClick={() => toggleShortlist(fullDomain)}
@@ -3135,8 +5756,8 @@ export function GenerateNames() {
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-white/50 transition-all hover:text-white/80"
                     style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
-                    <Download className="h-4 w-4" />
-                    Export List
+                    {isProUser ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                    {isProUser ? "Export List" : "Export List · Pro"}
                   </button>
                 </div>
               ) : (
@@ -3151,20 +5772,27 @@ export function GenerateNames() {
               className="mt-4 rounded-2xl p-5"
               style={{ background: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.12)" }}
             >
-              <h4 className="mb-3 text-sm font-semibold text-[#D4AF37]">Founder Signal™ Tips</h4>
+              <h4 className="mb-3 text-sm font-semibold text-[#D4AF37]">
+                {isQuickMode ? "Quick Generate Tips" : "Founder Signal Tips"}
+              </h4>
               <ul className="space-y-2.5 text-sm text-white/40">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
-                  Shorter names score higher for memorability
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
-                  Avoid hyphens and numbers
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
-                  .com scores highest for trust signals
-                </li>
+                {(isQuickMode
+                  ? [
+                      "Use 2-4 specific words for sharper names",
+                      "Add a rhyme reference when you want a familiar sound",
+                      "Use Advanced Generate for scoring and more TLDs",
+                    ]
+                  : [
+                      "Shorter names score higher for memorability",
+                      "Avoid hyphens and numbers",
+                      ".com scores highest for trust signals",
+                    ]
+                ).map((tip) => (
+                  <li key={tip} className="flex items-start gap-2">
+                    <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D4AF37]/60" />
+                    {tip}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -3210,14 +5838,15 @@ export function GenerateNames() {
                       <span className="truncate text-sm font-medium text-white/80">{fullDomain}</span>
                       <div className="flex items-center gap-1.5">
                         <a
-                          href={namecheapLink(fullDomain)}
+                          href={namecheapLink(fullDomain, { source: "mobile_shortlist", content: fullDomain })}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => handleNamecheapClick(fullDomain, "mobile_shortlist")}
                           className="flex min-h-[40px] items-center gap-1 rounded-lg px-3 text-xs font-semibold"
                           style={{ background: "rgba(212,175,55,0.12)", color: "#D4AF37", border: "1px solid rgba(212,175,55,0.2)" }}
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
-                          Buy
+                          Register
                         </a>
                         <button
                           onClick={() => toggleShortlist(fullDomain)}
@@ -3233,8 +5862,8 @@ export function GenerateNames() {
                     className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium text-white/50 transition-all hover:text-white/80"
                     style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
-                    <Download className="h-4 w-4" />
-                    Export List
+                    {isProUser ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                    {isProUser ? "Export List" : "Export List · Pro"}
                   </button>
                 </div>
               ) : (
@@ -3248,7 +5877,7 @@ export function GenerateNames() {
       </div>
 
       {/* SEO Potential Check Modal */}
-      {seoCheckDomain && (
+      {generatorToolsEnabled && seoCheckDomain && (
         <SeoPotentialCheck
           domainName={seoCheckDomain.name}
           tld={seoCheckDomain.tld}
@@ -3260,7 +5889,7 @@ export function GenerateNames() {
       {/* ── Creativity Feature Modals ─────────────────────────────────── */}
 
       {/* Name Battle */}
-      {showBattle && battleQueue.length === 2 && (
+      {generatorToolsEnabled && founderSignalUnlockedForCurrentMode && showBattle && battleQueue.length === 2 && (
         <NameBattleDialog
           names={battleQueue}
           onClose={() => { setShowBattle(false); setBattleQueue([]) }}
@@ -3268,7 +5897,7 @@ export function GenerateNames() {
       )}
 
       {/* Names Like */}
-      {namesLikeTarget !== null && (
+      {generatorToolsEnabled && namesLikeTarget !== null && (
         <NamesLikeSearch
           defaultInspiration={namesLikeTarget}
           onClose={() => setNamesLikeTarget(null)}
@@ -3286,6 +5915,6 @@ export function GenerateNames() {
           onClose={() => setShowSavedBoard(false)}
         />
       )}
-    </div>
+    </main>
   )
 }

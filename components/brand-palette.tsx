@@ -290,7 +290,7 @@ export function BrandPalette({
       })
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || `Error ${res.status}`)
+        throw new Error(data.message || data.error || `Error ${res.status}`)
       }
       const data: PaletteResult = await res.json()
       setPalette(data)
@@ -315,7 +315,7 @@ export function BrandPalette({
 
   return (
     <div
-      className="overflow-hidden rounded-2xl"
+      className="min-w-0 overflow-hidden rounded-2xl"
       style={{
         border: "1px solid rgba(212,175,55,0.22)",
         background: "rgba(255,255,255,0.025)",
@@ -343,21 +343,21 @@ export function BrandPalette({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="truncate text-sm font-bold text-white sm:text-base">Your Brand Identity</span>
+              <span className="truncate text-sm font-bold text-white sm:text-base">Access Brand Identity</span>
             </div>
             <p className="mt-0.5 truncate text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
               {hasPalette ? (
                 <>
-                  Colour identity for{" "}
+                  Brand identity preview for{" "}
                   <span style={{ color: "#D4AF37" }}>{brandName}</span>
                 </>
               ) : lockName ? (
                 <>
-                  Pick a brand type to generate 3 palettes for{" "}
+                  Pick a brand type to unlock identity directions for{" "}
                   <span style={{ color: "#D4AF37" }}>{brandName}</span>
                 </>
               ) : (
-                "AI-crafted colour palette for your brand"
+                "Paid brand palette generator"
               )}
             </p>
           </div>
@@ -550,7 +550,7 @@ export function BrandPalette({
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />
-                Create Brand Colours
+                Create Brand Identity
               </>
             )}
           </button>
@@ -605,10 +605,10 @@ export function BrandPalette({
 
       {/* ── Palette results ── */}
       {hasPalette && palette && activePalette && (
-        <div className="p-6 space-y-5">
+        <div className="flex flex-col gap-4 p-3 sm:gap-5 sm:p-6">
           {/* Variant selector — only shown when the API returned multiple */}
           {hasVariants && variants.length > 1 && (
-            <div>
+            <div className="order-1">
               <div className="mb-2.5 flex items-center justify-between">
                 <p
                   className="text-[10px] font-bold uppercase tracking-widest"
@@ -622,7 +622,7 @@ export function BrandPalette({
                   </p>
                 )}
               </div>
-              <div className="grid gap-2 sm:grid-cols-3">
+              <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0">
                 {variants.map((variant, idx) => {
                   const isActive = idx === activeVariantIndex
                   const bg = isValidHex(variant.palette.background.hex) ? variant.palette.background.hex : "#111"
@@ -635,7 +635,8 @@ export function BrandPalette({
                     <button
                       key={`${variant.name}-${idx}`}
                       onClick={() => setActiveVariantIndex(idx)}
-                      className="group relative overflow-hidden rounded-xl text-left transition-all hover:-translate-y-0.5"
+                      aria-pressed={isActive}
+                      className="group relative w-[84%] shrink-0 snap-start overflow-hidden rounded-xl text-left transition-all hover:-translate-y-0.5 sm:w-auto"
                       style={{
                         border: isActive
                           ? "1px solid rgba(212,175,55,0.55)"
@@ -677,7 +678,7 @@ export function BrandPalette({
           )}
 
           {/* Brand Preview */}
-          <div>
+          <div className="order-3 sm:order-2">
             <p
               className="mb-2.5 text-[10px] font-bold uppercase tracking-widest"
               style={{ color: "rgba(255,255,255,0.2)" }}
@@ -688,7 +689,7 @@ export function BrandPalette({
           </div>
 
           {/* Swatch grid */}
-          <div>
+          <div className="order-4 sm:order-3">
             <p
               className="mb-2.5 text-[10px] font-bold uppercase tracking-widest"
               style={{ color: "rgba(255,255,255,0.2)" }}
@@ -708,7 +709,7 @@ export function BrandPalette({
           {/* Designer's note — variant-specific insight when available */}
           {(activeVariant?.usageInsight || palette.rationale) && (
             <div
-              className="rounded-xl px-5 py-4 text-xs leading-relaxed"
+              className="order-5 rounded-xl px-4 py-3.5 text-xs leading-relaxed sm:order-4 sm:px-5 sm:py-4"
               style={{
                 background: "rgba(212,175,55,0.04)",
                 border: "1px solid rgba(212,175,55,0.12)",
@@ -728,7 +729,7 @@ export function BrandPalette({
 
           {/* Hex quick-copy strip */}
           <div
-            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-4 py-3"
+            className="order-6 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-4 py-3 sm:order-5"
             style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
           >
             {COLOUR_ROLES.map(({ key }) => {
@@ -753,14 +754,16 @@ export function BrandPalette({
           </div>
 
           {/* Native launch sandbox */}
-          <BrandLaunchSandbox
-            brandName={brandName}
-            keywords={keywords}
-            vibe={vibe}
-            brandType={brandType}
-            variantName={activeVariant?.name}
-            palette={activePalette}
-          />
+          <div className="order-2 min-w-0 sm:order-6">
+            <BrandLaunchSandbox
+              brandName={brandName}
+              keywords={keywords}
+              vibe={vibe}
+              brandType={brandType}
+              variantName={activeVariant?.name}
+              palette={activePalette}
+            />
+          </div>
         </div>
       )}
     </div>

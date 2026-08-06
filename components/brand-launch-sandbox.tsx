@@ -15,6 +15,7 @@ import {
   Tags,
 } from "lucide-react"
 import { StitchPrompt } from "@/components/stitch-prompt"
+import { trackEvent } from "@/lib/analytics"
 
 type TemplateId =
   | "saas"
@@ -27,6 +28,13 @@ type TemplateId =
   | "mobile"
 type DeviceId = "mobile" | "desktop"
 type ViewId = "landing" | "dashboard" | "product" | "pricing"
+
+const MOBILE_VIEWPORT_WIDTH = 390
+const MOBILE_IFRAME_HEIGHT = 720
+const MOBILE_FRAME_BORDER = 5
+const MOBILE_CHROME_HEIGHT = 37
+const MOBILE_FRAME_WIDTH = MOBILE_VIEWPORT_WIDTH + MOBILE_FRAME_BORDER * 2
+const MOBILE_FRAME_HEIGHT = MOBILE_IFRAME_HEIGHT + MOBILE_CHROME_HEIGHT + MOBILE_FRAME_BORDER * 2
 
 interface PaletteColour {
   hex: string
@@ -616,7 +624,8 @@ function cssForTemplate(template: TemplateConfig, tokens: ReturnType<typeof norm
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; overflow-x: hidden; }
+  html, body { margin: 0; min-height: 100%; overflow-x: hidden; scrollbar-width: none; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
   body {
     background:
       radial-gradient(circle at 84% -8%, ${rgba(tokens.primary, 0.2)}, transparent 30%),
@@ -937,6 +946,36 @@ function cssForTemplate(template: TemplateConfig, tokens: ReturnType<typeof norm
     .chart { height: 132px; }
     .big-number { font-size: 38px; }
   }
+
+  @media (max-width: 420px) {
+    .nav { gap: 10px; padding: 13px 14px; }
+    .mark { gap: 9px; }
+    .logo { height: 30px; width: 30px; }
+    .brand { font-size: 13px; }
+    .nav-cta { font-size: 11px; min-height: 36px; padding: 8px 10px; }
+    .hero { padding: 24px 14px 22px; }
+    .badge { font-size: 10px; margin-bottom: 14px; padding: 7px 10px; }
+    h1 {
+      font-size: clamp(30px, 8.7vw, 34px);
+      line-height: 1.06;
+      max-width: 13ch;
+      text-wrap: balance;
+    }
+    .lead { font-size: 13px; line-height: 1.55; margin-top: 16px; }
+    .actions { display: grid; gap: 8px; grid-template-columns: 1fr; margin-top: 18px; }
+    .primary-button, .secondary-button {
+      min-height: 42px;
+      padding: 11px 12px;
+      width: 100%;
+    }
+    .hero-panel { margin-top: 22px; padding: 10px; }
+    .panel-header { margin-bottom: 12px; }
+    .feature-intro { padding: 30px 14px 4px; }
+    .feature-grid { padding: 16px 14px 28px; }
+    .proof { padding: 0 14px 30px; }
+    .bottom-cta { padding: 30px 14px; }
+    .view-shell, .dashboard, .product, .pricing { padding: 26px 14px; }
+  }
 `
 }
 
@@ -1219,14 +1258,49 @@ export function BrandLaunchSandbox({
   const [template, setTemplate] = useState<TemplateId>(inferredTemplate)
   const [view, setView] = useState<ViewId>("landing")
   const [device, setDevice] = useState<DeviceId>("desktop")
+  const [mobileFrameScale, setMobileFrameScale] = useState(1)
   const [copiedHtml, setCopiedHtml] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const mobileStageRef = useRef<HTMLDivElement>(null)
+  const deviceWasChosenRef = useRef(false)
 
   useEffect(() => {
     setTemplate(inferredTemplate)
   }, [inferredTemplate, brandName])
+
+  useEffect(() => {
+    const mobileViewport = window.matchMedia("(max-width: 640px)")
+    const syncDefaultDevice = () => {
+      if (!deviceWasChosenRef.current) {
+        setDevice(mobileViewport.matches ? "mobile" : "desktop")
+      }
+    }
+
+    syncDefaultDevice()
+    mobileViewport.addEventListener("change", syncDefaultDevice)
+    return () => mobileViewport.removeEventListener("change", syncDefaultDevice)
+  }, [])
+
+  useEffect(() => {
+    if (device !== "mobile") return
+
+    const stage = mobileStageRef.current
+    if (!stage) return
+
+    const updateScale = () => {
+      const nextScale = Math.min(1, stage.clientWidth / MOBILE_FRAME_WIDTH)
+      setMobileFrameScale((currentScale) =>
+        Math.abs(currentScale - nextScale) < 0.001 ? currentScale : nextScale,
+      )
+    }
+
+    updateScale()
+    const observer = new ResizeObserver(updateScale)
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [device])
 
   const html = useMemo(
     () => buildSandboxHtml({ brandName, keywords, vibe, template, view, palette }),
@@ -1241,6 +1315,10 @@ export function BrandLaunchSandbox({
     setActionError(null)
     try {
       await copyText(html)
+      trackEvent({
+        action: "brand_export_clicked",
+        metadata: { source: "brand_launch_sandbox_copy_html", brandName, template, view, device },
+      })
       setCopiedHtml(true)
       window.setTimeout(() => setCopiedHtml(false), 2200)
     } catch {
@@ -1275,6 +1353,10 @@ export function BrandLaunchSandbox({
       link.download = `${slugify(brandName)}-${template}-${view}-${device}.png`
       link.href = canvas.toDataURL("image/png")
       link.click()
+      trackEvent({
+        action: "brand_export_clicked",
+        metadata: { source: "brand_launch_sandbox_download_png", brandName, template, view, device },
+      })
     } catch {
       setActionError("PNG export failed. Try switching device view and exporting again.")
     } finally {
@@ -1285,7 +1367,7 @@ export function BrandLaunchSandbox({
   return (
     <section
       data-testid="brand-launch-sandbox"
-      className="overflow-hidden rounded-2xl"
+      className="min-w-0 overflow-hidden rounded-2xl"
       style={{
         background:
           "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.018))",
@@ -1300,7 +1382,7 @@ export function BrandLaunchSandbox({
           background: `radial-gradient(circle at 12% 0%, ${rgba(tokens.primary, 0.18)}, transparent 34%), rgba(5,5,5,0.46)`,
         }}
       >
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="flex min-w-0 flex-col gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
@@ -1321,15 +1403,16 @@ export function BrandLaunchSandbox({
             </div>
           </div>
 
-          <div className="grid gap-3 xl:min-w-[620px]">
-            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="grid min-w-0 gap-3">
+            <div className="flex min-w-0 snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:pb-0">
               {TEMPLATE_OPTIONS.map((item) => {
                 const isActive = item.id === template
                 return (
                   <button
                     key={item.id}
                     onClick={() => setTemplate(item.id)}
-                    className="min-h-10 shrink-0 rounded-xl px-3 py-2 text-[11px] font-black transition-all focus:outline-none focus:ring-2 focus:ring-white/30"
+                    aria-pressed={isActive}
+                    className="min-h-10 shrink-0 snap-start rounded-xl px-3 py-2 text-[11px] font-black transition-all focus:outline-none focus:ring-2 focus:ring-white/30"
                     style={
                       isActive
                         ? {
@@ -1353,9 +1436,9 @@ export function BrandLaunchSandbox({
               })}
             </div>
 
-            <div className="grid gap-2 lg:grid-cols-[1fr_auto_auto] lg:items-center">
+            <div className="grid min-w-0 gap-2">
               <div
-                className="flex gap-1 overflow-x-auto rounded-xl p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex min-w-0 gap-1 overflow-x-auto rounded-xl p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 style={{
                   background: "rgba(255,255,255,0.045)",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -1368,6 +1451,7 @@ export function BrandLaunchSandbox({
                     <button
                       key={item.id}
                       onClick={() => setView(item.id)}
+                      aria-pressed={isActive}
                       className="flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black transition-all focus:outline-none focus:ring-2 focus:ring-white/25"
                       style={
                         isActive
@@ -1390,81 +1474,87 @@ export function BrandLaunchSandbox({
                 })}
               </div>
 
-              <div
-                className="flex rounded-xl p-1"
-                style={{
-                  background: "rgba(255,255,255,0.045)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                {([
-                  { id: "mobile", label: "Mobile", icon: Smartphone },
-                  { id: "desktop", label: "Desktop", icon: Monitor },
-                ] as const).map((item) => {
-                  const Icon = item.icon
-                  const isActive = item.id === device
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setDevice(item.id)}
-                      aria-label={`${item.label} preview`}
-                      className="flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black transition-all focus:outline-none focus:ring-2 focus:ring-white/25 sm:flex-none"
-                      style={
-                        isActive
-                          ? {
-                              background: "rgba(255,255,255,0.1)",
-                              border: "1px solid rgba(255,255,255,0.16)",
-                              color: "rgba(255,255,255,0.92)",
-                            }
-                          : {
-                              border: "1px solid transparent",
-                              color: "rgba(255,255,255,0.36)",
-                            }
-                      }
-                      type="button"
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      <span>{item.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
+              <div className="grid min-w-0 gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
+                <div
+                  className="flex min-w-0 rounded-xl p-1"
+                  style={{
+                    background: "rgba(255,255,255,0.045)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  {([
+                    { id: "mobile", label: "Mobile", icon: Smartphone },
+                    { id: "desktop", label: "Desktop", icon: Monitor },
+                  ] as const).map((item) => {
+                    const Icon = item.icon
+                    const isActive = item.id === device
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          deviceWasChosenRef.current = true
+                          setDevice(item.id)
+                        }}
+                        aria-label={`${item.label} preview`}
+                        aria-pressed={isActive}
+                        className="flex min-h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-black transition-all focus:outline-none focus:ring-2 focus:ring-white/25"
+                        style={
+                          isActive
+                            ? {
+                                background: "rgba(255,255,255,0.1)",
+                                border: "1px solid rgba(255,255,255,0.16)",
+                                color: "rgba(255,255,255,0.92)",
+                              }
+                            : {
+                                border: "1px solid transparent",
+                                color: "rgba(255,255,255,0.36)",
+                              }
+                        }
+                        type="button"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span>{item.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:flex">
-                <button
-                  onClick={copyHtml}
-                  className="flex min-h-10 items-center justify-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white/25"
-                  style={{
-                    background: copiedHtml ? "rgba(52,211,153,0.13)" : rgba(tokens.primary, 0.13),
-                    border: copiedHtml ? "1px solid rgba(52,211,153,0.3)" : `1px solid ${rgba(tokens.primary, 0.28)}`,
-                    color: copiedHtml ? "#34d399" : tokens.primary,
-                  }}
-                  type="button"
-                >
-                  {copiedHtml ? <Check className="h-3.5 w-3.5" /> : <Code2 className="h-3.5 w-3.5" />}
-                  {copiedHtml ? "Copied" : "Copy HTML"}
-                </button>
-                <button
-                  onClick={downloadPng}
-                  disabled={downloading}
-                  className="flex min-h-10 items-center justify-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white/25 disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{
-                    background: `linear-gradient(135deg, ${tokens.primary}, ${tokens.accent})`,
-                    boxShadow: `0 12px 30px ${rgba(tokens.primary, 0.22)}`,
-                    color: readableOn(mix(tokens.primary, tokens.accent, 0.42)),
-                  }}
-                  type="button"
-                >
-                  {downloading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-                  {downloading ? "Exporting" : "Download PNG"}
-                </button>
+                <div className="grid min-w-0 grid-cols-2 gap-2">
+                  <button
+                    onClick={copyHtml}
+                    className="flex min-h-10 min-w-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] font-black transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white/25"
+                    style={{
+                      background: copiedHtml ? "rgba(52,211,153,0.13)" : rgba(tokens.primary, 0.13),
+                      border: copiedHtml ? "1px solid rgba(52,211,153,0.3)" : `1px solid ${rgba(tokens.primary, 0.28)}`,
+                      color: copiedHtml ? "#34d399" : tokens.primary,
+                    }}
+                    type="button"
+                  >
+                    {copiedHtml ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Code2 className="h-3.5 w-3.5 shrink-0" />}
+                    <span>{copiedHtml ? "Copied" : "Copy HTML"}</span>
+                  </button>
+                  <button
+                    onClick={downloadPng}
+                    disabled={downloading}
+                    className="flex min-h-10 min-w-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] font-black transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white/25 disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{
+                      background: `linear-gradient(135deg, ${tokens.primary}, ${tokens.accent})`,
+                      boxShadow: `0 12px 30px ${rgba(tokens.primary, 0.22)}`,
+                      color: readableOn(mix(tokens.primary, tokens.accent, 0.42)),
+                    }}
+                    type="button"
+                  >
+                    {downloading ? <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" /> : <Download className="h-3.5 w-3.5 shrink-0" />}
+                    <span>{downloading ? "Exporting" : "Download PNG"}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4">
+      <div className="min-w-0 p-2 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/30">
             <LayoutTemplate className="h-3.5 w-3.5" style={{ color: tokens.primary }} />
@@ -1485,19 +1575,37 @@ export function BrandLaunchSandbox({
         </div>
 
         <div
-          className={device === "mobile" ? "mx-auto w-full max-w-[390px]" : "w-full"}
-          style={{ transition: "max-width 220ms ease" }}
+          ref={device === "mobile" ? mobileStageRef : undefined}
+          className={device === "mobile" ? "relative mx-auto w-full overflow-hidden" : "w-full min-w-0"}
+          style={
+            device === "mobile"
+              ? {
+                  height: MOBILE_FRAME_HEIGHT * mobileFrameScale,
+                  maxWidth: MOBILE_FRAME_WIDTH,
+                  transition: "height 220ms ease, max-width 220ms ease",
+                }
+              : { transition: "max-width 220ms ease" }
+          }
         >
           <div
-            className="overflow-hidden"
+            className={device === "mobile" ? "absolute left-0 top-0 overflow-hidden" : "overflow-hidden"}
             style={{
               background: "#020202",
+              boxSizing: device === "mobile" ? "content-box" : "border-box",
               border:
                 device === "mobile"
                   ? "5px solid rgba(255,255,255,0.11)"
                   : "1px solid rgba(255,255,255,0.12)",
               borderRadius: device === "mobile" ? 34 : 18,
               boxShadow: "0 30px 90px rgba(0,0,0,0.54), inset 0 1px 0 rgba(255,255,255,0.08)",
+              // A legacy global mobile rule caps every div at max-width: 100%.
+              // The phone frame must retain its 390px design canvas and then
+              // scale once to the stage width; otherwise it is constrained and
+              // transformed, producing a visibly undersized double-scale.
+              maxWidth: device === "mobile" ? "none" : undefined,
+              transform: device === "mobile" ? `scale(${mobileFrameScale})` : undefined,
+              transformOrigin: device === "mobile" ? "top left" : undefined,
+              width: device === "mobile" ? MOBILE_VIEWPORT_WIDTH : "100%",
             }}
           >
             <div
@@ -1533,7 +1641,7 @@ export function BrandLaunchSandbox({
               className="block w-full border-0"
               style={{
                 background: tokens.background,
-                height: device === "mobile" ? 680 : 620,
+                height: device === "mobile" ? MOBILE_IFRAME_HEIGHT : 620,
               }}
             />
           </div>

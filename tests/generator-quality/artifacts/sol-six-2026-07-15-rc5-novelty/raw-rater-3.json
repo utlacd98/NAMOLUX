@@ -1,0 +1,255 @@
+{
+  "raterId": "rc5-rater-3",
+  "caseReviews": [
+    {
+      "caseId": "cozy-puzzle-studio",
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 7,
+        "vibeFit": 8
+      },
+      "nameRatings": [
+        { "name": "mossamble", "label": "shortlist" },
+        { "name": "puzzlebloom", "label": "shortlist" },
+        { "name": "softlogic", "label": "usable" },
+        { "name": "ponderkin", "label": "usable" },
+        { "name": "mirthwork", "label": "usable" },
+        { "name": "amblemind", "label": "usable" },
+        { "name": "lampglow", "label": "usable" },
+        { "name": "meander", "label": "usable" },
+        { "name": "tessella", "label": "shortlist" },
+        { "name": "oddment", "label": "usable" },
+        { "name": "daydream", "label": "reject" },
+        { "name": "mellivo", "label": "reject" },
+        { "name": "porchlight", "label": "usable" },
+        { "name": "quietplay", "label": "usable" },
+        { "name": "slowmorrow", "label": "shortlist" },
+        { "name": "littlepause", "label": "usable" }
+      ],
+      "topTwo": [
+        "tessella",
+        "mossamble"
+      ],
+      "criticalDefects": [
+        "Too many names signal generalized coziness or reflection without a puzzle, game, or studio cue.",
+        "Several familiar dictionary words and domestic-light images feel crowded and difficult to own.",
+        "The cutest constructions risk reading as children's entertainment despite the adult audience."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "gentle activity or cognition compounds",
+          "members": ["mossamble", "softlogic", "ponderkin", "amblemind", "quietplay", "littlepause"]
+        },
+        {
+          "pattern": "cozy nature, bloom, and lamplight imagery",
+          "members": ["mossamble", "puzzlebloom", "lampglow", "porchlight"]
+        },
+        {
+          "pattern": "poetic standalone or near-standalone nouns",
+          "members": ["meander", "tessella", "oddment", "daydream", "slowmorrow"]
+        }
+      ]
+    },
+    {
+      "caseId": "alpine-skincare",
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 7,
+        "distinctiveness": 7,
+        "vibeFit": 8
+      },
+      "nameRatings": [
+        { "name": "alveraine", "label": "shortlist" },
+        { "name": "velmoraine", "label": "shortlist" },
+        { "name": "caldrisse", "label": "usable" },
+        { "name": "snowmelt", "label": "shortlist" },
+        { "name": "quietglade", "label": "usable" },
+        { "name": "stonepetal", "label": "shortlist" },
+        { "name": "highgarden", "label": "usable" },
+        { "name": "selvarine", "label": "usable" },
+        { "name": "frostveil", "label": "shortlist" },
+        { "name": "orivelle", "label": "usable" },
+        { "name": "headwater", "label": "usable" },
+        { "name": "alpenglow", "label": "usable" },
+        { "name": "watershed", "label": "reject" },
+        { "name": "evergreen", "label": "reject" },
+        { "name": "verglas", "label": "usable" },
+        { "name": "halcyon", "label": "usable" }
+      ],
+      "topTwo": [
+        "stonepetal",
+        "velmoraine"
+      ],
+      "criticalDefects": [
+        "The batch splits between generic landscape words and invented luxury-sounding forms with little product meaning.",
+        "Several candidates emphasize cold, ice, or geological harshness more than skin comfort and efficacy.",
+        "The pseudo-European endings create pronunciation ambiguity and begin to feel mechanically premium rather than genuinely distinctive."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "invented Romance-style premium endings",
+          "members": ["alveraine", "velmoraine", "caldrisse", "selvarine", "orivelle"]
+        },
+        {
+          "pattern": "literal alpine nature compounds",
+          "members": ["snowmelt", "quietglade", "stonepetal", "highgarden", "frostveil", "headwater"]
+        },
+        {
+          "pattern": "unmodified landscape or atmospheric dictionary words",
+          "members": ["alpenglow", "watershed", "evergreen", "verglas", "halcyon"]
+        }
+      ]
+    },
+    {
+      "caseId": "ai-scheduling-founders",
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 6,
+        "vibeFit": 7
+      },
+      "nameRatings": [
+        { "name": "kordia", "label": "usable" },
+        { "name": "dayweave", "label": "shortlist" },
+        { "name": "openlane", "label": "usable" },
+        { "name": "cadensa", "label": "shortlist" },
+        { "name": "clearspan", "label": "usable" },
+        { "name": "timekind", "label": "usable" },
+        { "name": "orbitide", "label": "reject" },
+        { "name": "brevia", "label": "usable" },
+        { "name": "whitepace", "label": "reject" },
+        { "name": "daywright", "label": "shortlist" },
+        { "name": "calendra", "label": "usable" },
+        { "name": "flowstate", "label": "reject" },
+        { "name": "unclutter", "label": "usable" },
+        { "name": "onemove", "label": "usable" },
+        { "name": "rightaway", "label": "usable" },
+        { "name": "instride", "label": "usable" }
+      ],
+      "topTwo": [
+        "dayweave",
+        "cadensa"
+      ],
+      "criticalDefects": [
+        "Much of the batch uses generic productivity and frictionless-motion language that could describe almost any work tool.",
+        "There is little sense of an intelligent assistant, delegation, or founder-specific urgency.",
+        "A few compressed compounds and calendar-derived inventions read like typos or me-too naming rather than deliberate brands."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "day, time, cadence, and calendar constructions",
+          "members": ["dayweave", "cadensa", "timekind", "daywright", "calendra"]
+        },
+        {
+          "pattern": "frictionless productivity or motion phrases",
+          "members": ["openlane", "clearspan", "flowstate", "unclutter", "onemove", "rightaway", "instride"]
+        },
+        {
+          "pattern": "smooth vowel-ended tech coinages",
+          "members": ["kordia", "cadensa", "orbitide", "brevia", "calendra"]
+        }
+      ]
+    },
+    {
+      "caseId": "freelance-accounting",
+      "scores": {
+        "relevance": 6,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 6,
+        "vibeFit": 7
+      },
+      "nameRatings": [
+        { "name": "tallivo", "label": "shortlist" },
+        { "name": "clearharbor", "label": "usable" },
+        { "name": "keystone", "label": "reject" },
+        { "name": "evenkeel", "label": "usable" },
+        { "name": "plainworth", "label": "usable" },
+        { "name": "daymark", "label": "usable" },
+        { "name": "balansa", "label": "usable" },
+        { "name": "caldrin", "label": "reject" },
+        { "name": "truecourse", "label": "usable" },
+        { "name": "reckoner", "label": "usable" },
+        { "name": "tideline", "label": "reject" },
+        { "name": "fairfold", "label": "shortlist" },
+        { "name": "settld", "label": "reject" },
+        { "name": "netnest", "label": "usable" },
+        { "name": "openmargin", "label": "shortlist" },
+        { "name": "tallyho", "label": "reject" }
+      ],
+      "topTwo": [
+        "openmargin",
+        "tallivo"
+      ],
+      "criticalDefects": [
+        "A dominant maritime-navigation motif obscures invoices, tax, books, and the independent-worker audience.",
+        "Several names are broad trust metaphors or common words with limited ownability and weak accounting recall.",
+        "The vowel deletion and tally wordplay introduce either dated startup styling or a frivolous tone for tax software."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "maritime safety and navigation metaphors",
+          "members": ["clearharbor", "evenkeel", "daymark", "truecourse", "tideline"]
+        },
+        {
+          "pattern": "accounting-root coinages and wordplay",
+          "members": ["tallivo", "balansa", "reckoner", "settld", "openmargin", "tallyho"]
+        },
+        {
+          "pattern": "structural trust, value, or containment compounds",
+          "members": ["keystone", "plainworth", "fairfold", "netnest"]
+        }
+      ]
+    },
+    {
+      "caseId": "cyber-threat-analytics",
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 7,
+        "vibeFit": 8
+      },
+      "nameRatings": [
+        { "name": "vescora", "label": "usable" },
+        { "name": "flintmark", "label": "shortlist" },
+        { "name": "nightglass", "label": "shortlist" },
+        { "name": "sentryn", "label": "reject" },
+        { "name": "tracewake", "label": "shortlist" },
+        { "name": "keystone", "label": "reject" },
+        { "name": "undertow", "label": "usable" },
+        { "name": "threshline", "label": "reject" },
+        { "name": "wayfinder", "label": "reject" },
+        { "name": "signalforge", "label": "usable" },
+        { "name": "quarry", "label": "usable" },
+        { "name": "fathom", "label": "usable" },
+        { "name": "cinderwatch", "label": "usable" },
+        { "name": "vantage", "label": "usable" },
+        { "name": "foxglove", "label": "reject" },
+        { "name": "blacklight", "label": "usable" }
+      ],
+      "topTwo": [
+        "nightglass",
+        "tracewake"
+      ],
+      "criticalDefects": [
+        "The strongest visibility and forensic metaphors sit beside generic enterprise nouns and unrelated nature terms, weakening category coherence.",
+        "Several common dictionary names feel crowded, while the altered spellings feel less credible for enterprise security buyers.",
+        "The compound-heavy construction becomes formulaic, especially around dark materials, signals, watching, and traces."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "hard or dark imagery joined to evidence and visibility nouns",
+          "members": ["flintmark", "nightglass", "tracewake", "signalforge", "cinderwatch", "blacklight"]
+        },
+        {
+          "pattern": "surveillance, boundary, and navigation language",
+          "members": ["sentryn", "threshline", "wayfinder", "vantage"]
+        },
+        {
+          "pattern": "single-word enterprise or threat metaphors",
+          "members": ["keystone", "undertow", "quarry", "fathom", "foxglove"]
+        }
+      ]
+    }
+  ]
+}

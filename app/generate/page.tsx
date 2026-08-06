@@ -1,12 +1,22 @@
 import type { Metadata } from "next"
-import { Suspense } from "react"
 import { GenerateNames } from "@/components/generate-names-premium"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
+import { parseContentSlug, parseGeneratorSource } from "@/lib/generator-attribution"
+import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
+import { isGeneratorLabV3Enabled } from "@/lib/generator-flags"
+import { isGeneratorLabRequestAllowed } from "@/lib/generator-lab"
+import { LabNameGenerator } from "@/components/lab-name-generator"
+import { headers } from "next/headers"
+import { permanentRedirect } from "next/navigation"
 
 export const metadata: Metadata = {
-  title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
+  title: "Name generator and domain checker | NamoLux",
   description:
-    "Generate high-quality brandable domain names from your keywords, verify availability across 6 TLDs, and rank every result with Founder Signal scoring.",
+    "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
   keywords: [
+    "free domain name generator",
     "AI domain name generator",
     "business name generator",
     "startup name generator",
@@ -14,13 +24,11 @@ export const metadata: Metadata = {
     "brand name ideas",
     "Founder Signal scoring",
   ],
-  alternates: {
-    canonical: "/generate",
-  },
+  robots: { index: false, follow: false },
   openGraph: {
-    title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
+    title: "Name generator and domain checker | NamoLux",
     description:
-      "Generate brandable names, check availability across .com, .io, .co, .ai, .app, and .dev, and buy available domains through Namecheap.",
+      "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
     url: "https://www.namolux.com/generate",
     type: "website",
     images: [
@@ -28,20 +36,36 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux AI domain name generator",
+        alt: "NamoLux domain name generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Domain Name Generator with Founder Signal Scoring | NamoLux",
+    title: "Name generator and domain checker | NamoLux",
     description:
-      "Generate brandable names, verify availability, and rank every result with Founder Signal scoring.",
+      "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
     images: ["/opengraph-image"],
   },
 }
 
-export default function GeneratePage() {
+type GeneratePageProps = { searchParams?: Promise<Record<string, string | string[] | undefined>> }
+
+export default async function GeneratePage({ searchParams }: GeneratePageProps) {
+  const requestHeaders = await headers()
+  if (!isGeneratorLabRequestAllowed(requestHeaders.get("host"))) {
+    permanentRedirect("/bulk-domain-check")
+  }
+  if (isGeneratorLabV3Enabled()) return <LabNameGenerator />
+  const params = await searchParams
+  const rawBrief = params?.q ?? params?.keyword
+  const initialBrief = (Array.isArray(rawBrief) ? rawBrief[0] : rawBrief || "").slice(0, 1000)
+  const rawMode = Array.isArray(params?.mode) ? params.mode[0] : params?.mode
+  const initialMode: "quick" | "advanced" | "bulk" = rawMode === "advanced" || rawMode === "bulk" ? rawMode : "quick"
+  const rawNames = Array.isArray(params?.names) ? params.names[0] : params?.names
+  const initialNames = (rawNames || "").slice(0, 5000)
+  const initialSource = parseGeneratorSource(params?.source)
+  const initialContentSlug = parseContentSlug(params?.content)
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -51,12 +75,11 @@ export default function GeneratePage() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      "Generate brandable startup names, verify live availability across 6 TLDs, and rank every result with Founder Signal scoring.",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
+      "Explore names free in Quick, use three Advanced batches and one complete Founder Signal batch each month, then check domains without interrupting ideation.",
+    offers: [
+      { "@type": "Offer", price: "0", priceCurrency: "GBP", description: PRODUCT_OFFER.freeUsageLabel },
+      { "@type": "Offer", price: PRODUCT_OFFER.proMonthlyPrice, priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
+    ],
     publisher: { "@id": "https://www.namolux.com/#organization" },
   }
 
@@ -66,9 +89,30 @@ export default function GeneratePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Suspense fallback={null}>
-        <GenerateNames />
-      </Suspense>
+      <Navbar />
+      <div className="pt-[78px]">
+        <GenerateNames
+          initialBrief={initialBrief}
+          initialMode={initialMode}
+          initialNames={initialNames}
+          hasInitialMode={Boolean(rawMode)}
+          initialSource={initialSource}
+          initialContentSlug={initialContentSlug}
+          redesignEnabled={isGeneratorRedesignEnabled()}
+        />
+        <noscript>
+          <section className="mx-auto my-8 max-w-3xl border border-amber-300/30 bg-amber-300/10 p-5 text-amber-50">
+            <h2 className="text-lg font-semibold">JavaScript is required for live generation and domain checks.</h2>
+            <p className="mt-2 text-sm leading-6 text-amber-50/75">You can keep your brief in this page URL, then retry when scripts are enabled.</p>
+            <form action="/generate" method="get" className="mt-4">
+              <label htmlFor="no-script-brief" className="mb-2 block text-sm font-medium">Naming brief</label>
+              <textarea id="no-script-brief" name="q" defaultValue={initialBrief} rows={4} className="w-full border border-amber-100/30 bg-black/20 p-3" />
+              <button type="submit" className="mt-3 min-h-11 border border-amber-100/40 px-4 font-semibold">Keep brief and retry</button>
+            </form>
+          </section>
+        </noscript>
+      </div>
+      <Footer />
     </>
   )
 }

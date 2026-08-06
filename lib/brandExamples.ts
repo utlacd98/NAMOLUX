@@ -380,7 +380,7 @@ REJECT: -ify, -hub, tech compounds, numbers, anything that sounds like software`
   futuristic: `VIBE: FUTURISTIC — Should feel like it arrived from 10 years ahead, not just "tech".
 
 FUTURISTIC NAMING PRINCIPLES:
-- Clean invented CVCV words with forward-momentum feel: Vexa, Nuvra, Synq, Axon, Plex, Flux
+- Clean invented words with forward-momentum feel: Figma, Canva, Pendo, Axon, Plex, Flux
 - Physics and systems vocabulary: Arc, Vector, Flux, Prism, Core, Node, Helix
 - Compound precision words: NexGen (only if both parts have meaning)
 - Hard consonants and crisp vowels give a precise, confident feel
@@ -417,7 +417,7 @@ const STRATEGY_INSTRUCTIONS: Record<DeepSearchStrategy, string> = {
   compound:
     "THIS BATCH: Focus on short compound words only (Approach 3). Two short real English words merged into one. Think Dropbox, Webflow, Mailchimp, Basecamp, Hubspot. Both parts must be recognisable. Total length ≤10 characters.",
   "root+suffix":
-    "THIS BATCH: Focus on roots with clean endings (Approach 2). Real word root + natural ending: -ly, -io, -era, -va, -ix, -ify, -ara, -ora, -ova. Think Shopify, Cloudera, Airtable. Root must be instantly recognisable. Do not repeat any suffix used in a previous name.",
+    "THIS BATCH: Focus on roots with clean endings (Approach 2). Real word root + natural ending: -er, -en, -le, -al, -ly, -fy, -ry. Think Render, Timber, Airtable. Root must be instantly recognisable. Do not repeat any suffix used in a previous name.",
   metaphor:
     "THIS BATCH: Focus on evocative real words from adjacent domains (Approach 1). Pick words from nature, physics, mythology, architecture, or craft that carry the right emotional weight for this industry. Think Notion, Slack, Plaid, Mercury, Titan, Arc. No made-up words this batch.",
 }
@@ -455,11 +455,13 @@ export function buildGenerationPrompt(opts: BuildPromptOptions): { system: strin
   const outputInstruction =
     outputFormat === "names-only"
       ? `Return ONLY a JSON array of lowercase name strings. No explanations, no markdown, no backticks.
-Example: ["nimbus", "synqo", "hubflow", "vaultly", "zentro"]`
+Example: ["emberpath", "signalnest", "tallygrove", "craftlane", "grovepilot"]`
       : `Return ONLY a JSON array where each item has:
 - name: the domain name (lowercase, no extension, no hyphens)
-- reasoning: which approach was used and why it works
-- meaning: 1-2 sentences: (a) linguistic root/inspiration, (b) brand/industry fit, (c) emotional tone. Max 40 words.
+- reasoning: 18-32 words naming the visible word/root construction and why that construction fits this exact product or audience
+- meaning: 1-2 sentences covering (a) linguistic root/inspiration, (b) specific industry/audience fit, and (c) intended emotional tone. Max 45 words.
+Do not make domain-availability, trademark-safety, score, uniqueness, or guaranteed-outcome claims.
+If you cannot explain a verifiable connection between the name and this brief, do not include that name.
 Format: [{"name": "...", "reasoning": "...", "meaning": "..."}, ...]`
 
   const system = `You are an elite startup naming consultant. You have named companies that went on to raise millions in funding.

@@ -85,8 +85,8 @@ Choose a name with that kind of generosity, and you'll never have to spend six f
 
 ---
 
-✨ *NamoLux uses Founder Signal™ to score names on the same criteria that make Stripe, Notion, and Figma successful — phonetic strength, memorability, brand risk, and scalability. Generate names that are built to last.*
+✨ *Bring your candidate names to NamoLux when you are ready to decide. Founder Signal compares phonetic strength, memorability, brand risk, and domain fit in one clear view.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

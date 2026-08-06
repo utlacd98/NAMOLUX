@@ -27,7 +27,7 @@ export function RestorePurchase() {
 
       if (res.ok && data.success) {
         setStatus("success")
-        setMessage("Purchase restored! Redirecting to your dashboard…")
+        setMessage("Paid access restored. Redirecting to your dashboard...")
         setTimeout(() => {
           window.location.href = "/dashboard"
         }, 1500)
@@ -54,13 +54,13 @@ export function RestorePurchase() {
           className="inline-flex items-center gap-1.5 text-sm text-[#555] hover:text-[#888] transition-colors"
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          Already paid? Restore your purchase
+          Already subscribed? Restore paid access
         </button>
       ) : (
         <div className="mx-auto max-w-sm bg-[#141414] border border-[#1f1f1f] rounded-xl p-6 text-left">
-          <h3 className="text-white font-medium mb-1">Restore Purchase</h3>
+          <h3 className="text-white font-medium mb-1">Restore Paid Access</h3>
           <p className="text-[#666] text-sm mb-4">
-            Enter the email address you used when you paid and we'll restore your Pro access.
+            Enter the email address on your active subscription and we'll restore paid access.
           </p>
 
           {status === "success" ? (
@@ -93,7 +93,7 @@ export function RestorePurchase() {
                   className="flex-1 bg-[#D4A843] hover:bg-[#c49a3d] disabled:opacity-50 text-black font-medium py-2.5 rounded-lg text-sm transition flex items-center justify-center gap-2"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {loading ? "Checking…" : "Restore Access"}
+                  {loading ? "Checking..." : "Restore Access"}
                 </button>
                 <button
                   type="button"

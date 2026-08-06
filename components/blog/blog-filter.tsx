@@ -1,44 +1,47 @@
-"use client"
-
-import { useState } from "react"
+import Link from "next/link"
 import { BlogCard } from "./blog-card"
 import type { BlogPost, BlogCategory } from "@/lib/blog"
 
 interface BlogFilterProps {
   posts: BlogPost[]
   categories: BlogCategory[]
+  activeCategory?: BlogCategory
+  activeTopic?: string
+  query?: string
   featuredPost?: BlogPost
 }
 
-export function BlogFilter({ posts, categories, featuredPost }: BlogFilterProps) {
-  const [activeCategory, setActiveCategory] = useState<BlogCategory | "all">("all")
-
-  const filteredPosts = activeCategory === "all"
-    ? posts
-    : posts.filter((post) => post.category === activeCategory)
-
-  const regularPosts = filteredPosts.filter((p) => p.slug !== featuredPost?.slug)
-  const showFeatured = activeCategory === "all" && featuredPost
+export function BlogFilter({ posts, categories, activeCategory, activeTopic, query, featuredPost }: BlogFilterProps) {
+  const regularPosts = posts.filter((post) => post.slug !== featuredPost?.slug)
+  const showFeatured = !activeCategory && featuredPost
+  const categoryHref = (category?: BlogCategory) => {
+    const params = new URLSearchParams()
+    if (activeTopic) params.set("topic", activeTopic)
+    if (query) params.set("q", query)
+    if (category) params.set("category", category)
+    const suffix = params.toString()
+    return suffix ? `/blog?${suffix}` : "/blog"
+  }
 
   return (
     <>
       {/* Category Filter */}
       <section className="border-b border-border/20 px-4 py-4">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-2">
-          <button
-            onClick={() => setActiveCategory("all")}
+          <Link
+            href={categoryHref()}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeCategory === "all"
+              !activeCategory
                 ? "bg-primary/10 text-primary"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             All Posts
-          </button>
+          </Link>
           {categories.map((category) => (
-            <button
+            <Link
               key={category}
-              onClick={() => setActiveCategory(category)}
+              href={categoryHref(category)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 activeCategory === category
                   ? "bg-primary/10 text-primary"
@@ -46,7 +49,7 @@ export function BlogFilter({ posts, categories, featuredPost }: BlogFilterProps)
               }`}
             >
               {category}
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -67,7 +70,7 @@ export function BlogFilter({ posts, categories, featuredPost }: BlogFilterProps)
       <section className="px-4 py-10 sm:py-12">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {activeCategory === "all" ? "All Articles" : activeCategory}
+            {activeCategory || "All Articles"}
           </h2>
           {regularPosts.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2">
@@ -85,4 +88,3 @@ export function BlogFilter({ posts, categories, featuredPost }: BlogFilterProps)
     </>
   )
 }
-

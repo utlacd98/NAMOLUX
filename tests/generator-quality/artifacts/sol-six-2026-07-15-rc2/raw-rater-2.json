@@ -1,0 +1,267 @@
+{
+  "raterId": "rater-2",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "prudence": "usable",
+        "allowance": "reject",
+        "cushion": "shortlist",
+        "provision": "usable",
+        "nestegg": "reject",
+        "headroom": "usable",
+        "reserve": "reject",
+        "margin": "reject",
+        "familyfund": "reject",
+        "pocketplan": "shortlist",
+        "budgetbond": "reject",
+        "thrifthaven": "reject",
+        "wellthrift": "reject",
+        "wiseplan": "reject",
+        "clearthrift": "reject",
+        "wisethrift": "reject"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 4,
+        "vibeFit": 6
+      },
+      "topTwo": [
+        "pocketplan",
+        "cushion"
+      ],
+      "criticalDefects": [
+        "Most of the single-word options are bare household-finance vocabulary rather than defensible brands.",
+        "The repeated thrift compounds feel generated and several have unnatural modifier order.",
+        "Literal constructions such as familyfund and budgetbond describe the category without creating a distinctive identity.",
+        "Much of the set sounds stern or institutional rather than warmly supportive for young families."
+      ],
+      "mechanicalFamilies": [
+        "bare finance terms: allowance, nestegg, reserve, margin",
+        "modifier plus thrift: wellthrift, clearthrift, wisethrift",
+        "literal finance compounds: familyfund, pocketplan, budgetbond",
+        "generic virtue or planning language: prudence, provision, wiseplan"
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "mosaic": "usable",
+        "puzzleverse": "reject",
+        "knitplay": "reject",
+        "qubitry": "reject",
+        "lattice": "usable",
+        "puzzluxe": "reject",
+        "knitmaze": "usable",
+        "cozygrid": "reject",
+        "mindloom": "shortlist",
+        "knotique": "shortlist",
+        "threadle": "reject",
+        "mysticube": "usable",
+        "cogwheel": "reject",
+        "jigsaw": "reject",
+        "cozypuzzle": "reject",
+        "logicnest": "usable"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 7,
+        "distinctiveness": 6,
+        "vibeFit": 7
+      },
+      "topTwo": [
+        "mindloom",
+        "knotique"
+      ],
+      "criticalDefects": [
+        "Several options simply attach puzzle language to a fashionable suffix or a literal cozy cue.",
+        "Threadle reads as a derivative of the Wordle naming pattern rather than an original studio identity.",
+        "Some coined forms are awkward to say or parse, especially qubitry, puzzluxe, and knitplay.",
+        "The set drifts from thoughtful adult coziness into quantum, mechanical, or generic game-title territory."
+      ],
+      "mechanicalFamilies": [
+        "category plus trend suffix: puzzleverse, puzzluxe, threadle",
+        "craft cue plus game structure: knitplay, knitmaze, mindloom, knotique",
+        "literal cozy-puzzle compounds: cozygrid, cozypuzzle, logicnest",
+        "common puzzle or structure nouns: mosaic, lattice, cogwheel, jigsaw"
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "avelune": "shortlist",
+        "snowmelt": "usable",
+        "silverleaf": "usable",
+        "glacielle": "reject",
+        "alpenglow": "shortlist",
+        "velvetspring": "usable",
+        "halcyon": "reject",
+        "everpure": "reject",
+        "mountaindew": "reject",
+        "verdant": "usable",
+        "aurelisse": "usable",
+        "stillwater": "usable",
+        "crystalline": "reject",
+        "edelwise": "reject",
+        "glacial": "reject",
+        "serenity": "reject"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "avelune",
+        "alpenglow"
+      ],
+      "criticalDefects": [
+        "Mountaindew is inseparable from the famous beverage name and is commercially unusable here.",
+        "Several candidates rely on generic purity, serenity, or nature vocabulary already endemic to skincare.",
+        "Glacielle and edelwise look like conspicuous suffix or spelling manipulations rather than confident inventions.",
+        "Cold literal descriptors such as glacial and crystalline can feel clinical or harsh rather than sensorially premium."
+      ],
+      "mechanicalFamilies": [
+        "alpine water imagery: snowmelt, glacielle, stillwater, glacial",
+        "botanical or landscape nouns: silverleaf, alpenglow, verdant",
+        "generic purity and wellness language: everpure, crystalline, serenity",
+        "luxury-phonetic coinages: avelune, glacielle, aurelisse",
+        "sensory nature compounds: velvetspring, silverleaf"
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "clyptra": "reject",
+        "timetide": "shortlist",
+        "cogniq": "reject",
+        "flextide": "shortlist",
+        "chroniq": "reject",
+        "zenitha": "reject",
+        "sylvane": "reject",
+        "synthiq": "reject",
+        "siftiq": "reject",
+        "tidelet": "reject",
+        "sequence": "usable",
+        "smartslot": "reject",
+        "slotmind": "reject",
+        "diary": "reject",
+        "readyagenda": "reject",
+        "timekeeper": "reject"
+      },
+      "scores": {
+        "relevance": 6,
+        "pronounceabilityNaturalness": 6,
+        "distinctiveness": 4,
+        "vibeFit": 5
+      },
+      "topTwo": [
+        "timetide",
+        "flextide"
+      ],
+      "criticalDefects": [
+        "The repeated iq or terminal-q treatment is a dated pseudo-AI device and creates uncertain spellings.",
+        "Several invented words are opaque to the scheduling job and offer no useful founder benefit or metaphor.",
+        "The literal feature names are generic, crowded, or awkwardly assembled rather than ownable.",
+        "Two of the best options reuse the same tide template, revealing limited conceptual range."
+      ],
+      "mechanicalFamilies": [
+        "pseudo-tech iq or q endings: cogniq, chroniq, synthiq, siftiq",
+        "word plus tide: timetide, flextide",
+        "literal calendar terms: smartslot, slotmind, diary, readyagenda, timekeeper",
+        "opaque coined forms: clyptra, zenitha, sylvane, tidelet"
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "tallynest": "usable",
+        "evenline": "shortlist",
+        "daymark": "usable",
+        "balansa": "reject",
+        "freelume": "reject",
+        "truecourse": "usable",
+        "netkeep": "usable",
+        "accord": "usable",
+        "harbor": "reject",
+        "candor": "usable",
+        "settled": "shortlist",
+        "cleanslate": "usable",
+        "cashbook": "reject",
+        "wiseinvoice": "reject",
+        "invoicegrid": "reject",
+        "bookkeep": "reject"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "evenline",
+        "settled"
+      ],
+      "criticalDefects": [
+        "Cashbook and bookkeep are bare accounting terms, while wiseinvoice and invoicegrid are feature descriptions dressed as brands.",
+        "Balansa and freelume use conspicuous spelling or fragment manipulation without gaining clarity or character.",
+        "Harbor and candor come from familiar generic startup vocabulary and have weak accounting specificity.",
+        "The compound-heavy set repeatedly adds container, system, or navigation language to a finance cue."
+      ],
+      "mechanicalFamilies": [
+        "finance cue plus container or system: tallynest, netkeep, invoicegrid",
+        "clean outcome or virtue words: accord, candor, settled, cleanslate",
+        "navigation and marker metaphors: evenline, daymark, truecourse, harbor",
+        "literal category naming: cashbook, wiseinvoice, bookkeep",
+        "altered finance fragments: balansa, freelume"
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "tracesmith": "shortlist",
+        "telluric": "reject",
+        "nightwatch": "reject",
+        "signalforge": "usable",
+        "thretic": "reject",
+        "outflank": "shortlist",
+        "redthread": "usable",
+        "sentryn": "reject",
+        "deepsight": "usable",
+        "foresight": "reject",
+        "findnorth": "reject",
+        "vigilant": "reject",
+        "detector": "reject",
+        "detectmax": "reject",
+        "spectrum": "reject",
+        "firewall": "reject"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 8,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "tracesmith",
+        "outflank"
+      ],
+      "criticalDefects": [
+        "Detector and firewall are bare cybersecurity categories, and detectmax is a mechanical intensifier variant.",
+        "Nightwatch, foresight, vigilant, and spectrum are crowded common terms with little defensible identity.",
+        "Thretic and sentryn are visibly forced mutations that reduce spelling confidence and credibility.",
+        "Telluric and findnorth are conceptually remote from enterprise threat analytics.",
+        "Several options recycle familiar security surveillance language instead of expressing a differentiated analytical advantage."
+      ],
+      "mechanicalFamilies": [
+        "craft compounds: tracesmith, signalforge",
+        "surveillance and vision terms: nightwatch, sentryn, deepsight, foresight, vigilant",
+        "detect plus mutation or intensifier: detector, detectmax, thretic",
+        "generic security or analytics nouns: spectrum, firewall",
+        "strategic direction language: outflank, findnorth"
+      ]
+    }
+  ]
+}

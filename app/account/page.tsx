@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
@@ -18,18 +18,11 @@ import {
   CheckCircle
 } from "lucide-react"
 
-interface Profile {
-  id: string
-  email: string
-  full_name: string | null
-}
-
 export default function AccountPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   
   const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   
   // Form states
@@ -37,7 +30,6 @@ export default function AccountPage() {
   const [nameLoading, setNameLoading] = useState(false)
   const [nameSuccess, setNameSuccess] = useState(false)
   
-  const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordLoading, setPasswordLoading] = useState(false)
@@ -63,7 +55,6 @@ export default function AccountPage() {
         .single()
       
       if (profileData) {
-        setProfile(profileData as Profile)
         setFullName(profileData.full_name || "")
       }
       setLoading(false)
@@ -73,13 +64,14 @@ export default function AccountPage() {
 
   const handleUpdateName = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
     setNameLoading(true)
     setNameSuccess(false)
 
     const { error } = await supabase
       .from("profiles")
       .update({ full_name: fullName })
-      .eq("id", user?.id)
+      .eq("id", user.id)
 
     if (!error) {
       setNameSuccess(true)
@@ -109,7 +101,6 @@ export default function AccountPage() {
       setPasswordError(error.message)
     } else {
       setPasswordSuccess(true)
-      setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
       setTimeout(() => setPasswordSuccess(false), 3000)
@@ -124,10 +115,20 @@ export default function AccountPage() {
 
   const handleDeleteAccount = async () => {
     setDeleteLoading(true)
-    // Note: Full account deletion requires a server-side function with service role
-    // For now, we sign out and show instructions
-    await supabase.auth.signOut()
-    router.push("/?deleted=pending")
+    const response = await fetch("/api/account/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirmation: "DELETE" }),
+    })
+    if (response.ok) {
+      await supabase.auth.signOut()
+      router.push("/?deleted=1")
+      return
+    }
+    const result = await response.json().catch(() => null)
+    setPasswordError(result?.error || "Account deletion failed. Please contact support.")
+    setShowDeleteModal(false)
+    setDeleteLoading(false)
   }
 
   if (loading) {
@@ -283,7 +284,7 @@ export default function AccountPage() {
               </div>
             </div>
             <p className="text-[#888] mb-6">
-              Are you sure you want to delete your account? All your data, including generation history and subscription, will be permanently removed.
+              Are you sure you want to delete your account? All your data, including saved shortlists, decision records, and subscription details, will be permanently removed.
             </p>
             <div className="flex gap-3">
               <button
@@ -307,4 +308,3 @@ export default function AccountPage() {
     </div>
   )
 }
-

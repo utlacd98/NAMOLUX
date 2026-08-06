@@ -1,0 +1,424 @@
+{
+  "raterId": "rater-3",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestori": "reject",
+        "pocketgrove": "shortlist",
+        "sunnyside": "usable",
+        "littleways": "usable",
+        "kinkeep": "usable",
+        "meadow": "reject",
+        "tendril": "usable",
+        "hearthwise": "shortlist",
+        "pennytrail": "usable",
+        "harbor": "reject",
+        "morrow": "usable",
+        "steadily": "usable",
+        "spriglet": "reject",
+        "homeward": "usable",
+        "smallsteps": "usable",
+        "nestegg": "reject"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "hearthwise",
+        "pocketgrove"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "nest, kin, home, or safety language",
+          "names": [
+            "nestori",
+            "kinkeep",
+            "hearthwise",
+            "harbor",
+            "homeward",
+            "nestegg"
+          ]
+        },
+        {
+          "pattern": "small-scale progress or savings journey",
+          "names": [
+            "littleways",
+            "pennytrail",
+            "steadily",
+            "smallsteps"
+          ]
+        },
+        {
+          "pattern": "nature and growth imagery",
+          "names": [
+            "pocketgrove",
+            "meadow",
+            "tendril",
+            "spriglet"
+          ]
+        },
+        {
+          "pattern": "generic optimism or future-facing word",
+          "names": [
+            "sunnyside",
+            "morrow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "mosslight": "usable",
+        "puzzello": "reject",
+        "tinkora": "usable",
+        "softspoken": "usable",
+        "ludelle": "usable",
+        "mirthwork": "usable",
+        "hearthink": "usable",
+        "ponderkin": "usable",
+        "kindling": "usable",
+        "oddments": "shortlist",
+        "daydream": "usable",
+        "meander": "usable",
+        "whimwork": "usable",
+        "mosaic": "usable",
+        "tessera": "shortlist",
+        "pastime": "reject"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 7,
+        "vibeFit": 9
+      },
+      "topTwo": [
+        "tessera",
+        "oddments"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "warm, slow, or dreamlike atmosphere",
+          "names": [
+            "mosslight",
+            "softspoken",
+            "kindling",
+            "daydream",
+            "meander"
+          ]
+        },
+        {
+          "pattern": "invented play or thought-root coinage",
+          "names": [
+            "puzzello",
+            "tinkora",
+            "ludelle",
+            "hearthink",
+            "ponderkin"
+          ]
+        },
+        {
+          "pattern": "playfulness or craft joined to work",
+          "names": [
+            "mirthwork",
+            "whimwork"
+          ]
+        },
+        {
+          "pattern": "piece, pattern, or game-related real word",
+          "names": [
+            "oddments",
+            "mosaic",
+            "tessera",
+            "pastime"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "snowmelt": "usable",
+        "alpenglow": "usable",
+        "velmora": "usable",
+        "silverfern": "reject",
+        "everfrost": "reject",
+        "montara": "usable",
+        "springveil": "shortlist",
+        "clearhaven": "reject",
+        "altavera": "usable",
+        "pureascent": "reject",
+        "glacielle": "usable",
+        "stonebloom": "shortlist",
+        "highmeadow": "usable",
+        "watershed": "reject",
+        "montane": "reject",
+        "stillwater": "usable"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "stonebloom",
+        "springveil"
+      ],
+      "criticalDefects": [
+        "montane is the exact name of an established outdoor brand in the alpine-adjacent market."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "cold, water, or alpine real-word imagery",
+          "names": [
+            "snowmelt",
+            "alpenglow",
+            "everfrost",
+            "watershed",
+            "montane",
+            "stillwater"
+          ]
+        },
+        {
+          "pattern": "pseudo-romance premium coinage",
+          "names": [
+            "velmora",
+            "montara",
+            "altavera",
+            "glacielle"
+          ]
+        },
+        {
+          "pattern": "material, botanical, or water compound",
+          "names": [
+            "silverfern",
+            "springveil",
+            "stonebloom",
+            "highmeadow"
+          ]
+        },
+        {
+          "pattern": "generic purity or ascent construction",
+          "names": [
+            "clearhaven",
+            "pureascent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "cadentra": "usable",
+        "caldrin": "reject",
+        "tessora": "reject",
+        "orivane": "reject",
+        "clearstride": "usable",
+        "dayweave": "shortlist",
+        "quietlane": "usable",
+        "openwindow": "usable",
+        "timecraft": "usable",
+        "switchyard": "shortlist",
+        "wayfinder": "reject",
+        "breathing": "usable",
+        "keystone": "reject",
+        "whiteboard": "reject",
+        "rightontime": "reject",
+        "makeitfit": "usable"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 7
+      },
+      "topTwo": [
+        "dayweave",
+        "switchyard"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "abstract coinage with an ornamental ending",
+          "names": [
+            "cadentra",
+            "caldrin",
+            "tessora",
+            "orivane"
+          ]
+        },
+        {
+          "pattern": "path, space, or schedule-relief metaphor",
+          "names": [
+            "clearstride",
+            "quietlane",
+            "openwindow",
+            "wayfinder",
+            "breathing",
+            "makeitfit"
+          ]
+        },
+        {
+          "pattern": "time and orchestration construction",
+          "names": [
+            "dayweave",
+            "timecraft",
+            "switchyard",
+            "rightontime"
+          ]
+        },
+        {
+          "pattern": "generic planning or structural object",
+          "names": [
+            "keystone",
+            "whiteboard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "tallivo": "usable",
+        "sumstead": "shortlist",
+        "clearharbor": "usable",
+        "mintfold": "shortlist",
+        "balancio": "reject",
+        "duetally": "usable",
+        "evenkeel": "usable",
+        "daymark": "usable",
+        "nestegg": "reject",
+        "truecourse": "reject",
+        "sumwise": "reject",
+        "billow": "usable",
+        "reckoner": "usable",
+        "tideline": "reject",
+        "accord": "usable",
+        "faircount": "usable"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "mintfold",
+        "sumstead"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "sum, tally, balance, or count coinage",
+          "names": [
+            "tallivo",
+            "sumstead",
+            "balancio",
+            "duetally",
+            "sumwise",
+            "faircount"
+          ]
+        },
+        {
+          "pattern": "clarity, trust, or navigation metaphor",
+          "names": [
+            "clearharbor",
+            "evenkeel",
+            "daymark",
+            "truecourse",
+            "tideline",
+            "accord"
+          ]
+        },
+        {
+          "pattern": "money or organization wordplay",
+          "names": [
+            "mintfold",
+            "nestegg",
+            "billow",
+            "reckoner"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "virelance": "reject",
+        "flintwatch": "usable",
+        "cinderline": "usable",
+        "signalkeep": "usable",
+        "threatloom": "usable",
+        "nightglass": "shortlist",
+        "guardrail": "usable",
+        "ironpulse": "usable",
+        "forewarn": "usable",
+        "sightline": "usable",
+        "lumenward": "shortlist",
+        "redthread": "usable",
+        "earlymark": "usable",
+        "overwatch": "reject",
+        "clearveil": "reject",
+        "knowfirst": "reject"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 7,
+        "vibeFit": 9
+      },
+      "topTwo": [
+        "nightglass",
+        "lumenward"
+      ],
+      "criticalDefects": [
+        "overwatch is the exact name of a famous video-game franchise and is unsafe as a fresh enterprise brand."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "watch, visibility, or early-warning language",
+          "names": [
+            "flintwatch",
+            "nightglass",
+            "forewarn",
+            "sightline",
+            "earlymark",
+            "overwatch",
+            "clearveil",
+            "knowfirst"
+          ]
+        },
+        {
+          "pattern": "defence or signal compound",
+          "names": [
+            "signalkeep",
+            "guardrail",
+            "ironpulse",
+            "lumenward"
+          ]
+        },
+        {
+          "pattern": "dark, fire, or investigative-line imagery",
+          "names": [
+            "cinderline",
+            "redthread"
+          ]
+        },
+        {
+          "pattern": "altered threat or virulence construction",
+          "names": [
+            "virelance",
+            "threatloom"
+          ]
+        }
+      ]
+    }
+  ]
+}

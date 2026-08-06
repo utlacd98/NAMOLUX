@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "packId": "blind-generator-benchmark-2026-07-14-v1",
+  "raterId": null,
+  "completedAt": null,
+  "instructions": "Score only the provider-neutral A/B names in evaluator-pack.json. Do not open provider-reveal.json until every raw-name score is frozen.",
+  "cases": [
+    {
+      "presentationOrder": 1,
+      "caseId": "investigative-podcast",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 2,
+      "caseId": "recycled-gold-jewellery",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 3,
+      "caseId": "carbon-accounting",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 4,
+      "caseId": "welsh-farm-market",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 5,
+      "caseId": "cyber-threat-analytics",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 6,
+      "caseId": "alpine-skincare",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 7,
+      "caseId": "cozy-puzzle-studio",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 8,
+      "caseId": "rural-telehealth",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 9,
+      "caseId": "family-budgeting",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 10,
+      "caseId": "ai-scheduling-founders",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 11,
+      "caseId": "privacy-saas",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    },
+    {
+      "presentationOrder": 12,
+      "caseId": "curly-hair-beauty",
+      "batchA": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "batchB": {
+        "relevance": null,
+        "pronounceability": null,
+        "distinctiveness": null,
+        "controlFit": null,
+        "shortlistDepth": null,
+        "shortlistWorthyCount": null,
+        "topTwoNames": [],
+        "criticalDefect": null
+      },
+      "forcedPreference": null,
+      "confidence": null,
+      "notes": ""
+    }
+  ]
+}

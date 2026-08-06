@@ -1,31 +1,55 @@
 import { NextResponse } from "next/server"
+import type { EmailOtpType } from "@supabase/supabase-js"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { applyAuthNoStoreHeaders } from "@/lib/supabase/middleware"
+import { getAppUrl } from "@/lib/env"
+import { sanitizeRedirectPath } from "@/lib/safe-redirect"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const redirect = searchParams.get("redirect") || "/generate"
-  const requestedNext = searchParams.get("next") ?? redirect
-  const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//")
-    ? requestedNext
-    : "/generate"
+  const tokenHash = searchParams.get("token_hash")
+  const type = searchParams.get("type") as EmailOtpType | null
+  const next = sanitizeRedirectPath(
+    searchParams.get("next") ?? searchParams.get("redirect"),
+    type === "recovery" ? "/reset-password" : "/dashboard",
+  )
+  const isPasswordRecovery = type === "recovery" || next.startsWith("/reset-password")
+  const redirectOrigin = process.env.NODE_ENV === "development" ? origin : getAppUrl(origin)
 
-  if (code) {
-    const supabase = await createClient()
-    const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code)
+  const buildRedirect = (path: string) => {
+    return applyAuthNoStoreHeaders(
+      NextResponse.redirect(new URL(path, redirectOrigin)),
+    )
+  }
+
+  const withRecoveryFlag = (path: string) => {
+    if (!isPasswordRecovery) return path
+
+    const recoveryUrl = new URL(path, origin)
+    recoveryUrl.searchParams.set("recovery", "1")
+    return `${recoveryUrl.pathname}${recoveryUrl.search}`
+  }
+
+  const supabase = await createClient()
+
+  if (code || (tokenHash && type)) {
+    const { data: sessionData, error } = code
+      ? await supabase.auth.exchangeCodeForSession(code)
+      : await supabase.auth.verifyOtp({
+          token_hash: tokenHash as string,
+          type: type as EmailOtpType,
+        })
 
     if (!error) {
-      // Auto-log email to admin email list on new account creation
       try {
         const user = sessionData?.user
-        if (user?.email) {
-          // Only log if account was created within the last 5 minutes (new signup, not returning login)
+        if (!isPasswordRecovery && user?.email) {
           const createdAt = new Date(user.created_at).getTime()
           const isNewAccount = Date.now() - createdAt < 5 * 60 * 1000
 
           if (isNewAccount) {
             const serviceClient = createServiceClient()
-            // Upsert — safe to call multiple times, won't create duplicates
             await serviceClient.from("email_subscribers").upsert(
               {
                 email: user.email.toLowerCase().trim(),
@@ -39,24 +63,16 @@ export async function GET(request: Request) {
           }
         }
       } catch (logErr) {
-        // Non-fatal — don't block auth redirect if email logging fails
         console.error("Failed to log signup email:", logErr)
       }
 
-      // Successful authentication — redirect
-      const forwardedHost = request.headers.get("x-forwarded-host")
-      const isLocalEnv = process.env.NODE_ENV === "development"
-
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
+      return buildRedirect(withRecoveryFlag(next))
     }
   }
 
-  // If there's an error or no code, redirect to sign-in with error
-  return NextResponse.redirect(`${origin}/sign-in?error=auth_callback_error`)
+  const failurePath = isPasswordRecovery
+    ? "/reset-password?recovery=1&error=reset_link_invalid"
+    : "/sign-in?error=auth_callback_error"
+
+  return buildRedirect(failurePath)
 }

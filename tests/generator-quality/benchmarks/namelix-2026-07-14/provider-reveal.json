@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "benchmarkVersion": "namelix-2026-07-14-v1",
+  "randomizationSeed": "namolux-vs-namelix-2026-07-14-v1",
+  "caseOrderAlgorithm": "Sort ascending by SHA-256(seed + '|' + caseId + '|case-order').",
+  "providerOrderAlgorithm": "Sort ascending by SHA-256(seed + '|' + caseId + '|provider-order'); the first six case IDs place NamoLux in A and the remaining six place Namelix in A.",
+  "assignments": [
+    { "caseId": "family-budgeting", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "welsh-farm-market", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "cozy-puzzle-studio", "A": "NamoLux", "B": "Namelix" },
+    { "caseId": "curly-hair-beauty", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "alpine-skincare", "A": "NamoLux", "B": "Namelix" },
+    { "caseId": "recycled-gold-jewellery", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "ai-scheduling-founders", "A": "NamoLux", "B": "Namelix" },
+    { "caseId": "privacy-saas", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "rural-telehealth", "A": "NamoLux", "B": "Namelix" },
+    { "caseId": "carbon-accounting", "A": "NamoLux", "B": "Namelix" },
+    { "caseId": "cyber-threat-analytics", "A": "Namelix", "B": "NamoLux" },
+    { "caseId": "investigative-podcast", "A": "NamoLux", "B": "Namelix" }
+  ]
+}

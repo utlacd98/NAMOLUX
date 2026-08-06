@@ -1,22 +1,36 @@
 import { NextRequest, NextResponse } from "next/server"
+import { createHash } from "node:crypto"
 import OpenAI from "openai"
 import { autoFind5DotComByFounderScore, type AutoFindVibe } from "@/lib/autofind/autoFindByFounderScore"
 import {
-  containsKeywordRoot,
-  isKeywordAnchored,
   hasAiSmellPattern,
+  hasMalformedCompoundPattern,
   hasRandomSyllablePattern,
   hasRecognisableBrandRoot,
   hasUnsafeBrandMeaning,
   passesTasteGate,
 } from "@/lib/domainGen/filters"
 import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
+import { createGeneratedNameId } from "@/lib/domainGen/generatedName"
+import { generateQuickCandidates, selectPrimaryQuickCandidates, type QuickGenerateVibe } from "@/lib/domainGen/quickGenerate"
+import { generateGroqQuickCandidates } from "@/lib/domainGen/quickGenerateGroq"
 import { isGibberish, isKeywordClone } from "@/lib/domainGen/realness"
 import { rankCandidates } from "@/lib/domainGen/scoreCandidates"
 import { expandRelatedTerms, parseKeywordTokens } from "@/lib/domainGen/synonyms"
 import { scoreName } from "@/lib/founderSignal/scoreName"
+import { ADVANCED_SCORING_TOKEN_TTL_MS, issueGenerationWorkflowToken } from "@/lib/generation-workflow-token"
+import { isAdvancedGenerateEmergencyHoldEnabled, isGeneratorRedesignEnabled } from "@/lib/generator-flags"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { trackMetric } from "@/lib/metrics"
-import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import {
+  checkBurstLimit,
+  checkFeatureQuotaIdempotent,
+  checkRateLimit,
+  getFeatureQuotaReplayState,
+  getFeatureQuotaState,
+  getRateLimitState,
+  logGeneration,
+} from "@/lib/rate-limit"
 import { brandExamples, buildGenerationPrompt } from "@/lib/brandExamples"
 
 // Lazy initialization to avoid build-time errors
@@ -35,6 +49,39 @@ function getOpenAI(): OpenAI {
   return openaiInstance
 }
 
+function generationWorkflowIdentity(request: NextRequest, userId: string | null): string {
+  if (userId) return `user:${userId}`
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+  const ip = forwarded || request.headers.get("x-real-ip")?.trim() || "unknown"
+  return `anonymous:${ip}`
+}
+
+function advancedQuotaWorkflowKey(input: {
+  requestId: string
+  keyword: string
+  vibe: string
+  industry?: string
+  maxLength: number
+  refinementInstruction?: string
+  alreadySeen: readonly string[]
+}): string {
+  // Bind a retry to the exact normalized request without persisting the brief.
+  // Reusing a client request ID with different inputs must be a new allowance,
+  // while an exact retry resolves to the same opaque marker.
+  return createHash("sha256")
+    .update(JSON.stringify({
+      version: "advanced-candidate-first-v2",
+      requestId: input.requestId,
+      keyword: input.keyword,
+      vibe: input.vibe,
+      industry: input.industry || "",
+      maxLength: input.maxLength,
+      refinementInstruction: input.refinementInstruction || "",
+      alreadySeen: [...input.alreadySeen].sort(),
+    }))
+    .digest("hex")
+}
+
 // ── AI candidate source ──────────────────────────────────────────────────────
 // The LLM is the creative engine; the deterministic Founder Signal pipeline is
 // the authority. Every AI name passes the same taste/slop gates as engine names.
@@ -42,27 +89,45 @@ function getOpenAI(): OpenAI {
 // deterministic engine so generation never hard-fails.
 
 const FALLBACK_NAMING_MODELS = ["gpt-4.1-mini", "gpt-4o-mini"]
+const MAX_KEYWORD_LENGTH = 1_000
+const MAX_ALREADY_SEEN = 50
+const SUPPORTED_VIBES = new Set(["luxury", "futuristic", "playful", "trustworthy", "minimal"])
+const ADVANCED_BURST_LIMIT = 6
+const AUTO_FIND_BURST_LIMIT = 3
+
+function normaliseRefinementInstruction(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined
+  const text = value.replace(/\s+/g, " ").trim()
+  if (/Focus exclusively on invented CVCV/i.test(text)) {
+    return "THIS BATCH: Use short, naturally pronounceable coined words. Do not clip words, repeat fragments, or use fake-Latin endings. Every name must retain a verifiable concept cue from the brief."
+  }
+  if (/Focus on compound words that clearly describe/i.test(text)) {
+    return "THIS BATCH: Use two complete, familiar words whose combined meaning clearly relates to the product and audience. Do not abbreviate or damage either word."
+  }
+  if (/All names must be 4.{0,3}7 characters/i.test(text)) {
+    return "THIS BATCH: Prefer concise names, but never clip or misspell a word to meet the length target. Return fewer names if the quality bar cannot be met."
+  }
+  if (/Maximum playfulness/i.test(text)) {
+    return "THIS BATCH: Add a warm sensory or emotional hook while keeping every name credible for the stated audience and category."
+  }
+  if (/Optimise for \.com availability/i.test(text)) {
+    return "THIS BATCH: Prefer less crowded full-word compounds and natural phonetics. Do not claim availability and do not sacrifice readability for rarity."
+  }
+  return undefined
+}
+
+function cleanAiNarrative(value: unknown, minimumCharacters: number): string | undefined {
+  if (typeof value !== "string") return undefined
+  const clean = value.replace(/\s+/g, " ").replace(/[<>]/g, "").trim().slice(0, 360)
+  if (clean.length < minimumCharacters || clean.split(" ").filter(Boolean).length < 8) return undefined
+  if (/\b(available|availability|trademark safe|guaranteed|perfect name|best name)\b/i.test(clean)) return undefined
+  return clean
+}
 
 interface AiNameSuggestion {
   name: string
   reasoning?: string
   meaning?: string
-}
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("ai_naming_timeout")), ms)
-    promise.then(
-      (value) => {
-        clearTimeout(timer)
-        resolve(value)
-      },
-      (error) => {
-        clearTimeout(timer)
-        reject(error)
-      },
-    )
-  })
 }
 
 async function fetchAiNameCandidates(opts: {
@@ -75,8 +140,10 @@ async function fetchAiNameCandidates(opts: {
   alreadySeen?: string[]
   refinementInstruction?: string
   totalTimeoutMs?: number
+  signal?: AbortSignal
 }): Promise<AiNameSuggestion[]> {
   if (!process.env.OPENAI_API_KEY?.trim()) return []
+  if (opts.signal?.aborted) throw new DOMException("Generation cancelled", "AbortError")
 
   const { system, user } = buildGenerationPrompt({
     keywords: opts.keyword,
@@ -94,13 +161,21 @@ async function fetchAiNameCandidates(opts: {
   const deadline = Date.now() + (opts.totalTimeoutMs ?? 12_000)
 
   for (const model of models) {
+    if (opts.signal?.aborted) throw new DOMException("Generation cancelled", "AbortError")
     const remaining = deadline - Date.now()
     if (remaining < 800) break
 
     const attemptStarted = Date.now()
+    const attemptController = new AbortController()
+    const abortFromRequest = () => attemptController.abort(opts.signal?.reason)
+    opts.signal?.addEventListener("abort", abortFromRequest, { once: true })
+    const attemptTimer = setTimeout(
+      () => attemptController.abort(new DOMException("AI naming timed out", "TimeoutError")),
+      remaining,
+    )
     try {
-      const completion = await withTimeout(
-        getOpenAI().chat.completions.create({
+      const completion = await getOpenAI().chat.completions.create(
+        {
           model,
           messages: [
             { role: "system", content: finalSystem },
@@ -108,8 +183,8 @@ async function fetchAiNameCandidates(opts: {
           ],
           temperature: 0.9,
           max_tokens: opts.outputFormat === "names-only" ? 300 : 1100,
-        }),
-        remaining,
+        },
+        { signal: attemptController.signal },
       )
 
       const responseText = completion.choices[0]?.message?.content || "[]"
@@ -125,9 +200,8 @@ async function fetchAiNameCandidates(opts: {
         seen.add(clean)
         suggestions.push({
           name: clean,
-          reasoning:
-            typeof item?.reasoning === "string" && item.reasoning.trim().length > 0 ? item.reasoning.trim() : undefined,
-          meaning: typeof item?.meaning === "string" && item.meaning.trim().length > 0 ? item.meaning.trim() : undefined,
+          reasoning: cleanAiNarrative(item?.reasoning, 45),
+          meaning: cleanAiNarrative(item?.meaning, 60),
         })
       }
 
@@ -136,10 +210,14 @@ async function fetchAiNameCandidates(opts: {
         return suggestions
       }
     } catch (error) {
+      if (opts.signal?.aborted) throw error
       console.error(
         `AI naming model ${model} failed after ${Date.now() - attemptStarted}ms:`,
         error instanceof Error ? error.message : error,
       )
+    } finally {
+      clearTimeout(attemptTimer)
+      opts.signal?.removeEventListener("abort", abortFromRequest)
     }
   }
 
@@ -168,8 +246,25 @@ function passesAiQualityGate(name: string, keywordTokens: string[], maxLength: n
   if (hasUnsafeBrandMeaning(name)) return false
   if (hasRandomSyllablePattern(name)) return false
   if (hasAiSmellPattern(name)) return false
+  if (hasMalformedCompoundPattern(name)) return false
   if (!passesTasteGate(name)) return false
   return true
+}
+
+/**
+ * Advanced exploration intentionally does not use Founder Signal as an
+ * admission gate. Only objective safety and severe legibility failures are
+ * rejected here; evaluation happens later when the user requests it.
+ */
+function passesAdvancedCreativeGate(name: string, maxLength: number): boolean {
+  if (name.length < 3 || name.length > maxLength) return false
+  if (KNOWN_BRAND_NAMES.has(name)) return false
+  if (/([bcdfghjkmnpqrtvwxy])\1$/.test(name)) return false
+  if (isGibberish(name)) return false
+  if (hasUnsafeBrandMeaning(name)) return false
+  if (hasRandomSyllablePattern(name)) return false
+  if (hasMalformedCompoundPattern(name)) return false
+  return passesTasteGate(name)
 }
 
 /**
@@ -230,6 +325,120 @@ function toAutoFindVibe(value: unknown): AutoFindVibe {
   if (safe === "playful") return "Playful"
   if (safe === "trustworthy") return "Trustworthy"
   return "Minimal"
+}
+
+function toQuickGenerateVibe(value: unknown): QuickGenerateVibe {
+  const safe = String(value || "").toLowerCase()
+  if (safe === "luxury") return "premium"
+  if (safe === "futuristic") return "tech"
+  if (safe === "playful") return "playful"
+  if (safe === "trustworthy") return "clean"
+  return "clean"
+}
+
+interface PersonalizedNameCopy {
+  personalDescription: string
+  styleRationale: string
+  slogan: string
+}
+
+function formatBrandName(name: string): string {
+  const clean = String(name || "").replace(/[^a-z0-9]/gi, "")
+  return clean ? `${clean[0].toUpperCase()}${clean.slice(1)}` : "This name"
+}
+
+function cleanBriefText(value: unknown, fallback: string): string {
+  const text = String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/[<>]/g, "")
+    .trim()
+  if (!text) return fallback
+  return text.length > 110 ? `${text.slice(0, 107).trim()}...` : text
+}
+
+function getBriefCore(value: unknown, fallback: string): string {
+  const words = String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 2)
+    .filter((word) => !["the", "and", "for", "with", "that", "this", "from", "your", "into", "about"].includes(word))
+    .slice(0, 3)
+
+  return words.length > 0 ? words.join(" ") : fallback
+}
+
+function getVibeCopy(vibe: unknown): { label: string; description: string; sloganTemplate: string } {
+  const safe = String(vibe || "").toLowerCase()
+  if (safe === "luxury") {
+    return {
+      label: "Luxury",
+      description: "premium, polished, and restrained",
+      sloganTemplate: "Elevated by design.",
+    }
+  }
+  if (safe === "futuristic") {
+    return {
+      label: "Futuristic",
+      description: "sharp, modern, and forward-looking",
+      sloganTemplate: "Build what comes next.",
+    }
+  }
+  if (safe === "playful") {
+    return {
+      label: "Playful",
+      description: "friendly, upbeat, and easy to remember",
+      sloganTemplate: "Make it feel effortless.",
+    }
+  }
+  if (safe === "trustworthy") {
+    return {
+      label: "Trustworthy",
+      description: "clear, credible, and dependable",
+      sloganTemplate: "Confidence from the first click.",
+    }
+  }
+  return {
+    label: "Minimal",
+    description: "clean, simple, and direct",
+    sloganTemplate: "Simple name. Strong signal.",
+  }
+}
+
+function buildPersonalizedNameCopy(input: {
+  name: string
+  keyword: string
+  industry?: string
+  vibe?: string
+  founderScore?: number
+  whyItWorks?: string | null
+  meaningBreakdown?: string | null
+  reasons?: string[]
+}): PersonalizedNameCopy {
+  const displayName = formatBrandName(input.name)
+  const brief = cleanBriefText(input.keyword, "your idea")
+  const industry = cleanBriefText(input.industry, "your market")
+  const vibe = getVibeCopy(input.vibe)
+  const briefCore = getBriefCore(input.keyword, industry.toLowerCase())
+  const score = typeof input.founderScore === "number" ? input.founderScore : undefined
+  const proof =
+    input.whyItWorks ||
+    input.meaningBreakdown ||
+    input.reasons?.slice(0, 2).join(" ") ||
+    `${displayName} keeps the name concise, pronounceable, and brandable.`
+  const scoreText = score
+    ? score >= 75
+      ? `Its Founder Signal score of ${score}/100 supports it as a strong shortlist candidate.`
+      : score >= 60
+        ? `Its Founder Signal score of ${score}/100 places it in the viable range, with room for comparison.`
+        : `Its Founder Signal score of ${score}/100 suggests this direction needs more scrutiny before selection.`
+    : ""
+
+  return {
+    personalDescription: `${displayName} was shortlisted against the brief "${brief}" for ${industry}. ${proof} ${scoreText}`.replace(/\s+/g, " ").trim(),
+    styleRationale: `Style fit: ${vibe.label}. The name is built to feel ${vibe.description}, which matches the selected vibe while keeping the domain short enough to scan, say, and remember.`,
+    slogan: `${displayName}: ${briefCore[0]?.toUpperCase() || "Y"}${briefCore.slice(1)}, ${vibe.sloganTemplate.toLowerCase()}`,
+  }
 }
 
 function isNameStyleV2Enabled(): boolean {
@@ -531,30 +740,152 @@ function isPreviewQualityCandidate(name: string, strategy: string, maxLength: nu
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    // Check rate limit first - domain generation feature
-    const rateLimitResult = await checkRateLimit(request, "domain")
+  const labBlockResponse = getGeneratorLabApiBlockResponse(request)
+  if (labBlockResponse) return labBlockResponse
 
-    if (!rateLimitResult.allowed) {
+  try {
+    const requestStartedAt = Date.now()
+    const payload = await request.json().catch(() => null)
+    if (!payload || typeof payload !== "object") {
+      return NextResponse.json({ error: "A valid JSON request is required" }, { status: 400 })
+    }
+
+    const keyword = typeof payload.keyword === "string" ? payload.keyword.trim().slice(0, MAX_KEYWORD_LENGTH) : ""
+    if (keyword.length < 2) {
+      return NextResponse.json({ error: "Describe the product, audience, or category in at least two characters." }, { status: 400 })
+    }
+
+    const requestedVibe = typeof payload.vibe === "string" ? payload.vibe.toLowerCase() : "minimal"
+    const vibe = SUPPORTED_VIBES.has(requestedVibe) ? requestedVibe : "minimal"
+    const industry = typeof payload.industry === "string" ? payload.industry.replace(/[<>]/g, "").trim().slice(0, 80) : undefined
+    const maxLength = Math.max(6, Math.min(15, typeof payload.maxLength === "number" && Number.isFinite(payload.maxLength) ? Math.floor(payload.maxLength) : 10))
+    const count = typeof payload.count === "number" && Number.isFinite(payload.count) ? Math.floor(payload.count) : undefined
+    const autoFindV2 = payload.autoFindV2 === true
+    const generatorV2 = payload.generatorV2
+    const redesignV2 = isGeneratorRedesignEnabled()
+    if (isAdvancedGenerateEmergencyHoldEnabled()) {
       return NextResponse.json(
         {
-          error: "token_limit_reached",
-          message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.",
-          upgradeUrl: "/pricing",
+          error: "advanced_generation_quality_hold",
+          message: "Advanced Generate is temporarily being improved to protect result quality. Please try again shortly; no allowance was used.",
+          retryable: true,
+          generationMeta: {
+            resultCount: 0,
+            isPartial: true,
+            qualityState: "temporarily_paused",
+          },
         },
-        { status: 429 }
+        { status: 503 },
+      )
+    }
+    const workflowRequestId = typeof payload.requestId === "string" ? payload.requestId.trim() : ""
+    if (redesignV2 && !autoFindV2 && !/^[a-zA-Z0-9._:-]{16,200}$/.test(workflowRequestId)) {
+      return NextResponse.json(
+        { error: "invalid_request_id", message: "A valid Advanced workflow request id is required." },
+        { status: 400 },
+      )
+    }
+    const refinementInstruction = normaliseRefinementInstruction(payload.refinementInstruction)
+    const alreadySeen: string[] = Array.isArray(payload.alreadySeen)
+      ? payload.alreadySeen.slice(0, MAX_ALREADY_SEEN).map((name: unknown) => String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 63)).filter(Boolean)
+      : []
+    const workflowQuotaKey = redesignV2 && !autoFindV2
+      ? advancedQuotaWorkflowKey({
+          requestId: workflowRequestId,
+          keyword,
+          vibe,
+          industry,
+          maxLength,
+          refinementInstruction,
+          alreadySeen,
+        })
+      : workflowRequestId
+
+    const burst = await checkBurstLimit(
+      request,
+      autoFindV2 ? "advanced-auto-find" : "advanced-generate",
+      autoFindV2 ? AUTO_FIND_BURST_LIMIT : ADVANCED_BURST_LIMIT,
+    )
+    if (!burst.allowed) {
+      return NextResponse.json(
+        {
+          error: "generation_rate_limited",
+          message: "Please wait a moment before starting another naming batch.",
+          resetAt: burst.resetAt,
+        },
+        { status: burst.unavailable ? 503 : 429 },
       )
     }
 
-    const payload = await request.json()
-    const { keyword, vibe, industry, maxLength, count, autoFindV2, generatorV2, refinementInstruction, alreadySeen } = payload
-    const hasCustomCount = typeof count === "number" && Number.isFinite(count)
-    const safeCount = hasCustomCount ? Math.max(12, Math.min(Math.floor(count), 20)) : 10
-    const useQualityGenerator = generatorV2 !== false
-
-    if (!keyword || !keyword.trim()) {
-      return NextResponse.json({ error: "Keyword is required" }, { status: 400 })
+    const replayState = redesignV2 && !autoFindV2
+      ? await getFeatureQuotaReplayState(request, "advanced-generation-monthly", workflowQuotaKey)
+      : { replayed: false, unavailable: false }
+    if (replayState.unavailable) {
+      return NextResponse.json(
+        { error: "usage_check_unavailable", message: "Usage checks are temporarily unavailable. Please try again shortly." },
+        { status: 503 },
+      )
     }
+
+    // Invalid requests never consume one of the user's monthly workflows.
+    const rateLimitResult = autoFindV2
+      ? await getRateLimitState(request)
+      : redesignV2
+        ? await getFeatureQuotaState(request, "advanced-generation-monthly", 3)
+        : await checkRateLimit(request, "domain")
+
+    if (autoFindV2 && !rateLimitResult.isPro) {
+      return NextResponse.json(
+        { error: "pro_required", message: "Auto-find premium domains is included with NamoLux Pro." },
+        { status: 403 },
+      )
+    }
+
+    if (!autoFindV2 && !rateLimitResult.allowed && !replayState.replayed) {
+      if (redesignV2 && "used" in rateLimitResult) {
+        return NextResponse.json(
+          {
+            error: rateLimitResult.statusCode === 503
+              ? "usage_check_unavailable"
+              : "advanced_generation_monthly_limit_reached",
+            message: rateLimitResult.statusCode === 503
+              ? rateLimitResult.message
+              : "The free plan includes 3 Advanced naming batches per month. Upgrade for unlimited fair-use access.",
+            upgradeUrl: "/pricing",
+            resetAt: rateLimitResult.resetAt,
+            tokensUsed: rateLimitResult.used,
+            tokensTotal: rateLimitResult.limit,
+            remaining: rateLimitResult.remaining,
+          },
+          { status: rateLimitResult.statusCode },
+        )
+      }
+      if (!("tokensUsed" in rateLimitResult)) {
+        return NextResponse.json(
+          { error: "usage_check_unavailable", message: "Usage checks are temporarily unavailable. Please try again shortly." },
+          { status: 503 },
+        )
+      }
+      return NextResponse.json(
+        {
+          error: "monthly_usage_limit_reached",
+          message: rateLimitResult.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+          resetAt: rateLimitResult.resetAt,
+          tokensUsed: rateLimitResult.tokensUsed,
+          tokensTotal: rateLimitResult.tokensTotal,
+          remaining: rateLimitResult.remaining,
+        },
+        { status: rateLimitResult.statusCode || 429 }
+      )
+    }
+
+    const hasCustomCount = typeof count === "number" && Number.isFinite(count)
+    const safeCount = redesignV2 ? 12 : hasCustomCount ? Math.max(12, Math.min(Math.floor(count), 20)) : 10
+    // Once the rollout is enabled, Advanced generation is always candidate-first.
+    // A client-controlled legacy flag must never restore hidden score filtering or
+    // bypass the dedicated Advanced allowance. Auto-find remains its own explicit
+    // score-led Pro workflow and is handled above.
+    const useQualityGenerator = redesignV2 ? true : generatorV2 !== false
 
     if (autoFindV2) {
       if (!isAutoFindV2Enabled()) {
@@ -574,6 +905,7 @@ export async function POST(request: NextRequest) {
         batchSize: 16,
         outputFormat: "names-only",
         totalTimeoutMs: 7_000,
+        signal: request.signal,
       })
 
       const result = await autoFind5DotComByFounderScore({
@@ -600,7 +932,7 @@ export async function POST(request: NextRequest) {
       trackMetric({
         action: "name_generation",
         metadata: {
-          keyword,
+          briefLength: keyword.length,
           vibe,
           industry,
           mode: "auto_find_v2",
@@ -622,30 +954,51 @@ export async function POST(request: NextRequest) {
 
       // Log generation for rate limiting (only for free users - pro users don't need logging for limits)
       if (!rateLimitResult.isPro) {
-        logGeneration(request, rateLimitResult.userId, "domain", keyword, result.found.length).catch(() => {})
+        logGeneration(request, rateLimitResult.userId, "domain", undefined, result.found.length).catch(() => {})
       }
 
-      const verifiedPicks = result.found.map((pick) => ({
-        name: pick.name,
-        tld: pick.tld,
-        fullDomain: pick.domain,
-        available: true,
-        score: pick.founderScore,
-        founderScore: pick.founderScore,
-        pronounceable: pick.label === "Pronounceable",
-        memorability: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
-        length: pick.name.length,
-        strategy: "founder_score_priority",
-        scoreBreakdown: { founderSignal: pick.founderScore },
-        roots: [] as string[],
-        whyTag: (pick.reasons ?? []).slice(0, 2).join(" | "),
-        qualityBand: pick.founderScore >= 85 ? "high" : pick.founderScore >= 75 ? "medium" : "low",
-        meaningScore: Math.min(100, Math.max(10, pick.founderScore)),
-        meaningBreakdown: "Founder Signal quality-first selection.",
-        whyItWorks: `Founder Signal ${pick.founderScore}/100.`,
-        brandableScore: Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)),
-        pronounceabilityScore: pick.label === "Pronounceable" ? 90 : 72,
-      }))
+      const verifiedPicks = result.found.map((pick) => {
+        const visibleFounderScore = rateLimitResult.isPro ? pick.founderScore : undefined
+        const whyItWorks = rateLimitResult.isPro
+          ? `Founder Signal ${pick.founderScore}/100.`
+          : "Selected as an available, quality-filtered domain direction."
+        const meaningBreakdown = rateLimitResult.isPro
+          ? "Founder Signal quality-first selection."
+          : "Availability and baseline brand mechanics were checked for this direction."
+        const copy = buildPersonalizedNameCopy({
+          name: pick.name,
+          keyword: keyword.trim(),
+          industry: typeof industry === "string" ? industry : undefined,
+          vibe: typeof vibe === "string" ? vibe : undefined,
+          founderScore: visibleFounderScore,
+          whyItWorks,
+          meaningBreakdown,
+          reasons: pick.reasons,
+        })
+
+        return {
+          name: pick.name,
+          tld: pick.tld,
+          fullDomain: pick.domain,
+          available: true,
+          score: visibleFounderScore,
+          founderScore: visibleFounderScore,
+          pronounceable: rateLimitResult.isPro ? pick.label === "Pronounceable" : undefined,
+          memorability: rateLimitResult.isPro ? Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)) : undefined,
+          length: pick.name.length,
+          strategy: "founder_score_priority",
+          scoreBreakdown: rateLimitResult.isPro ? { founderSignal: pick.founderScore } : undefined,
+          roots: [] as string[],
+          whyTag: rateLimitResult.isPro ? (pick.reasons ?? []).slice(0, 2).join(" | ") : undefined,
+          qualityBand: rateLimitResult.isPro ? (pick.founderScore >= 85 ? "high" : pick.founderScore >= 75 ? "medium" : "low") : undefined,
+          meaningScore: rateLimitResult.isPro ? Math.min(100, Math.max(10, pick.founderScore)) : undefined,
+          meaningBreakdown,
+          whyItWorks,
+          brandableScore: rateLimitResult.isPro ? Number(Math.min(10, Math.max(1, pick.founderScore / 10)).toFixed(1)) : undefined,
+          pronounceabilityScore: rateLimitResult.isPro ? (pick.label === "Pronounceable" ? 90 : 72) : undefined,
+          ...copy,
+        }
+      })
 
       const picks = [...verifiedPicks]
 
@@ -672,6 +1025,245 @@ export async function POST(request: NextRequest) {
           nearMisses: [],
           explanation: result.message,
         },
+      })
+    }
+
+    if (redesignV2 && useQualityGenerator) {
+      const safeVibe = vibe.toLowerCase()
+      const safeIndustry = industry
+      const safeMaxLength = maxLength
+      const seenNames = new Set(alreadySeen)
+      const advancedSeed =
+        `advanced-${workflowRequestId}:${keyword}:${safeVibe}:${safeIndustry || ""}:${String(refinementInstruction || "")}:${seenNames.size}`
+      const advancedDescription = [
+        keyword,
+        safeIndustry ? `Industry context: ${safeIndustry}.` : "",
+        refinementInstruction || "",
+      ].filter(Boolean).join(" ")
+      const generation = await generateGroqQuickCandidates({
+        description: advancedDescription,
+        vibe: toQuickGenerateVibe(safeVibe),
+        style: "auto",
+        creativity: "balanced",
+        maxChars: safeMaxLength,
+        count: 16,
+        seed: advancedSeed,
+        blacklist: alreadySeen,
+        requireEditorialReview: true,
+      }, request.signal)
+
+      if (request.signal.aborted) {
+        return NextResponse.json({ error: "generation_cancelled" }, { status: 499 })
+      }
+
+      const selected = generation.candidates
+        .filter((candidate) => !seenNames.has(candidate.name))
+        .filter((candidate) => passesAdvancedCreativeGate(candidate.name, safeMaxLength))
+        .slice(0, 12)
+      const qualityCounts = [
+        generation.modelCandidateCount,
+        generation.modelGroundedCandidateCount,
+        generation.fallbackCandidateCount,
+        generation.fallbackGroundedCandidateCount,
+        generation.groundedCandidateCount,
+        generation.exploratoryCandidateCount,
+        generation.editorialCandidateCount,
+      ]
+      const hasConsistentQualityAccounting = qualityCounts.every(
+        (value) => Number.isSafeInteger(value) && value >= 0,
+      )
+        && generation.modelCandidateCount + generation.fallbackCandidateCount === generation.candidates.length
+        && generation.editorialCandidateCount === generation.modelCandidateCount
+        && generation.groundedCandidateCount
+          === generation.modelGroundedCandidateCount + generation.fallbackGroundedCandidateCount
+        && generation.groundedCandidateCount + generation.exploratoryCandidateCount
+          === generation.candidates.length
+      const generationIsFullyModelBacked = generation.modelBacked
+        && generation.provider !== "deterministic"
+        && hasConsistentQualityAccounting
+        && generation.fallbackCandidateCount === 0
+        && generation.modelCandidateCount === generation.candidates.length
+      const selectedModelCount = generationIsFullyModelBacked
+        ? selected.length
+        : 0
+      const selectedGroundedCount = selected.filter((candidate) => candidate.autoQualityTier === "grounded").length
+      if (
+        selected.length < 12
+        || selectedModelCount < 12
+        || generation.provider === "deterministic"
+        || !generation.editoriallyReviewed
+        || generation.editorialCandidateCount < 12
+      ) {
+        return NextResponse.json(
+          {
+            error: "advanced_generation_temporarily_limited",
+            message: "We couldn't build a complete professional shortlist for those settings. Please try again; no allowance was used.",
+            retryable: true,
+            generationMeta: {
+              modelBacked: generation.modelBacked,
+              model: generation.model,
+              durationMs: generation.durationMs,
+              providerAttempts: generation.providerAttempts,
+              editoriallyReviewed: generation.editoriallyReviewed,
+              editorialCandidateCount: generation.editorialCandidateCount,
+              requestedCount: 12,
+              resultCount: 0,
+              isPartial: true,
+              qualityState: "degraded",
+            },
+            quality: {
+              modelCandidateCount: generation.modelCandidateCount,
+              fallbackCandidateCount: generation.fallbackCandidateCount,
+              groundedCandidateCount: generation.groundedCandidateCount,
+              exploratoryCandidateCount: generation.exploratoryCandidateCount,
+            },
+          },
+          { status: 503 },
+        )
+      }
+
+      const generated = selected.map((candidate, index) => {
+        const generationRank = index + 1
+        const rationale = candidate.personality
+        const copy = buildPersonalizedNameCopy({
+          name: candidate.name,
+          keyword,
+          industry: safeIndustry,
+          vibe: safeVibe,
+          whyItWorks: rationale,
+          meaningBreakdown: rationale,
+        })
+        return {
+          id: createGeneratedNameId(candidate.name, generationRank),
+          name: candidate.name,
+          rationale: copy.personalDescription,
+          reasoning: copy.personalDescription,
+          style: candidate.style,
+          generationRank,
+          availability: {},
+          founderSignal: null,
+          meaning: rationale,
+          meaningShort: rationale,
+          personalDescription: copy.personalDescription,
+          styleRationale: copy.styleRationale,
+          slogan: copy.slogan,
+        }
+      })
+
+      // Candidate construction succeeded. Consume atomically only now so model
+      // or validation failures never burn a free monthly batch.
+      if (request.signal.aborted) {
+        return NextResponse.json({ error: "generation_cancelled" }, { status: 499 })
+      }
+      const consumedAllowance = await checkFeatureQuotaIdempotent(
+        request,
+        "advanced-generation-monthly",
+        3,
+        workflowQuotaKey,
+      )
+      if (!consumedAllowance.allowed) {
+        const unavailable = consumedAllowance.statusCode === 503
+        return NextResponse.json(
+          {
+            error: unavailable ? "usage_check_unavailable" : "advanced_generation_monthly_limit_reached",
+            message: unavailable
+              ? consumedAllowance.message
+              : "The free plan includes 3 Advanced naming batches per month. Upgrade for unlimited fair-use access.",
+            upgradeUrl: "/pricing",
+            resetAt: consumedAllowance.resetAt,
+            tokensUsed: consumedAllowance.used,
+            tokensTotal: consumedAllowance.limit,
+            remaining: consumedAllowance.remaining,
+          },
+          { status: consumedAllowance.statusCode },
+        )
+      }
+      const workflowIssuedAt = Date.parse(consumedAllowance.receiptCreatedAt || "")
+      if (!Number.isFinite(workflowIssuedAt)) {
+        return NextResponse.json(
+          { error: "usage_check_unavailable", message: "Usage checks are temporarily unavailable. Please try again shortly." },
+          { status: 503 },
+        )
+      }
+
+      const identity = generationWorkflowIdentity(request, consumedAllowance.userId)
+      const generatedNames = generated.map((candidate) => candidate.name)
+      const allowance = {
+        used: consumedAllowance.used,
+        limit: consumedAllowance.limit,
+        remaining: consumedAllowance.remaining,
+        resetAt: consumedAllowance.resetAt,
+      }
+
+      const userAgent = request.headers.get("user-agent") || undefined
+      const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
+      if (!consumedAllowance.replayed) {
+        trackMetric({
+          action: "name_generation",
+          metadata: {
+            mode: "advanced",
+            style: "auto",
+            creativity: "balanced",
+            provider: generation.provider,
+            model: generation.model,
+            resultCount: generated.length,
+            modelCandidateCount: selectedModelCount,
+            fallbackCandidateCount: generated.length - selectedModelCount,
+            fallbackRatio: generated.length > 0
+              ? Number(((generated.length - selectedModelCount) / generated.length).toFixed(4))
+              : 0,
+            timeToNamesMs: Date.now() - requestStartedAt,
+            contract: "candidate_first_v2",
+          },
+          userAgent,
+          country,
+        })
+      }
+
+      if (!consumedAllowance.isPro && !consumedAllowance.replayed) {
+        logGeneration(request, consumedAllowance.userId, "domain", undefined, generated.length).catch(() => {})
+      }
+
+      return NextResponse.json({
+        success: true,
+        generatorV2: true,
+        isPro: consumedAllowance.isPro,
+        generation: generation.provider,
+        state: "names_ready",
+        availabilityState: "checking_domains",
+        generationMeta: {
+          modelBacked: generation.modelBacked,
+          model: generation.model,
+          durationMs: generation.durationMs,
+          providerAttempts: generation.providerAttempts,
+          editoriallyReviewed: generation.editoriallyReviewed,
+          editorialCandidateCount: generation.editorialCandidateCount,
+          requestedCount: 12,
+          resultCount: generated.length,
+          isPartial: false,
+          styleFulfilled: true,
+        },
+        quality: {
+          modelCandidateCount: selectedModelCount,
+          modelGroundedCandidateCount: selectedGroundedCount,
+          fallbackCandidateCount: generated.length - selectedModelCount,
+          fallbackGroundedCandidateCount: 0,
+          groundedCandidateCount: selectedGroundedCount,
+          exploratoryCandidateCount: Math.max(0, generated.length - selectedGroundedCount),
+        },
+        workflowToken: issueGenerationWorkflowToken(
+          generatedNames,
+          `advanced-founder-signal:${identity}`,
+          workflowIssuedAt,
+          ADVANCED_SCORING_TOKEN_TTL_MS,
+          { binding: "ordered" },
+        ),
+        // Availability is a short-lived continuation. Replays intentionally get
+        // a fresh window, while the 24-hour Founder Signal decision token remains
+        // anchored to the immutable quota receipt above.
+        availabilityToken: issueGenerationWorkflowToken(generatedNames, `availability:${identity}`, Date.now()),
+        advancedGenerationAllowance: allowance,
+        domains: generated,
       })
     }
 
@@ -704,6 +1296,18 @@ export async function POST(request: NextRequest) {
         showAnyAvailable: false,
       }
 
+      const semanticFloor = generateQuickCandidates({
+        description: keyword.trim(),
+        vibe: toQuickGenerateVibe(safeVibe),
+        maxChars: safeMaxLength,
+        count: 12,
+        seed: `${controls.seed}|semantic-floor`,
+      })
+      const primarySemanticFloor = selectPrimaryQuickCandidates(semanticFloor, safeCount)
+      const primaryRoots = Array.from(new Set(primarySemanticFloor.flatMap((candidate) => candidate.fitRoots || [])))
+      const hasPrimaryFit = (name: string) =>
+        primaryRoots.length === 0 || primaryRoots.some((root) => root.length >= 3 && name.includes(root))
+
       // Kick off the AI creative pass while the deterministic pool builds.
       // AI output is gated by the exact same taste/slop filters as engine output.
       const aiSuggestionsPromise = fetchAiNameCandidates({
@@ -712,15 +1316,14 @@ export async function POST(request: NextRequest) {
         vibe: safeVibe,
         maxLength: safeMaxLength,
         batchSize: Math.min(16, safeCount + 4),
-        // names-only keeps the completion small (~3s); meaning copy is
-        // derived server-side from Founder Signal so latency stays interactive
-        outputFormat: "names-only",
+        outputFormat: "with-metadata",
         alreadySeen: Array.from(seenNames),
         refinementInstruction:
           typeof refinementInstruction === "string" && refinementInstruction.trim().length > 0
             ? refinementInstruction.trim()
             : undefined,
-        totalTimeoutMs: 20_000,
+        totalTimeoutMs: 10_000,
+        signal: request.signal,
       })
 
       const pool = generateCandidatePool(
@@ -748,8 +1351,21 @@ export async function POST(request: NextRequest) {
         }))
         .filter(({ candidate }) => isPreviewQualityCandidate(candidate.name, candidate.strategy, safeMaxLength))
 
+      const semanticGenerated = primarySemanticFloor.map((semantic) => ({
+        candidate: {
+          name: semantic.name,
+          strategy: "verified_semantic",
+          score: 100,
+          roots: semantic.fitRoots || [],
+          meaningBreakdown: semantic.personality,
+          whyItWorks: semantic.personality,
+        },
+        founder: scoreName({ name: semantic.name, tld: "com", vibe: safeVibe as any, keywords: pool.keywordTokens }),
+      }))
+
       const curatedGenerated = buildPreviewQualitySeeds(keyword.trim(), safeIndustry, safeVibe)
         .filter((name) => name.length <= safeMaxLength && isPreviewQualityCandidate(name, "curated_emotional", safeMaxLength))
+        .filter((name) => hasPrimaryFit(name))
         .map((name) => ({
           candidate: {
             name,
@@ -782,7 +1398,7 @@ export async function POST(request: NextRequest) {
         })
 
       const rankPreviewItem = (
-        item: (typeof curatedGenerated)[number] | (typeof rankedGenerated)[number] | (typeof aiGenerated)[number],
+        item: (typeof curatedGenerated)[number] | (typeof rankedGenerated)[number] | (typeof aiGenerated)[number] | (typeof semanticGenerated)[number],
       ) => ({
         ...item,
         rankScore:
@@ -790,8 +1406,10 @@ export async function POST(request: NextRequest) {
           item.candidate.score / 10 +
           previewContextFit(item.candidate.name, contextRoots) * 18 +
           previewIntentFit(item.candidate.name, intentRoots) * 24 +
-          (item.candidate.strategy === "curated_emotional" ? 35 : 0) +
-          (item.candidate.strategy === "ai_creative" ? 40 : 0) -
+          (item.candidate.strategy === "verified_semantic" ? 110 : 0) +
+          (item.candidate.strategy === "verified_concept_compound" ? 28 : 0) +
+          (item.candidate.strategy === "curated_emotional" ? 8 : 0) +
+          (item.candidate.strategy === "ai_creative" ? 24 : 0) -
           (item.candidate.name.length <= 5 ? 28 : 0),
       })
 
@@ -823,22 +1441,32 @@ export async function POST(request: NextRequest) {
         rankedGenerated
           .filter(({ candidate }) => !seenNames.has(candidate.name.toLowerCase()))
           .filter(({ candidate }) => candidate.name.length >= 6)
+          .filter(({ candidate }) => hasPrimaryFit(candidate.name))
           .filter(({ candidate }) => {
+            if (candidate.strategy === "verified_concept_compound") return true
             if (contextRoots.length === 0 && intentRoots.length === 0) return true
             return previewContextFit(candidate.name, contextRoots) > 0 || previewIntentFit(candidate.name, intentRoots) > 0
           })
-          .filter(({ founder }) => founder.score >= 70)
+          .filter(({ candidate, founder }) => founder.score >= (candidate.strategy === "verified_concept_compound" ? 60 : 70))
           .map(rankPreviewItem),
       )
 
       const aiRanked = dedupeRanked(
         aiGenerated
           .filter(({ candidate }) => !seenNames.has(candidate.name.toLowerCase()))
+          .filter(({ candidate }) => hasPrimaryFit(candidate.name))
           .filter(({ founder }) => founder.score >= 60)
           .map(rankPreviewItem),
       )
 
-      let generated = diversifyPicks(dedupeRanked([...aiRanked, ...curatedRanked, ...engineRanked]), safeCount)
+      const semanticRanked = dedupeRanked(
+        semanticGenerated
+          .filter(({ candidate }) => !seenNames.has(candidate.name.toLowerCase()))
+          .filter(({ founder }) => founder.score >= 55)
+          .map(rankPreviewItem),
+      )
+
+      let generated = diversifyPicks(dedupeRanked([...semanticRanked, ...aiRanked, ...engineRanked, ...curatedRanked]), safeCount)
 
       if (generated.length < safeCount && engineRanked.length > 0) {
         generated = dedupeInOrder([...generated, ...engineRanked]).slice(0, safeCount)
@@ -869,6 +1497,7 @@ export async function POST(request: NextRequest) {
             ...rankedGenerated
               .filter(({ candidate }) => !seenNames.has(candidate.name.toLowerCase()))
               .filter(({ candidate }) => candidate.name.length >= 6)
+              .filter(({ candidate }) => hasPrimaryFit(candidate.name))
               .filter(({ candidate }) => isPreviewQualityCandidate(candidate.name, candidate.strategy, safeMaxLength))
               .map(rankPreviewItem),
           ],
@@ -880,7 +1509,7 @@ export async function POST(request: NextRequest) {
       trackMetric({
         action: "name_generation",
         metadata: {
-          keyword,
+          briefLength: keyword.length,
           vibe,
           industry,
           mode: "quality_generator_v2",
@@ -894,21 +1523,41 @@ export async function POST(request: NextRequest) {
       })
 
       if (!rateLimitResult.isPro) {
-        logGeneration(request, rateLimitResult.userId, "domain", keyword, generated.length).catch(() => {})
+        logGeneration(request, rateLimitResult.userId, "domain", undefined, generated.length).catch(() => {})
       }
 
       return NextResponse.json({
         success: true,
         generatorV2: true,
         isPro: rateLimitResult.isPro,
-        domains: generated.map(({ candidate, founder }) => ({
-          name: candidate.name,
-          style: candidate.strategy,
-          meaningShort: candidate.meaningBreakdown || null,
-          meaning: candidate.meaningBreakdown || candidate.whyItWorks || founder.reasons.slice(0, 2).join(" | ") || null,
-          reasoning: candidate.whyItWorks || founder.reasons.slice(0, 2).join(" | ") || "Quality-engine candidate.",
-          founderScore: founder.score,
-        })),
+        availabilityToken: issueGenerationWorkflowToken(
+          generated.map(({ candidate }) => candidate.name),
+          generationWorkflowIdentity(request, rateLimitResult.userId),
+        ),
+        domains: generated.map(({ candidate, founder }) => {
+          const reasoning =
+            candidate.whyItWorks || founder.reasons.slice(0, 2).join(" | ") || "Quality-engine candidate."
+          const copy = buildPersonalizedNameCopy({
+            name: candidate.name,
+            keyword: keyword.trim(),
+            industry: safeIndustry,
+            vibe: safeVibe,
+            founderScore: rateLimitResult.isPro ? founder.score : undefined,
+            whyItWorks: reasoning,
+            meaningBreakdown: candidate.meaningBreakdown,
+            reasons: founder.reasons,
+          })
+
+          return {
+            name: candidate.name,
+            style: candidate.strategy,
+            meaningShort: candidate.meaningBreakdown || null,
+            meaning: candidate.meaningBreakdown || reasoning || null,
+            reasoning,
+            founderScore: rateLimitResult.isPro ? founder.score : undefined,
+            ...copy,
+          }
+        }),
       })
 
     }
@@ -939,13 +1588,7 @@ export async function POST(request: NextRequest) {
       .filter((t: string) => t.length >= 2)
 
     function passesQualityGate(name: string): boolean {
-      if (KNOWN_BRAND_NAMES.has(name)) return false
-      if (/([bcdfghjkmnpqrtvwxy])\1$/.test(name)) return false
-      if (hasAiSmellPattern(name)) return false
-      if (containsKeywordRoot(name, keywordRoots)) return false
-      if (isKeywordAnchored(name, keywordRoots)) return false
-      if (!passesTasteGate(name)) return false
-      return true
+      return passesAiQualityGate(name, keywordRoots, maxLength)
     }
 
     // Step 1: collect raw candidates from BOTH sources
@@ -1031,20 +1674,50 @@ export async function POST(request: NextRequest) {
       .filter(s => s.score >= MIN_SCORE)
       .sort((a, b) => b.score - a.score)
 
-    let finalSuggestions = ranked.slice(0, safeCount).map(s => ({
-      name: s.name,
-      reasoning: s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine."),
-      meaning: s.meaning,
-    }))
+    let finalSuggestions = ranked.slice(0, safeCount).map(s => {
+      const reasoning = s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine.")
+      const copy = buildPersonalizedNameCopy({
+        name: s.name,
+        keyword: keyword.trim(),
+        industry: typeof industry === "string" ? industry : undefined,
+        vibe: typeof vibe === "string" ? vibe : undefined,
+        founderScore: rateLimitResult.isPro ? s.score : undefined,
+        whyItWorks: reasoning,
+        meaningBreakdown: s.meaning,
+        reasons: s.reasons,
+      })
+      return {
+        name: s.name,
+        reasoning,
+        meaning: s.meaning,
+        founderScore: rateLimitResult.isPro ? s.score : undefined,
+        ...copy,
+      }
+    })
 
     // If the ranked pool still has too few, drop the floor to salvage results
     if (finalSuggestions.length < Math.max(5, Math.floor(safeCount / 2))) {
       const relaxed = scored.sort((a, b) => b.score - a.score).slice(0, safeCount)
-      finalSuggestions = relaxed.map(s => ({
-        name: s.name,
-        reasoning: s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine."),
-        meaning: s.meaning,
-      }))
+      finalSuggestions = relaxed.map(s => {
+        const reasoning = s.reasoning || (s.source === "ai" ? "AI-generated candidate, ranked by Founder Signal." : "Generated by quality engine.")
+        const copy = buildPersonalizedNameCopy({
+          name: s.name,
+          keyword: keyword.trim(),
+          industry: typeof industry === "string" ? industry : undefined,
+          vibe: typeof vibe === "string" ? vibe : undefined,
+          founderScore: rateLimitResult.isPro ? s.score : undefined,
+          whyItWorks: reasoning,
+          meaningBreakdown: s.meaning,
+          reasons: s.reasons,
+        })
+        return {
+          name: s.name,
+          reasoning,
+          meaning: s.meaning,
+          founderScore: rateLimitResult.isPro ? s.score : undefined,
+          ...copy,
+        }
+      })
     }
 
     // Track metric (non-blocking)
@@ -1052,22 +1725,29 @@ export async function POST(request: NextRequest) {
     const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
     trackMetric({
       action: "name_generation",
-      metadata: { keyword, vibe, industry, requestedCount: safeCount, resultCount: finalSuggestions.length },
+      metadata: { vibe, industry, requestedCount: safeCount, resultCount: finalSuggestions.length, briefLength: keyword.length },
       userAgent,
       country,
     })
 
     // Log generation for rate limiting (only for free users)
     if (!rateLimitResult.isPro) {
-      logGeneration(request, rateLimitResult.userId, "domain", keyword, finalSuggestions.length).catch(() => {})
+      logGeneration(request, rateLimitResult.userId, "domain", undefined, finalSuggestions.length).catch(() => {})
     }
 
     return NextResponse.json({
       success: true,
       isPro: rateLimitResult.isPro,
+      availabilityToken: issueGenerationWorkflowToken(
+        finalSuggestions.map((suggestion) => suggestion.name),
+        generationWorkflowIdentity(request, rateLimitResult.userId),
+      ),
       domains: finalSuggestions,
     })
   } catch (error: any) {
+    if (request.signal.aborted || error?.name === "AbortError") {
+      return NextResponse.json({ error: "generation_cancelled" }, { status: 499 })
+    }
     console.error("Error generating domains:", error)
 
     // Handle specific OpenAI errors
@@ -1093,7 +1773,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: error.message || "Failed to generate domain names" },
+      { error: "Failed to generate domain names" },
       { status: 500 }
     )
   }

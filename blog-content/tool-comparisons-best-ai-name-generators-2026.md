@@ -17,7 +17,7 @@ This comparison covers 7 tools I've tested with the same brief: a fintech startu
 
 | Tool | Name Quality | Domain Check | Scoring | Pricing |
 |---|---|---|---|---|
-| NamoLux | ★★★★★ | Real-time, multi-TLD | Founder Signal™ (0–100) | One-time purchase |
+| NamoLux | ★★★★★ | Bulk Check across six TLDs | Optional Founder Signal™ (0–100) | 3 checks and 1 score/month free; Pro at GBP 7.99/month includes 120 of each |
 | Namelix | ★★★★☆ | Basic | None | Free |
 | Looka | ★★★☆☆ | Basic | None | Free / paid logos |
 | Shopify | ★★☆☆☆ | .com only | None | Free |
@@ -25,15 +25,15 @@ This comparison covers 7 tools I've tested with the same brief: a fintech startu
 | BrandBucket | ★★★★☆ | N/A (pre-owned) | None | £1,500–£5,000 |
 | Namecheap Generator | ★★☆☆☆ | Yes (.com) | None | Free |
 
-## 1. NamoLux — Best for Scored, Data-Backed Decisions
+## 1. NamoLux — Best for Shortlist Decision Support
 
-**What it does:** Generates brandable names from a keyword brief, checks availability across .com, .io, .ai, and .co in real-time, and scores every name with Founder Signal™ — a 0–100 rating covering phonetics, memorability, brand risk, and domain quality.
+**What it does:** Takes the candidate names you already have, checks them across six domain extensions, and adds Founder Signal™ when you want an explained comparison of the shortlist.
 
 **Best for:** Founders who want to make a naming decision with objective quality data rather than pure aesthetic judgment.
 
-**Pricing:** One-time purchase. One free generation per day, no account required.
+**Pricing:** Free includes three Bulk Check runs and one Founder Signal run per UTC calendar month. Pro is GBP 7.99/month for 120 Bulk Check runs and 120 Founder Signal runs, saved decisions, CSV exports, shareable reports, and an ad-free workspace.
 
-**Honest take:** The scoring system is what separates NamoLux from everything else on this list. You're not just browsing names — you're getting structured feedback on why a name works or doesn't. The logo preview feature that Namelix has is absent here, which some founders will miss.
+**Honest take:** The decision layer is what distinguishes the workflow. You can bring candidates from a team, agency, or generator, check what is available, then request structured evidence only when you need it. Namelix still offers richer logo mockups.
 
 ## 2. Namelix — Best Free Option for Visual Exploration
 
@@ -95,13 +95,13 @@ This comparison covers 7 tools I've tested with the same brief: a fintech startu
 
 **Honest take:** Not really a "name generator" in the creative sense — it's a domain availability checker with mild name variation features. Useful at the end of a naming process when you're finalising a decision, not at the beginning.
 
-💡 **The two-tool approach:** Many founders get the best results using two tools in sequence. Namelix for broad creative ideation (it's free, it's fast, it shows visual concepts). NamoLux for scoring and final selection (Founder Signal™ tells you which names are actually worth committing to). The combination covers both the generative and evaluative phases.
+💡 **The benchmark approach:** Use a generator to create options, then compare the finalists without letting a score replace judgment. NamoLux handles the decision phase with Bulk Check and optional Founder Signal™ analysis.
 
 ## Overall Verdict
 
 For most founders naming an early-stage startup or SaaS:
 
-**Free tier, maximum speed:** Namelix or NamoLux (one free generation)
+**Free start, maximum ideation:** Namelix
 **Scored decision-making:** NamoLux
 **Human creativity, budget available:** Squadhelp
 **Premium pre-built brand:** BrandBucket
@@ -111,8 +111,8 @@ The single biggest mistake is choosing a name based purely on aesthetics and ava
 
 ---
 
-✨ *NamoLux is the only name generator that tells you *why* a name is strong. Generate brandable names with Founder Signal™ scoring — free to try, no account required.*
+✨ *Bring your shortlist to NamoLux, check six domain extensions, then score it with Founder Signal™ when you are ready to compare the evidence.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

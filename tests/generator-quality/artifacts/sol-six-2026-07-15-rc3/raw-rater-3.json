@@ -1,0 +1,247 @@
+{
+  "raterId": "rater-3",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestory": "reject",
+        "pocketa": "reject",
+        "hushbank": "reject",
+        "hearthwise": "shortlist",
+        "littlemore": "shortlist",
+        "softlanding": "usable",
+        "homelytics": "reject",
+        "safekeep": "usable",
+        "breadbasket": "usable",
+        "allowance": "usable",
+        "patchwork": "usable",
+        "harborlight": "usable",
+        "smallsteps": "usable",
+        "groweasy": "usable",
+        "steward": "usable",
+        "wiseplan": "usable"
+      },
+      "scores": {
+        "relevance": 8.0,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 5.2,
+        "vibeFit": 8.1
+      },
+      "topTwo": [
+        "hearthwise",
+        "littlemore"
+      ],
+      "criticalDefects": [
+        "homelytics is a mechanical analytics blend and also carries an unflattering 'homely' reading",
+        "hushbank suggests secrecy and presents itself as a regulated bank rather than a budgeting app",
+        "too many generic reassurance phrases reduce searchability and ownability"
+      ],
+      "mechanicalFamilies": [
+        "forced coined endings: nestory, pocketa, homelytics",
+        "generic reassuring compounds and phrases: softlanding, safekeep, smallsteps, groweasy, wiseplan"
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "morrowink": "shortlist",
+        "puzzello": "reject",
+        "amblefern": "shortlist",
+        "softparlor": "usable",
+        "candlewick": "usable",
+        "lucidnest": "usable",
+        "sloworbit": "usable",
+        "kindreday": "reject",
+        "hearthside": "usable",
+        "riddance": "reject",
+        "daydream": "usable",
+        "afterglow": "usable",
+        "savoring": "reject",
+        "jigsaw": "usable",
+        "cozypuzzle": "reject",
+        "logicnest": "usable"
+      },
+      "scores": {
+        "relevance": 7.4,
+        "pronounceabilityNaturalness": 7.9,
+        "distinctiveness": 6.3,
+        "vibeFit": 8.4
+      },
+      "topTwo": [
+        "morrowink",
+        "amblefern"
+      ],
+      "criticalDefects": [
+        "riddance has a strongly negative meaning",
+        "candlewick has a conspicuous established publishing association and would need collision review",
+        "several choices communicate coziness but not thoughtful adult puzzle games"
+      ],
+      "mechanicalFamilies": [
+        "cozy-place compounds: softparlor, lucidnest, hearthside, logicnest",
+        "literal puzzle constructions: puzzello, jigsaw, cozypuzzle"
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "alverine": "reject",
+        "vesperia": "usable",
+        "altivelle": "shortlist",
+        "silvarin": "usable",
+        "orivane": "usable",
+        "snowmelt": "usable",
+        "stoneveil": "shortlist",
+        "cloudpine": "usable",
+        "springmoss": "usable",
+        "watershed": "usable",
+        "headwater": "usable",
+        "evergreen": "usable",
+        "alpenglow": "usable",
+        "fountain": "usable",
+        "snowline": "usable",
+        "quietspring": "usable"
+      },
+      "scores": {
+        "relevance": 8.5,
+        "pronounceabilityNaturalness": 8.1,
+        "distinctiveness": 6.2,
+        "vibeFit": 8.5
+      },
+      "topTwo": [
+        "altivelle",
+        "stoneveil"
+      ],
+      "criticalDefects": [
+        "alverine is associated with a pharmaceutical ingredient and is unsuitable for a clean premium skincare identity",
+        "the first five names form a visibly synthetic pseudo-European cosmetics family",
+        "the latter half relies heavily on common alpine nature words with limited ownability"
+      ],
+      "mechanicalFamilies": [
+        "pseudo-Latinate endings: alverine, vesperia, altivelle, silvarin, orivane",
+        "literal alpine compounds and dictionary words: snowmelt, cloudpine, springmoss, headwater, evergreen, alpenglow, snowline, quietspring"
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "appointment": "reject",
+        "sequence": "usable",
+        "chronology": "reject",
+        "diary": "reject",
+        "cadence": "shortlist",
+        "timekeeper": "usable",
+        "timetable": "reject",
+        "calendar": "reject",
+        "scheduler": "reject",
+        "planner": "reject",
+        "slotmind": "shortlist",
+        "signalslot": "usable",
+        "foundercore": "reject",
+        "foundergrid": "reject",
+        "smartslot": "usable",
+        "readyagenda": "usable"
+      },
+      "scores": {
+        "relevance": 8.5,
+        "pronounceabilityNaturalness": 7.7,
+        "distinctiveness": 3.2,
+        "vibeFit": 5.6
+      },
+      "topTwo": [
+        "cadence",
+        "slotmind"
+      ],
+      "criticalDefects": [
+        "most of the batch consists of generic scheduling nouns that are not ownable product brands",
+        "the batch barely communicates intelligent assistance or the high-pressure founder use case",
+        "foundercore and foundergrid are generic audience-label compounds rather than considered names"
+      ],
+      "mechanicalFamilies": [
+        "generic scheduling dictionary wall: appointment, sequence, chronology, diary, timekeeper, timetable, calendar, scheduler, planner",
+        "slot compounds: slotmind, signalslot, smartslot",
+        "founder compounds: foundercore, foundergrid"
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "daymark": "usable",
+        "clearward": "shortlist",
+        "evenkeel": "shortlist",
+        "pactline": "usable",
+        "duenorth": "usable",
+        "balansa": "reject",
+        "earnest": "reject",
+        "truecourse": "usable",
+        "fairfold": "usable",
+        "tideline": "reject",
+        "netpath": "reject",
+        "accord": "usable",
+        "reckon": "usable",
+        "cashbook": "usable",
+        "wiseinvoice": "reject",
+        "invoicegrid": "reject"
+      },
+      "scores": {
+        "relevance": 6.9,
+        "pronounceabilityNaturalness": 8.6,
+        "distinctiveness": 5.5,
+        "vibeFit": 7.8
+      },
+      "topTwo": [
+        "clearward",
+        "evenkeel"
+      ],
+      "criticalDefects": [
+        "earnest has a conspicuous established financial-services association and should not be shortlisted",
+        "many names use navigation or maritime metaphors with only a weak connection to invoicing and tax",
+        "cashbook, wiseinvoice and invoicegrid are generic or mechanical category labels"
+      ],
+      "mechanicalFamilies": [
+        "navigation and maritime family: daymark, clearward, evenkeel, duenorth, truecourse, tideline, netpath",
+        "literal accounting family: reckon, cashbook, wiseinvoice, invoicegrid"
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "semaphore": "usable",
+        "nightglass": "shortlist",
+        "corvanta": "usable",
+        "understory": "reject",
+        "sentryline": "usable",
+        "nocturne": "usable",
+        "signalkeep": "shortlist",
+        "blackfin": "usable",
+        "wardmark": "usable",
+        "velum": "usable",
+        "thrum": "usable",
+        "crosswind": "usable",
+        "threatloom": "usable",
+        "detector": "reject",
+        "sharpthreat": "reject",
+        "detectmax": "reject"
+      },
+      "scores": {
+        "relevance": 7.7,
+        "pronounceabilityNaturalness": 8.1,
+        "distinctiveness": 6.5,
+        "vibeFit": 8.2
+      },
+      "topTwo": [
+        "nightglass",
+        "signalkeep"
+      ],
+      "criticalDefects": [
+        "the last three names collapse into generic or mechanical threat-detection labels",
+        "understory is too soft and semantically detached from enterprise cybersecurity",
+        "semaphore and blackfin are collision-prone common product or company terms and would need careful screening"
+      ],
+      "mechanicalFamilies": [
+        "dark surveillance imagery: nightglass, nocturne, blackfin",
+        "defensive signal compounds: sentryline, signalkeep, wardmark, threatloom",
+        "literal threat-detection tail: detector, sharpthreat, detectmax"
+      ]
+    }
+  ]
+}

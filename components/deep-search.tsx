@@ -2,10 +2,12 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react"
 import { Check, X, Copy, CheckCircle, Search, RefreshCw, ExternalLink, Zap, ChevronDown, ChevronUp } from "lucide-react"
-import { FounderSignalPanel } from "@/components/founder-signal"
 import { namecheapLink } from "@/lib/affiliateLink"
+import { trackAffiliateClick, trackEvent } from "@/lib/analytics"
+import { DomainStatusChip } from "@/components/domain-status-chip"
 
 const OTHER_TLDS = ["io", "co", "ai", "app", "dev"] as const
+const SOCIAL_HANDLE_CHECK_ENABLED = false
 type OtherTld = typeof OTHER_TLDS[number]
 
 type SocialPlatformId = "twitter" | "instagram" | "tiktok"
@@ -42,20 +44,6 @@ interface DeepSearchProps {
   vibe?: string
   industry?: string
   maxLength?: number
-}
-
-const scoreColor = (score: number) => {
-  if (score >= 80) return "#22c55e"
-  if (score >= 60) return "#D4AF37"
-  if (score >= 40) return "#f97316"
-  return "rgba(255,255,255,0.4)"
-}
-
-const scoreBand = (score: number) => {
-  if (score >= 80) return "Elite"
-  if (score >= 65) return "Strong"
-  if (score >= 50) return "Good"
-  return "Fair"
 }
 
 // Minimal inline SVG icons for social platforms
@@ -95,14 +83,6 @@ const SOCIAL_LABELS: Record<SocialPlatformId, string> = {
   tiktok: "TT",
 }
 
-function TldDot({ available }: { available: boolean | null | undefined }) {
-  if (available === true)
-    return <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" title="Available" />
-  if (available === false)
-    return <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500/70" title="Taken" />
-  return <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/20" title="Not checked" />
-}
-
 function ResultCard({
   result,
   index,
@@ -114,7 +94,13 @@ function ResultCard({
   copiedName: string | null
   onCopy: (domain: string) => void
 }) {
-  const color = scoreColor(result.score)
+  const trackRegister = (domain: string, source: string, metadata: Record<string, unknown> = {}) => {
+    trackAffiliateClick(domain, { source, ...metadata })
+    trackEvent({
+      action: "domain_register_clicked",
+      metadata: { domain, source, ...metadata },
+    })
+  }
 
   return (
     <div
@@ -137,7 +123,7 @@ function ResultCard({
           DEEP SEARCH
         </span>
         <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
-          — .com confirmed available
+          — .com available in this check
         </span>
       </div>
 
@@ -157,16 +143,13 @@ function ResultCard({
             </span>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-bold text-white sm:text-lg">{result.name}</span>
-              <span
-                className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-bold sm:text-xs"
-                style={{
-                  background: "rgba(52,211,153,0.12)",
-                  color: "#34d399",
-                  border: "1px solid rgba(52,211,153,0.2)",
-                }}
-              >
-                .com ✓
-              </span>
+              <DomainStatusChip
+                tld="com"
+                status="available"
+                available
+                href={namecheapLink(result.fullDomain, { source: "deep_search_primary", content: result.fullDomain })}
+                onClick={() => trackRegister(result.fullDomain, "deep_search_primary", { score: result.score })}
+              />
               {result.label && (
                 <span
                   className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
@@ -185,9 +168,10 @@ function ResultCard({
           <div className="flex shrink-0 items-center gap-1.5">
             <button
               onClick={() => onCopy(result.fullDomain)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
+              className="flex h-11 w-11 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
               title="Copy domain"
+              aria-label={`Copy ${result.fullDomain}`}
             >
               {copiedName === result.fullDomain ? (
                 <CheckCircle className="h-4 w-4 text-green-400" />
@@ -196,14 +180,15 @@ function ResultCard({
               )}
             </button>
             <a
-              href={namecheapLink(result.fullDomain)}
+              href={namecheapLink(result.fullDomain, { source: "deep_search_primary", content: result.fullDomain })}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackRegister(result.fullDomain, "deep_search_primary", { score: result.score })}
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold text-black transition-all hover:-translate-y-0.5"
               style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              Register
+              Verify at registrar
             </a>
           </div>
         </div>
@@ -232,47 +217,22 @@ function ResultCard({
           <div className="mt-3 flex flex-wrap gap-1.5">
             {OTHER_TLDS.map((tld) => {
               const av = result.otherTlds?.[tld]
-              const isAvail = av === true
-              const isTaken = av === false
-              if (isAvail) {
-                return (
-                  <a
-                    key={tld}
-                    href={namecheapLink(`${result.name}.${tld}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all hover:-translate-y-0.5"
-                    style={{
-                      background: "rgba(52,211,153,0.1)",
-                      color: "#34d399",
-                      border: "1px solid rgba(52,211,153,0.2)",
-                    }}
-                  >
-                    <ExternalLink className="h-2.5 w-2.5" />
-                    .{tld}
-                  </a>
-                )
-              }
               return (
-                <span
+                <DomainStatusChip
                   key={tld}
-                  className="rounded-lg px-2.5 py-1 text-[11px]"
-                  style={{
-                    background: "rgba(255,255,255,0.02)",
-                    color: isTaken ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.28)",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    textDecoration: isTaken ? "line-through" : "none",
-                  }}
-                >
-                  .{tld}
-                </span>
+                  tld={tld}
+                  status={av === true ? "likely_available" : av === false ? "taken" : "error"}
+                  available={av === true}
+                  href={namecheapLink(`${result.name}.${tld}`, { source: "deep_search_alt_tld", content: tld })}
+                  onClick={() => trackRegister(`${result.name}.${tld}`, "deep_search_alt_tld", { tld, score: result.score })}
+                />
               )
             })}
           </div>
         )}
 
         {/* Social handle availability */}
-        {result.socials && result.socials.length > 0 && (
+        {SOCIAL_HANDLE_CHECK_ENABLED && result.socials && result.socials.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.2)" }}>
               @{result.name}
@@ -310,9 +270,14 @@ function ResultCard({
           </div>
         )}
 
-        {/* Founder Signal */}
-        <div className="mt-3">
-          <FounderSignalPanel name={result.name} tld="com" />
+        {/* Founder Signal — the score was issued by the Pro-only server route. */}
+        <div
+          className="mt-3 flex items-center justify-between rounded-xl px-3 py-2"
+          style={{ background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.14)" }}
+          aria-label={`Founder Signal ${result.score} out of 100`}
+        >
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-white/45">Founder Signal</span>
+          <span className="text-sm font-bold text-[#F4D779]">{result.score}/100</span>
         </div>
 
         {/* What to do next */}
@@ -332,9 +297,10 @@ function ResultCard({
                 1
               </span>
               <a
-                href={namecheapLink(result.fullDomain)}
+                href={namecheapLink(result.fullDomain, { source: "deep_search_next_step", content: result.fullDomain })}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackRegister(result.fullDomain, "deep_search_next_step", { score: result.score })}
                 className="text-[11px] font-semibold transition-colors hover:text-white"
                 style={{ color: "#34d399" }}
               >
@@ -366,7 +332,7 @@ function ResultCard({
                 3
               </span>
               <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Secure social handles (X, IG, TT shown above)
+                Check priority social handles directly on each network
               </span>
             </div>
             <div className="flex items-center gap-2.5">

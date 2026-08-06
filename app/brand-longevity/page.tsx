@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { AdBanner } from "@/components/ad-banner"
 import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -55,6 +56,8 @@ export default function BrandLongevityPage() {
               These names work initially. But as the company evolves — and the industry moves on — they start to feel like relics.
             </p>
           </section>
+
+          <AdBanner placement="guide-after-intro" />
 
           {/* What causes decay */}
           <section className="mb-12">
@@ -121,6 +124,8 @@ export default function BrandLongevityPage() {
             </p>
           </section>
 
+          <AdBanner placement="guide-before-conclusion" />
+
           {/* Quote */}
           <section className="mb-12 rounded-xl border border-border/50 bg-card/50 p-6">
             <p className="text-xl font-medium italic text-foreground">
@@ -130,7 +135,7 @@ export default function BrandLongevityPage() {
 
           {/* CTA */}
           <div className="text-center">
-            <Link href="/generate">
+            <Link href="/bulk-domain-check">
               <Button size="lg" className="gap-2">
                 Test name longevity
                 <ArrowRight className="h-4 w-4" />
@@ -143,4 +148,3 @@ export default function BrandLongevityPage() {
     </div>
   )
 }
-

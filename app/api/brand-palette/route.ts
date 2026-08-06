@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
@@ -373,11 +374,18 @@ function buildResponse(variants: PaletteVariant[]): BrandPaletteResult {
 }
 
 export async function POST(req: NextRequest) {
+  const labBlockResponse = getGeneratorLabApiBlockResponse(req)
+  if (labBlockResponse) return labBlockResponse
+
   const rateLimit = await checkRateLimit(req, "palette")
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
-      { status: 429 }
+      {
+        error: "upgrade_required",
+        message: rateLimit.message || "Brand palette is available on the paid plan.",
+        plan: rateLimit.plan,
+      },
+      { status: rateLimit.statusCode || 403 }
     )
   }
 

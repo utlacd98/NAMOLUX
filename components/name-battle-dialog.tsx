@@ -3,7 +3,23 @@
 import { useState, useEffect } from "react"
 import { X, Swords, Trophy, TrendingUp } from "lucide-react"
 import { scoreName } from "@/lib/founderSignal/scoreName"
+import { FOUNDER_SIGNAL_DIMENSIONS, getFounderSignalBand, type FounderSignalDimensionKey } from "@/lib/founderSignal/spec"
 import { getTrendAge } from "@/lib/nameCreativity"
+
+const RAW_SCORE_KEY: Record<FounderSignalDimensionKey, string> = {
+  clarity: "clarity",
+  memorability: "memorability",
+  pronunciation: "pronounceability",
+  extensionStrength: "extension",
+  characterQuality: "characterQuality",
+  brandRisk: "brandRisk",
+}
+
+const BATTLE_FACTORS = FOUNDER_SIGNAL_DIMENSIONS.map((dimension) => ({
+  key: RAW_SCORE_KEY[dimension.key],
+  label: dimension.label,
+  weight: dimension.weight,
+}))
 
 interface BattleEntry {
   name: string
@@ -64,22 +80,16 @@ export function NameBattleDialog({ names, onClose }: NameBattleDialogProps) {
   const loser = a.score >= b.score ? b : a
   const margin = Math.abs(a.score - b.score)
 
-  const FACTORS = [
-    { key: "length",          label: "Length",          weight: 15 },
-    { key: "pronounceability",label: "Pronounceability",weight: 20 },
-    { key: "memorability",    label: "Memorability",    weight: 20 },
-    { key: "extension",       label: "Extension",       weight: 15 },
-    { key: "characterQuality",label: "Characters",      weight: 15 },
-    { key: "brandRisk",       label: "Brand Risk",      weight: 15 },
-  ]
+  const FACTORS = BATTLE_FACTORS
 
   const GOLD = "#D4AF37"
   const BLUE = "#60a5fa"
 
   function scoreColor(s: number) {
-    if (s >= 85) return GOLD
-    if (s >= 70) return "#34d399"
-    if (s >= 55) return BLUE
+    const band = getFounderSignalBand(s)
+    if (band === "Elite") return GOLD
+    if (band === "Strong") return "#34d399"
+    if (band === "Viable") return BLUE
     return "#f87171"
   }
 

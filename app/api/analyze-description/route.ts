@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 let openaiInstance: OpenAI | null = null
@@ -125,11 +126,21 @@ function fallbackAnalysis(description: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const labBlockResponse = getGeneratorLabApiBlockResponse(request)
+  if (labBlockResponse) return labBlockResponse
+
   const rateLimit = await checkRateLimit(request, "analyze")
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
-      { status: 429 }
+      {
+        error: "monthly_usage_limit_reached",
+        message: rateLimit.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+        resetAt: rateLimit.resetAt,
+        tokensUsed: rateLimit.tokensUsed,
+        tokensTotal: rateLimit.tokensTotal,
+        remaining: rateLimit.remaining,
+      },
+      { status: rateLimit.statusCode || 429 }
     )
   }
 

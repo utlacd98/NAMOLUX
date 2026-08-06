@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button"
 
 const helpfulLinks = [
   { href: "/", label: "Back to homepage" },
-  { href: "/generate", label: "Generate domain names" },
-  { href: "/blog", label: "Read the blog" },
+  { href: "/bulk-domain-check", label: "Check a shortlist" },
+  { href: "/blog", label: "Read the Journal" },
   { href: "/contact", label: "Contact support" },
 ]
 
@@ -25,7 +25,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
-      <main className="flex flex-1 items-center justify-center px-4 pt-28 pb-16 sm:pt-32">
+      <main id="main-content" className="flex flex-1 items-center justify-center px-4 pt-28 pb-16 sm:pt-32">
         <div className="w-full max-w-2xl rounded-2xl border border-border/50 bg-card/60 p-6 text-center shadow-sm sm:p-10">
           <p className="text-sm font-medium uppercase tracking-wider text-primary">404</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Page not found</h1>
@@ -41,9 +41,9 @@ export default function NotFound() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/generate" className="gap-2">
+              <Link href="/bulk-domain-check" className="gap-2">
                 <Search className="h-4 w-4" />
-                Find domains
+                Check a shortlist
               </Link>
             </Button>
           </div>

@@ -1,19 +1,19 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import Image from "next/image"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles, Target, Heart } from "lucide-react"
+import { CTA_LABELS } from "@/lib/site-content"
 
 export const metadata: Metadata = {
   title: "About Us | NamoLux",
   description:
-    "Learn about NamoLux and our mission to help founders find the perfect domain name. Built by Andrew Barrett.",
+    "Learn why Andrew Barrett built NamoLux as a decision toolkit for founders choosing a company name.",
   openGraph: {
     title: "About NamoLux",
     description:
-      "Learn about NamoLux and our mission to help founders find the perfect domain name.",
+      "NamoLux helps founders move from name ideas to a defensible shortlist.",
     type: "website",
     url: "https://www.namolux.com/about",
   },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "About NamoLux",
     description:
-      "Learn about NamoLux and our mission to help founders find the perfect domain name.",
+      "NamoLux helps founders move from name ideas to a defensible shortlist.",
   },
   alternates: {
     canonical: "/about",
@@ -32,7 +32,7 @@ export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Hero Section */}
         <section className="border-b border-border/30 px-4 pt-28 pb-16 sm:pt-32 sm:pb-20">
           <div className="mx-auto max-w-3xl text-center">
@@ -54,14 +54,13 @@ export default function AboutPage() {
               </div>
               <h2 className="mb-4 text-2xl font-bold text-foreground">Our Mission</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Choosing the right domain name is one of the most important decisions a founder makes. 
-                A great domain builds trust, improves SEO, and becomes the foundation of your brand. 
-                A bad one can cost you customers, credibility, and years of wasted effort.
+                Generating options is easy. Choosing one name that can carry a company for years is the harder decision.
+                NamoLux puts the shortlist, domain evidence, scoring rationale, and trade-offs in one calm workspace.
               </p>
               <p className="mt-4 text-muted-foreground leading-relaxed">
-                NamoLux was built to solve this problem. We combine AI-powered name generation with 
-                live availability checking and our proprietary Founder Signal™ scoring system to
-                help you find domains that are not just available, but actually worth building on.
+                Founder Signal v1.0 gives every candidate the same six-dimension heuristic review. Domain availability,
+                company-name collisions, social handles, and legal trademark clearance remain separate checks.
+                <Link href="/founder-signal" className="ml-1 text-primary underline underline-offset-4">Read the methodology.</Link>
               </p>
             </div>
 
@@ -109,9 +108,9 @@ export default function AboutPage() {
                 <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Heart className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="mb-2 font-semibold text-foreground">Free & Accessible</h3>
+                <h3 className="mb-2 font-semibold text-foreground">Transparent by Default</h3>
                 <p className="text-sm text-muted-foreground">
-                  Great tools should be available to everyone, not just those with big budgets.
+                  Clear limits, versioned scores, explicit caveats, and no invented certainty.
                 </p>
               </div>
             </div>
@@ -122,15 +121,14 @@ export default function AboutPage() {
         <section className="border-t border-border/30 px-4 py-16">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="mb-3 text-2xl font-bold text-foreground">
-              Ready to find your perfect domain?
+              Ready to choose the name worth building on?
             </h2>
             <p className="mb-6 text-muted-foreground">
-              Generate brandable domain ideas with live availability checks
-              and Founder Signal™ scoring.
+              Check a full shortlist, compare domain availability, and add Founder Signal when you want a ranked decision view.
             </p>
             <Button asChild size="lg" className="gap-2">
-              <Link href="/generate">
-                Try NamoLux Free
+              <Link href="/bulk-domain-check">
+                {CTA_LABELS.primary}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -141,5 +139,3 @@ export default function AboutPage() {
     </div>
   )
 }
-
-

@@ -1,5 +1,7 @@
 -- NamoLux Supabase Database Schema
 -- Run this in Supabase SQL Editor
+-- New installations must then apply the versioned migrations in
+-- supabase/migrations (normally with `supabase db push`).
 
 -- ============================================================================
 -- PROFILES TABLE
@@ -28,22 +30,33 @@ CREATE INDEX idx_profiles_email ON profiles(email);
 -- ============================================================================
 -- GENERATION LOGS TABLE
 -- ============================================================================
--- Tracks all domain generation requests for rate limiting
+-- Tracks all metered requests for monthly rate limiting
 
 CREATE TABLE public.generation_logs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   ip_address INET NOT NULL,
   user_agent TEXT,
-  generation_type TEXT DEFAULT 'domain' CHECK (generation_type IN ('domain', 'bulk', 'seo')),
+  generation_type TEXT DEFAULT 'domain' CHECK (
+    generation_type IN (
+      'domain',
+      'bulk',
+      'seo',
+      'palette',
+      'deep-search',
+      'analyze',
+      'name-tools',
+      'ai-chat'
+    )
+  ),
   keyword_used TEXT,
   results_count INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Indexes for fast rate limit lookups
-CREATE INDEX idx_generation_logs_ip_24h ON generation_logs (ip_address, created_at DESC);
-CREATE INDEX idx_generation_logs_user_24h ON generation_logs (user_id, created_at DESC);
+-- Indexes for fast monthly rate limit lookups
+CREATE INDEX idx_generation_logs_ip_monthly ON generation_logs (ip_address, created_at DESC);
+CREATE INDEX idx_generation_logs_user_monthly ON generation_logs (user_id, created_at DESC);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS) - CRITICAL
@@ -58,11 +71,28 @@ CREATE POLICY "Users can view own profile"
   FOR SELECT 
   USING (auth.uid() = id);
 
--- Users can only update their own profile
+-- Users can only update safe profile fields on their own row.
+-- Billing fields are service-role only via API routes/webhooks.
 CREATE POLICY "Users can update own profile" 
   ON public.profiles 
   FOR UPDATE 
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+REVOKE ALL ON public.profiles FROM anon, authenticated;
+GRANT SELECT (
+  id,
+  email,
+  full_name,
+  avatar_url,
+  plan,
+  subscription_status,
+  subscription_end,
+  created_at,
+  updated_at
+) ON public.profiles TO authenticated;
+GRANT UPDATE (full_name, avatar_url) ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
 
 -- Enable RLS on generation_logs
 ALTER TABLE public.generation_logs ENABLE ROW LEVEL SECURITY;
@@ -73,8 +103,11 @@ CREATE POLICY "Users can view own logs"
   FOR SELECT 
   USING (auth.uid() = user_id);
 
--- Service role can insert logs (for API routes)
--- Note: Service role bypasses RLS, so this is handled automatically
+REVOKE ALL ON public.generation_logs FROM anon, authenticated;
+GRANT SELECT ON public.generation_logs TO authenticated;
+GRANT ALL ON public.generation_logs TO service_role;
+
+-- Service role inserts logs from API routes and bypasses RLS.
 
 -- ============================================================================
 -- AUTO-CREATE PROFILE ON SIGN-UP (TRIGGER)
@@ -92,7 +125,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth;
 
 -- Create the trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -120,30 +153,32 @@ CREATE TRIGGER profiles_updated_at
 -- HELPER FUNCTIONS FOR RATE LIMITING
 -- ============================================================================
 
--- Get count of generations in the last 24 hours for an IP
+-- Get count of metered requests in the current UTC month for an IP
 CREATE OR REPLACE FUNCTION public.get_ip_generation_count(check_ip INET)
 RETURNS INTEGER AS $$
   SELECT COUNT(*)::INTEGER
   FROM public.generation_logs
-  WHERE ip_address = check_ip
-    AND created_at > NOW() - INTERVAL '24 hours';
-$$ LANGUAGE SQL SECURITY DEFINER;
+  WHERE ip_address::TEXT = check_ip::TEXT
+    AND created_at >= date_trunc('month', timezone('utc', now()));
+$$ LANGUAGE SQL SECURITY DEFINER SET search_path = public;
 
--- Get count of generations in the last 24 hours for a user
+-- Get count of metered requests in the current UTC month for a user
 CREATE OR REPLACE FUNCTION public.get_user_generation_count(check_user_id UUID)
 RETURNS INTEGER AS $$
   SELECT COUNT(*)::INTEGER
   FROM public.generation_logs
   WHERE user_id = check_user_id
-    AND created_at > NOW() - INTERVAL '24 hours';
-$$ LANGUAGE SQL SECURITY DEFINER;
+    AND created_at >= date_trunc('month', timezone('utc', now()));
+$$ LANGUAGE SQL SECURITY DEFINER SET search_path = public;
 
 -- Get the reset time for rate limiting
 CREATE OR REPLACE FUNCTION public.get_rate_limit_reset_time(check_ip INET, check_user_id UUID DEFAULT NULL)
 RETURNS TIMESTAMP WITH TIME ZONE AS $$
-  SELECT MIN(created_at) + INTERVAL '24 hours'
-  FROM public.generation_logs
-  WHERE (ip_address = check_ip OR user_id = check_user_id)
-    AND created_at > NOW() - INTERVAL '24 hours';
-$$ LANGUAGE SQL SECURITY DEFINER;
+  SELECT date_trunc('month', timezone('utc', now())) + INTERVAL '1 month';
+$$ LANGUAGE SQL SECURITY DEFINER SET search_path = public;
 
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_updated_at() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_ip_generation_count(INET) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_generation_count(UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_rate_limit_reset_time(INET, UUID) FROM PUBLIC;

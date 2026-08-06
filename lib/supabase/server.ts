@@ -1,13 +1,19 @@
 import { createServerClient } from "@supabase/ssr"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
+import { getSupabaseEnvironment, getSupabaseServiceEnvironment } from "@/lib/env"
+import { SUPABASE_COOKIE_OPTIONS } from "@/lib/supabase/cookie-options"
+import type { Database } from "@/lib/supabase/database.types"
 
 export async function createClient() {
   const cookieStore = await cookies()
+  const environment = getSupabaseEnvironment()
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  return createServerClient<Database>(
+    environment.url,
+    environment.publishableKey,
     {
+      cookieOptions: SUPABASE_COOKIE_OPTIONS,
       cookies: {
         getAll() {
           return cookieStore.getAll()
@@ -28,19 +34,18 @@ export async function createClient() {
   )
 }
 
-// Create a service role client for admin operations (server-side only)
+let serviceClient: ReturnType<typeof createSupabaseClient<Database>> | null = null
+
 export function createServiceClient() {
-  const { createClient } = require("@supabase/supabase-js")
-  
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
+  if (!serviceClient) {
+    const environment = getSupabaseServiceEnvironment()
+    serviceClient = createSupabaseClient<Database>(environment.url, environment.serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
-    }
-  )
-}
+    })
+  }
 
+  return serviceClient
+}

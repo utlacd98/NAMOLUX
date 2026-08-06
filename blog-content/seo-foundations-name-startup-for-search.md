@@ -82,8 +82,8 @@ The name you choose creates the search landscape you'll operate in for the next 
 
 ---
 
-✨ *NamoLux generates startup names designed for brand strength and memorability — not just availability. Every result includes a Founder Signal™ score and SEO micro-signals so you know which names are built to rank.*
+✨ *Bring your startup-name shortlist to NamoLux when you want structured evidence on brand strength, memorability, and domain fit. Founder Signal™ supports the decision; it does not replace independent research.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

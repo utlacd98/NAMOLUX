@@ -1,23 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServiceClient } from "@/lib/supabase/server"
-
-// Verify admin access — fail closed if ADMIN_SECRET is not set
-function isAdmin(request: NextRequest): boolean {
-  const adminToken = process.env.ADMIN_SECRET
-  if (!adminToken) return false
-  const token = request.headers.get("x-admin-token") ||
-                request.cookies.get("admin_token")?.value ||
-                request.nextUrl.searchParams.get("token")
-  return token === adminToken
-}
-
-function unauthorized() {
-  return NextResponse.json({ error: "unauthorized" }, { status: 401 })
-}
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 // GET - Fetch all email subscribers
 export async function GET(request: NextRequest) {
-  if (!isAdmin(request)) return unauthorized()
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
 
   try {
     const supabase = createServiceClient()
@@ -71,7 +59,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Add new email subscriber
 export async function POST(request: NextRequest) {
-  if (!isAdmin(request)) return unauthorized()
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
   try {
     const body = await request.json()
     const { email, source = "manual", tags = [] } = body
@@ -131,7 +120,8 @@ export async function POST(request: NextRequest) {
 
 // DELETE - Remove or unsubscribe email
 export async function DELETE(request: NextRequest) {
-  if (!isAdmin(request)) return unauthorized()
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
   try {
     const { searchParams } = new URL(request.url)
     const email = searchParams.get("email")
@@ -162,4 +152,3 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
-

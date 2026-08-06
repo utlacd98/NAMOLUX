@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 1,
+  "benchmarkVersion": "namelix-2026-07-14-v1",
+  "generatedAt": "2026-07-14T14:43:36.691Z",
+  "scope": "Objective contract checks only. This report does not score creative quality or declare a winner.",
+  "summary": {
+    "cases": 12,
+    "totalCandidates": 192,
+    "allCasesHave16UniqueNames": true,
+    "modelBackedCases": 10,
+    "modelBackedCaseRatePercent": 83.3,
+    "modelCandidates": 68,
+    "fallbackCandidates": 124,
+    "fallbackCandidateRatePercent": 64.6,
+    "providerCounts": {
+      "deterministic": 2,
+      "groq": 10
+    },
+    "p95DurationMs": 6651,
+    "maxDurationMs": 6651,
+    "crossCaseExactDuplicateOccurrences": 0,
+    "crossCaseExactDuplicateRatePercent": 0,
+    "crossCaseDuplicates": [],
+    "totalMaxLengthViolations": 0,
+    "totalMalformedOrUnsafeFlags": 40,
+    "totalExplicitStyleMismatches": 86,
+    "totalExactSameCaseProviderOverlap": 0,
+    "gates": {
+      "candidateContract": true,
+      "maxLength": true,
+      "malformedUnsafeHeuristics": false,
+      "explicitStyleMetadata": false,
+      "modelBackedCasesAtLeast90Percent": false,
+      "crossCaseExactDuplicationAtMost1Percent": true,
+      "p95GenerationAtMost8Seconds": true
+    }
+  },
+  "perCase": [
+    {
+      "caseId": "investigative-podcast",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 10,
+      "fallbackCandidateCount": 6,
+      "durationMs": 3214,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "wrdswap",
+        "probestory",
+        "storypress",
+        "scopestory"
+      ],
+      "explicitStyleMismatches": [],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "recycled-gold-jewellery",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "durationMs": 3487,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [],
+      "explicitStyleMismatches": [],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "carbon-accounting",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 5,
+      "fallbackCandidateCount": 11,
+      "durationMs": 2814,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [],
+      "explicitStyleMismatches": [
+        {
+          "name": "carbonwise",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "ledjer",
+          "actualStyle": "alternate_spelling"
+        },
+        {
+          "name": "ledgerwise",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "wisecarbon",
+          "actualStyle": "short_phrase"
+        },
+        {
+          "name": "carbonpath",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "carbonpilot",
+          "actualStyle": "evocative"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "welsh-farm-market",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 5,
+      "fallbackCandidateCount": 11,
+      "durationMs": 1212,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "gwynne",
+        "brynca",
+        "cwmio",
+        "sylfa",
+        "cymruhaven",
+        "cymrubridge",
+        "carecymru",
+        "cymrucare",
+        "cymruguide"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "cymruhaven",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "havencymru",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "cymrubridge",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "carecymru",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "schul",
+          "actualStyle": "alternate_spelling"
+        },
+        {
+          "name": "schoolhaven",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "havenschool",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "schoolbridge",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "nestschool",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "cymrucare",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "cymruguide",
+          "actualStyle": "brandable"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "cyber-threat-analytics",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "durationMs": 2564,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "cybermax",
+        "cyberdata",
+        "bravecyber"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "cybermax",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "cyberdata",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "dataworks",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "detectmax",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "datathreat",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "bravecyber",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "layerdetect",
+          "actualStyle": "compound"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "alpine-skincare",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 7,
+      "fallbackCandidateCount": 9,
+      "durationMs": 2627,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "mineralworks"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "florawise",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "florapath",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "alpinewise",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "wisealpine",
+          "actualStyle": "short_phrase"
+        },
+        {
+          "name": "mineralpath",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "pathmineral",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "mineralworks",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "worksmineral",
+          "actualStyle": "compound"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "cozy-puzzle-studio",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": false,
+      "provider": "deterministic",
+      "modelCandidateCount": 0,
+      "fallbackCandidateCount": 16,
+      "durationMs": 6651,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "playcozy",
+        "cozymark",
+        "markcozy",
+        "cozyloom",
+        "loomcozy",
+        "playpuzzle",
+        "puzzleplay",
+        "puzzlemark",
+        "markpuzzle"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "cozyplay",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "playcozy",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "markcozy",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "cozyloom",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "loomcozy",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "framecozy",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "playpuzzle",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "puzzleplay",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "markplay",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "playloom",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "loomplay",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "markpuzzle",
+          "actualStyle": "compound"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "rural-telehealth",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 11,
+      "fallbackCandidateCount": 5,
+      "durationMs": 3544,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "vitalrise"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "reachclinic",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "clinicreach",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "reachbond",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "bondreach",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "pathclinic",
+          "actualStyle": "compound"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "family-budgeting",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 8,
+      "fallbackCandidateCount": 8,
+      "durationMs": 1055,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "savvyden",
+        "saveryoung",
+        "saverbudget",
+        "budgetsaver"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "youngsaver",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "saveryoung",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "yowng",
+          "actualStyle": "alternate_spelling"
+        },
+        {
+          "name": "youngflow",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "flowyoung",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "saverbudget",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "budgetsaver",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "budjet",
+          "actualStyle": "alternate_spelling"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "ai-scheduling-founders",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "durationMs": 2538,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "logicmind",
+        "founderwise"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "fownder",
+          "actualStyle": "alternate_spelling"
+        },
+        {
+          "name": "founderflow",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "founderwise",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "ajenda",
+          "actualStyle": "alternate_spelling"
+        },
+        {
+          "name": "agendaguide",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "wisefounder",
+          "actualStyle": "short_phrase"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "privacy-saas",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": true,
+      "provider": "groq",
+      "modelCandidateCount": 4,
+      "fallbackCandidateCount": 12,
+      "durationMs": 2825,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [],
+      "explicitStyleMismatches": [
+        {
+          "name": "trusteuro",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "watcheuro",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "layertrust",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "watchtrust",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "baseprivacy",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "eurotrust",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "patheuro",
+          "actualStyle": "compound"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    },
+    {
+      "caseId": "curly-hair-beauty",
+      "candidateCount": 16,
+      "uniqueCandidateCount": 16,
+      "modelBacked": false,
+      "provider": "deterministic",
+      "modelCandidateCount": 0,
+      "fallbackCandidateCount": 16,
+      "durationMs": 6573,
+      "maxLengthViolations": [],
+      "malformedOrUnsafeFlags": [
+        "coiltexture",
+        "texturecoil",
+        "coilcare",
+        "curltexture",
+        "welltexture",
+        "texturecare",
+        "textureskip"
+      ],
+      "explicitStyleMismatches": [
+        {
+          "name": "coiltexture",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "texturecoil",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "wellcoil",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "coilbloom",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "bloomcoil",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "coilglow",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "glowcoil",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "coilcare",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "curltexture",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "welltexture",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "textureglow",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "glowtexture",
+          "actualStyle": "compound"
+        },
+        {
+          "name": "texturecare",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "textureskip",
+          "actualStyle": "brandable"
+        },
+        {
+          "name": "curlbloom",
+          "actualStyle": "evocative"
+        },
+        {
+          "name": "curlglow",
+          "actualStyle": "brandable"
+        }
+      ],
+      "rationaleUnder70Characters": [],
+      "rationaleUnder12Words": [],
+      "candidatesWithoutFitRoots": [],
+      "exactSameCaseProviderOverlap": []
+    }
+  ]
+}

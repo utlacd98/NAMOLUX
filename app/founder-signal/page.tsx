@@ -1,163 +1,239 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Navbar } from "@/components/navbar"
+import {
+  ArrowRight,
+  AtSign,
+  Building2,
+  CalendarDays,
+  CircleHelp,
+  Database,
+  Info,
+  Scale,
+  Search,
+  Shield,
+} from "lucide-react"
 import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, AlertTriangle, Info } from "lucide-react"
+import { Navbar } from "@/components/navbar"
+import { scoreName } from "@/lib/founderSignal/scoreName"
+import {
+  FOUNDER_SIGNAL_BANDS,
+  FOUNDER_SIGNAL_DIMENSIONS,
+  FOUNDER_SIGNAL_SPEC,
+} from "@/lib/founderSignal/spec"
+import styles from "./page.module.css"
 
 export const metadata: Metadata = {
-  title: "Founder Signal™ | NamoLux",
-  description: "Not just availability. Brand viability. Founder Signal™ scores domain names from 0–100 based on brand strength, risk, and scalability.",
+  title: "Founder Signal methodology | NamoLux",
+  description:
+    "See how Founder Signal compares a naming shortlist against a chosen primary domain extension using clarity, memorability, pronunciation, extension strength, character quality, and brand risk.",
+  alternates: { canonical: "/founder-signal" },
 }
 
-const scoreTiers = [
-  { range: "90–100", label: "Elite brand", color: "text-green-400", bg: "bg-green-500/10" },
-  { range: "75–89", label: "Strong brand", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { range: "60–74", label: "Viable", color: "text-yellow-400", bg: "bg-yellow-500/10" },
-  { range: "40–59", label: "Risky", color: "text-orange-400", bg: "bg-orange-500/10" },
-  { range: "Below 40", label: "Avoid", color: "text-red-400", bg: "bg-red-500/10" },
-]
+const SAMPLE_NAME = "Vaulten"
+const sample = scoreName({ name: SAMPLE_NAME, tld: "com" })
 
-const measures = [
-  { title: "Brand length", desc: "Shorter names scale better. Under 7 characters is ideal." },
-  { title: "Pronounceability", desc: "Can someone say it after hearing it once?" },
-  { title: "Memorability", desc: "Will people remember it tomorrow without writing it down?" },
-  { title: "Extension strength", desc: ".com carries weight. Some alternatives work. Most don't." },
-  { title: "Character quality", desc: "No hyphens. No numbers. No awkward letter clusters." },
-  { title: "Brand risk", desc: "Generic words, industry clichés, and similarity to existing brands." },
-]
+const sampleDomains = [".com", ".io", ".co", ".ai"] as const
 
-const exampleInsights = [
-  { type: "positive", text: "Short & brandable" },
-  { type: "positive", text: "Easy to pronounce" },
-  { type: "positive", text: "Clean characters" },
-  { type: "warning", text: "Generic industry keyword" },
-  { type: "warning", text: "Weaker extension (.dev)" },
-]
+const bandDescriptions = {
+  Elite: "Outstanding across most dimensions with minimal heuristic risk.",
+  Strong: "Strong overall with minor trade-offs.",
+  Viable: "Usable with some notable weaknesses or risks.",
+  Reconsider: "Material weaknesses, collision risk, or both.",
+} as const
+
+function formatAuditDate(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`))
+}
+
+function ArrowIcon() {
+  return <ArrowRight aria-hidden="true" size={19} strokeWidth={1.7} />
+}
 
 export default function FounderSignalPage() {
+  const evaluatedOn = formatAuditDate(sample.evaluatedOn)
+  const dataFreshness = formatAuditDate(sample.confidence.dataFreshness)
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={styles.page}>
       <Navbar />
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="px-4 pt-32 pb-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Not just availability.
-              <br />
-              <span className="text-primary">Brand viability.</span>
-            </h1>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
-              Founder Signal™ scores domain names from 0–100 based on brand strength, risk, and scalability.
-            </p>
-          </div>
-        </section>
 
-        {/* What it measures */}
-        <section className="border-t border-border/50 px-4 py-20">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="mb-12 text-2xl font-semibold text-foreground sm:text-3xl">
-              What Founder Signal™ measures
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {measures.map((item) => (
-                <div key={item.title} className="rounded-xl border border-border/50 bg-card/30 p-5">
-                  <h3 className="mb-2 font-semibold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
-              ))}
+      <main id="main-content" className={styles.main}>
+        <div className={styles.rail}>
+          <section className={styles.hero} aria-labelledby="founder-signal-title">
+            <div className={styles.heroCopy}>
+              <h1 id="founder-signal-title">Choose the name worth building on.</h1>
+              <p>
+                Choose a primary domain extension, then use Founder Signal to compare the strengths, risks, and
+                decision evidence behind every submitted candidate.
+              </p>
+
+              <div className={styles.heroActions}>
+                <Link className={styles.primaryAction} href="#shortlist-form">
+                  Score a shortlist
+                  <ArrowIcon />
+                </Link>
+                <Link className={styles.secondaryAction} href="/bulk-domain-check">
+                  Open Bulk Check
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
 
-        {/* Score Tiers */}
-        <section className="border-t border-border/50 px-4 py-20">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="mb-12 text-2xl font-semibold text-foreground sm:text-3xl">
-              What the score means
-            </h2>
-            <div className="space-y-3">
-              {scoreTiers.map((tier) => (
-                <div
-                  key={tier.range}
-                  className={`flex items-center justify-between rounded-lg ${tier.bg} px-5 py-4`}
-                >
-                  <span className={`font-mono font-semibold ${tier.color}`}>{tier.range}</span>
-                  <span className="text-foreground">{tier.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Example Breakdown */}
-        <section className="border-t border-border/50 px-4 py-20">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="mb-12 text-2xl font-semibold text-foreground sm:text-3xl">
-              Example breakdown
-            </h2>
-            <div className="rounded-2xl border border-border/50 bg-card/50 p-6 sm:p-8">
-              <div className="mb-6 flex items-center justify-between">
+            <article className={styles.sampleCard} aria-labelledby="sample-name">
+              <div className={styles.sampleHeading}>
                 <div>
-                  <span className="text-2xl font-bold text-foreground">gadgethub</span>
-                  <span className="ml-2 rounded-md bg-cyan-500/20 px-2 py-1 text-sm font-medium text-cyan-400">.dev</span>
+                  <h2 id="sample-name">{SAMPLE_NAME}</h2>
+                  <p className={styles.sampleQualifier}>Illustrative score preview — not a live result</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-3xl font-bold text-yellow-400">60</span>
-                  <span className="text-lg text-muted-foreground">/100</span>
+                <div className={styles.sampleScore} aria-label={`${sample.score} out of 100, ${sample.band}`}>
+                  <span>{sample.score}</span>
+                  <strong>· {sample.band}</strong>
                 </div>
               </div>
-              
-              <div className="mb-6 space-y-2">
-                {exampleInsights.map((insight, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center gap-2 text-sm ${
-                      insight.type === "positive" ? "text-green-400" : "text-yellow-400"
-                    }`}
-                  >
-                    {insight.type === "positive" ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <AlertTriangle className="h-4 w-4" />
-                    )}
-                    <span>{insight.text}</span>
+
+              <div className={styles.domainLedger} aria-label={`Example domain checks for ${SAMPLE_NAME}`}>
+                {sampleDomains.map((domain) => (
+                  <div className={styles.domainRow} key={domain}>
+                    <CircleHelp aria-hidden="true" size={21} strokeWidth={1.6} />
+                    <span className={styles.domainExtension}>{domain}</span>
+                    <span className={styles.domainStatus}>Verification required</span>
                   </div>
                 ))}
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                "This name works technically, but it's forgettable and competes with dozens of similar brands."
+              <p className={styles.sampleNote}>
+                No domain, company, social, or trademark status is inferred from this example.
+              </p>
+            </article>
+          </section>
+
+          <section className={styles.dimensionSection} aria-labelledby="dimensions-title">
+            <h2 id="dimensions-title">How Founder Signal scores</h2>
+            <ol className={styles.dimensionLedger}>
+              {FOUNDER_SIGNAL_DIMENSIONS.map((dimension) => (
+                <li key={dimension.key}>
+                  <strong>{dimension.weight}%</strong>
+                  <span>{dimension.label}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <div className={styles.metaLedger} aria-label="Founder Signal specification details">
+            <span>
+              <Info aria-hidden="true" size={17} />
+              Founder Signal v{sample.version}
+            </span>
+            <span>
+              <CalendarDays aria-hidden="true" size={17} />
+              Evaluated {evaluatedOn}
+            </span>
+            <span>
+              <Shield aria-hidden="true" size={17} />
+              {sample.confidence.level} confidence
+            </span>
+            <span>
+              <Database aria-hidden="true" size={17} />
+              Data freshness {dataFreshness}
+            </span>
+          </div>
+
+          <section className={styles.methodologyLedger} aria-label="Founder Signal methodology">
+            <div className={styles.bandsPanel}>
+              <h2>Score bands</h2>
+              <div className={styles.bandRows}>
+                {FOUNDER_SIGNAL_BANDS.map((band) => (
+                  <div className={styles.bandRow} key={band.label}>
+                    <span className={styles.bandDot} data-band={band.label.toLowerCase()} aria-hidden="true" />
+                    <strong>
+                      {band.min}–{band.max}
+                    </strong>
+                    <span className={styles.bandLabel}>{band.label}</span>
+                    <span className={styles.bandDescription}>{bandDescriptions[band.label]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.collisionPanel}>
+              <h2>Collision rules</h2>
+              <div className={styles.collisionBody}>
+                <Shield aria-hidden="true" size={68} strokeWidth={1.3} />
+                <dl>
+                  <div>
+                    <dt>Exact active-brand match</dt>
+                    <dd>
+                      Disqualified · score {FOUNDER_SIGNAL_SPEC.collisionPolicy.exact.score}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Close active-brand match</dt>
+                    <dd>
+                      Severe cap · maximum {FOUNDER_SIGNAL_SPEC.collisionPolicy.closeMatch.scoreCap}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              <p>{sample.confidence.basis}. Registry coverage is not legal clearance.</p>
+            </div>
+
+            <div className={styles.dueDiligencePanel}>
+              <h2>Four separate checks</h2>
+              <dl className={styles.checkRows}>
+                <div>
+                  <Search aria-hidden="true" size={18} />
+                  <dt>Domain</dt>
+                  <dd>Live registrar availability</dd>
+                </div>
+                <div>
+                  <Building2 aria-hidden="true" size={18} />
+                  <dt>Company</dt>
+                  <dd>Registers and known products</dd>
+                </div>
+                <div>
+                  <AtSign aria-hidden="true" size={18} />
+                  <dt>Social</dt>
+                  <dd>Per-network handle availability</dd>
+                </div>
+                <div>
+                  <Scale aria-hidden="true" size={18} />
+                  <dt>Trademark</dt>
+                  <dd>Independent legal clearance</dd>
+                </div>
+              </dl>
+              <p className={styles.disclaimer}>
+                Founder Signal supports judgment. It is not legal or trademark advice. Do your own due diligence before
+                committing to a name.
               </p>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* CTA */}
-        <section className="border-t border-border/50 px-4 py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <Link href="/generate">
-              <Button size="lg" className="gap-2">
-                Generate names
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </section>
-
-        {/* Disclaimer */}
-        <section className="px-4 pb-16">
-          <div className="mx-auto max-w-3xl">
-            <p className="flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
-              <Info className="h-3 w-3" />
-              Founder Signal™ estimates brand strength. Not legal or trademark advice.
-            </p>
-          </div>
-        </section>
+          <form id="shortlist-form" className={styles.shortlistForm} action="/bulk-domain-check/workspace" method="get">
+            <div className={styles.formLabelBlock}>
+              <label htmlFor="founder-signal-shortlist">Paste your shortlist</label>
+              <span id="shortlist-help">One name per line; choose your primary TLD in the workspace</span>
+            </div>
+            <textarea
+              id="founder-signal-shortlist"
+              name="names"
+              rows={3}
+              required
+              aria-describedby="shortlist-help"
+              placeholder={"e.g. Vaulten\nAurevo\nNorthline"}
+            />
+            <button type="submit">
+              Open scoring workspace
+              <ArrowIcon />
+            </button>
+          </form>
+        </div>
       </main>
+
       <Footer />
     </div>
   )
 }
-

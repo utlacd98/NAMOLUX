@@ -5,7 +5,8 @@
   isStyleBlend,
   parseKeywordTokens,
 } from "@/lib/domainGen/synonyms"
-import { containsKeywordRoot, isKeywordAnchored, passesTasteGate } from "@/lib/domainGen/filters"
+import { hasMalformedCompoundPattern, passesTasteGate } from "@/lib/domainGen/filters"
+import { generateQuickCandidates, type QuickGenerateVibe } from "@/lib/domainGen/quickGenerate"
 import { isGibberish, isKeywordClone, getRelevanceScore } from "@/lib/domainGen/realness"
 import type { AutoFindRequestInput, Candidate, NameStyleMode } from "@/lib/domainGen/types"
 
@@ -84,6 +85,17 @@ function pickWeighted<T>(items: Array<{ value: T; weight: number }>, rng: () => 
   }
 
   return items[items.length - 1].value
+}
+
+function toQuickVibe(value: string | undefined): QuickGenerateVibe {
+  const vibe = (value || "").toLowerCase()
+  if (vibe === "luxury") return "premium"
+  if (vibe === "futuristic") return "tech"
+  if (vibe === "playful") return "playful"
+  if (vibe === "trustworthy") return "clean"
+  if (vibe === "minimal") return "clean"
+  if (["premium", "tech", "clean", "bold", "friendly"].includes(vibe)) return vibe as QuickGenerateVibe
+  return "clean"
 }
 
 function mergeReadableParts(first: string, second: string): string {
@@ -352,6 +364,7 @@ export function generateCandidatePool(
     if (!candidate || !candidate.name) return
     if (candidate.name.length < 3) return
     if (hasUglyCollision(candidate.name)) return
+    if (hasMalformedCompoundPattern(candidate.name)) return
     if (candidates.has(candidate.name)) return
 
     const name = candidate.name
@@ -366,14 +379,7 @@ export function generateCandidatePool(
     if (keywordTokens.length > 0 && getRelevanceScore(name, keywordTokens) < 20) return
 
     // Taste gate — reject names that feel generic, awkward, or not brand-worthy
-    if (!passesTasteGate(name)) return
-
-    // Keyword mutation gate — reject names derived from input keywords unless
-    // the caller explicitly requested keyword inclusion.
-    if (effectiveKeywordMode === "none") {
-      if (containsKeywordRoot(name, keywordTokens)) return
-      if (isKeywordAnchored(name, keywordTokens)) return
-    }
+    if (candidate.strategy !== "verified_concept_compound" && !passesTasteGate(name)) return
 
     // Suffix diversity gate
     if (name.length >= 4) {
@@ -421,6 +427,29 @@ export function generateCandidatePool(
     rhythmUsage.set(rhythm, rhythmCount + 1)
   }
 
+  // Seed every pool with the same verified semantic compounds used by Quick
+  // Generate. These are built from complete concept roots (never clipped
+  // fragments), giving niche prompts a dependable relevance floor before the
+  // broader exploratory strategies add variety.
+  const verifiedCandidates = generateQuickCandidates({
+    description: input.keyword,
+    vibe: toQuickVibe(input.vibe),
+    maxChars: targetLength,
+    count: 12,
+    seed: `${input.controls.seed || input.keyword}|advanced-semantic-floor`,
+  })
+  for (const candidate of verifiedCandidates) {
+    tryAdd({
+      name: candidate.name,
+      strategy: "verified_concept_compound",
+      roots: candidate.fitRoots || [],
+      keywordHits: keywordTokens.filter((token) => candidate.name.includes(token)),
+      meaningBreakdown: candidate.personality,
+      whyItWorks: candidate.personality,
+      meaningScore: 92,
+    })
+  }
+
   // ── Strategy diversity buckets ────────────────────────────────────────
   // Group strategies into conceptual categories to ensure batch variety
   const STRATEGY_BUCKETS = [
@@ -454,7 +483,7 @@ export function generateCandidatePool(
       strategy = pickOne(bucket, rng)
       bucketIndex++
     } else {
-      strategy = pickWeighted(strategyWeights as Array<{ value: string; weight: number }>, rng)
+      strategy = pickWeighted([...strategyWeights], rng)
     }
 
     if (

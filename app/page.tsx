@@ -1,28 +1,20 @@
 import type { Metadata } from "next"
-import { Navbar } from "@/components/navbar"
-import { Hero } from "@/components/hero"
-import { SocialProof } from "@/components/social-proof"
-import { ProductShowcase } from "@/components/landing/product-showcase"
-import { Features } from "@/components/features"
-import { HowItWorks } from "@/components/how-it-works"
-import { Comparison } from "@/components/landing/comparison"
-import { FAQ } from "@/components/faq"
-import { FinalCTA } from "@/components/final-cta"
-import { Footer } from "@/components/footer"
+import { PremiumHome } from "@/components/landing/premium-home"
 
 const siteUrl = "https://www.namolux.com"
+const homeTitle = "Bulk Domain Checker & Founder Signal | NamoLux"
+const homeDescription =
+  "NamoLux helps founders check up to 50 candidate names across six domain extensions, verify their brand footprint, and use Founder Signal to compare finalists."
 
 export const metadata: Metadata = {
-  title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
-  description:
-    "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
+  title: homeTitle,
+  description: homeDescription,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
-    description:
-      "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
+    title: homeTitle,
+    description: homeDescription,
     url: siteUrl,
     siteName: "NamoLux",
     type: "website",
@@ -31,15 +23,14 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
+        alt: "NamoLux bulk domain checker and Founder Signal workspace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
-    description:
-      "Choose a brand name with evidence. Generate or paste a shortlist, check live availability across six TLDs, and rank every name with Founder Signal scoring.",
+    title: homeTitle,
+    description: homeDescription,
     images: ["/opengraph-image"],
   },
 }
@@ -53,23 +44,15 @@ export default function Home() {
         "@id": `${siteUrl}/#website`,
         name: "NamoLux",
         url: `${siteUrl}/`,
-        inLanguage: "en-US",
+        inLanguage: "en-GB",
         publisher: { "@id": `${siteUrl}/#organization` },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${siteUrl}/generate?q={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
       },
       {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
         name: "NamoLux",
         description:
-          "A domain naming platform powered by Founder Signal scoring. Generate or paste a shortlist, get live availability checks across six TLDs, and rank every candidate with clear reasoning.",
+          "A shortlist decision platform powered by Founder Signal. Check six domain extensions, open social-profile, company and official UK, US and EU trade-mark verification links, then compare the strongest options with clear reasoning.",
         url: `${siteUrl}/`,
         logo: {
           "@type": "ImageObject",
@@ -89,34 +72,20 @@ export default function Home() {
         "@type": "WebPage",
         "@id": `${siteUrl}/#webpage`,
         url: `${siteUrl}/`,
-        name: "NamoLux - AI Domain Name Generator & Bulk Domain Checker",
+        name: homeTitle,
         description:
-          "Generate or paste your domain name shortlist. Get Founder Signal scoring, live availability across six TLDs, and a clear verdict on every candidate.",
+          "Paste a name shortlist. Get live availability across six TLDs, brand-footprint verification links, optional Founder Signal scoring, and a clear next step for every candidate.",
         isPartOf: { "@id": `${siteUrl}/#website` },
         about: { "@id": `${siteUrl}/#organization` },
-        inLanguage: "en-US",
+        inLanguage: "en-GB",
       },
     ],
   }
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background">
-      <Navbar />
-      <main className="overflow-x-clip">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-        <Hero />
-        <SocialProof />
-        <ProductShowcase />
-        <Features />
-        <HowItWorks />
-        <Comparison />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <PremiumHome />
+    </>
   )
 }

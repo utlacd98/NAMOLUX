@@ -1,115 +1,167 @@
 import { NextRequest, NextResponse } from "next/server"
-import Stripe from "stripe"
+import type Stripe from "stripe"
+import {
+  billingStateFromSubscription,
+  getStripeId,
+  syncSubscriptionProfile,
+  updateBillingProfile,
+} from "@/lib/billing-profile"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
+import { getStripeClient } from "@/lib/stripe-client"
+import { getStripeAllowedPriceIds, isAllowedNamoLuxSubscription } from "@/lib/stripe-plans"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function subscriptionStillGrantsAccess(subscription: Stripe.Subscription): boolean {
+  return isAllowedNamoLuxSubscription(subscription) && billingStateFromSubscription(subscription).plan === "pro"
+}
 
-async function grantPro(userId: string, _customerId: string | null) {
-  const serviceClient = createServiceClient()
-
-  const { error } = await serviceClient
-    .from("profiles")
-    .upsert({ id: userId, plan: "pro" }, { onConflict: "id" })
-
-  if (error) {
-    console.error("Upsert error:", error)
-    // fallback: plain update
-    const { error: e2 } = await serviceClient
-      .from("profiles")
-      .update({ plan: "pro" })
-      .eq("id", userId)
-    if (e2) throw new Error("DB update failed: " + e2.message)
+async function findSubscriptionByUserId(userId: string): Promise<Stripe.Subscription | null> {
+  try {
+    const result = await getStripeClient().subscriptions.search({
+      query: `metadata['supabase_user_id']:'${userId}'`,
+      limit: 25,
+    })
+    return result.data.find(subscriptionStillGrantsAccess) || null
+  } catch (error) {
+    console.warn("Stripe subscription metadata search failed:", error)
+    return null
   }
 }
 
-async function findPaidCustomerByEmail(email: string, userId: string): Promise<string | null> {
-  const customers = await stripe.customers.list({ email, limit: 10 })
+async function findSubscriptionByVerifiedCustomer(
+  email: string,
+  userId: string,
+  storedCustomerId: string | null,
+): Promise<Stripe.Subscription | null> {
+  const stripe = getStripeClient()
+  const customerIds = new Set<string>()
+  if (storedCustomerId) customerIds.add(storedCustomerId)
 
+  const customers = await stripe.customers.list({ email, limit: 25 })
   for (const customer of customers.data) {
-    if (customer.metadata?.supabase_user_id !== userId) continue
-
-    const [piList, sessionList] = await Promise.all([
-      stripe.paymentIntents.list({ customer: customer.id, limit: 20 }),
-      stripe.checkout.sessions.list({ customer: customer.id, limit: 20 }),
-    ])
-
-    const hasSucceededPI = piList.data.some((pi) => pi.status === "succeeded")
-    const hasPaidSession = sessionList.data.some((s) => s.payment_status === "paid")
-
-    if (hasSucceededPI || hasPaidSession) return customer.id
+    if (!customer.deleted && customer.metadata?.supabase_user_id === userId) {
+      customerIds.add(customer.id)
+    }
   }
+
+  for (const customerId of customerIds) {
+    const subscriptions = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 100 })
+    const match = subscriptions.data.find(subscriptionStillGrantsAccess)
+    if (match) return match
+  }
+
+  return null
+}
+
+async function sessionHasAllowedPrice(sessionId: string): Promise<boolean> {
+  const allowedPriceIds = getStripeAllowedPriceIds()
+  if (allowedPriceIds.size === 0) return false
+
+  const lineItems = await getStripeClient().checkout.sessions.listLineItems(sessionId, { limit: 100 })
+  return lineItems.data.some((item) => item.price?.id && allowedPriceIds.has(item.price.id))
+}
+
+async function sessionHasRetainedPayment(session: Stripe.Checkout.Session): Promise<boolean> {
+  if (session.mode !== "payment" || session.payment_status !== "paid" || (session.amount_total || 0) <= 0) {
+    return false
+  }
+
+  const paymentIntentId = getStripeId(session.payment_intent)
+  if (!paymentIntentId) return false
+
+  const paymentIntent = await getStripeClient().paymentIntents.retrieve(paymentIntentId, {
+    expand: ["latest_charge"],
+  })
+  if (paymentIntent.status !== "succeeded" || paymentIntent.amount_received <= 0) return false
+
+  const charge = typeof paymentIntent.latest_charge === "string" ? null : paymentIntent.latest_charge
+  if (!charge || charge.disputed) return false
+
+  return paymentIntent.amount_received - charge.amount_refunded > 0
+}
+
+async function findLegacyLifetimePurchase(userId: string): Promise<Stripe.Checkout.Session | null> {
+  const sessions = getStripeClient().checkout.sessions.list({ limit: 100 })
+
+  for await (const session of sessions) {
+    const belongsToUser =
+      session.metadata?.supabase_user_id === userId || session.client_reference_id === userId
+    if (!belongsToUser) continue
+    if (!(await sessionHasAllowedPrice(session.id))) continue
+    if (await sessionHasRetainedPayment(session)) return session
+  }
+
   return null
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
-
-    if (!email || typeof email !== "string") {
+    const body = await request.json()
+    const enteredEmail = typeof body?.email === "string" ? body.email.toLowerCase().trim() : ""
+    if (!enteredEmail) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: "You must be signed in to restore a purchase" }, { status: 401 })
+      return NextResponse.json({ error: "You must be signed in to restore paid access" }, { status: 401 })
     }
 
-    const enteredEmail = email.toLowerCase().trim()
     const accountEmail = user.email?.toLowerCase().trim()
-
     if (!accountEmail || enteredEmail !== accountEmail) {
       return NextResponse.json(
         { error: "Use the email address on your signed-in NamoLux account." },
-        { status: 403 }
+        { status: 403 },
       )
     }
 
-    // 1. Search payment intents by supabase_user_id metadata (most reliable)
-    try {
-      const piSearch = await stripe.paymentIntents.search({
-        query: `metadata['supabase_user_id']:'${user.id}' AND status:'succeeded'`,
-        limit: 5,
+    const service = createServiceClient()
+    const { data: profile, error: profileError } = await service
+      .from("profiles")
+      .select("entitlement_source, stripe_customer_id")
+      .eq("id", user.id)
+      .maybeSingle()
+    if (profileError) throw profileError
+
+    if (profile?.entitlement_source === "legacy_lifetime") {
+      return NextResponse.json({ success: true, restored: "legacy_lifetime" })
+    }
+
+    const subscription =
+      (await findSubscriptionByUserId(user.id)) ||
+      (await findSubscriptionByVerifiedCustomer(accountEmail, user.id, profile?.stripe_customer_id || null))
+
+    if (subscription) {
+      await syncSubscriptionProfile({ userId: user.id, email: user.email, subscription })
+      return NextResponse.json({ success: true, restored: "subscription" })
+    }
+
+    const lifetimeSession = await findLegacyLifetimePurchase(user.id)
+    if (lifetimeSession) {
+      await updateBillingProfile({
+        userId: user.id,
+        email: user.email,
+        plan: "pro",
+        entitlementSource: "legacy_lifetime",
+        stripeCustomerId: getStripeId(lifetimeSession.customer),
+        subscriptionStatus: "inactive",
+        stripeStatus: "legacy_lifetime",
+        subscriptionEnd: null,
+        accessExpiresAt: null,
+        cancelAtPeriodEnd: false,
       })
-      console.log(`PI search by user ID found:`, piSearch.data.length)
-      if (piSearch.data.length > 0) {
-        const customerId = piSearch.data[0].customer as string | null
-        await grantPro(user.id, customerId)
-        return NextResponse.json({ success: true })
-      }
-    } catch (e) {
-      console.log("PI metadata search not available, skipping:", e)
+      return NextResponse.json({ success: true, restored: "legacy_lifetime" })
     }
 
-    // 2. Search checkout sessions by supabase_user_id metadata
-    try {
-      const csSearch = await (stripe.checkout.sessions as any).search({
-        query: `metadata['supabase_user_id']:'${user.id}' AND payment_status:'paid'`,
-        limit: 5,
-      })
-      console.log(`Session search by user ID found:`, csSearch.data.length)
-      if (csSearch.data.length > 0) {
-        const customerId = csSearch.data[0].customer as string | null
-        await grantPro(user.id, customerId)
-        return NextResponse.json({ success: true })
-      }
-    } catch (e) {
-      console.log("Session metadata search not available, skipping:", e)
-    }
-
-    const foundCustomerId = await findPaidCustomerByEmail(enteredEmail, user.id)
-
-    if (!foundCustomerId) {
-      return NextResponse.json({
-        error: "No completed purchase found. Make sure you're using the email address you paid with. Contact support if the issue persists.",
-      }, { status: 404 })
-    }
-
-    await grantPro(user.id, foundCustomerId)
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error("Restore purchase error:", error)
+    return NextResponse.json(
+      { error: "No eligible NamoLux subscription or retained lifetime purchase was found for this account." },
+      { status: 404 },
+    )
+  } catch (error) {
+    console.error("Restore paid access failed:", error)
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }

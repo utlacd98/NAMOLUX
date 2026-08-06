@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
-
-// Admin auth — fail closed if ADMIN_SECRET is not set
-function isAdmin(request: NextRequest): boolean {
-  const adminToken = process.env.ADMIN_SECRET
-  if (!adminToken) return false
-  const token = request.headers.get("x-admin-token") ||
-                request.cookies.get("admin_token")?.value ||
-                request.nextUrl.searchParams.get("token")
-  return token === adminToken
-}
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 let openaiInstance: OpenAI | null = null
 
@@ -26,9 +17,8 @@ function getOpenAI(): OpenAI {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAdmin(request)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 })
-  }
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
 
   try {
     const { topic, category } = await request.json()
@@ -43,7 +33,7 @@ Write high-quality, SEO-optimized blog posts about domains, branding, SEO, and s
 Your writing style:
 - Clear, actionable, and practical
 - Use examples and data when possible
-- Include strategic internal links to /generate and /seo-audit
+- Include one strategic internal product link matched to the article intent: /generate for naming, /bulk-domain-check for domain due diligence, /founder-signal for decision science, or /seo-audit only for an SEO Foundations article
 - Target founders, entrepreneurs, and small business owners
 - Professional but approachable tone
 
@@ -65,7 +55,7 @@ Return a JSON object with this EXACT structure:
     { "type": "callout", "calloutType": "tip", "content": "Pro tip content..." },
     { "type": "heading", "level": 2, "content": "Second Main Section" },
     { "type": "paragraph", "content": "More content..." },
-    { "type": "callout", "calloutType": "cta", "content": "Ready to find your perfect domain?", "ctaLink": "/generate", "ctaText": "Generate Names Now" },
+    { "type": "callout", "calloutType": "cta", "content": "Put the guidance into practice.", "ctaLink": "/generate", "ctaText": "Start naming" },
     { "type": "heading", "level": 2, "content": "Conclusion" },
     { "type": "paragraph", "content": "Conclusion paragraph..." }
   ]
@@ -74,7 +64,7 @@ Return a JSON object with this EXACT structure:
 Requirements:
 - Include 3-5 main sections with H2 headings
 - Add 1-2 lists with actionable items
-- Include 1 tip callout and 1 CTA callout linking to /generate or /seo-audit
+- Include 1 tip callout and exactly 1 CTA callout. Use /seo-audit only when the selected category is SEO Foundations; otherwise choose /generate, /bulk-domain-check, or /founder-signal to match the article intent
 - Make content 1000-1500 words total
 - Use keywords naturally throughout
 - Each paragraph should be 2-4 sentences`
@@ -128,4 +118,3 @@ Requirements:
     )
   }
 }
-

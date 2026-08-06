@@ -2,9 +2,9 @@ import { Reveal, SectionHeader } from "@/components/landing/reveal"
 import { ScorecardDemo } from "@/components/landing/scorecard-demo"
 
 const proofPoints = [
-  { value: "0–100", label: "Founder Signal™ score with reasoning on every name" },
-  { value: "6 TLDs", label: "RDAP + DNS verified availability in the same pass" },
-  { value: "50", label: "Names scored side by side in a single batch" },
+  { value: "0–100", label: "Optional Founder Signal™ score with reasoning" },
+  { value: "6 TLDs", label: "RDAP + DNS availability that updates after names appear" },
+  { value: "12", label: "Advanced candidates scored together without hidden filtering" },
 ]
 
 export function ProductShowcase() {
@@ -36,7 +36,7 @@ export function ProductShowcase() {
               </span>
             </>
           }
-          sub="Paste candidate names from any source. Each one comes back with a Founder Signal™ verdict, live availability, and the reasoning behind the number — in seconds, not a two-week engagement."
+          sub="Generate the creative shortlist first, then choose when to run Founder Signal™. The score annotates every candidate without removing names or changing their original order."
         />
 
         <Reveal delay={0.15} className="mt-12 sm:mt-16">

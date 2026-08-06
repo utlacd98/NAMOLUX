@@ -700,11 +700,123 @@
   background: linear-gradient(90deg, transparent, rgba(255, 233, 166, 0.48), transparent);
 }
 
+/* NamoLux auth pages */
+.namolux-auth-page {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(214, 178, 124, 0.2), transparent 18rem),
+    radial-gradient(circle at 50% 58%, rgba(214, 178, 124, 0.15), transparent 34rem),
+    linear-gradient(180deg, #080807 0%, #050505 100%);
+}
+
+.namolux-auth-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(45deg, rgba(214, 178, 124, 0.08) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(214, 178, 124, 0.06) 1px, transparent 1px),
+    radial-gradient(circle, rgba(214, 178, 124, 0.14) 1px, transparent 1.4px);
+  background-position: center;
+  background-size: 108px 108px, 108px 108px, 54px 54px;
+  mask-image: radial-gradient(ellipse at center, black 0%, black 48%, transparent 82%);
+  opacity: 0.42;
+}
+
+.namolux-auth-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #050505 0%, transparent 18%, transparent 82%, #050505 100%),
+    linear-gradient(180deg, #050505 0%, transparent 22%, transparent 74%, #050505 100%);
+}
+
+@keyframes auth-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  50% {
+    opacity: 0.86;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes auth-glow-drift {
+  0%,
+  100% {
+    background-position: 50% 44%;
+  }
+  50% {
+    background-position: 50% 56%;
+  }
+}
+
+@keyframes auth-border-sweep {
+  0% {
+    transform: translateX(-38%);
+    opacity: 0;
+  }
+  18%,
+  62% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(38%);
+    opacity: 0;
+  }
+}
+
+.auth-gold-glow {
+  background:
+    radial-gradient(ellipse at center, rgba(255, 221, 128, 0.24) 0%, rgba(214, 178, 124, 0.17) 24%, rgba(110, 75, 18, 0.1) 45%, transparent 72%),
+    linear-gradient(90deg, transparent, rgba(214, 178, 124, 0.12), transparent);
+  filter: blur(18px);
+  animation: auth-glow-breathe 6.5s ease-in-out infinite, auth-glow-drift 10s ease-in-out infinite;
+}
+
+.auth-card-halo::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  z-index: 1;
+  height: 1px;
+  width: 64%;
+  background: linear-gradient(90deg, transparent, rgba(255, 232, 166, 0.95), transparent);
+  filter: blur(0.2px);
+  animation: auth-border-sweep 4.8s ease-in-out infinite;
+}
+
+.auth-card-shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 234, 166, 0.16), transparent 28%),
+    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.055) 42%, transparent 64%);
+  opacity: 0.9;
+}
+
+.auth-card-shine > * {
+  position: relative;
+  z-index: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .namolux-generate-page::before,
   .namolux-generate-page::after,
   .namolux-signal-array {
     opacity: 0.35;
+  }
+
+  .auth-gold-glow,
+  .auth-card-halo::before {
+    animation: none;
   }
 }
 

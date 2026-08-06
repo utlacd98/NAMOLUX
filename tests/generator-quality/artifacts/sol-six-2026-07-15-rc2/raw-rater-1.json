@@ -1,0 +1,251 @@
+{
+  "raterId": "rater-1",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "prudence": "usable",
+        "allowance": "reject",
+        "cushion": "usable",
+        "provision": "reject",
+        "nestegg": "reject",
+        "headroom": "shortlist",
+        "reserve": "reject",
+        "margin": "reject",
+        "familyfund": "reject",
+        "pocketplan": "shortlist",
+        "budgetbond": "reject",
+        "thrifthaven": "usable",
+        "wellthrift": "reject",
+        "wiseplan": "reject",
+        "clearthrift": "reject",
+        "wisethrift": "reject"
+      },
+      "scores": {
+        "relevance": 7.5,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 3.8,
+        "vibeFit": 6.5
+      },
+      "topTwo": [
+        "headroom",
+        "pocketplan"
+      ],
+      "criticalDefects": [
+        "The set relies heavily on bare financial vocabulary that is relevant but not ownable or distinctive.",
+        "Several thrift compounds are unidiomatic and feel mechanically assembled rather than friendly."
+      ],
+      "mechanicalFamilies": [
+        "wellthrift / clearthrift / wisethrift",
+        "pocketplan / wiseplan",
+        "familyfund / budgetbond"
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "mosaic": "usable",
+        "puzzleverse": "reject",
+        "knitplay": "usable",
+        "qubitry": "reject",
+        "lattice": "usable",
+        "puzzluxe": "reject",
+        "knitmaze": "usable",
+        "cozygrid": "reject",
+        "mindloom": "shortlist",
+        "knotique": "usable",
+        "threadle": "reject",
+        "mysticube": "reject",
+        "cogwheel": "reject",
+        "jigsaw": "reject",
+        "cozypuzzle": "reject",
+        "logicnest": "shortlist"
+      },
+      "scores": {
+        "relevance": 7.1,
+        "pronounceabilityNaturalness": 7.2,
+        "distinctiveness": 5.2,
+        "vibeFit": 6.9
+      },
+      "topTwo": [
+        "mindloom",
+        "logicnest"
+      ],
+      "criticalDefects": [
+        "Several names are literal descriptions of cozy puzzles rather than credible studio brands.",
+        "threadle reads as a derivative Wordle-style construction, while puzzluxe and qubitry feel forced."
+      ],
+      "mechanicalFamilies": [
+        "knitplay / knitmaze",
+        "puzzleverse / puzzluxe / cozypuzzle",
+        "cozygrid / logicnest"
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "avelune": "usable",
+        "snowmelt": "usable",
+        "silverleaf": "usable",
+        "glacielle": "shortlist",
+        "alpenglow": "usable",
+        "velvetspring": "shortlist",
+        "halcyon": "reject",
+        "everpure": "reject",
+        "mountaindew": "reject",
+        "verdant": "reject",
+        "aurelisse": "usable",
+        "stillwater": "reject",
+        "crystalline": "reject",
+        "edelwise": "reject",
+        "glacial": "reject",
+        "serenity": "reject"
+      },
+      "scores": {
+        "relevance": 6.8,
+        "pronounceabilityNaturalness": 7.5,
+        "distinctiveness": 5.4,
+        "vibeFit": 7.2
+      },
+      "topTwo": [
+        "velvetspring",
+        "glacielle"
+      ],
+      "criticalDefects": [
+        "mountaindew is an obvious famous beverage name and is commercially unusable here.",
+        "everpure carries a strong established water-purification association rather than offering a fresh skincare identity.",
+        "Several generic nature and wellness words are saturated and do not create a premium alpine brand."
+      ],
+      "mechanicalFamilies": [
+        "snowmelt / stillwater / glacial / crystalline",
+        "avelune / glacielle / aurelisse",
+        "halcyon / verdant / serenity"
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "clyptra": "usable",
+        "timetide": "shortlist",
+        "cogniq": "reject",
+        "flextide": "reject",
+        "chroniq": "reject",
+        "zenitha": "reject",
+        "sylvane": "reject",
+        "synthiq": "reject",
+        "siftiq": "reject",
+        "tidelet": "reject",
+        "sequence": "reject",
+        "smartslot": "reject",
+        "slotmind": "reject",
+        "diary": "reject",
+        "readyagenda": "reject",
+        "timekeeper": "reject"
+      },
+      "scores": {
+        "relevance": 4.9,
+        "pronounceabilityNaturalness": 6.0,
+        "distinctiveness": 4.0,
+        "vibeFit": 5.8
+      },
+      "topTwo": [
+        "timetide",
+        "clyptra"
+      ],
+      "criticalDefects": [
+        "Most invented options communicate generic AI styling without scheduling relevance.",
+        "The descriptive options sound like features or category terms rather than differentiated products.",
+        "chroniq risks being read as chronic, creating an avoidable negative association."
+      ],
+      "mechanicalFamilies": [
+        "cogniq / chroniq / synthiq / siftiq",
+        "timetide / flextide / tidelet",
+        "smartslot / slotmind",
+        "diary / readyagenda / timekeeper"
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "tallynest": "shortlist",
+        "evenline": "shortlist",
+        "daymark": "usable",
+        "balansa": "usable",
+        "freelume": "reject",
+        "truecourse": "reject",
+        "netkeep": "usable",
+        "accord": "reject",
+        "harbor": "reject",
+        "candor": "reject",
+        "settled": "usable",
+        "cleanslate": "usable",
+        "cashbook": "reject",
+        "wiseinvoice": "reject",
+        "invoicegrid": "reject",
+        "bookkeep": "reject"
+      },
+      "scores": {
+        "relevance": 6.4,
+        "pronounceabilityNaturalness": 7.8,
+        "distinctiveness": 5.1,
+        "vibeFit": 6.8
+      },
+      "topTwo": [
+        "evenline",
+        "tallynest"
+      ],
+      "criticalDefects": [
+        "The literal accounting names are generic category descriptions with little brand equity.",
+        "Several polished common words drift too far from invoicing and tax accounting to feel purposeful.",
+        "freelume is an opaque blend whose intended meaning is not recoverable."
+      ],
+      "mechanicalFamilies": [
+        "cashbook / wiseinvoice / invoicegrid / bookkeep",
+        "daymark / truecourse / harbor",
+        "accord / candor / settled"
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "tracesmith": "shortlist",
+        "telluric": "reject",
+        "nightwatch": "reject",
+        "signalforge": "usable",
+        "thretic": "reject",
+        "outflank": "shortlist",
+        "redthread": "usable",
+        "sentryn": "reject",
+        "deepsight": "reject",
+        "foresight": "reject",
+        "findnorth": "reject",
+        "vigilant": "reject",
+        "detector": "reject",
+        "detectmax": "reject",
+        "spectrum": "reject",
+        "firewall": "reject"
+      },
+      "scores": {
+        "relevance": 6.9,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 4.7,
+        "vibeFit": 7.3
+      },
+      "topTwo": [
+        "tracesmith",
+        "outflank"
+      ],
+      "criticalDefects": [
+        "The list overuses crowded security vocabulary and bare threat-detection category terms.",
+        "nightwatch, deepsight, foresight, spectrum, and firewall are too familiar or saturated to differentiate an enterprise platform.",
+        "thretic and sentryn sacrifice naturalness for superficial distinctiveness."
+      ],
+      "mechanicalFamilies": [
+        "tracesmith / signalforge",
+        "deepsight / foresight",
+        "detector / detectmax",
+        "nightwatch / vigilant / sentryn"
+      ]
+    }
+  ]
+}

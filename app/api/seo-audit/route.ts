@@ -1123,11 +1123,14 @@ export async function POST(request: NextRequest) {
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         {
-          error: "token_limit_reached",
-          message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.",
-          upgradeUrl: "/pricing",
+          error: "temporary_limit_reached",
+          message: rateLimitResult.message || "NamoLux is busy right now. Please try again in a moment.",
+          resetAt: rateLimitResult.resetAt,
+          tokensUsed: rateLimitResult.tokensUsed,
+          tokensTotal: rateLimitResult.tokensTotal,
+          remaining: rateLimitResult.remaining,
         },
-        { status: 429 }
+        { status: rateLimitResult.statusCode || 429 }
       )
     }
 
@@ -1235,7 +1238,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error performing SEO audit:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to perform SEO audit" },
+      { error: "Failed to perform SEO audit" },
       { status: 500 }
     )
   }

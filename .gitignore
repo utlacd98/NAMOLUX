@@ -2,13 +2,17 @@
 
 # dependencies
 /node_modules
+**/node_modules/
 
 # next.js
 /.next/
+/.eslintcache
 /.next-local/
 /.next-codex-build*/
 /.next-codex-dev*/
 /out/
+/playwright-report/
+/test-results/
 
 # production
 /build
@@ -26,9 +30,14 @@ yarn-error.log*
 # local agent/tooling state
 /.claude/
 /.codex-remote-attachments/
+/.codex-*
+/tmp/
+/motion/
+/videos/
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel

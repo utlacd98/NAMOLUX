@@ -12,16 +12,7 @@ import {
   type PostType,
   type GenerateContentRequest 
 } from "@/lib/marketing-agent-engine"
-
-// Admin authentication check — fail closed if ADMIN_SECRET is not set
-function isAdmin(request: NextRequest): boolean {
-  const adminToken = process.env.ADMIN_SECRET
-  if (!adminToken) return false
-  const token = request.headers.get("x-admin-token") ||
-                request.cookies.get("admin_token")?.value ||
-                request.nextUrl.searchParams.get("token")
-  return token === adminToken
-}
+import { requireAdminRequest } from "@/lib/admin-auth"
 
 // Content log storage (in-memory for now, can be extended to database)
 interface ContentLogEntry {
@@ -33,9 +24,8 @@ interface ContentLogEntry {
 const contentLog: ContentLogEntry[] = []
 
 export async function POST(request: NextRequest) {
-  if (!isAdmin(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
 
   try {
     const body = await request.json()
@@ -154,13 +144,11 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint for fetching content log
 export async function GET(request: NextRequest) {
-  if (!isAdmin(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const adminError = await requireAdminRequest(request)
+  if (adminError) return adminError
 
   return NextResponse.json({
     success: true,
     data: contentLog.slice(0, 20)
   })
 }
-

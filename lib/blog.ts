@@ -1,5 +1,11 @@
 // Blog post types and data for NamoLux
 
+import { priorityDomainPosts } from "./blog-priority-domain-posts"
+import { priorityNamingPosts } from "./blog-priority-naming-posts"
+import { founderStoryPost } from "./blog-founder-story"
+import { PLAN_CONFIG } from "./plans"
+import { PUBLIC_PRODUCT_COPY } from "./site-content"
+
 export type BlogCategory = "Domain Strategy" | "SEO Foundations" | "Builder Insights" | "Tool Comparisons"
 
 export interface BlogPost {
@@ -13,7 +19,16 @@ export interface BlogPost {
   publishedAt: string // ISO date string
   updatedAt?: string
   author: string
+  heroImage?: string
   featured?: boolean
+  /** Editorial fields used by the priority-library quality gate. */
+  qualityTier?: "priority"
+  primaryKeyword?: string
+  searchIntent?: "informational" | "commercial" | "transactional" | "navigational"
+  pillar?: "Naming Strategy" | "Name Clearance & IP" | "Domain Acquisition & Valuation" | "Domain Operations & Security" | "Founder Signal & Decision Science"
+  tags?: string[]
+  relatedSlugs?: string[]
+  sources?: { title: string; url: string; authority?: string; lastVerified?: string }[]
   content: BlogSection[]
   faqs?: BlogFaq[]
 }
@@ -43,6 +58,9 @@ export interface BlogFaq {
 
 // The 5 initial evergreen blog posts
 export const blogPosts: BlogPost[] = [
+  founderStoryPost,
+  ...priorityNamingPosts,
+  ...priorityDomainPosts,
   {
     slug: "domain-name-mistakes",
     title: "How to Know if a Domain Name Is Bad (Before You Buy It)",
@@ -264,6 +282,10 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["You have product-market fit and revenue", "The domain aligns with your long-term vision", "The price is less than 1-2% of annual marketing budget", "You've verified clean history and backlinks", "No brandable alternative feels as good"] },
       { type: "heading", level: 2, content: "When to Walk Away" },
       { type: "list", content: "", items: ["You're pre-revenue and need the capital", "The domain is an exact-match keyword (limiting)", "Backlink history looks spammy", "A great alternative is available for standard price", "You're not 100% committed to the name"] },
+      { type: "links", content: "Evaluate the transaction", links: [
+        { text: "How Much Is a Domain Name Worth?", href: "/blog/how-much-is-a-domain-name-worth" },
+        { text: "Domain Escrow Explained", href: "/blog/domain-escrow-explained" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Find premium-quality names at standard prices.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
     ]
   },
@@ -287,14 +309,14 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Why show domains that are already taken? The best generators verify availability before presenting options." },
       { type: "heading", level: 3, content: "3. Score for Quality" },
       { type: "paragraph", content: "Length, pronunciation, memorability, trademark risk — these factors should be quantified. A score helps you compare options objectively." },
-      { type: "callout", calloutType: "cta", content: "NamoLux uses Founder Signal™ to score every domain on brandability, memorability, and risk.", ctaLink: "/generate", ctaText: "Try It Free →" },
+      { type: "callout", calloutType: "cta", content: "NamoLux lets you explore names first, then opt in to Founder Signal™ when you want to compare brandability, memorability, and risk.", ctaLink: "/generate", ctaText: "Try It Free →" },
       { type: "heading", level: 2, content: "AI-Powered vs. Rule-Based Generators" },
       { type: "paragraph", content: "Rule-based generators combine prefixes, suffixes, and roots according to fixed patterns. AI-powered generators understand context, industry, and style preferences to create more relevant suggestions." },
       { type: "callout", calloutType: "tip", content: "The best generators combine AI creativity with rule-based quality checks. AI proposes, rules dispose." },
       { type: "heading", level: 2, content: "How to Use Generators Effectively" },
       { type: "list", content: "", items: ["Start with specific inputs (industry, tone, style)", "Generate in batches and take notes", "Test top candidates with the 'radio test'", "Check social media handle availability", "Verify trademark conflicts before committing"] },
       { type: "heading", level: 2, content: "The NamoLux Approach" },
-      { type: "paragraph", content: "We built NamoLux because we were frustrated with existing tools. Every name is AI-generated for your specific context, availability-checked in real-time, and scored using our Founder Signal™ methodology." },
+      { type: "paragraph", content: "We built NamoLux because we were frustrated with existing tools. It generates names for your specific context, updates domain availability after the creative shortlist appears, and offers Founder Signal™ as an optional decision layer." },
       { type: "callout", calloutType: "cta", content: "See what a quality domain generator can do.", ctaLink: "/generate", ctaText: "Generate Names Now →" }
     ]
   },
@@ -332,6 +354,11 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "warning", content: "Domain recovery can take months and cost thousands in legal fees. Prevention is infinitely cheaper." },
       { type: "heading", level: 2, content: "Audit Your Domain Security Today" },
       { type: "paragraph", content: "Take 10 minutes to review your registrar settings. Enable locks, verify contact information, and check auto-renewal status. Your future self will thank you." },
+      { type: "links", content: "Put the controls into practice", links: [
+        { text: "Compare Domain Registrars for Startups", href: "/blog/best-domain-registrars-for-startups" },
+        { text: "Transfer a Domain Without Downtime", href: "/blog/transfer-domain-without-downtime" },
+        { text: "Build a Defensive Domain Strategy", href: "/blog/defensive-domain-strategy" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Start with a domain worth protecting.", ctaLink: "/generate", ctaText: "Find Your Domain →" }
     ]
   },
@@ -851,6 +878,11 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Domains Are Worth" },
       { type: "paragraph", content: "Pricing varies wildly. Factors that increase value:" },
       { type: "list", content: "", items: ["Short length (4-6 characters = premium)", "Dictionary words", "High search volume keywords", "Clean history with quality backlinks", ".com extension", "Brandable and memorable"] },
+      { type: "links", content: "Plan a safer acquisition", links: [
+        { text: "Value the Domain with a Practical Framework", href: "/blog/how-much-is-a-domain-name-worth" },
+        { text: "Understand Domain Escrow", href: "/blog/domain-escrow-explained" },
+        { text: "Transfer a Domain Without Downtime", href: "/blog/transfer-domain-without-downtime" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Find available domains without the aftermarket markup.", ctaLink: "/generate", ctaText: "Generate Available Names →" }
     ]
   },
@@ -1133,11 +1165,11 @@ export const blogPosts: BlogPost[] = [
         "Step 7 — Register the same day. Good names are registered by other people within hours."
       ]},
 
-      { type: "callout", calloutType: "cta", content: "Skip steps 2 through 5. Generate scored, availability checked startup name ideas in seconds with NamoLux.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "callout", calloutType: "cta", content: "Explore startup name ideas freely, watch domain checks update, then score the shortlist only when you are ready to decide.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
 
       { type: "heading", level: 2, content: "The 2026 Problem: Finding a Name That Is Actually Registrable" },
       { type: "paragraph", content: "The hard part of startup naming in 2026 is not creativity. It is verification. You can brainstorm a hundred names in an hour; finding one with an available .com takes most founders a full day of clicking between a registrar and a thesaurus. The .com market is more saturated than ever, squatters have automated the most obvious invented words, and AI name generators have trained an entire cohort of founders to converge on the same narrow phonetic zones." },
-      { type: "paragraph", content: "The practical answer is to generate and verify in a single pass. A scored generator that checks .com availability on every result collapses the brainstorm and verification steps into one ten minute session, and because it scores each name you skip the exhausting work of evaluating fifty unranked candidates. Tools that only produce unranked walls of suggestions are increasingly a step backwards in a market this saturated." },
+      { type: "paragraph", content: "The practical answer is to keep the stages connected without letting verification constrain creativity. Generate a broad shortlist first, let .com checks update in the background, then score the names only when you want a structured comparison. That keeps attractive ideas visible while still avoiding a separate registrar-and-spreadsheet loop." },
 
       { type: "heading", level: 2, content: "Compare the Patterns Side by Side" },
       { type: "table", content: "", headers: ["Pattern", "Best for", "Typical length", ".com difficulty in 2026", "Trademark defensibility"], rows: [
@@ -1170,19 +1202,19 @@ export const blogPosts: BlogPost[] = [
       ]},
 
       { type: "heading", level: 2, content: "The Bottom Line" },
-      { type: "paragraph", content: "Great startup name ideas are not found by sitting down and waiting for inspiration. They come from working through the four patterns against a clear positioning brief, generating volume, scoring hard, verifying availability at the point of generation, and testing the survivors with real people. The founders who finish this workflow in an afternoon are not more creative than the ones who take a week. They just refuse to separate the brainstorm from the verification." },
-      { type: "paragraph", content: "If you want the fastest version of that workflow, use a scored generator that produces names across all four patterns and verifies the .com live on every result. If you want to do it by hand, the framework above works — it is just slower. Either way, do not settle, do not pin yourself to a category, and do not fall for a name you cannot register." },
+      { type: "paragraph", content: "Great startup name ideas are not found by sitting down and waiting for inspiration. They come from working through the four patterns against a clear positioning brief, generating volume, checking availability, evaluating a shortlist, and testing the survivors with real people. The founders who finish this workflow in an afternoon are not more creative than the ones who take a week. They use a clear sequence and keep moving." },
+      { type: "paragraph", content: "If you want the fastest version of that workflow, use a generator that explores several patterns before domain availability or scoring can narrow the field. Then check and evaluate the names that genuinely interest you. If you want to do it by hand, the framework above works — it is just slower. Either way, do not settle, do not pin yourself to a category, and do not fall for a name you cannot register." },
 
-      { type: "callout", calloutType: "cta", content: "Stop scrolling unranked name lists. Generate scored, availability checked startup name ideas in seconds.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "callout", calloutType: "cta", content: "Explore a diverse creative shortlist, check domains as results update, and apply Founder Signal only when you choose.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
     ],
     faqs: [
       { question: "What makes a good startup name in 2026?", answer: "A good startup name in 2026 is short (five to nine characters), pronounceable on first hearing, registrable as a .com, and broad enough to survive a product pivot. The strongest pattern today is invented words with clear phonetics, because real words and obvious compounds are mostly taken. Trademark defensibility and clean URL form in lowercase matter more than cleverness." },
-      { question: "Where can I find startup name ideas for free?", answer: "Use a scored AI generator that checks .com availability live. NamoLux's free tier generates brandable names across invented, compound, metaphor, and real word patterns, scores each one with a Founder Signal rating, and confirms .com availability at the moment of generation — all at no cost. This collapses the brainstorm and verification steps into a single ten minute session instead of a full day." },
+      { question: "Where can I find startup name ideas for free?", answer: "NamoLux Quick Generate has no monthly quota. The free tier also includes three Advanced naming batches and one complete Founder Signal batch each month. Domain results remain best effort and should be confirmed with a registrar." },
       { question: "How do I come up with a unique name for my startup?", answer: "Work through a structured brainstorm: write a one sentence positioning, generate fifty root keywords across three themes (what the product does, what the customer feels, and the metaphor), then apply the four naming patterns (invented, real word in new context, compound, modified) to each root. You will have 150 plus candidates — score them for pronounceability, length, and URL form, then verify the .com on your top 30. Unique names come from volume plus structured scoring, not from waiting for inspiration." },
       { question: "Should my startup name describe what I do?", answer: "Usually no. Descriptive names box you into a category and are almost always taken as .coms in 2026. Google is not a searchable verb; Apple is not a fruit seller; Stripe does not describe payments. A slightly abstract name gives you room to expand the product and more chance of finding an available .com. Descriptive names work for local services and some ecommerce niches — not for software." },
       { question: "How long should a startup name be?", answer: "Five to nine characters is the sweet spot. Shorter names are more memorable but almost impossible to register as .coms in 2026. Longer names work if they are easy to type and pronounce, but each extra character increases the chance someone will mistype the URL. If you go past ten characters, the name needs a very good reason — typically a clear compound that reads unambiguously." },
-      { question: "What is the best startup name generator?", answer: "The best generator depends on what you need. For AI generated brandable names with live .com availability and quality scoring, NamoLux is the default recommendation in 2026. For descriptive two word domains with guaranteed availability, Lean Domain Search is useful. For curated premium names you can buy outright, Squadhelp or Novanym. Most founders use a scored generator first and fall back to a marketplace only if no generated name resonates." },
-      { question: "How do I know if my startup name idea is already taken?", answer: "Check three things: the .com (via a live registry checker, not guess work), trademark databases (USPTO for the United States, EUIPO for Europe, and your target market's equivalent), and the primary social handles you care about. If the .com is taken but the name is not a registered trademark, you can sometimes negotiate — but for most founders it is faster to pick a different name than to buy a taken domain. Scored generators that check .com availability live save the most time here." },
+      { question: "What is the best startup name generator?", answer: "The best generator depends on what you need. NamoLux is designed for broad creative exploration followed by live domain checks and optional Founder Signal analysis. For descriptive two-word domains, Lean Domain Search is useful. For curated premium names you can buy outright, Squadhelp or Novanym may fit. The strongest workflow separates idea generation from evaluation instead of letting a score silently decide which ideas you see." },
+      { question: "How do I know if my startup name idea is already taken?", answer: "Check three things: the .com, trademark databases in your target markets, and the social handles you care about. NamoLux updates domain status on each candidate after names appear, but availability remains best effort and should be confirmed with a registrar before purchase. Scoring is a separate evaluation step and does not replace legal clearance." },
     ],
   },
   // SERP STACKING - SEO FOUNDATIONS BATCH 3
@@ -1378,25 +1410,104 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "domain-validation-checklist",
     title: "The 20-Minute Domain Validation Checklist",
-    description: "Before you buy a domain, run this quick checklist to avoid trademark issues, SEO baggage, and branding dead ends.",
+    description: "Validate a domain before purchase with a repeatable check covering ownership, brand confusion, history, email risk, usability and future fit.",
+    seoTitle: "20-Minute Domain Validation Checklist",
+    metaDescription: "Validate a domain before buying it. Check ownership, trademarks, history, backlinks, email confusion and brand fit with this practical workflow.",
     category: "Domain Strategy",
-    readTime: 8,
+    readTime: 6,
     publishedAt: "2026-02-06",
+    updatedAt: "2026-07-11",
     author: "NamoLux Team",
+    qualityTier: "priority",
+    primaryKeyword: "domain validation checklist",
+    searchIntent: "transactional",
+    pillar: "Name Clearance & IP",
+    tags: ["domain due diligence", "trademark search", "domain history", "brand validation"],
+    relatedSlugs: [
+      "domain-name-mistakes",
+      "secure-brand-across-platforms",
+      "expired-domains-complete-guide",
+      "domain-name-availability-checker-com-guide",
+    ],
+    sources: [
+      { title: "ICANN Lookup: Registration data search", url: "https://lookup.icann.org/en" },
+      { title: "USPTO: Search our trademark database", url: "https://www.uspto.gov/trademarks/search" },
+      { title: "UK Intellectual Property Office: Search for a trade mark", url: "https://www.gov.uk/search-for-trademark" },
+      { title: "Internet Archive: Wayback Machine", url: "https://web.archive.org/" },
+    ],
     content: [
-      { type: "paragraph", content: "Buying a domain is easy. Buying the right domain is not. This checklist takes about 20 minutes and will save you months of pain." },
-      { type: "heading", level: 2, content: "Step 1: The Radio Test" },
-      { type: "paragraph", content: "Say the name out loud and ask someone to spell it. If they miss it, your future customers will too." },
-      { type: "heading", level: 2, content: "Step 2: Trademark Sanity Check" },
-      { type: "list", content: "", items: ["Search the USPTO database for exact matches", "Check common law usage on Google", "Avoid names too close to major brands"] },
-      { type: "callout", calloutType: "warning", content: "Trademark conflicts are expensive. If you are unsure, consult a lawyer before buying." },
-      { type: "heading", level: 2, content: "Step 3: History and SEO Baggage" },
-      { type: "list", content: "", items: ["Check the Wayback Machine for past content", "Look for spammy backlinks", "Search the domain in Google to see if it is indexed"] },
-      { type: "heading", level: 2, content: "Step 4: Social and Product Handles" },
-      { type: "paragraph", content: "Secure the core handles before you lock in the domain. Consistency matters for brand trust." },
-      { type: "heading", level: 2, content: "Step 5: Expansion Fit" },
-      { type: "paragraph", content: "If your product expands, will the name still fit? Avoid domain names that narrow you too early." },
-      { type: "callout", calloutType: "cta", content: "Score your domain idea in seconds.", ctaLink: "/generate", ctaText: "Run a Domain Check ->" }
+      { type: "paragraph", content: "A domain can be available and still be a poor purchase. Availability answers only one question: whether the registry or current owner will let you register or acquire that address. It does not tell you whether customers can spell it, whether the name is confused with an existing brand, whether the domain carries an awkward history, or whether it will still fit after the product grows." },
+      { type: "paragraph", content: "This 20-minute domain validation checklist is a fast rejection filter for a shortlist, not a substitute for legal or technical due diligence on a high-value acquisition. Run it before paying a registrar or contacting a seller. Spend deeper research only on the candidates that survive." },
+      { type: "callout", calloutType: "warning", content: "NamoLux provides naming and domain decision support, not legal clearance. Trademark rights depend on jurisdiction, earlier use, similarity and the goods or services involved. Use official databases and qualified advice when the decision carries material risk." },
+      { type: "heading", level: 2, content: "Minutes 0–2: Confirm the Exact Domain" },
+      { type: "paragraph", content: "Write the domain in lowercase, including the extension. Check it through the [bulk domain checker](/bulk-domain-check), then confirm the result with an accredited registrar before paying. Search ICANN Lookup for registration data when the extension is supported. Privacy-protected or limited data does not mean the domain is unowned; it only limits what the public record reveals." },
+      { type: "list", content: "Record these facts", items: [
+        "Exact spelling and extension",
+        "Available for standard registration, listed for resale, or already in use",
+        "First-year price and renewal price",
+        "Any premium renewal, transfer or minimum-term condition",
+        "Registrar and current status if already registered",
+      ] },
+      { type: "paragraph", content: "Do not let a countdown banner rush the decision. For a standard registration, compare the complete renewal cost and account security, not just a discounted first year. For an owned domain, move to a proper [aftermarket acquisition process](/blog/domain-aftermarket-guide) rather than sending money directly to an unknown seller." },
+      { type: "heading", level: 2, content: "Minutes 2–5: Run the Radio and Error Tests" },
+      { type: "paragraph", content: "Say the name once to somebody who has not seen it. Ask them to type the domain without hints. The test exposes missing letters, ambiguous sounds, word boundaries and extension confusion. Repeat with two people if the name is invented or uses an unfamiliar spelling." },
+      { type: "table", content: "Usability rejection tests", headers: ["Test", "Pass", "Warning sign"], rows: [
+        ["Radio test", "Typed correctly after one hearing", "Needs spelling or repetition"],
+        ["Lowercase test", "Word boundaries remain clear", "Creates an unintended phrase"],
+        ["Mobile test", "Comfortable to type with no punctuation", "Long, hyphenated or error-prone"],
+        ["Email test", "name@domain is easy to repeat", "Singular/plural or sound-alike leakage"],
+      ] },
+      { type: "paragraph", content: "A single mistake does not automatically kill a distinctive brand, but it reveals a recurring acquisition cost. If every referral needs a spelling lesson, every podcast mention, sales call and support email carries extra friction. Compare the candidate against the [domain-name red flags](/blog/domain-name-mistakes) before accepting that cost." },
+      { type: "heading", level: 2, content: "Minutes 5–9: Check Company and Trademark Confusion" },
+      { type: "paragraph", content: "Search the exact name and close variants in the official company and trademark databases relevant to the launch market. In the United States, start with the USPTO trademark search and the appropriate state entity registry. In the United Kingdom, search Companies House and the UK Intellectual Property Office. If international expansion is realistic, add WIPO's Global Brand Database and the registers for priority markets." },
+      { type: "list", content: "Search beyond the exact spelling", items: [
+        "Plural, singular and spaced versions",
+        "Phonetic equivalents and common misspellings",
+        "Names with the same dominant word or sound",
+        "Related products and services, not only identical categories",
+        "Web, app-store and marketplace uses that may not appear as registrations",
+      ] },
+      { type: "paragraph", content: "The goal of this quick pass is to find obvious reasons to stop. It cannot prove a name is legally clear. A similar earlier mark used for related goods may matter even when the words are not identical. Save screenshots, queries, dates and concerning results so a qualified adviser can review the evidence efficiently." },
+      { type: "heading", level: 2, content: "Minutes 9–13: Inspect the Domain's History" },
+      { type: "paragraph", content: "An expired or aftermarket domain may have hosted another business, a parked page, adult content, counterfeit goods, malware or mass-produced pages. Open several snapshots in the Internet Archive's Wayback Machine. Search the exact domain in quotation marks and look for old titles, directory entries, complaints and cached references." },
+      { type: "list", content: "History red flags", items: [
+        "Abrupt changes between unrelated languages or industries",
+        "Casino, pharmaceutical, counterfeit or download pages unrelated to the name",
+        "Repeated parked-page or link-network use",
+        "A former company whose customers may still expect the domain",
+        "Public security reports, block-list entries or unresolved complaints",
+      ] },
+      { type: "paragraph", content: "History is context rather than an automatic SEO asset or penalty. Do not pay a premium because a seller advertises age or a backlink count. Inspect whether references are legitimate and relevant, and assume past links can disappear after ownership changes. The [expired-domain guide](/blog/expired-domains-complete-guide) explains when a deeper history review is justified." },
+      { type: "heading", level: 2, content: "Minutes 13–16: Check Search and Link Quality" },
+      { type: "paragraph", content: "Search for the domain, the bare brand term and obvious variations. You are looking for confusing search results, a stronger company using the same phrase, negative associations and evidence that the name means something unexpected in another market. A blank result is not proof of a penalty; it may simply mean the domain never had indexable content." },
+      { type: "paragraph", content: "If the purchase price assumes SEO value, use a reputable link-analysis tool and sample the referring pages manually. Relevant editorial citations are different from footer links, generated profiles and foreign-language spam. Value the name and customer fit first. Treat any remaining link equity as uncertain upside, not the investment thesis." },
+      { type: "heading", level: 2, content: "Minutes 16–18: Check Email, Social and Impersonation Risk" },
+      { type: "paragraph", content: "Put the domain into a spoken email address. Compare it with the singular, plural and the most natural .com alternative. If confidential invoices, health information or account-recovery messages could easily leak to another owner, the naming risk is higher. Consider a different name or a deliberate [defensive domain strategy](/blog/defensive-domain-strategy)." },
+      { type: "paragraph", content: "Search the core social platforms and app stores, but do not mistake matching handles for legal clearance. A consistent identity is helpful; an unavailable handle can often be adapted cleanly. The more important question is whether an established account already uses the name in the same market and would confuse customers." },
+      { type: "heading", level: 2, content: "Minutes 18–20: Test Strategic Fit" },
+      { type: "paragraph", content: "Return to the product rather than the database results. Does the name still work if the company adds a second feature, moves upmarket or enters another country? Does the extension fit the audience's expectations? Can a salesperson say it confidently, and can a customer remember it tomorrow?" },
+      { type: "list", content: "Final decision questions", items: [
+        "Is it easy to hear, type and use in email?",
+        "Is there an obvious company or trademark conflict that requires review?",
+        "Is its prior use clean enough for the planned brand?",
+        "Does the complete purchase and renewal cost fit the stage of the business?",
+        "Can the name survive the most likely product and market expansion?",
+        "Would the team be comfortable putting it on contracts, adverts and support replies?",
+      ] },
+      { type: "heading", level: 2, content: "Use a Pass, Investigate or Reject Decision" },
+      { type: "table", content: "Domain validation outcome", headers: ["Outcome", "Meaning", "Next action"], rows: [
+        ["Pass", "No material issue found in the quick review", "Confirm at registrar, save evidence and secure promptly"],
+        ["Investigate", "One issue may be manageable but evidence is incomplete", "Pause purchase and get technical or legal review"],
+        ["Reject", "Confusion, history, usability or cost defeats the brand case", "Return to the shortlist instead of rationalising"],
+      ] },
+      { type: "paragraph", content: "A checklist is valuable because it makes rejection easier. Founders often fall in love with a name and reinterpret every warning as a solvable detail. A written decision rule protects the business from that momentum. Score each candidate the same way, keep the evidence, and choose the strongest surviving option rather than the first available one." },
+      { type: "callout", calloutType: "cta", content: "Check several finalists together, then apply this validation workflow to the strongest one.", ctaLink: "/bulk-domain-check", ctaText: "Check your domain shortlist" }
+    ],
+    faqs: [
+      { question: "How do I validate a domain before buying it?", answer: "Confirm registration status and full cost, run a radio test, search relevant company and trademark databases, inspect prior use and backlinks, assess email confusion, and test whether the name fits likely expansion. Escalate unclear legal or technical issues before paying." },
+      { question: "Can NamoLux confirm that a domain is legally safe?", answer: "No. NamoLux can support naming, scoring and availability decisions, but it is not a legal-clearance service. Official database searches and qualified advice are appropriate when trademark or company-name risk is material." },
+      { question: "Does an old domain automatically have SEO value?", answer: "No. Age alone does not guarantee rankings or durable links. Review what the domain hosted, the quality and relevance of referring pages, and whether old links are likely to remain. Buy for brand fit first, not an unverified SEO promise." },
+      { question: "What if the domain passes every check but the social handle is taken?", answer: "A taken handle is usually manageable with a clear modifier, provided the existing account does not create brand or legal confusion. Domain, company-name and trademark checks carry more weight than perfect handle symmetry." },
     ]
   },
   {
@@ -1532,24 +1643,98 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "defensive-domain-strategy",
-    title: "Defensive Domain Strategy: What to Buy Beyond the .com",
-    description: "Which variants are worth buying and which are a waste for early-stage teams.",
+    title: "Defensive Domain Strategy: What Else Should You Buy?",
+    description: "A risk-based framework for deciding which domain variants protect your brand, which can wait, and which are simply wasted renewal spend.",
+    seoTitle: "Defensive Domain Strategy for Startups",
+    metaDescription: "Decide which domain variants, misspellings and country extensions are worth registering with a practical defensive domain strategy for startups.",
     category: "Domain Strategy",
-    readTime: 7,
+    readTime: 6,
     publishedAt: "2026-02-15",
+    updatedAt: "2026-07-11",
     author: "NamoLux Team",
+    qualityTier: "priority",
+    primaryKeyword: "defensive domain strategy",
+    searchIntent: "commercial",
+    pillar: "Domain Operations & Security",
+    tags: ["brand protection", "domain security", "domain portfolio", "registrars"],
+    relatedSlugs: [
+      "protect-your-domain-brand-security",
+      "secure-brand-across-platforms",
+      "domain-extension-guide-2026",
+      "domain-name-availability-checker-com-guide",
+    ],
+    sources: [
+      { title: "NCSC: Protecting your public domain name", url: "https://www.ncsc.gov.uk/collection/using-online-services-safely/protecting-your-public-domain-name" },
+      { title: "ICANN: A Registrant's Guide to Protecting Domain Name Registration Accounts", url: "https://www.icann.org/en/ssac/publications/sac044-executive-summary-for-a-registrants-guide-to-protecting-domain-name-registration-accounts-05-11-2010-en" },
+      { title: "ICANN: Uniform Domain Name Dispute Resolution Policy", url: "https://www.icann.org/resources/pages/policy-2024-02-21-en" },
+    ],
     content: [
-      { type: "paragraph", content: "Buying every possible variant is expensive and usually unnecessary. A defensive plan keeps your brand safe without burning runway." },
-      { type: "heading", level: 2, content: "Always Buy These" },
-      { type: "list", content: "", items: ["Your primary .com", "The close misspelling (if common)", "Your .io if you are a dev tool", "Your .co if your .com is primary"] },
-      { type: "heading", level: 2, content: "Maybe Buy These" },
-      { type: "list", content: "", items: ["Plural or singular variant", "Common hyphenated version", "Country TLD if you are local (e.g., .co.uk)"] },
-      { type: "heading", level: 2, content: "Skip These" },
-      { type: "list", content: "", items: ["Every modern TLD under the sun", "Keyword stuffed versions", "Long variants you will never market"] },
-      { type: "heading", level: 2, content: "Redirect Everything Cleanly" },
-      { type: "paragraph", content: "Point all variants to your primary domain with permanent redirects. Consistency helps SEO and prevents confusion." },
-      { type: "callout", calloutType: "tip", content: "Set a yearly reminder to review your portfolio and drop low-value domains." },
-      { type: "callout", calloutType: "cta", content: "Plan your domain strategy in one place.", ctaLink: "/generate", ctaText: "Map Your Domains ->" }
+      { type: "paragraph", content: "A defensive domain strategy is not a shopping list of every extension your registrar can sell you. It is a small, deliberate portfolio that protects the routes customers are most likely to type, remember or mistake for your brand. The right plan reduces impersonation and traffic leakage without turning annual renewals into an uncontrolled tax." },
+      { type: "paragraph", content: "Early-stage companies often make one of two mistakes. They register only the launch domain and ignore obvious risks, or they panic-buy dozens of variants that nobody would realistically visit. A better decision starts with exposure: how visible is the brand, how sensitive is the product, and how costly would customer confusion be?" },
+      { type: "heading", level: 2, content: "Start With the One Domain You Will Actually Use" },
+      { type: "paragraph", content: "Choose one canonical domain for the website, email, product links and every public profile. If you are still deciding, use the [domain extension guide](/blog/domain-extension-guide-2026) and check the shortlist with the [bulk domain checker](/bulk-domain-check). Defensive registrations only work when customers can clearly recognise the primary address." },
+      { type: "paragraph", content: "The canonical domain should sit in the company account rather than a founder's personal registrar account. Protect it with a unique password, multi-factor authentication, registrar lock, current recovery details and auto-renewal. The UK's National Cyber Security Centre treats control of the domain-management account as a high-value security responsibility because losing the domain can interrupt both the website and email." },
+      { type: "heading", level: 2, content: "Score Risk Before Buying Variants" },
+      { type: "paragraph", content: "Use a simple two-axis model. First score probability: how likely is a real customer to type or trust this variant? Then score impact: what happens if somebody else controls it? A misspelling used in an invoice-heavy finance product deserves more attention than an obscure extension for a private beta." },
+      { type: "table", content: "A risk-based defensive registration scorecard", headers: ["Variant", "Probability", "Impact", "Default decision"], rows: [
+        ["Primary domain", "Certain", "Critical", "Register and secure now"],
+        ["Obvious spoken misspelling", "Medium to high", "High", "Register if affordable"],
+        ["Launch-country extension", "Medium", "Medium to high", "Register when the market is real"],
+        ["Singular or plural twin", "Low to medium", "Medium", "Test before buying"],
+        ["Hyphenated version", "Low", "Low to medium", "Usually monitor"],
+        ["Unrelated new extension", "Very low", "Low", "Skip"],
+      ] },
+      { type: "heading", level: 2, content: "Tier 1: Register Before Launch" },
+      { type: "heading", level: 3, content: "The primary domain" },
+      { type: "paragraph", content: "Register the domain you intend to print, say and use for email before you announce the name. Confirm ownership and renewal details yourself; an availability result is not a reservation. If the exact address is already owned, use the [domain aftermarket guide](/blog/domain-aftermarket-guide) before contacting a seller or changing your brand." },
+      { type: "heading", level: 3, content: "One or two high-probability misspellings" },
+      { type: "paragraph", content: "Run a radio test with people who have never seen the word. Say the name once and ask them to type it. Repeated errors reveal variants worth considering. Prioritise sound-alikes, omitted double letters and common word-boundary mistakes. Do not buy every theoretical typo generated by software; protect the errors real people actually make." },
+      { type: "heading", level: 3, content: "The natural local extension" },
+      { type: "paragraph", content: "A country-code domain can matter when customers expect it, when you operate a local service, or when an expansion market is already funded. A UK-first company using .com may reasonably secure the matching .co.uk. A business with no near-term German market usually does not need .de simply because it is available." },
+      { type: "heading", level: 2, content: "Tier 2: Register When Evidence Appears" },
+      { type: "paragraph", content: "Some variants become valuable only after the brand has traction. Add them when support tickets, analytics, sales calls or impersonation attempts show an actual pattern. This evidence-led tier can include the singular or plural twin, a second market's country extension, a former product name retained for migration, or a common abbreviation customers have adopted." },
+      { type: "list", content: "Signals that justify a Tier 2 purchase", items: [
+        "Customers repeatedly send email to the wrong domain",
+        "A meaningful expansion market has been approved and budgeted",
+        "Paid campaigns reveal a frequent spelling error",
+        "A product rename creates a legitimate redirect need",
+        "A look-alike domain is creating support or phishing reports",
+      ] },
+      { type: "paragraph", content: "Record the reason for every registration. If nobody can explain the threat or customer behaviour it addresses, the domain probably belongs on a watch list rather than the renewal list." },
+      { type: "heading", level: 2, content: "Tier 3: Monitor Instead of Registering" },
+      { type: "paragraph", content: "Modern extension catalogues make complete coverage impossible. Buying dozens of low-probability endings does not stop abuse; an attacker can add a word, a country, a hyphen or another extension you did not buy. Monitoring and a response plan scale better than trying to own the internet around your name." },
+      { type: "list", content: "Usually skip", items: [
+        "Every new generic top-level domain",
+        "Long keyword combinations nobody would confuse with the brand",
+        "Hyphenated variants that fail the radio test in a different way",
+        "Extensions unrelated to the product or served markets",
+        "Typos that did not appear in user testing, analytics or support",
+      ] },
+      { type: "callout", calloutType: "warning", content: "Registering a domain does not create trademark rights, and holding another party's mark can create legal risk. NamoLux is a naming and domain decision tool, not a legal-clearance service. Ask a qualified professional when a registration may affect existing rights." },
+      { type: "heading", level: 2, content: "Redirect Defensive Domains Without Creating SEO Clutter" },
+      { type: "paragraph", content: "A defensive domain should not become a duplicate website. Redirect useful variants to the closest relevant page on the canonical domain using a permanent server-side redirect. Keep navigation, canonical tags, analytics and email on the primary address. Search engines then receive one consistent destination instead of several copies competing for the same signals." },
+      { type: "paragraph", content: "Do not configure catch-all email on typo domains by default. It can collect sensitive messages that users never intended to send and creates another inbox to secure. Decide deliberately with your security and privacy requirements in mind." },
+      { type: "heading", level: 2, content: "Secure the Portfolio You Decide to Keep" },
+      { type: "paragraph", content: "The [domain security checklist](/blog/protect-your-domain-brand-security) matters more than the size of the portfolio. Centralise ownership, restrict administrator access, enable the strongest account protection your registrar provides, keep registration data current, and document the renewal owner. For high-risk organisations, ask the registrar about registry-lock or equivalent controls rather than assuming a standard transfer lock covers every threat." },
+      { type: "heading", level: 2, content: "Run a Quarterly Portfolio Review" },
+      { type: "paragraph", content: "Review the portfolio quarterly and make renewal decisions at least 60 days before expiry. For each domain, record its purpose, destination, renewal cost, account owner and last traffic or incident signal. Keep variants that protect a demonstrated path. Retire speculative registrations carefully after checking links, email, campaigns and contracts that may still use them." },
+      { type: "list", content: "Ten-minute review checklist", items: [
+        "Confirm the canonical domain and every redirect destination",
+        "Verify multi-factor authentication, locks and recovery contacts",
+        "Check renewal dates and payment methods",
+        "Review typo traffic, support errors and abuse reports",
+        "Add only variants supported by new evidence",
+        "Remove unused domains only after a dependency check",
+      ] },
+      { type: "heading", level: 2, content: "A Sensible Default for an Early Startup" },
+      { type: "paragraph", content: "For most early startups, the sensible starting portfolio is the canonical domain, one proven misspelling if it exists, and a relevant local extension when the local market matters. Everything else should earn its renewal through evidence. As the company becomes more visible or handles more sensitive transactions, widen monitoring and security before widening the shopping basket." },
+      { type: "callout", calloutType: "cta", content: "Compare the domains behind your shortlist before deciding which name deserves a defensive portfolio.", ctaLink: "/bulk-domain-check", ctaText: "Check your shortlist" }
+    ],
+    faqs: [
+      { question: "How many defensive domains should a startup buy?", answer: "There is no universal number. Many early startups need only the canonical domain, one proven misspelling and perhaps a relevant country extension. Add variants when customer behaviour, expansion plans or abuse reports demonstrate a real risk." },
+      { question: "Should I buy every extension for my brand?", answer: "Usually no. Complete coverage is impossible and creates recurring cost. Prioritise extensions customers expect, markets you actually serve and variants that could plausibly cause costly confusion; monitor the rest." },
+      { question: "Do defensive domains help SEO?", answer: "Not by themselves. Their primary purpose is brand and customer protection. If a useful variant receives genuine traffic, redirect it permanently to the relevant canonical page rather than publishing a duplicate site." },
+      { question: "Does buying a domain protect the name as a trademark?", answer: "No. Domain registration and trademark rights are different. Search the relevant trademark and company-name databases and obtain qualified legal advice when the commercial risk warrants it." },
     ]
   },
   {
@@ -1685,7 +1870,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What NamoLux does" },
       { type: "list", content: "", items: ["Availability-first domain suggestions so you do not waste time on taken names", "Founder Signal(TM) scoring to assess brand strength, risk and long-term fit", "Shortlist and export options for faster decisions with your team", "Vibe modes to explore naming styles such as luxury, playful, minimal and trustworthy"] },
       { type: "callout", calloutType: "cta", content: "Need to verify you are on the right website?", ctaLink: "/", ctaText: "Visit the NamoLux homepage" },
-      { type: "callout", calloutType: "cta", content: "Want a fair tool comparison before choosing?", ctaLink: "/blog/best-ai-domain-name-generators", ctaText: "Read the 2026 comparison guide" }
+      { type: "callout", calloutType: "cta", content: "Want a fair tool comparison before choosing?", ctaLink: "/blog/best-ai-domain-name-generators-2026", ctaText: "Read the 2026 comparison guide" }
     ]
   },
   {
@@ -1715,9 +1900,12 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What to do when your first choices are taken" },
       { type: "list", content: "", items: ["Try adjacent roots and synonyms", "Change word order or structure", "Use a cleaner brandable variant instead of forcing exact keywords", "Keep one backup domain ready before launch"] },
       { type: "heading", level: 2, content: "Domain availability checker checklist" },
+      { type: "links", content: "Before registration", links: [
+        { text: "Compare the Best Domain Registrars for Startups", href: "/blog/best-domain-registrars-for-startups" },
+      ] },
       { type: "list", content: "", items: ["Live .com status check", "Simple shortlist and export", "Brand quality scoring", "Fast iteration with controlled naming vibe"] },
       { type: "callout", calloutType: "tip", content: "Availability is the starting point. Clarity and memorability are what make a domain valuable." },
-      { type: "callout", calloutType: "cta", content: "Need a broader comparison of naming tools?", ctaLink: "/blog/best-ai-domain-name-generators", ctaText: "See the full tool comparison" }
+      { type: "callout", calloutType: "cta", content: "Need a broader comparison of naming tools?", ctaLink: "/blog/best-ai-domain-name-generators-2026", ctaText: "See the full tool comparison" }
     ]
   },
   {
@@ -1803,6 +1991,10 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "Pro tip: Newly expired domains sometimes include brandable options. Monitor expiration lists for opportunities." },
       { type: "heading", level: 2, content: "Evaluating Brandable Domain Value" },
       { type: "paragraph", content: "Consider development potential, industry fit, linguistic quality, and comparable sales. A name worth $10,000 to one buyer might be worth $100 to another—context matters." },
+      { type: "links", content: "Price and purchase a domain", links: [
+        { text: "Use the Domain Valuation Framework", href: "/blog/how-much-is-a-domain-name-worth" },
+        { text: "Buy Safely with Domain Escrow", href: "/blog/domain-escrow-explained" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Generate your own brandable domain names for free.", ctaLink: "/generate", ctaText: "Generate Brandable Names →" }
     ]
   },
@@ -2038,7 +2230,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Generic domains like 'bestdomains.com' or 'cheapaccounting.com' might seem good for SEO, but they're forgettable and impossible to build a brand around. The best domain names are invented words or unexpected combinations that feel natural once you hear them a few times — think Canva, Notion, Figma, Loom." },
       { type: "heading", level: 3, content: "6. Check It Across Everything" },
       { type: "list", content: "", items: ["Is the exact-match .com available?", "Are matching social media handles free on X, Instagram, LinkedIn?", "Does it conflict with any registered trademarks?", "Is there anything negative that shows up when you Google it?", "Has the domain been penalised or used for spam in the past?"] },
-      { type: "callout", calloutType: "tip", content: "NamoLux checks domain availability, social handle availability, and Founder Signal™ score all in one search — saving you hours of manual checking." },
+      { type: "callout", calloutType: "tip", content: "NamoLux keeps domain availability and optional Founder Signal analysis in one workflow without letting either hide creative candidates. Social handles and trademarks still need separate verification." },
       { type: "heading", level: 2, content: "Common Mistakes Founders Make When Choosing a Domain" },
       { type: "list", content: "", items: [
         "Buying a domain before validating the business idea",
@@ -2055,7 +2247,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Don't panic. First, try variations: add a prefix like 'get', 'try', 'use', or 'go' to your name (e.g., getnotion.com, tryloom.com). Or use a different TLD if the .com alternative is credible for your industry. You can also try dropping vowels (carefully), combining two short words, or exploring related concept words using a thesaurus." },
       { type: "quote", content: "The perfect domain name doesn't exist. The right domain name does — it's the one that's memorable, available, and you can build a brand around." },
       { type: "heading", level: 2, content: "How NamoLux Helps You Choose" },
-      { type: "paragraph", content: "NamoLux's AI generates domain name ideas based on your niche, brand vibe, and industry — then instantly checks availability across .com, .io, .ai, and .co. Every result comes with a Founder Signal™ score from 0-100 rating brandability, risk, and scalability. It's the fastest way to go from concept to confident domain choice." },
+      { type: "paragraph", content: "NamoLux generates domain name ideas from your niche, brand vibe, and industry, then updates availability across key extensions after the names appear. When an Advanced shortlist is ready, Founder Signal™ can score the complete batch from 0-100 for a structured comparison without removing or reordering candidates by default." },
       { type: "callout", calloutType: "cta", content: "Try it free — no account needed to start generating names.", ctaLink: "/generate", ctaText: "Generate Domain Ideas →" }
     ],
     faqs: [
@@ -2128,7 +2320,7 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "warning", content: "Avoid free domain extensions (.tk, .ml, .ga, .cf). They are heavily used for phishing and spam, and email providers often block or flag them. Even if your intentions are good, your reputation will suffer." },
       { type: "heading", level: 2, content: "The Smart TLD Strategy" },
       { type: "paragraph", content: "Register your primary domain in your chosen TLD. Then buy the .com version too if possible — even if you don't use it as your main domain, redirect it to your site to capture traffic from users who instinctively type .com. Brand protection is worth the £10/year registration fee." },
-      { type: "table", headers: ["TLD", "Best For", "Trust Level", "SEO Treatment"], rows: [
+      { type: "table", content: "", headers: ["TLD", "Best For", "Trust Level", "SEO Treatment"], rows: [
         [".com", "Any business", "Highest", "Standard"],
         [".io", "SaaS, dev tools", "High (tech)", "Same as .com"],
         [".ai", "AI products", "High (growing)", "Same as .com"],
@@ -2192,9 +2384,13 @@ export const blogPosts: BlogPost[] = [
         "Do the social handles match or are close enough?",
         "Does it pass the 'embarrassment test' — would you be proud to say it in a meeting?"
       ] },
-      { type: "callout", calloutType: "cta", content: "Let AI generate names across all 10 frameworks based on your niche — then check domain and social availability instantly.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" },
+      { type: "callout", calloutType: "cta", content: "Generate names across all 10 frameworks, then check domains and take the strongest candidates into a separate social-handle review.", ctaLink: "/generate", ctaText: "Start naming →" },
+      { type: "links", content: "Clear the shortlist before launch", links: [
+        { text: "Check If a Business Name Is Taken", href: "/blog/how-to-check-if-business-name-is-taken" },
+        { text: "Business Name vs Legal Name vs DBA", href: "/blog/business-name-vs-legal-company-name-vs-dba" },
+      ] },
       { type: "heading", level: 2, content: "The Founder Signal™ Score" },
-      { type: "paragraph", content: "NamoLux's Founder Signal™ scores every generated name from 0-100 based on brandability, domain strength, risk factors, and scalability. It's the fastest way to separate the names worth pursuing from those that look good on paper but have hidden problems." }
+      { type: "paragraph", content: "Founder Signal™ is an optional evaluation step for an Advanced shortlist. When you run it, every name in the batch receives a 0-100 score and reasoning based on brandability, domain strength, risk factors, and scalability; no candidate is silently removed, and sorting by score is your choice." }
     ],
     faqs: [
       { question: "How many business name ideas should I generate before deciding?", answer: "Aim for at least 50-100 candidates before shortlisting. The first ideas that come to mind are usually the most obvious — and therefore the most taken. AI tools like NamoLux can generate hundreds in seconds." },
@@ -2375,7 +2571,7 @@ export const blogPosts: BlogPost[] = [
       ] },
       { type: "heading", level: 2, content: "10. Page Speed and Core Web Vitals" },
       { type: "paragraph", content: "Core Web Vitals are official Google ranking factors. Pages that load fast, respond quickly to interaction, and don't shift layout as they load provide a better user experience — and Google rewards that." },
-      { type: "table", headers: ["Metric", "What It Measures", "Good Score"], rows: [
+      { type: "table", content: "", headers: ["Metric", "What It Measures", "Good Score"], rows: [
         ["LCP (Largest Contentful Paint)", "How fast main content loads", "Under 2.5 seconds"],
         ["INP (Interaction to Next Paint)", "How fast page responds to clicks", "Under 200ms"],
         ["CLS (Cumulative Layout Shift)", "How much layout shifts during load", "Under 0.1"]
@@ -2625,7 +2821,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "Step 4: Pricing Your SaaS" },
       { type: "paragraph", content: "Most first-time founders underprice. The logic feels backwards, but charging more can make it easier to acquire customers — higher prices signal quality, attract customers who value the product (and don't churn immediately), and give you margin to actually support them." },
       { type: "heading", level: 3, content: "Common SaaS Pricing Models" },
-      { type: "table", headers: ["Model", "How It Works", "Best For"], rows: [
+      { type: "table", content: "", headers: ["Model", "How It Works", "Best For"], rows: [
         ["Flat-rate", "One price for all features", "Simple products, early stage"],
         ["Per-seat", "Price per user/month", "Team collaboration tools"],
         ["Usage-based", "Pay for what you use", "APIs, infrastructure, data tools"],
@@ -3138,7 +3334,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Is Namify?" },
       { type: "paragraph", content: "Namify is a name generator that combines keyword input with a category selector to produce name ideas across different styles. You enter a keyword, choose a business category, and Namify returns a set of results that includes availability indicators for domain names and social handles. It is clean, fast, and well regarded for consumer and ecommerce brand naming. Namify also provides availability checking for social media usernames alongside the domain, which is a practical addition for brands where social presence matters from day one." },
       { type: "heading", level: 2, content: "What Is NamoLux?" },
-      { type: "paragraph", content: "NamoLux generates business names and domain ideas with a scoring layer on top. Each result is evaluated by Founder Signal, which scores names from 0 to 100 across brandability, memorability, clarity, and domain viability. The goal is to surface the strongest candidates quickly rather than producing a large list for you to sort manually. NamoLux is built around the insight that naming fatigue — having too many plausible options with no clear signal about which is best — is the most common reason founders struggle to finalise a name." },
+      { type: "paragraph", content: "NamoLux separates creative exploration from its scoring layer. Quick produces a broad set of ideas without Founder Signal, while Advanced keeps all 12 candidates in creative order and lets the founder run a complete 0-to-100 Founder Signal analysis later. Scoring annotates the shortlist rather than deciding which names are admitted, so founders get creative range first and decision support when it becomes useful." },
       { type: "dualCta", content: "See what Founder Signal scoring looks like on real name results.", ctaLink: "/founder-signal", ctaText: "See Founder Signal in Action", ctaLink2: "/generate", ctaText2: "Generate Your Name Now" },
       { type: "heading", level: 2, content: "Namify vs NamoLux: Feature Comparison" },
       { type: "table", content: "", headers: ["Feature", "Namify", "NamoLux"], rows: [
@@ -3148,8 +3344,8 @@ export const blogPosts: BlogPost[] = [
         ["Category selector", "Business categories", "Vibe selector (tone and style)"],
         ["Steps to results", "Keyword plus category", "Keyword plus vibe, then instant results"],
         ["Decision support", "Manual review", "Scored ranking"],
-        ["Free usage", "Yes, unlimited", "2 per day free"],
-        ["Paid plan", "Not required", "£15 one time for unlimited"],
+        ["Free usage", "Yes, unlimited", "Quick unlimited; 3 Advanced batches and 1 scored batch/month"],
+        ["Paid plan", "Not required", "GBP 7.99/month"],
         ["Best for", "Consumer and ecommerce brands", "Founders and startup naming"],
       ] },
       { type: "heading", level: 2, content: "UX and Path to Results" },
@@ -3157,10 +3353,10 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "NamoLux also produces results within 30 seconds. The main input difference is the vibe selector, which lets you signal the emotional tone you want rather than the business category. Choosing between Luxury, Futuristic, Playful, or Minimal shapes the output differently than a category label does, and tends to match brand character more closely than an industry label." },
       { type: "heading", level: 2, content: "Social Handle Availability: Where Namify Has an Edge" },
       { type: "paragraph", content: "Namify checks Twitter, Instagram, and Facebook username availability alongside domain names. For consumer brands and ecommerce businesses where social identity is as important as the domain, this is a genuinely useful feature. If you need to confirm that your chosen name is available everywhere before committing, Namify's multi-platform check saves time." },
-      { type: "callout", calloutType: "tip", content: "If social handle availability matters for your brand, run your shortlisted names through Namify's social check after using NamoLux to identify the strongest candidates via Founder Signal scoring." },
+      { type: "callout", calloutType: "tip", content: "If social handle availability matters for your brand, explore and score your shortlist in NamoLux, then run the finalists through Namify's social check." },
       { type: "heading", level: 2, content: "Name Quality and the Scoring Difference" },
-      { type: "paragraph", content: "Both tools produce a range of output quality — some names will be excellent, some will be mediocre. The difference is that NamoLux surfaces the distinction automatically via Founder Signal, while Namify leaves the evaluation entirely to you. For founders naming their first company or working under time pressure, the scoring layer in NamoLux tends to make the difference between a session that ends with a shortlist and one that ends with more confusion than you started with." },
-      { type: "callout", calloutType: "cta", content: "Founder Signal scores every name so you spend your time choosing, not sifting. Start free today.", ctaLink: "/generate", ctaText: "Generate Scored Names →" },
+      { type: "paragraph", content: "Both tools produce a range of output quality — some names will be excellent, some will be mediocre. NamoLux keeps that creative range visible, then offers Founder Signal as an explicit evaluation step. Free users can score one complete Advanced batch each month; Pro removes that scoring limit and adds comparison, stress tests, exports, and brand tools." },
+      { type: "callout", calloutType: "cta", content: "Start with unlimited Quick exploration, then use your free monthly Founder Signal batch when the shortlist needs a deeper read.", ctaLink: "/generate", ctaText: "Start naming →" },
       { type: "heading", level: 2, content: "Who Is Namify Best For?" },
       { type: "list", content: "", items: [
         "Consumer brands and ecommerce projects where social handle availability matters from the start",
@@ -3180,9 +3376,9 @@ export const blogPosts: BlogPost[] = [
     ],
     faqs: [
       { question: "Does Namify check social media username availability?", answer: "Yes. Namify checks availability on Twitter, Instagram, and Facebook alongside the domain name. This is one of Namify's standout features for consumer brand founders. NamoLux currently focuses on domain availability across .com, .io, .co, and .ai." },
-      { question: "Is Namify free?", answer: "Namify is free to use with no account required. NamoLux offers 2 name generations per day on its free tier, with unlimited access available for a one time payment of £15." },
-      { question: "How does NamoLux decide which names score highest?", answer: "NamoLux uses Founder Signal, a proprietary scoring system that evaluates each name across brandability, memorability, spelling clarity, and domain viability. Names with available .com domains, strong brand potential, and clean pronunciation score highest. You can learn more on the Founder Signal page." },
-      { question: "Can I use Namify and NamoLux together?", answer: "Yes, and this is a practical approach. Use NamoLux to generate a scored shortlist of strong candidates, then run those through Namify to confirm social handle availability before making a final decision. The two tools complement each other well." },
+      { question: "Is Namify free?", answer: "Namify is free to use with no account required. NamoLux Quick Generate also has no monthly quota, while free includes three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "How does NamoLux use Founder Signal?", answer: "NamoLux first presents the creative shortlist in generation order. Founder Signal is an optional decision layer that evaluates each Advanced candidate across five brand signals; it annotates rather than removes names, and the user can choose to sort the batch by score." },
+      { question: "Can I use Namify and NamoLux together?", answer: "Yes. Use NamoLux to explore candidates, check domains, and optionally score the complete shortlist; then run the finalists through Namify to confirm social handle availability. The tools complement each other without making scoring a gate on creativity." },
     ]
   },
 
@@ -3224,9 +3420,9 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "We have excluded tools that are really logo makers with a naming feature bolted on, generators that produce only descriptive keyword combinations, and clones that produce similar output to a better known tool under different branding. What remains is a small field." },
 
       { type: "heading", level: 3, content: "1. NamoLux" },
-      { type: "paragraph", content: "NamoLux is a decision engine rather than just a generator. The workflow looks familiar at first: a keyword or a vibe brief in, brandable names out. What is different is that every result is scored and availability checked on the same pass. Each name carries a Founder Signal score from zero to a hundred, built from pronounceability, memorability, length, extension strength, character quality, and brand risk. You start at the top and work down. The names you can register are marked as such at the moment of generation, so you never invest emotional energy in a domain you cannot have." },
+      { type: "paragraph", content: "NamoLux combines open-ended generation with a later decision layer. A keyword or vibe brief produces a creative shortlist first, preserving every candidate and its original order. Domain checks continue asynchronously on the cards. In Advanced, the founder can then run Founder Signal across the complete batch and choose whether to sort by its evidence-based score." },
       { type: "paragraph", content: "Two design choices distinguish NamoLux in a crowded field. The first is style rotation. NamoLux treats invented, blended, metaphor, and real word names as separate generation passes, which forces creative range rather than the narrow pattern output most tools drift into. The second is the absence of logo mockups. Logos sell names, and names that photograph well in a specific sans serif often outcompete genuinely stronger names in plain text. NamoLux leaves the visual for later, on purpose, so the decision rests on the name itself." },
-      { type: "paragraph", content: "The free tier is meaningful: generation, scoring, and live availability checks without paying. The Pro upgrade is a one off £15 rather than a subscription. Brand palette and tagline generation are bundled into Pro, which closes the loop for founders who want more than just a name." },
+      { type: "paragraph", content: "Quick Generate has no monthly quota. Free founders also receive three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience; domain registration remains available through helpful partner links." },
 
       { type: "heading", level: 3, content: "2. Squadhelp" },
       { type: "paragraph", content: "Squadhelp occupies a different category. The AI generator is basic; the curated marketplace is the draw. You are buying a pre vetted premium name, typically between a thousand and fifty thousand pounds, often with trademark clearance and a polished logo included. Good fit if you have budget and want a finished brand you can register in an afternoon. Poor fit if you are bootstrapping or you want an invented name rather than a curated English compound." },
@@ -3235,7 +3431,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Lean Domain Search is honest about what it does. It combines your keyword with an enormous dictionary of prefixes and suffixes and shows only the results with an available .com. Every candidate is registrable, which is genuinely useful when you want a descriptive two word domain. It is not a brand builder: there is no invented name generation, no scoring, and no creative rotation. But for its specific job it is excellent." },
 
       { type: "heading", level: 3, content: "4. Namelix" },
-      { type: "paragraph", content: "Namelix is the tool most founders try first, and for good reason: it popularised the AI naming workflow. In 2026 it has slipped behind the field. Availability indicators are inconsistent, scoring is absent, and the output clusters tightly around one phonetic zone because the model has not evolved much in several years. The logo mockups, useful for marketing the tool, bias founders toward names that look good rather than names that work. If you are starting a side project and any available domain will do, it is still a reasonable choice. For a serious brand decision in a saturated market, a scored generator with live availability is the right fit." },
+      { type: "paragraph", content: "Namelix popularised the AI naming workflow and remains useful for free, visual exploration. NamoLux competes by preserving broad creative ideation while adding live domain updates and optional decision support. The important distinction is not scoring every idea upfront; it is being able to apply Founder Signal to a serious shortlist when you are ready." },
       { type: "links", content: "Further reading", links: [
         { text: "Best Namelix Alternatives 2026", href: "/blog/best-namelix-alternatives-2026" }
       ]},
@@ -3252,7 +3448,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 3, content: "8. Wordoid" },
       { type: "paragraph", content: "Wordoid generates pseudo words, real sounding coined terms with linguistic plausibility. No availability checking and no scoring, so it is a supplement rather than a primary generator. Useful when you want specifically invented names and you plan to verify in a separate tool." },
 
-      { type: "callout", calloutType: "cta", content: "See what a scored, availability checked generator actually produces. Generate brandable .com names with Founder Signal scoring in seconds.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
+      { type: "callout", calloutType: "cta", content: "Explore brandable names freely, watch .com checks update, then run Founder Signal only when your shortlist is ready.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
 
       { type: "heading", level: 2, content: "Side by Side Comparison" },
       { type: "table", content: "", headers: ["Capability", "NamoLux", "Namelix", "Squadhelp", "Lean Domain Search", "Panabee", "Novanym"], rows: [
@@ -3262,13 +3458,13 @@ export const blogPosts: BlogPost[] = [
         ["Style rotation", "Invented, blended, metaphor, real word", "Narrow", "Curated marketplace", "Keyword combinations", "Varies", "Curated premium"],
         ["Social handle check", "No", "No", "No", "No", "Yes", "No"],
         ["Logo mockups", "No (by design)", "Yes", "Yes (premium)", "No", "No", "Yes"],
-        ["Price", "Free + £15 lifetime", "Free + paid tiers", "Premium names from £1000", "Free", "Free", "Premium listings"],
+        ["Price", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99", "Free + paid tiers", "Premium names from £1000", "Free", "Free", "Premium listings"],
         ["Best for", "Scored decisions with .com guarantee", "Quick browsing", "Budget buyers of premium names", "Two word descriptive domains", "Social first brands", "Boutique premium brands"],
       ] },
 
       { type: "heading", level: 2, content: "A Real Example: What Changes When the Tool Does the Evaluation" },
       { type: "paragraph", content: "To make the difference concrete, consider the same keyword run through two approaches. A standard generator, seed word 'fintech', ten minutes of active use: output includes Finova, PayEdge, Monetra, FinHub, Capitalix. On the page, reasonable candidates. In practice, four of the five are registered, one is parked at a premium, and the free option scores poorly on length and uniqueness against the fintech competitive set. After twenty five manual verifications, you have one usable name and none that are strong." },
-      { type: "paragraph", content: "Same keyword, same ten minutes, through a decision engine that scores and verifies live: Klaeron, Vestari, Ledgira, Nyxos Capital. Each carries a Founder Signal score, a short note on why it is strong, and a confirmed available .com. The top three all score above 85. The difference is not that one tool produced better names by accident. It is that one tool produced scored names with availability baked in, so the ten minutes was spent evaluating genuine candidates rather than hunting for any candidate at all." },
+      { type: "paragraph", content: "The better comparison separates two questions. First, which tool produces the stronger raw names before explanations or scores influence judgement? Second, which workflow helps evaluate the resulting shortlist? NamoLux presents candidates in creative order, adds rationale and live domain updates, then lets the founder run Founder Signal on the complete Advanced batch without hiding weaker-scoring ideas." },
       { type: "paragraph", content: "The point is not that the second tool is clever and the first is not. The point is that evaluation and verification are what consume founder time, and a 2026 generator that does not do both is making you do work the tool should be doing." },
 
       { type: "heading", level: 2, content: "Common Mistakes Founders Make When Picking a Generator" },
@@ -3283,7 +3479,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "The Ten Minute Decision Process" },
       { type: "list", content: "", items: [
         "Write a one sentence positioning. What the product does, who uses it, and what it competes with. Every naming decision ladders back to this sentence.",
-        "Choose a tool that scores and verifies live. For most founders that is NamoLux. For descriptive two word options, Lean Domain Search is a good supplement. For budget-holding founders who want a finished premium name, Squadhelp is worth a look.",
+        "Choose a tool that separates exploration from evaluation while keeping live domain evidence in the same workspace. For descriptive two-word options, Lean Domain Search is a useful supplement. For a finished premium name, Squadhelp is worth a look.",
         "Generate across at least two style modes. Invented plus blended is a sensible default. Add metaphor if the brand benefits from imagery.",
         "Take the top ten by score. Ignore anything under 75 unless nothing above it resonates.",
         "Say each name out loud. Drop anything you stumble on.",
@@ -3313,16 +3509,16 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "For most founders, NamoLux is the cleanest direct choice because it was built around those three capabilities rather than retrofitted. For founders with budget who want a curated premium name without the hunt, Squadhelp and Novanym are legitimate options. For descriptive two word domains, Lean Domain Search does its specific job well. Everything else is noise you do not need in your workflow." },
       { type: "paragraph", content: "The thing to remember is that a generator is only useful to the extent that it gets you to a decision. Tools that give you volume without evaluation are selling you the feeling of progress, not progress itself. In 2026, with .coms as scarce as they are and founder time as expensive as it is, the right tool is the one that respects both." },
 
-      { type: "callout", calloutType: "cta", content: "Stop scrolling unranked name lists. Generate scored, availability checked .com names in seconds.", ctaLink: "/generate", ctaText: "Generate Names on NamoLux →" },
+      { type: "callout", calloutType: "cta", content: "Explore a stronger creative shortlist, see .com evidence as it arrives, and choose when to score the batch.", ctaLink: "/generate", ctaText: "Generate Names on NamoLux →" },
     ],
     faqs: [
-      { question: "Which AI domain name generator is the best in 2026?", answer: "For most founders, NamoLux is the strongest all round choice because it scores every name with a Founder Signal rating and verifies .com availability live at the moment of generation. For curated premium names you buy outright, Squadhelp is a legitimate alternative. For descriptive two word domains, Lean Domain Search is excellent. The best tool depends on whether you want to generate and own a name, buy a finished premium, or anchor on a specific keyword." },
+      { question: "Which AI domain name generator is the best in 2026?", answer: "For founders who want creative range followed by structured decision support, NamoLux is a strong all-round choice: Quick is open-ended, domain checks update after names appear, and Founder Signal is optional. For curated premium names you buy outright, Squadhelp is a legitimate alternative. For descriptive two-word domains, Lean Domain Search is excellent. The best tool depends on whether you want to explore, evaluate, buy a finished premium, or anchor on a specific keyword." },
       { question: "Are AI domain name generators worth using at all in 2026?", answer: "Yes, if the tool does more than generate. The value is not in producing names, any model can do that — it is in evaluating them, filtering out unavailable ones, and helping you make a confident decision quickly. Generators that score, verify, and explain are worth the time. Generators that only produce unranked walls of suggestions are increasingly a step backwards." },
       { question: "Why do so many names from AI generators turn out to be unavailable?", answer: "Two reasons. Most tools do not perform a live registry check on every name at generation time, so availability indicators lag reality. And because the most popular tools have trained a generation of founders to pull from the same narrow creative zone, the strongest sounding names in that zone were registered years ago by earlier users or squatters. Generators that verify live and rotate creative styles avoid both problems." },
-      { question: "Is NamoLux free to use?", answer: "Yes. The free tier includes AI name generation, Founder Signal scoring, and live .com availability checks. You can find and register a strong name without paying. The Pro upgrade is a one off £15 lifetime fee that unlocks unlimited generation, brand palette generation, and tagline tools for founders who want the full end to end brand pack." },
-      { question: "Should I use Namelix, NamoLux, or Squadhelp?", answer: "Different jobs. Namelix is a browsing tool — good for early exploration but thin on evaluation. NamoLux is a decision engine — good when you want scored, verified candidates and a final shortlist quickly. Squadhelp is a premium marketplace — good when you have budget and want a curated finished name rather than a generated one. Most founders get furthest by treating NamoLux as the primary and using the others only for specific jobs." },
-      { question: "Can ChatGPT replace a dedicated AI domain name generator?", answer: "Not on its own. ChatGPT is a strong brainstorming partner but it cannot check .com availability, score brandability, or filter out names that are already registered. Every suggestion still needs manual verification, which is the exact workflow a purpose built generator is meant to remove. Use ChatGPT for narrative work (brand story, taglines, copy) and a scored generator for the core name and domain decision." },
-      { question: "How long should picking a domain name take?", answer: "With the right tool, under an afternoon. A typical ten minute session with a scored, availability checked generator produces a ranked shortlist of ten viable names. Saying each one out loud, checking trademarks, and running three external tester opinions adds another hour or two. Founders spending a week or more on naming are almost always stuck in a workflow where generation and verification are separate steps — the fix is a tool that combines them." },
+      { question: "Is NamoLux free to use?", answer: "Yes. Quick Generate has no monthly quota, and free includes three Advanced batches plus one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Should I use Namelix, NamoLux, or Squadhelp?", answer: "Different jobs. Namelix is useful for open-ended browsing. NamoLux combines free creative exploration with optional Founder Signal analysis and asynchronous live domain checks when you are ready to decide. Squadhelp is a premium marketplace for founders who want to buy a curated finished name." },
+      { question: "Can ChatGPT replace a dedicated AI domain name generator?", answer: "ChatGPT is a strong brainstorming partner, but a dedicated workflow can add structured styles, live domain evidence, local preference actions, and an optional batch analysis. NamoLux deliberately keeps availability and Founder Signal from filtering creative admission, while keeping those decision tools close at hand." },
+      { question: "How long should picking a domain name take?", answer: "With the right workflow, you can build and evaluate a serious shortlist in an afternoon. Generate broadly, review the raw names before scores bias judgement, confirm domain and trademark evidence, and test the finalists with real people. Keeping those stages connected saves time without collapsing them into a score-first pass." },
     ],
   },
 
@@ -3359,7 +3555,7 @@ export const blogPosts: BlogPost[] = [
       { type: "list", content: "", items: ["Check domain history — use the Wayback Machine to verify no previous spam or penalties", "Test distinctiveness — Google the name and see if unrelated content dominates", "Assess memorability — will people be able to type it directly from memory?", "Verify .com availability — to prevent brand traffic leakage, not for ranking reasons", "Consider citation ease — journalists and bloggers link more readily if the name is easy to reference"] },
       { type: "heading", level: 2, content: "What Doesn't Matter (That Everyone Thinks Does)" },
       { type: "list", content: "", items: ["Keywords in the domain name — minor signal at best, can look spammy", "Domain age — quality content history matters, not age alone", "TLD prestige — Google treats all TLDs equally in rankings", "Domain length for crawling — crawlers don't care about character count"] },
-      { type: "callout", calloutType: "cta", content: "NamoLux scores every generated name on brand strength and memorability with Founder Signal™ — so you can choose a name that builds search authority over time.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "Explore names freely, then run Founder Signal™ on an Advanced shortlist when you want evidence on brand strength and memorability.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Do keywords in a domain name help SEO?", answer: "Minimally, and less every year. Google's 2012 EMD update reduced ranking advantages for exact-match domains. In 2026, keywords in a domain are a very weak signal. A distinctive brandable name often outperforms a keyword-stuffed domain because it builds stronger brand search signals over time." },
@@ -3468,17 +3664,17 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "How to Evaluate Name Quality Without a Branding Expert" },
       { type: "paragraph", content: "Agencies charge partly because name evaluation is genuinely hard. But the framework they use isn't proprietary:" },
       { type: "list", content: "", items: ["Phonetic test — can you say it naturally? Can someone spell it after hearing it once?", "Clarity test — is there a plausible, positive interpretation?", "Length test — ideally 6–10 characters, under 15 at most", "Uniqueness test — Google it; is there already a well-known brand using this name?", "Trademark test — search the USPTO or UKIPO for existing marks in your category (free, 10 minutes)", "48-hour test — do you still like it tomorrow? What do five uninvested people think?"] },
-      { type: "callout", calloutType: "tip", content: "Founder Signal™ in NamoLux automates the quality framework: it scores every name on phonetics, memorability, brand risk, and domain strength automatically — giving you agency-level evaluation in seconds, for free." },
-      { type: "heading", level: 2, content: "The One-Time Purchase Advantage" },
-      { type: "paragraph", content: "Subscription pricing is everywhere in software. Monthly charges for tools that become background infrastructure. A name generator that charges monthly creates the wrong incentive structure — you pay every month regardless of how often you generate names." },
-      { type: "paragraph", content: "A one-time purchase model aligns better with how founders actually use naming tools: intensively during a naming sprint, then rarely after. NamoLux is priced this way deliberately." },
+      { type: "callout", calloutType: "tip", content: "Founder Signal™ applies a consistent quality framework across clarity, memorability, pronunciation, extension strength, character quality, and brand risk. Free users can score one complete Advanced batch each month; Pro adds unlimited fair-use scoring." },
+      { type: "heading", level: 2, content: "The Layered Free Tier Advantage" },
+      { type: "paragraph", content: "Subscription pricing is everywhere in software. Monthly charges for tools that become background infrastructure are a poor fit for early naming work, where founders need speed, confidence, and a path to registration rather than another recurring bill." },
+      { type: "paragraph", content: "NamoLux Quick Generate has no monthly quota. Free founders also receive three Advanced batches and one complete Founder Signal batch each month. Upgrade to Pro for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
       { type: "heading", level: 2, content: "Getting to a Shortlist Fast" },
       { type: "list", content: "The fastest path to a good name doesn't involve more options — it involves better filtering:", items: ["Write a brief: what the product does, who it's for, 3 adjectives that should describe the brand, 3 that shouldn't", "Generate broadly: run your core concept through an AI generator and get 20–30 options", "Eliminate, don't rank: cut anything that fails the phonetic test, trademark check, or availability check — get to 5–8", "Score the survivors: apply the quality framework or use a scoring tool", "Sleep on your top 2: the name that still feels right after 48 hours is your name"] },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates brandable startup names with instant domain checking and Founder Signal™ scoring — free to try, no account required.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "Explore freely in Quick, then use Advanced and Founder Signal when your shortlist is ready for evidence.", ctaLink: "/generate", ctaText: "Start naming →" }
     ],
     faqs: [
-      { question: "Can I really get a good startup name for free?", answer: "Yes. Free AI name generators like NamoLux (one free generation per day) and Namelix produce genuinely useful options. The difference between a free tool and a £30,000 naming agency isn't name quality — it's the depth of linguistic analysis, trademark screening across territories, and account management. For most early-stage startups, the free tools are more than enough." },
-      { question: "Is a one-time payment better than a subscription for a name generator?", answer: "For most founders, yes. Naming work happens in bursts — intensive during a naming sprint, then rarely. A subscription charges every month regardless. NamoLux's one-time model means you pay once and access the tool whenever you need it." },
+      { question: "Can I really get a good startup name for free?", answer: "Yes. NamoLux Quick Generate has no monthly quota, and free tools like Namelix also produce useful options. The difference between a self-serve tool and a £30,000 naming agency is the depth of linguistic research, trademark screening across territories, and account management. NamoLux also includes three Advanced batches and one complete Founder Signal batch each month for deeper evaluation." },
+      { question: "Is a paid naming tool better than a free one?", answer: "Sometimes, but only when the paid feature saves real decision time. Free Quick exploration can create the first shortlist. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and Founder Signal scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
       { question: "When does it make sense to hire a naming agency?", answer: "For well-funded companies (Series A+) launching flagship consumer brands where the name is a significant strategic asset, and where international trademark clearance is required. For seed-stage and bootstrapped founders, a structured DIY approach using good AI tools produces outcomes that are hard to distinguish from agency work at a fraction of the cost." },
     ]
   } as BlogPost,
@@ -3506,7 +3702,7 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "NamoLux Founder Signal™ score helps identify which two-word names have strong phonetics and low brand risk before you register. Run your shortlist through scoring before paying for any domain." },
       { type: "heading", level: 2, content: "Trademark and Brand Risk" },
       { type: "paragraph", content: "Two-word names can hit trademark conflicts more easily than fully invented words, because both component words may already appear in registered trademarks. Before registering a domain or incorporating under a two-word name, run a free search on USPTO.gov (US) or trademarks.ipo.gov.uk (UK). Pay particular attention to trademarks in your specific category — identical names in unrelated industries are often legally coexistent, but same-category conflicts create genuine risk." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates two-word brandable startup names with Founder Signal™ scoring and real-time domain availability checking — free to try, no account required.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "NamoLux generates two-word candidates and checks domains in the free workflow. One complete Founder Signal™ batch is included monthly; Pro adds unlimited fair-use scoring.", ctaLink: "/generate", ctaText: "Start naming →" }
     ],
     faqs: [
       { question: "Are two-word domain names better than one-word?", answer: "One-word .com domains are almost never available at standard registration prices. Two-word names offer a realistic path to a strong, memorable domain without paying premium aftermarket prices. For most early-stage founders, a well-chosen two-word name is the practical optimum." },
@@ -3570,7 +3766,7 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "If you've been parking a domain for more than 12 months with no concrete build plan attached to it, seriously consider letting it drop at renewal. Renewal fees compound. The opportunity cost of the mental overhead alone — the vague guilt every time a renewal notice arrives — is worth something." },
       { type: "heading", level: 2, content: "Parking vs Redirect vs Minimal Landing Page" },
       { type: "paragraph", content: "If you own a variant domain, redirect it with a 301 to your primary domain rather than parking it — this passes any incidental link equity and creates no confusion for users who navigate there directly. If you own a domain for a future product, a minimal 'coming soon' page with an email capture serves you better than a blank parking page. You can start building an audience, Google sees genuine intent, and you have something to share when the topic comes up." },
-      { type: "callout", calloutType: "cta", content: "Before parking another domain, make sure you've found a name worth building on. NamoLux generates quality-scored brandable names with real-time domain checking — free to try.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "Before parking another domain, explore brandable names freely, watch real-time domain checks update, and score only the shortlist you are ready to compare.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Does parking a domain affect SEO?", answer: "A parked domain isn't penalised, but it doesn't build any SEO equity either. Years of parking are years without content, links, or brand signals — meaning you start from zero when you eventually launch. Domain age alone provides minimal SEO benefit without a history of indexed content." },
@@ -3666,7 +3862,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Your waitlist URL becomes a piece of brand collateral that you'll share, print, and reference for months before launch. Launching at a URL shortener or a generic subdomain signals low confidence in the brand. A proper domain costs £10–£15 per year and makes every reference to your waitlist shareable and professional. Use NamoLux to find a name with strong brand fundamentals before you commit to a domain — it's much cheaper to change the name before the waitlist than after it." },
       { type: "heading", level: 2, content: "Waitlist to Launch Conversion" },
       { type: "paragraph", content: "A well-nurtured waitlist converts 20–30% of signups to active users in the first month after launch. Below 10% usually means the waitlist wasn't properly maintained. Measure open rate on your launch email (target 40% or above for a properly nurtured list), click-through from the launch email to your product page, and activation rate — the percentage of users who complete the key action in your product within the first session." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with real-time domain availability — find a name worth building your waitlist around.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "NamoLux generates a creative startup-name shortlist first, updates domain availability on the cards, and lets you score the batch later.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "How many waitlist signups do I need before launching?", answer: "There's no universal number. 100 engaged signups from your exact target audience is more valuable than 5,000 broadly interested people. Focus on qualification over volume: are these people who have the problem your product solves, at the scale where your product is relevant to them?" },
@@ -3700,7 +3896,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "One follow-up is almost always worth sending — reply rates on follow-up emails are often 30–40% of the total replies from an entire sequence. Three or more follow-ups starts feeling like harassment. The optimal sequence: Day 1 (original email), Day 4 (short follow-up with one new piece of context or a different angle), Day 10 (closing email: 'I'll assume the timing isn't right — happy to reconnect when that changes'). Stop there." },
       { type: "heading", level: 2, content: "Deliverability Basics" },
       { type: "paragraph", content: "If your emails land in spam, the copy doesn't matter. Use a separate sending domain rather than your primary brand domain — protect your brand domain's sender reputation. Set up SPF, DKIM, and DMARC records on your sending domain. Warm up new sending addresses gradually, starting at 20–30 emails per day and scaling up over 4–6 weeks. Keep bounce rates below 3% by validating email addresses before sending." },
-      { type: "callout", calloutType: "cta", content: "Before you start outreach, make sure your brand name and domain are ready to withstand scrutiny. NamoLux generates quality-scored startup names with real-time domain checking.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "Before outreach, explore startup names, check domains as results update, and run Founder Signal when the shortlist is ready for scrutiny.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "How many cold emails should I send per day?", answer: "For a new sending domain, start with 20–30 per day and scale up over 4–6 weeks. For an established sending domain with good reputation, 100–150 per day per inbox is a reasonable ceiling. Above 200 from a single inbox, deliverability typically degrades and your sender score takes a measurable hit." },
@@ -3734,7 +3930,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Between bootstrapping and institutional VC, there's a useful spectrum. Angel investors provide capital from their own funds with lighter governance and typically smaller check sizes. Revenue-based financing lets you repay a multiple of the investment as a percentage of revenue — no equity dilution. Friends and family rounds can provide early runway without full VC terms. These middle-ground options provide capital without requiring the growth trajectory that institutional VC demands." },
       { type: "heading", level: 2, content: "Brand and Domain Implications" },
       { type: "paragraph", content: "Funded startups often need to move fast on brand decisions — including domain names — because competitive dynamics accelerate once capital is deployed. Bootstrapped founders have more time but fewer resources for brand work. Either way, your domain and company name lock in early and change expensively. Tools that help you make a good naming decision quickly — rather than spending months on it — serve both paths equally well." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names in minutes — whether you're bootstrapping carefully or moving fast on VC capital.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "NamoLux explores startup names in minutes and keeps scoring optional — whether you are bootstrapping carefully or moving fast on VC capital.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Can I bootstrap a SaaS business?", answer: "Yes, and many of the most profitable SaaS businesses are bootstrapped. Basecamp, Balsamiq, and Transistor are well-known examples. The key constraint: SaaS typically requires a longer time-to-revenue runway than a service business, because you're building before you're earning. Personal financial runway matters more for SaaS bootstrapping than for service-business bootstrapping." },
@@ -3756,17 +3952,17 @@ export const blogPosts: BlogPost[] = [
     content: [
       { type: "paragraph", content: "Squadhelp and NamoLux represent two different philosophies about how you arrive at a great startup name. Squadhelp bet on human creativity at scale — thousands of real namers competing to win your brief. NamoLux bet on AI generation with structured quality evaluation. This comparison looks at the practical trade-offs for founders who need a name they can actually build a company on." },
       { type: "heading", level: 2, content: "Feature Comparison" },
-      { type: "paragraph", content: "Squadhelp runs naming contests: you submit a brief, 100–400 human namers submit ideas over 7–10 days, you select a winner, and Squadhelp conducts trademark screening on the winning name. Brand identity packages (logo, colour palette) are available as add-ons. Contest fees start at £150 and scale to £500 or more for premium guaranteed contests. NamoLux generates names instantly from a brand brief, applies Founder Signal™ scoring to every result (covering phonetics, memorability, brand risk, and domain quality), checks domain availability across .com, .io, .ai, and .co in real-time, and operates on a free tier with a one-time purchase for full access. Results in under a minute." },
+      { type: "paragraph", content: "Squadhelp runs naming contests: you submit a brief, 100–400 human namers submit ideas over 7–10 days, you select a winner, and Squadhelp conducts trademark screening on the winning name. Brand identity packages are available as add-ons. NamoLux generates a creative shortlist from a brand brief, updates domain availability in the background, and lets you opt in to Founder Signal™ once you are ready to evaluate. Quick has no monthly quota; free also includes three Advanced batches and one complete scored batch each month. Pro is GBP 7.99/month." },
       { type: "heading", level: 2, content: "Name Quality: Can AI Match Human Creativity?" },
       { type: "paragraph", content: "Squadhelp's ceiling is higher. 300 human namers bring cultural intuition, wordplay, and creative leaps that AI generation doesn't consistently replicate. But Squadhelp's floor is also lower — the majority of submissions in a typical contest are not usable. The median quality across 300 submissions is often lower than the top 10 NamoLux results, because human namers submit filler alongside genuine creativity to increase their chances of winning the contest fee." },
       { type: "heading", level: 2, content: "Speed and Iteration" },
       { type: "paragraph", content: "If you need a name this week, Squadhelp's 7–10 day minimum window is a blocker. NamoLux produces results in under a minute. For founders doing iterative naming work — testing briefs, exploring different directions, refining based on what comes back — AI generation's speed is a significant practical advantage. You can run five different brief variations in the time it takes to write a Squadhelp contest brief." },
-      { type: "callout", calloutType: "tip", content: "Consider using NamoLux first (free, instant, quality-scored) and Squadhelp second — only if none of the AI-generated names are compelling after two or three brief iterations. The combination gives you AI speed for early exploration and human creativity as a fallback for genuinely difficult briefs." },
+      { type: "callout", calloutType: "tip", content: "Consider using NamoLux first for fast, free exploration and optional shortlist scoring, then Squadhelp only if several brief iterations still produce nothing compelling. The combination gives you AI speed first and human creativity as a fallback for unusually difficult briefs." },
       { type: "heading", level: 2, content: "Pricing" },
-      { type: "paragraph", content: "Squadhelp contests start at £150 and scale to £500 or more for premium contests with guaranteed winner selection. Trademark screening on the winning name is typically an additional £100–£300. NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. The total cost difference for a naming project: NamoLux is typically 10–30 times cheaper than a Squadhelp contest." },
+      { type: "paragraph", content: "Squadhelp contests start at £150 and scale to £500 or more for premium contests with guaranteed winner selection. Trademark screening may cost more. NamoLux starts with unlimited Quick exploration, three Advanced batches, and one complete Founder Signal batch per month; Pro is GBP 7.99/month. The cost difference for a self-serve naming project remains stark." },
       { type: "heading", level: 2, content: "Who Each Tool Is For" },
-      { type: "paragraph", content: "Squadhelp is the right choice for funded companies (Seed stage or beyond) who want maximum creative input, need trademark clearance built into the process, and have a 1–2 week timeline. NamoLux is the right choice for bootstrapped and early-stage founders who need a decision in days rather than weeks, want objective quality scoring rather than pure volume of options, and prefer a one-time cost model over a per-project agency fee." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain availability — free to try, results in under a minute.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "paragraph", content: "Squadhelp is the right choice for funded companies (Seed stage or beyond) who want maximum creative input, need trademark clearance built into the process, and have a 1–2 week timeline. NamoLux is the right choice for bootstrapped and early-stage founders who need a decision in days rather than weeks, want objective quality scoring rather than pure volume of options, and prefer a low-cost self-serve workflow before paying for a contest." },
+      { type: "callout", calloutType: "cta", content: "Explore startup names first, watch live domain checks update, and run Founder Signal™ only when the shortlist is ready.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Does Squadhelp guarantee a name I'll like?", answer: "Not exactly. Guaranteed contests ensure you select a winner (you cannot close the contest without picking one), but there's no guarantee of name quality. If you run a guaranteed contest and find none of the submissions strong, you're still required to select a winner. Non-guaranteed contests allow rejection of all submissions and a refund, but this is designed as an exception, not a standard outcome." },
@@ -3790,19 +3986,19 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Looka Does" },
       { type: "paragraph", content: "Looka is primarily a logo generator. You enter your company name, choose style preferences and colour palettes, and it produces logo options across typeface and layout combinations. As part of its workflow, it also suggests company names — but names are a secondary feature, not the primary value proposition. Looka's core value is: walk in with a rough idea, walk out with a name and a logo in under an hour." },
       { type: "heading", level: 2, content: "What NamoLux Does" },
-      { type: "paragraph", content: "NamoLux generates names from a brand brief (keywords, industry, the feeling you want the brand to evoke), checks domain availability across .com, .io, .ai, and .co in real-time, and scores every name with Founder Signal™ — a 0–100 rating covering phonetics, memorability, brand risk, and domain quality. There's no logo generation, but there's a structured framework for deciding which generated names are actually worth committing to — which is a different and harder problem than generating a visual treatment." },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief, presents them in creative order, and updates domain availability after the shortlist appears. Founder Signal™ is a later opt-in step that gives every Advanced candidate a 0–100 rating covering phonetics, memorability, brand risk, and domain quality. The score annotates rather than filters the creative output." },
       { type: "heading", level: 2, content: "The Naming Quality Gap" },
-      { type: "paragraph", content: "Looka's names are generated to be aesthetically pleasing alongside a logo preview — they're evaluated for how they look, not for phonetic strength, trademark risk, or brand scalability. NamoLux's names come with explicit quality scoring. If you generate 20 names in NamoLux, you can immediately identify the top 3 based on Founder Signal™ scores rather than picking the one that happens to look best in a particular typeface next to a particular icon." },
+      { type: "paragraph", content: "Looka's names are generated to be aesthetically pleasing alongside a logo preview — they are evaluated for how they look, not for phonetic strength, trademark risk, or brand scalability. NamoLux keeps visual wordmarks lightweight during exploration, then lets you apply Founder Signal™ to a serious Advanced shortlist and explicitly sort by score if that view helps." },
       { type: "callout", calloutType: "tip", content: "Logo design and name selection should be sequential, not simultaneous. Pick a name first using objective quality criteria — phonetics, memorability, domain availability, trademark risk. Then design a logo around the name. Picking a name because it looks good in a specific typeface is optimising for the wrong variable." },
       { type: "heading", level: 2, content: "Pricing Comparison" },
-      { type: "paragraph", content: "Looka is free to explore but requires payment to download: £65 or more for a single logo download, £96 or more for a full brand kit with social assets. NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. If you need both a name and a logo, using NamoLux for the name and Looka for the logo (two separate one-time costs) makes more economic sense than using either tool alone for both jobs." },
+      { type: "paragraph", content: "Looka is free to explore but requires payment to download. NamoLux Quick has no monthly quota, while free accounts receive three Advanced batches and one complete Founder Signal batch each month. Pro is GBP 7.99/month and adds unlimited fair-use scoring plus comparison, stress tests, exports, brand tools, and an ad-free experience." },
       { type: "heading", level: 2, content: "The Two-Tool Approach" },
       { type: "paragraph", content: "The most efficient workflow: use NamoLux to find and score your name, confirm domain availability, and run your shortlist through Founder Signal™. Once you have a final candidate that scores well and has a clean domain, use Looka to generate logo concepts around that confirmed name. The combination costs less than a freelance designer for equivalent output and gives you full control over both decisions." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain checking — start with the name before you design the logo.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "callout", calloutType: "cta", content: "Generate the creative shortlist, watch domain checks update, then run Founder Signal™ before investing in the logo.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Can I use Looka for name generation only?", answer: "Yes, you can browse Looka's name suggestions without purchasing a logo. But name generation is not Looka's primary feature, and the suggestions aren't evaluated for phonetic quality, trademark risk, or domain availability. If name selection is your priority, NamoLux provides a more structured and thorough approach." },
-      { question: "Does NamoLux offer any visual brand assets?", answer: "Not currently. NamoLux focuses on name generation and quality evaluation — Founder Signal™ scoring and real-time domain availability checking. For logos and visual brand assets, use a dedicated tool like Looka or Brandmark, or work with a freelance designer after finalising your name." },
+      { question: "Does NamoLux offer any visual brand assets?", answer: "Yes. Paid users can generate brand palettes alongside the naming workflow. NamoLux does not replace a full logo or identity design process, so use a dedicated tool like Looka or Brandmark, or work with a freelance designer after finalising your name if you need finished visual assets." },
       { question: "Which tool should I use first?", answer: "NamoLux first, Looka second. Locking in a name before designing a logo is the correct sequence. Designing a logo first creates psychological anchoring — you start evaluating name options based on aesthetic compatibility with the logo rather than on the brand fundamentals that actually matter for long-term success." }
     ]
   } as BlogPost,
@@ -3822,7 +4018,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What GoDaddy's Generator Does" },
       { type: "paragraph", content: "GoDaddy's tool generates name variations based on keyword input, checks availability across .com and other TLDs, and presents results with immediate Add to Cart options for registration. It's optimised for the top of GoDaddy's sales funnel: get you to a domain registration as efficiently as possible. The UX is clean, the availability checking is accurate, and the path from name to registered domain is seamless." },
       { type: "heading", level: 2, content: "What NamoLux Does Differently" },
-      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — not just keyword variations — applies Founder Signal™ scoring to every result (covering phonetics, memorability, brand risk, and domain quality), and checks availability across .com, .io, .ai, and .co simultaneously. The goal is not to get you to a domain registration quickly. The goal is to help you arrive at a name that's actually worth building a company on." },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief rather than only combining keywords. It presents the creative shortlist first, updates availability across key extensions without blocking interaction, and offers Founder Signal™ as an optional evaluation step. The goal is not a rushed registration; it is a name worth building on." },
       { type: "heading", level: 2, content: "The Fundamental Difference in Philosophy" },
       { type: "paragraph", content: "GoDaddy shows you what's available. NamoLux shows you what's good. These are different questions with different answers. A domain can be available because nobody wanted it, or because it's a genuinely strong brand-quality name that hasn't been registered yet. GoDaddy's tool treats all available domains equally. Founder Signal™ is designed specifically to distinguish between these two cases." },
       { type: "callout", calloutType: "tip", content: "Domain availability is table stakes — almost any combination of letters that isn't currently registered is technically available. The useful question is whether the name is actually strong enough to build a brand on. That's what quality scoring answers, and it's a question domain registrar tools aren't designed to ask." },
@@ -3831,8 +4027,8 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "When NamoLux Is the Right Tool" },
       { type: "paragraph", content: "When you're starting from a blank page with only a brief — what the product does, who it's for, the feeling you want the brand to evoke — and you want quality scoring to help evaluate which generated names are actually worth committing to. NamoLux is built for the naming decision phase; GoDaddy is built for the registration phase. They're sequential tools, not competing alternatives." },
       { type: "heading", level: 2, content: "Pricing" },
-      { type: "paragraph", content: "GoDaddy's generator is free to use; you pay only for domain registration (typically £12–£20 per year for a .com). NamoLux has a free tier (one generation per day, no account required) and a one-time purchase for full access. If budget is the primary constraint, use NamoLux free tier to shortlist candidates and GoDaddy to check final availability and register — the combination costs nothing beyond the domain registration fee." },
-      { type: "callout", calloutType: "cta", content: "NamoLux generates quality-scored startup names with Founder Signal™ scoring and real-time domain availability — make a better naming decision before you register.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
+      { type: "paragraph", content: "GoDaddy's generator is free to use; you pay only for domain registration. NamoLux Quick also has no monthly quota, while free accounts receive three Advanced batches and one complete Founder Signal batch each month. Register the chosen domain through your preferred registrar after confirming availability." },
+      { type: "callout", calloutType: "cta", content: "Explore startup names first, then add Founder Signal™ and real-time domain evidence before you register.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
       { question: "Does GoDaddy's generator use AI for name generation?", answer: "GoDaddy uses pattern-matching and keyword variation rather than generative AI in the modern sense. The output tends toward keyword-compound names — HealthTrack, QuickInvoice, ProManage — rather than the invented or evocative names that AI generation produces. This makes GoDaddy's tool strong for exact-match domain searches and weaker for creative brand naming." },
@@ -3990,6 +4186,10 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Your existing users need to know before the transition happens. Email them with the new domain and a clear explanation. Update your email footer, email signatures, and any in-app references to the old domain. The worst outcome is existing users thinking your old domain was taken down or that you went out of business." },
       { type: "heading", level: 2, content: "Choosing the New Domain" },
       { type: "paragraph", content: "Don't rush this. The cost of a second pivot-forced rebrand is higher than the cost of taking an extra week to get the name right. Look for a name that's broad enough to accommodate future pivots — something that describes your customer or feeling rather than your product specifically." },
+      { type: "links", content: "Plan the transition", links: [
+        { text: "Transfer a Domain Without Downtime", href: "/blog/transfer-domain-without-downtime" },
+        { text: "Company Name vs Product Name", href: "/blog/company-name-vs-product-name-brand-architecture" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Find a domain name broad enough to grow with your startup — scored for brand strength and longevity.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
     ],
     faqs: [
@@ -4278,7 +4478,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Namecheap's Search Tool Does" },
       { type: "paragraph", content: "Namecheap's 'Beast Mode' domain search allows you to check availability across dozens of TLDs simultaneously, filter by extension, price, and length, and register directly in the same flow. It also suggests variations of your search term across different TLD combinations. It's designed for people who already have a name in mind and want to check availability and register — the final step, not the creative step." },
       { type: "heading", level: 2, content: "What NamoLux Does" },
-      { type: "paragraph", content: "NamoLux generates names from a brand brief — keywords, industry, and the vibe you want the brand to evoke — checks availability across .com, .io, .ai, and .co in real-time, and applies Founder Signal™ scoring to every result. The focus is on the creative and evaluation phase: starting from nothing and arriving at a shortlist of quality-scored options, rather than checking whether a specific name is available." },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief, shows the creative shortlist in its original order, and updates availability after names appear. Founder Signal™ remains an explicit later action, annotating the complete Advanced batch without silently removing or reordering candidates." },
       { type: "heading", level: 2, content: "The Key Difference: Discovery vs Confirmation" },
       { type: "paragraph", content: "Namecheap answers 'is this name available?' NamoLux answers 'what names should I be considering?' These are different questions that arise at different moments in the naming process. Most founders who feel stuck on naming are stuck at the discovery phase — they need NamoLux. Founders who've already shortlisted candidates and are ready to register are in the right place for Namecheap." },
       { type: "callout", calloutType: "tip", content: "The optimal workflow: use NamoLux to generate and score a shortlist of 5-10 strong candidates. Then use Namecheap (or your preferred registrar) to confirm final availability, check price, and register. These tools are sequential, not competing." },
@@ -4324,16 +4524,16 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Lean Domain Search Does" },
       { type: "paragraph", content: "Lean Domain Search is a single-purpose tool built by Matt Mazur. You enter a keyword, and it returns all available .com domains containing that keyword. Results are filterable by position (prefix, suffix, or anywhere) and sortable by length or alphabetical. It's fast, free, and accurate. The entire value proposition is speed of availability checking — not name quality evaluation." },
       { type: "heading", level: 2, content: "What NamoLux Does" },
-      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — keywords, industry, and desired vibe — rather than simply showing keyword combinations. Every generated name is scored with Founder Signal™ covering phonetics, memorability, brand risk, and domain quality. The output is a ranked shortlist of names worth considering, not an exhaustive list of technically available options." },
+      { type: "paragraph", content: "NamoLux generates names from a brand brief rather than simply showing keyword combinations. It presents the creative shortlist first and keeps generation order intact. Founder Signal™ is an optional Advanced step covering phonetics, memorability, brand risk, and domain quality; founders can choose whether to sort a scored batch." },
       { type: "heading", level: 2, content: "The Output Quality Difference" },
-      { type: "paragraph", content: "This is the fundamental distinction. Lean Domain Search shows you everything available. NamoLux shows you what's actually good. For a keyword like 'track', Lean Domain Search returns hundreds of available .com options: trackpro.com, tracklab.com, trackbase.com, and so on — many of which are generic, unmemorable, or trademarked. NamoLux generates and then filters by quality, returning a shorter list of names that meet a brand-strength threshold." },
+      { type: "paragraph", content: "This is the fundamental distinction. Lean Domain Search expands one keyword into available combinations. NamoLux explores several naming styles from a richer brief, keeps every usable creative candidate visible, and lets the founder apply a separate quality analysis later. Founder Signal never silently filters the generated list." },
       { type: "callout", calloutType: "tip", content: "Availability and quality are independent variables. A domain can be available because it's bad — generic, unmemorable, or already associated with a failed brand. Quality scoring is what separates the 2% of available names worth building on from the other 98%." },
       { type: "heading", level: 2, content: "When Lean Domain Search Wins" },
       { type: "paragraph", content: "When you have a specific keyword you're committed to including in your domain and you want to exhaustively survey what's available. If you're building an affiliate site or content site around a specific keyword, Lean Domain Search is the faster starting point — the exact-match nature of its results is a feature, not a bug." },
       { type: "heading", level: 2, content: "When NamoLux Wins" },
       { type: "paragraph", content: "When you're naming a startup or brand from scratch and you don't have a specific keyword locked in. When quality evaluation matters more than exhaustive availability surveys. When you want to compare options based on measurable brand-strength criteria rather than choosing between available options based on gut feel." },
       { type: "heading", level: 2, content: "Combining Both Tools" },
-      { type: "paragraph", content: "A practical workflow: use NamoLux to generate quality-scored name candidates that you wouldn't have thought of from a single keyword. For any candidate with a strong Founder Signal™ score that you want to explore further (different prefix/suffix combinations, related words), run that name through Lean Domain Search to see the full landscape of available .com variants. The two tools work well together as sequential steps." },
+      { type: "paragraph", content: "A practical workflow: use NamoLux to generate candidates beyond a single keyword, then opt in to Founder Signal for the complete Advanced shortlist. For a candidate you want to explore further, run it through Lean Domain Search to see the landscape of related .com variants. The tools work well as sequential steps." },
       { type: "callout", calloutType: "cta", content: "Start with brand quality, then check availability — the order that produces better naming decisions.", ctaLink: "/generate", ctaText: "Generate Names with NamoLux →" }
     ],
     faqs: [
@@ -4358,12 +4558,12 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "What Wordoid Does" },
       { type: "paragraph", content: "Wordoid generates invented, pronounceable words based on your quality and language settings. You can specify whether names should start or end with a specific word fragment, set a quality threshold (how real-word-like the output is), and choose from English, Spanish, French, Italian, or Portuguese phonetic rules. The results are filtered for domain availability. It's a pure word-generation engine — simple, focused, and fast." },
       { type: "heading", level: 2, content: "What NamoLux Does" },
-      { type: "paragraph", content: "NamoLux generates names using AI from a brand brief — your keywords, industry, and desired vibe — rather than from phonetic rules alone. It applies six remix strategies (compound words, evocative blends, abstract coinages, and others) informed by real brand examples from your industry. Every name is then scored with Founder Signal™ and checked for availability across .com, .io, .ai, and .co." },
+      { type: "paragraph", content: "NamoLux generates names from your keywords, industry, and desired vibe rather than from phonetic rules alone. It applies several creative strategies, presents the resulting candidates first, and updates availability after names appear. Founder Signal™ can then annotate an Advanced batch when you are ready to evaluate." },
       { type: "heading", level: 2, content: "The Strategy vs Pattern Difference" },
       { type: "paragraph", content: "Wordoid generates names that sound like words. NamoLux generates names that work as brands. The distinction is subtle but significant. A Wordoid result like 'Zovitex' might be pronounceable and available, but it carries no brand meaning and has no connection to your product category. NamoLux's AI is specifically trying to evoke the right associations for your industry and vibe — not just produce phonetically valid strings." },
       { type: "callout", calloutType: "tip", content: "A brand name doesn't need to be a real word, but it does need to do a job: evoke an emotion, hint at a category, or create a distinctive identity. Phonetically valid random syllables rarely achieve any of those goals." },
       { type: "heading", level: 2, content: "Output Volume vs Output Quality" },
-      { type: "paragraph", content: "Wordoid generates a large volume of options quickly. NamoLux generates fewer options but scores each one for quality. For founders who want maximum quantity to browse through, Wordoid's high-volume output is useful. For founders who want a shorter shortlist of quality-screened candidates, NamoLux's Founder Signal™ scoring saves significant evaluation time." },
+      { type: "paragraph", content: "Wordoid generates a large volume of invented options quickly. NamoLux explores a deliberate mix of naming styles and provides rationale for each candidate. When the shortlist is ready, optional Founder Signal™ analysis adds a consistent comparison without changing which names were originally shown." },
       { type: "heading", level: 2, content: "Availability Checking" },
       { type: "paragraph", content: "Wordoid filters results by domain availability as part of its generation — you see only available domains. NamoLux checks availability in real-time across multiple TLDs and shows both available and taken options so you can see the full brand landscape for each name candidate. If a .com is taken but .io is available, NamoLux shows you both states — which is useful context when evaluating whether to pursue the name." },
       { type: "heading", level: 2, content: "When Wordoid Is the Right Tool" },
@@ -4417,6 +4617,8 @@ export const blogPosts: BlogPost[] = [
         { text: "Why Your Startup's .com Still Matters More Than You Think", href: "/blog/why-dot-com-matters-startups" },
         { text: "How to Run a Domain Name Brainstorm: A Step-by-Step Process", href: "/blog/domain-name-brainstorm-process" },
         { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
+        { text: "Company Name vs Product Name", href: "/blog/company-name-vs-product-name-brand-architecture" },
+        { text: "Check If a Business Name Is Taken", href: "/blog/how-to-check-if-business-name-is-taken" },
       ]},
       { type: "callout", calloutType: "cta", content: "Generate SaaS name ideas scored by Founder Signal™ — with live .com availability checked instantly.", ctaLink: "/generate", ctaText: "Find Your SaaS Name →" },
     ],
@@ -4496,7 +4698,7 @@ export const blogPosts: BlogPost[] = [
         { text: "The Domain Extension Guide 2026", href: "/blog/domain-extension-guide-2026" },
         { text: "What Makes a Domain Name Age Well?", href: "/blog/domain-names-that-age-well" },
       ]},
-      { type: "callout", calloutType: "cta", content: "NamoLux Deep Search actively hunts for names with available .com domains — and scores every result so you know which ones are worth registering.", ctaLink: "/generate", ctaText: "Find Your .com →" },
+      { type: "callout", calloutType: "cta", content: "Need an explicitly score-led search? NamoLux's premium Auto-find workflow hunts for high-scoring names with available .com domains, while Quick and Advanced preserve creative order.", ctaLink: "/generate", ctaText: "Find Your .com →" },
     ],
     faqs: [
       { question: "What if the .com is taken but not in use?", answer: "Check WHOIS to see when it was registered and whether it's pointing to a live site. If it's a parked domain, you can often buy it through a domain broker or directly via an offer. Budget £200-2,000 for most inactive parked domains. Over £5,000 signals a professional domain investor — factor that into your naming decision." },
@@ -4536,7 +4738,7 @@ export const blogPosts: BlogPost[] = [
         { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
         { text: "What Makes a Domain Name Age Well?", href: "/blog/domain-names-that-age-well" },
       ]},
-      { type: "callout", calloutType: "cta", content: "Skip the blank page. NamoLux runs the metaphor mapping, compound generation, and availability checking for you — with Founder Signal™ scoring on every result.", ctaLink: "/generate", ctaText: "Start Your Brainstorm →" },
+      { type: "callout", calloutType: "cta", content: "Skip the blank page. NamoLux explores metaphors, compounds, and other styles first, updates availability afterward, and lets you run Founder Signal™ when the shortlist is ready.", ctaLink: "/generate", ctaText: "Start Your Brainstorm →" },
       { type: "heading", level: 2, content: "How Many Candidates Should You Produce?" },
       { type: "paragraph", content: "Aim for 40-60 raw candidates before filtering. Most will be eliminated quickly. You want 5-8 strong finalists to evaluate properly. If you have fewer than 5 finalists, the raw pool was too small — expand one of your metaphor categories and regenerate." },
     ],
@@ -4760,8 +4962,8 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "A Note on Copy vs Design" },
       { type: "paragraph", content: "Bad copy on a beautiful design converts poorly. Good copy on an ugly design often converts surprisingly well. Fix your copy first. Then fix the design. Most founders do this backwards." },
       { type: "links", content: "Further Reading", links: [
-        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-founders" },
-        { text: "How to Validate a Startup Idea Before Building", href: "/blog/validate-startup-idea-before-building" },
+        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-playbook" },
+        { text: "How to Validate a Startup Idea Before Building", href: "/blog/how-to-validate-a-business-idea" },
         { text: "Pre-Launch Waitlist Strategy for Founders", href: "/blog/pre-launch-waitlist-strategy" },
         { text: "Cold Email for Founders: How to Get Replies", href: "/blog/cold-email-for-founders" },
       ]},
@@ -4798,7 +5000,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "After the Interview: What to Do with the Data" },
       { type: "paragraph", content: "Immediately after each interview, write down: the 3 most surprising things you heard, the exact phrases the user used to describe the problem, and any workarounds they mentioned. Don't summarise — quote. The specific language users use to describe problems becomes your copywriting." },
       { type: "links", content: "Further Reading", links: [
-        { text: "How to Validate a Startup Idea Before Building", href: "/blog/validate-startup-idea-before-building" },
+        { text: "How to Validate a Startup Idea Before Building", href: "/blog/how-to-validate-a-business-idea" },
         { text: "MVP vs Prototype: What's the Difference?", href: "/blog/mvp-vs-prototype-difference" },
         { text: "How to Write a Landing Page That Converts", href: "/blog/landing-page-conversion-guide" },
         { text: "From Side Project to SaaS: When and How to Make the Leap", href: "/blog/side-project-to-saas" },
@@ -4839,8 +5041,8 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "A 90-Day Transition Plan" },
       { type: "paragraph", content: "Month 1: Set up payments (Stripe), write minimal legal pages, add basic monitoring. Month 2: Reach out to your most engaged free users and offer early access at a discounted rate. Month 3: Iterate based on paying user feedback, raise prices, and formally launch." },
       { type: "links", content: "Further Reading", links: [
-        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-founders" },
-        { text: "SaaS Pricing Strategy: How to Price Your First Product", href: "/blog/pricing-new-saas" },
+        { text: "How Founders Actually Get Their First 100 Customers", href: "/blog/first-100-customers-playbook" },
+        { text: "SaaS Pricing Strategy: How to Price Your First Product", href: "/blog/pricing-strategy-for-saas" },
         { text: "Customer Discovery: The Right Way to Talk to Early Users", href: "/blog/customer-discovery-interviews" },
         { text: "How to Launch on Product Hunt", href: "/blog/how-to-launch-on-product-hunt" },
       ]},
@@ -4878,7 +5080,7 @@ export const blogPosts: BlogPost[] = [
         ["Multi-TLD checking", "✅ Basic check", "✅ .com .io .ai .co .app .dev"],
         ["Social handle check", "✅ Basic", "✅ Twitter, IG, TikTok"],
         ["Industry examples", "❌", "✅ 13 industry libraries"],
-        ["Pricing", "Free", "Free tier + £15 Pro"],
+        ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99"],
       ]},
       { type: "heading", level: 2, content: "The Core Difference" },
       { type: "paragraph", content: "Panabee tells you what's available. NamoLux tells you what's good and available. If you're doing an initial brainstorm and want to quickly see domain availability for names you've already thought of, Panabee is a reasonable starting point. If you want AI to generate creative candidates and then score them for brand strength, NamoLux is the right tool." },
@@ -4887,7 +5089,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "When to Use NamoLux" },
       { type: "list", content: "", items: ["You need creative name ideas generated from your concept, not just keyword combinations", "You want to know which available names are actually worth building a brand on", "You need a Founder Signal™ score to objectively compare candidates", "You want multi-strategy AI generation (invented, compound, metaphor, root+suffix)"] },
       { type: "links", content: "Further Reading", links: [
-        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/best-namelix-alternatives-2026" },
         { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
         { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
         { text: "Bust a Name vs NamoLux", href: "/blog/bust-a-name-vs-namolux" },
@@ -4896,7 +5098,7 @@ export const blogPosts: BlogPost[] = [
     ],
     faqs: [
       { question: "Is Panabee reliable for domain availability?", answer: "Panabee uses standard WHOIS checks, which are generally accurate for .com but may lag for newer TLDs. NamoLux uses RDAP (the modern replacement for WHOIS) which is faster and more accurate, especially for .io, .ai, and .co domains." },
-      { question: "Can I use Panabee and NamoLux together?", answer: "Yes — use NamoLux to generate scored candidates, then use Panabee as a quick additional check for app store name availability (iOS/Android) since NamoLux focuses on domain and social handles." }
+      { question: "Can I use Panabee and NamoLux together?", answer: "Yes — use NamoLux to generate and evaluate candidates, then use Panabee as an additional app-store or social-handle check. NamoLux focuses on naming decisions and domain availability." }
     ]
   },
 
@@ -4922,14 +5124,14 @@ export const blogPosts: BlogPost[] = [
         ["Industry context", "❌ None", "✅ 13 industry example libraries"],
         ["Deep .com hunting", "❌ Shows results for your keywords", "✅ Hunts across 90 candidates per search"],
         ["Brand risk check", "❌", "✅ Phonetic conflict, trademark signals"],
-        ["Pricing", "Free", "Free tier + £15 Pro"],
+        ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99"],
       ]},
       { type: "heading", level: 2, content: "What NamoLux Does Differently" },
       { type: "paragraph", content: "Instead of combining your keywords, NamoLux uses them as a brief for AI generation. The AI applies naming frameworks (invented words, borrowed metaphors, root+suffix, compounds) informed by examples from successful companies in your industry. The output isn't a list of keyword combinations — it's a curated set of creative candidates, each scored for brand quality." },
       { type: "heading", level: 2, content: "The Right Tool for the Right Job" },
       { type: "paragraph", content: "Bust a Name is a volume tool: it helps you exhaust the possibility space for keyword combinations quickly. NamoLux is a quality tool: it helps you find a small number of genuinely strong name candidates. Most founders benefit from using volume tools early in brainstorming and quality tools when they're ready to choose." },
       { type: "links", content: "Further Reading", links: [
-        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/best-namelix-alternatives-2026" },
         { text: "How Domain Name Generators Actually Work", href: "/blog/domain-name-generators-how-they-work" },
         { text: "Panabee vs NamoLux: Quick Search vs AI Scoring", href: "/blog/panabee-vs-namolux" },
         { text: "The Best AI Domain Name Generators 2026", href: "/blog/best-ai-domain-name-generators-2026" },
@@ -4945,7 +5147,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "novanym-vs-namolux",
     title: "Novanym vs NamoLux: Curated Premium Domains vs AI-Generated Scoring",
-    description: "Novanym sells human-curated premium domain names at premium prices. NamoLux generates AI-scored names with live availability. Here's which one makes sense for your stage.",
+    description: "Novanym sells human-curated premium domains. NamoLux offers free creative exploration, live availability updates, and optional Founder Signal analysis. Here is which fits your stage.",
     category: "Tool Comparisons",
     readTime: 4,
     publishedAt: "2026-03-21",
@@ -4964,7 +5166,7 @@ export const blogPosts: BlogPost[] = [
         ["Quality assurance", "✅ Human editorial filter", "✅ Founder Signal™ 0–100"],
         ["Domain included", "✅ .com included in price", "✅ Check availability, register separately"],
         ["Logo included", "✅ Basic logo concept", "❌ Not included"],
-        ["Price range", "£300–£3,000+", "Free tier + £15 Pro"],
+        ["Price range", "£300–£3,000+", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99"],
         ["Industry targeting", "Limited browse filters", "✅ 13 industry libraries"],
         ["Speed", "Immediate (inventory exists)", "Under 60 seconds"],
       ]},
@@ -4974,12 +5176,12 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "The Combined Approach" },
       { type: "paragraph", content: "Some founders use NamoLux to identify the naming direction — which style, which emotional territory, which structural approach works best for their brand — then browse Novanym's inventory looking for names that match. This gives you the generative exploration of NamoLux with the curated quality assurance of Novanym for the final choice." },
       { type: "links", content: "Further Reading", links: [
-        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/namelix-vs-namolux" },
+        { text: "Namelix vs NamoLux: Which AI Domain Generator Wins?", href: "/blog/best-namelix-alternatives-2026" },
         { text: "Brandable vs Descriptive Domains: Which Works Better?", href: "/blog/brandable-vs-descriptive-domains" },
         { text: "Panabee vs NamoLux: Quick Search vs AI Scoring", href: "/blog/panabee-vs-namolux" },
         { text: "What Makes a Great Startup Name?", href: "/blog/what-makes-a-great-startup-name" },
       ]},
-      { type: "callout", calloutType: "cta", content: "Generate custom AI names scored by Founder Signal™ — free, no account required, live availability checked instantly.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
+      { type: "callout", calloutType: "cta", content: "Generate custom candidates and check domains with NamoLux. Free includes one complete Founder Signal™ batch monthly; Pro adds unlimited fair-use scoring.", ctaLink: "/generate", ctaText: "Start naming →" },
     ],
     faqs: [
       { question: "Is Novanym worth the premium price?", answer: "For founders at Series A or beyond who need a polished name quickly and have budget: potentially yes. For pre-revenue founders: the same quality naming is achievable with NamoLux at a fraction of the cost — the difference is the time investment in evaluation rather than the money." },
@@ -5012,7 +5214,7 @@ export const blogPosts: BlogPost[] = [
         "Vibe-specific vocabulary: playful briefs get sensory words, luxury briefs get restraint, futuristic briefs get precision",
         "Anti-pattern rejection: fake-Latin endings, sci-fi suffixes, meaningless tech-prefixes are blocked at the prompt level",
         "Availability pre-checked: RDAP verification runs before results are surfaced",
-        "Quality scored: Founder Signal™ rates every name across 6 dimensions",
+        "Optional decision layer: Founder Signal™ rates every name in the scored batch across 6 dimensions",
         "Refine mode: if results aren't right, iterate in a specific direction (shorter, more brandable, more playful) without starting over",
       ]},
       { type: "heading", level: 2, content: "What to Expect From Good AI Naming" },
@@ -5021,7 +5223,7 @@ export const blogPosts: BlogPost[] = [
     ],
     faqs: [
       { question: "Why are most AI business names bad?", answer: "Most AI naming tools use pattern-matching on existing startup names without building in meaning requirements, emotional vocabulary, or anti-pattern rejection. The result is names that structurally resemble brands but lack the story and emotional depth that make names memorable." },
-      { question: "How do you make AI generate better business names?", answer: "The most effective levers: require every name to pass a meaning-anchor test, inject vibe-specific emotional vocabulary into the generation context, explicitly reject overused patterns (fake-Latin, sci-fi endings), and pre-filter by quality score before showing results. This is the architecture NamoLux uses." },
+      { question: "How do you make AI generate better business names?", answer: "The most effective levers are a clear meaning anchor, style-specific emotional vocabulary, deliberate variety across construction families, and hard rejection only for unsafe, malformed, or severely unpronounceable output. NamoLux keeps broader creative candidates visible, then separates evaluation into optional Founder Signal analysis." },
       { question: "What should I do if I can't find a good available name?", answer: "Use Deep Search mode in NamoLux — it runs 90 candidates with parallel availability checks and uses strategies specifically designed to find available .com names (rare phonetics, less saturated patterns). Also try the Refine Results feature with '.com Likely' mode, which optimises generation for availability hit rate." },
     ],
   },
@@ -5204,7 +5406,7 @@ export const blogPosts: BlogPost[] = [
         items: [
           "Describe your idea — type a short description of what your brand is and who it's for. Be specific: 'a cosy lifestyle brand for home living' produces better names than 'a lifestyle brand'.",
           "Choose your vibe — Luxury, Futuristic, Playful, Trustworthy, or Minimal. This shapes both the name generation and the colour palette.",
-          "Generate names — NamoLux checks domain availability in real time. Every name with a green checkmark is available to register today. The Founder Signal score tells you which names are strongest for long-term brand building.",
+          "Generate names — NamoLux shows the shortlist before domain checks finish, then updates each card. Confirm any positive result with the registrar. Run Founder Signal only when you want a structured long-term brand comparison.",
           "Open Brand Studio — once you have a name you like, click the Palette button on the result card. This takes you to Brand Studio with the name pre-filled.",
           "Generate your colour palette — NamoLux builds a 5-colour identity: primary, secondary, accent, background, and text. Click any swatch to copy the hex code.",
           "Get your landing page — after the palette generates, a Stitch prompt appears at the bottom, pre-filled with your brand name, description, vibe, and all 5 colour codes. Copy it, open Google Stitch, paste, and generate.",
@@ -5695,7 +5897,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Every name NamoLux generates is scored from 0–100 across six dimensions: length, pronounceability, memorability, extension strength, character quality, and brand risk. You don't just see a list of available names — you see which ones are actually worth your attention.",
+        content: "NamoLux presents the creative shortlist first. When you run Founder Signal on an Advanced batch, every candidate receives a 0–100 analysis across length, pronounceability, memorability, extension strength, character quality, and brand risk. The names stay visible and in their original order unless you explicitly sort by score.",
       },
       {
         type: "heading",
@@ -5722,12 +5924,12 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "After generating a name, NamoLux can generate a brand colour palette — primary, secondary, accent, background, and text colours — based on your brand name and vibe. This extends the tool from domain generator into early brand builder.",
+        content: "Paid NamoLux users can generate a brand colour palette — primary, secondary, accent, background, and text colours — based on the brand name and vibe. This extends the tool from domain generator into early brand builder.",
       },
       {
         type: "callout",
         calloutType: "cta",
-        content: "Generate quality-scored brand names with live .com availability — and build your colour palette in the same session.",
+        content: "Explore brand names first, watch live .com status update, then score the shortlist and build its colour direction when you are ready.",
         ctaLink: "/generate",
         ctaText: "Try NamoLux Free →",
       },
@@ -5747,8 +5949,8 @@ export const blogPosts: BlogPost[] = [
           ["Phonetic quality analysis", "None", "Built in"],
           ["Industry / niche targeting", "Basic keyword", "Full context input"],
           ["Name styles (invented, blend, metaphor)", "None", "4 style modes"],
-          ["Brand colour palette", "None", "Yes"],
-          ["Pricing", "Free", "Free + Pro"],
+          ["Brand colour palette", "None", "Paid plan"],
+          ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99"],
         ],
       },
       {
@@ -5779,7 +5981,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       {
         question: "Is Namecheap's business name generator free?",
-        answer: "Yes, the generator itself is free. You pay only when you register a domain. NamoLux is also free for basic use, with a Pro plan for unlimited generations.",
+        answer: "Yes. Quick Generate has no monthly quota. Free accounts also receive three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
       },
       {
         question: "Does NamoLux register domains directly?",
@@ -5899,7 +6101,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "NamoLux scores every generated name on pronounceability, memorability, length, and brand risk — so you're not just picking from what's available, you're picking from what's actually good.",
+        content: "NamoLux lets you explore the names first, then opt in to Founder Signal when you want a consistent read on pronounceability, memorability, length, and brand risk. The score annotates rather than filters the shortlist.",
         ctaLink: "/generate",
         ctaText: "Generate Scored Brand Names →",
       },
@@ -6368,7 +6570,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "NamoLux generates brandable names with live .com availability and automatic quality scoring. Get from keywords to registered domain in minutes, not hours.",
+        content: "NamoLux generates brandable names first, updates live .com availability afterward, and offers quality scoring as an explicit next step. Move from keywords to a defensible shortlist without letting a score constrain the brainstorm.",
         ctaLink: "/generate",
         ctaText: "Generate Your Brand Name Free →",
       },
@@ -6722,7 +6924,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "Start the framework now. NamoLux handles steps 2 and 3 automatically — generating quality-scored names with live .com availability in seconds.",
+        content: "Start the framework now. NamoLux handles generation first, updates live .com availability in the background, and lets you apply Founder Signal to the shortlist only when you choose.",
         ctaLink: "/generate",
         ctaText: "Start the Naming Framework →",
       },
@@ -6799,7 +7001,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "NamoLux's free tier includes AI name generation, Founder Signal quality scoring, live .com availability checking, and brand colour palette generation. Start here.",
+        content: "NamoLux Quick Generate has no monthly quota. Free also includes three Advanced batches and one complete Founder Signal batch each month. Pro adds unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
         ctaLink: "/generate",
         ctaText: "Try NamoLux Free →",
       },
@@ -6819,7 +7021,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Free tiers cap your generations — often at 5–10 per day or 50–100 total. Paid plans remove this cap. This matters if you're naming multiple projects, testing different keyword angles, or running through the naming framework we described in our founder's naming guide. If you hit the free limit and felt like you hadn't found the right name yet, this is the most valuable upgrade.",
+        content: "Free tiers often cap your generations at 5–10 per day, a small monthly allowance, or 50–100 total. Paid plans reduce that friction by unlocking unlimited generation, deeper checks, exports, logos, websites, or brand assets. This matters if you're naming multiple projects, testing different keyword angles, or running through the naming framework we described in our founder's naming guide.",
       },
       {
         type: "heading",
@@ -6837,7 +7039,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Some paid tools (including NamoLux Pro) provide deeper scoring analysis — detailed breakdowns of why a name scored high or low, competitive analysis against existing brands in your space, and phonetic quality reports. This is most valuable for founders who are comparing a shortlist and need objective data to make a final decision.",
+        content: "Some tools provide deeper scoring analysis — detailed breakdowns of why a name scored high or low, competitive analysis, and phonetic quality reports. NamoLux gives free users one complete Founder Signal batch each month; Pro adds unlimited fair-use scoring because this data becomes most valuable across repeated serious shortlists.",
       },
       {
         type: "heading",
@@ -6872,7 +7074,7 @@ export const blogPosts: BlogPost[] = [
         items: [
           "You're exploring ideas and not ready to commit to a name",
           "You're naming a side project, not a funded startup",
-          "You find a name you love within the free generation limit",
+          "You find a name you love and can confirm availability quickly",
           "You're comfortable evaluating name quality yourself (you don't need scoring)",
           "Your budget is genuinely zero and every dollar matters",
         ],
@@ -6884,28 +7086,27 @@ export const blogPosts: BlogPost[] = [
       {
         type: "heading",
         level: 2,
-        content: "When the Upgrade Makes Sense",
+        content: "When Paid Brand Tools Make Sense",
       },
       {
         type: "paragraph",
-        content: "The paid upgrade delivers real value when:",
+        content: "Paid brand tools deliver real value when:",
       },
       {
         type: "list",
         content: "",
         items: [
-          "You've used up free generations and haven't found the right name yet",
           "You're naming a company you plan to run for 5+ years",
           "You need quality scoring to make a confident decision from a shortlist",
           "You're naming multiple products or projects within the same brand",
           "You want brand identity features (colour palette, vibe matching) alongside naming",
-          "Decision paralysis is costing you more time than the tool costs in money",
+          "Decision paralysis is costing you more time than a specialist brand workflow costs in money",
         ],
       },
       {
         type: "callout",
         calloutType: "tip",
-        content: "A good heuristic: if you've spent more than 3 hours trying to name your startup using free tools and you're still not confident, the paid upgrade will almost certainly save you time and produce a better result.",
+        content: "A good heuristic: if you've spent more than 3 hours trying to name your startup using free tools and you're still not confident, switch to a workflow with scoring, live availability, and structured shortlisting before paying for visual assets.",
       },
       {
         type: "heading",
@@ -6917,7 +7118,7 @@ export const blogPosts: BlogPost[] = [
         content: "",
         headers: ["Tool", "Free Tier", "Paid Price", "Key Paid Feature"],
         rows: [
-          ["NamoLux", "10 generations with scoring", "Pro plan", "Unlimited generations + full brand tools"],
+          ["NamoLux", "Quick unlimited; 3 Advanced + 1 Founder Signal batch/month", "GBP 7.99/month", "Unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, ad-free"],
           ["Namelix", "Unlimited (ad-supported)", "From $15/mo", "Premium name purchases"],
           ["Squadhelp", "Basic AI generator", "Contest from $199", "Expert naming contests + marketplace"],
           ["Looka", "Name generation free", "From $20 one-time", "Logo design (main product)"],
@@ -6936,12 +7137,12 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "The best name generator investment isn't the most expensive one — it's the one that gives you enough quality candidates, with enough evaluation data, to make a decision you're confident in. For many founders, a free tier does exactly that. For others, the upgrade is one of the best $20–50 they'll spend in the entire startup journey.",
+        content: "The best name generator investment is the one that gives you enough quality candidates and evaluation data to decide confidently. NamoLux keeps Quick exploration open while limiting only the costlier Advanced and Founder Signal actions. Spend later on repeated decision work, the domain, legal checks, and brand assets once the name is strong.",
       },
       {
         type: "callout",
         calloutType: "cta",
-        content: "Start with NamoLux's free tier — get AI name generation, quality scoring, and .com availability checking at no cost. Upgrade only if you need more.",
+        content: "Start with unlimited Quick Generate, then use three Advanced batches and one complete Founder Signal batch free each month. Upgrade for GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
         ctaLink: "/generate",
         ctaText: "Start Generating Names Free →",
       },
@@ -6953,7 +7154,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "What's the best free AI name generator?",
-        answer: "For pure volume of available domains, Lean Domain Search is excellent and completely free. For AI-generated names with quality scoring on a free tier, NamoLux provides the most evaluation data at no cost. Namelix offers unlimited free generations with logo mockups. The best choice depends on whether you value quantity, quality scoring, or visual presentation.",
+        answer: "For pure domain combinations, Lean Domain Search is completely free. NamoLux offers unlimited Quick exploration, three free Advanced batches, and one complete free Founder Signal batch each month. Namelix offers free generation with visual mockups. The best choice depends on whether you value raw volume, decision support, or presentation.",
       },
       {
         question: "Should I pay for a premium domain instead of a generator?",
@@ -6961,7 +7162,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "How many free generations do most tools offer?",
-        answer: "It varies widely. NamoLux offers 10 free tokens across all features. Namelix and Lean Domain Search are effectively unlimited on the free tier. Shopify's generator is unlimited but basic. Most tools with meaningful AI behind them (not just keyword combination) cap free usage at 5–20 generations per day or session.",
+        answer: "It varies widely. NamoLux Quick Generate has no monthly quota; free also includes three Advanced batches and one complete Founder Signal batch each month. Namelix and Lean Domain Search are effectively unlimited for their core free workflows. Other AI tools may cap usage by day, month, or session.",
       },
     ],
   },
@@ -6970,7 +7171,7 @@ export const blogPosts: BlogPost[] = [
     title: "NamoLux vs ChatGPT for Domain Names: Why a Purpose-Built Naming Tool Wins in 2026",
     description: "ChatGPT can brainstorm business names, but it can't check .com availability, score brandability, or stop you from falling in love with a taken domain. Here's why founders are switching to NamoLux.",
     seoTitle: "NamoLux vs ChatGPT for Domain Names | Which Is Better in 2026?",
-    metaDescription: "Using ChatGPT to generate business names and domains? Here's what it gets wrong, why .com availability matters, and how NamoLux's scored, availability-checked AI name generator compares.",
+    metaDescription: "Using ChatGPT to generate business names? See how NamoLux combines free creative exploration, live domain updates, and optional Founder Signal analysis.",
     category: "Tool Comparisons",
     readTime: 10,
     publishedAt: "2026-04-14",
@@ -7031,11 +7232,11 @@ export const blogPosts: BlogPost[] = [
       {
         type: "heading",
         level: 3,
-        content: "2. Founder Signal scoring on every name",
+        content: "2. Founder Signal when the shortlist is ready",
       },
       {
         type: "paragraph",
-        content: "Each name gets a 0–100 Founder Signal score based on pronounceability, memorability, length, extension quality, character patterns, and brand risk. Instead of scrolling through hundreds of equally-presented suggestions, you start at the top-scored names and work down. This is the biggest workflow difference compared to ChatGPT: you are no longer evaluating every name from scratch with gut feel — the tool has already done the first round of filtering for you.",
+        content: "NamoLux does not use Founder Signal to decide which creative names you are allowed to see. Advanced presents all 12 candidates in generation order, then lets you run a 0–100 analysis across the complete batch. You can keep the creative order or explicitly sort by score. That gives you structured comparison without outsourcing ideation to one number.",
       },
       {
         type: "heading",
@@ -7175,11 +7376,11 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "Why do NamoLux names come back available when ChatGPT's do not?",
-        answer: "Two reasons. First, NamoLux checks the live registry on every result and only surfaces names you can actually register. Second, NamoLux generates across style modes (invented, blended, metaphor) that explore creative space beyond the narrow statistical distribution that most ChatGPT users end up pulling from. Because every founder using ChatGPT is essentially asking for names in the same zone, those zones get registered fastest.",
+        answer: "Two reasons. First, NamoLux updates live registry checks on every result without hiding candidates or blocking interaction. Second, it generates across deliberate style families that explore creative space beyond the narrow distribution many generic prompts produce. Availability is evidence on the card, not a creative admission rule.",
       },
       {
         question: "Is NamoLux faster than using ChatGPT for naming?",
-        answer: "Significantly. A typical ChatGPT naming workflow — generate, list, manually check 50 domains, re-prompt, re-check — takes three to five hours before you have a confirmed shortlist. NamoLux produces a scored, availability-checked shortlist in under ten minutes because generation, scoring, and verification happen in a single pass.",
+        answer: "Significantly. A typical generic-chat workflow requires copying candidates into a registrar and a separate evaluation sheet. NamoLux shows names first, updates domain checks on the cards, and offers an opt-in scoring action for the complete Advanced batch. The stages stay connected without forcing them into one score-led pass.",
       },
       {
         question: "Should I use both ChatGPT and NamoLux together?",
@@ -7187,7 +7388,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "Do I have to pay to use NamoLux?",
-        answer: "No. NamoLux offers a free tier with AI name generation, quality scoring, and live .com availability checking. You can generate dozens of candidates and register a great .com without spending anything on the tool itself. The paid tier is a one-time £15 lifetime upgrade that unlocks unlimited generation and advanced brand features — but you do not need it to find a strong name.",
+        answer: "No. Quick Generate has no monthly quota, and free includes three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
       },
     ],
   },
@@ -7196,7 +7397,7 @@ export const blogPosts: BlogPost[] = [
     title: "Best Namelix Alternatives 2026: I Tested 9 Tools So You Don't Waste Your Time",
     description: "The definitive 2026 guide to Namelix alternatives. Why Namelix breaks down for serious founders, what to look for in a replacement, and the tools that actually help you find a scored, registrable .com without wasting your week.",
     seoTitle: "Best Namelix Alternatives 2026 | Brandable Domain Generators Compared",
-    metaDescription: "Tired of Namelix giving you 100 names and no available domains? Compare the best Namelix alternatives in 2026 — scored, availability-checked, and built for founders who need a real decision.",
+    metaDescription: "Compare Namelix alternatives that preserve creative exploration while adding live domain evidence, optional scoring, and a practical founder decision workflow.",
     category: "Tool Comparisons",
     readTime: 14,
     publishedAt: "2026-04-14",
@@ -7233,9 +7434,9 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Below are the tools that actually solve the problems above. We have excluded lookalike clones that produce similar output under different branding, and we have excluded tools that are really logo makers with a naming feature bolted on." },
 
       { type: "heading", level: 3, content: "1. NamoLux" },
-      { type: "paragraph", content: "NamoLux is the closest thing to a direct replacement for Namelix that addresses the specific gaps Namelix leaves open. The workflow is similar in spirit, a keyword or a vibe in, brand style names out, but the output is scored and availability checked on every result. Each name gets a Founder Signal score from zero to a hundred, built from pronounceability, memorability, length, extension strength, character quality, and brand risk. Instead of scrolling a wall of unranked suggestions, you start at the top and work down." },
-      { type: "paragraph", content: "Two things matter more than the feature list. The first is that unavailable names are never surfaced as primary picks, which removes the emotional trap of falling for a domain you cannot have. The second is the style rotation. NamoLux generates across invented, blended, metaphor, and real word modes as distinct passes, so you see genuine creative range rather than a hundred variations on the same pattern." },
-      { type: "paragraph", content: "The free tier is meaningful, which is unusual in this category. You can generate scored, live checked names without paying, and the Pro upgrade is a one off £15 rather than a subscription. Brand palette and tagline generation are included on the Pro side, which closes the loop for founders who want more than a name." },
+      { type: "paragraph", content: "NamoLux is a direct Namelix alternative that preserves open-ended exploration while adding a separate decision layer. Quick has no monthly quota and shows no locked scores. Advanced presents all 12 candidates in creative order, updates availability asynchronously, and lets the founder run Founder Signal across the complete batch later. Scoring never silently removes names or changes the default order." },
+      { type: "paragraph", content: "Two things matter more than the feature list. First, names appear before domain checks finish, so availability never suppresses or silently reorders the creative shortlist. Second, Auto mode deliberately rotates brandable, evocative, compound, alternate-spelling, real-word, short-phrase, and non-English constructions instead of producing a hundred variations on one pattern." },
+      { type: "paragraph", content: "The free tier is meaningful: Quick Generate has no monthly quota, while three Advanced batches and one complete Founder Signal batch are included each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
 
       { type: "heading", level: 3, content: "2. Squadhelp" },
       { type: "paragraph", content: "Squadhelp is a different category of tool and a legitimate alternative in specific cases. The AI generator itself is basic, but the curated marketplace is where the value lives. You are buying a pre vetted premium name at a premium price, typically between a thousand and fifty thousand pounds, with trademark clearance work already done and a polished logo included." },
@@ -7254,7 +7455,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 3, content: "6. Wordoid" },
       { type: "paragraph", content: "Wordoid is a coined word generator. It produces pseudo words that feel linguistically plausible but are not real. For founders who want an invented name specifically, it is a useful supplement to a broader generator, though it has no availability checking and no scoring." },
 
-      { type: "callout", calloutType: "cta", content: "See what a scored, availability-checked generator actually produces. Generate brandable .com names with Founder Signal scoring in seconds.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
+      { type: "callout", calloutType: "cta", content: "See what creative-first generation produces. Explore brandable names, watch .com status update, then choose whether to run Founder Signal.", ctaLink: "/generate", ctaText: "Try NamoLux Free →" },
 
       { type: "heading", level: 2, content: "Side by Side: How They Compare" },
       { type: "table", content: "", headers: ["Capability", "Namelix", "NamoLux", "Squadhelp", "Lean Domain Search", "Panabee", "Novanym"], rows: [
@@ -7264,21 +7465,21 @@ export const blogPosts: BlogPost[] = [
         ["Style range", "Narrow", "Invented, blended, metaphor, real word", "Curated marketplace", "Keyword combinations", "Varies", "Curated premium"],
         ["Social handle check", "No", "No", "No", "No", "Yes", "No"],
         ["Logo mockups", "Yes (can bias decisions)", "No (by design)", "Yes (premium tier)", "No", "No", "Yes"],
-        ["Price", "Free + paid tiers", "Free + £15 lifetime", "Premium names from £1000", "Free", "Free", "Premium listings"],
+        ["Price", "Free + paid tiers", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 7.99", "Premium names from £1000", "Free", "Free", "Premium listings"],
         ["Best for", "Quick browsing", "Scored decisions with .com guarantee", "Budget buyers of premium names", "Descriptive two word domains", "Social first brands", "Boutique premium brands"],
       ]},
 
-      { type: "heading", level: 2, content: "A Real Example: Namelix vs a Scored Generator" },
+      { type: "heading", level: 2, content: "A Fair Example: Compare Raw Names Before Scores" },
       { type: "paragraph", content: "To make this concrete, here is what the same keyword produces in a typical session. We used 'fintech' as the seed, spent ten minutes in each tool, and recorded the top candidates." },
       { type: "paragraph", content: "A typical Namelix run produces names like Finova, PayEdge, Monetra, FinHub, and Capitalix. Many look reasonable on the page. In practice, four of those five are registered, one is parked at a premium price, and the one that is free, Capitalix, scores poorly on length and uniqueness against the competitive set in fintech. After verifying twenty five of the top suggestions, we had one available name that was workable and none that were genuinely strong." },
-      { type: "paragraph", content: "A scored generator run on the same keyword surfaced names like Klaeron, Vestari, Nyxos Capital, and Ledgira. Each came with a Founder Signal score, a short note on why the name was strong, and a confirmed available .com. The top three all scored above 85. The difference was not that one tool produced better names by accident. It was that one tool produced names with scoring and availability baked in, so the ten minutes was spent evaluating genuine candidates rather than hunting for any candidate at all." },
+      { type: "paragraph", content: "A fair comparison hides explanations, scores, and visual treatments until the raw names have been rated. NamoLux is designed for that order: it presents the creative batch first, preserves every usable candidate, and updates domain evidence without reordering the list. Founder Signal becomes useful only after the raw ideas have earned a place on the shortlist." },
       { type: "paragraph", content: "The lesson is not that Namelix cannot produce strong names. It sometimes does. The lesson is that you cannot reliably find them without doing all the evaluation and verification yourself, and that work is exactly what a 2026 generator should be doing for you." },
 
       { type: "heading", level: 2, content: "Common Mistakes When Switching Away from Namelix" },
       { type: "paragraph", content: "Most founders make the same handful of mistakes when they start using alternatives, and they are worth naming directly so you can avoid them." },
       { type: "list", content: "", items: [
-        "Treating the new tool as a Namelix clone. If you paste in the same single keyword and expect a hundred names back, you are using the tool the old way. Scored generators reward specificity. Use style modes, use an industry input, use a vibe. The output quality scales with the quality of the brief.",
-        "Ignoring the score. Founders coming from Namelix are used to unranked output and tend to scroll past the scoring at first. Trust it. The top ten scored names almost always contain your winner, and the bottom half of the list is rarely worth reading.",
+        "Treating the new tool as a Namelix clone. A clear niche, audience, tone, and style direction give any generator more useful creative territory than one generic keyword.",
+        "Letting a score override the raw-name test. Founder Signal is evidence on a shortlist, not permission to ignore a lower-scoring idea that fits the audience better.",
         "Falling back into tab hell. Once you have a tool that checks availability live, you do not need to verify each candidate in a registrar. Doing so reintroduces the exact workflow problem you were trying to escape.",
         "Generating too much. Most founders need thirty strong candidates, not three hundred mediocre ones. Aim for a shortlist of ten inside ten minutes, then stop generating and start testing.",
         "Skipping the human test. No generator replaces saying the name out loud, typing it into a browser, and asking three people what they think it does. Keep that step. The scoring does the first pass; you do the final one."
@@ -7314,15 +7515,15 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "For most founders, NamoLux is the cleanest direct replacement. For founders with budget who want a curated premium name without the hunt, Squadhelp and Novanym are legitimate options. For founders who only need a descriptive two word domain, Lean Domain Search does the job. Everything else is noise." },
       { type: "paragraph", content: "Whichever tool you choose, the principle is the same. Spend less time generating and more time evaluating. Trust scoring over scrolling. Never fall in love with a name you cannot register. Do that, and you will find the right name in an afternoon instead of a week, and you will spend the rest of the week building the thing the name is actually for." },
 
-      { type: "callout", calloutType: "cta", content: "Stop scrolling through unscored names. Generate brand quality, availability-checked .com names in seconds.", ctaLink: "/generate", ctaText: "Generate Names on NamoLux →" },
+      { type: "callout", calloutType: "cta", content: "Explore strong raw names first, see .com evidence as it arrives, and apply scoring only when it helps the decision.", ctaLink: "/generate", ctaText: "Generate Names on NamoLux →" },
     ],
     faqs: [
-      { question: "What is the best Namelix alternative in 2026?", answer: "For most founders, NamoLux is the closest direct replacement. It generates brand style names across invented, blended, metaphor, and real word modes, scores every result with a 0 to 100 Founder Signal rating, and checks .com availability live on every name. The practical effect is that you evaluate ranked, registrable candidates instead of scrolling an unranked wall of names, most of which are taken." },
+      { question: "What is the best Namelix alternative in 2026?", answer: "For founders who value both creative range and decision support, NamoLux is a close direct replacement. Quick supports open exploration across several styles, availability updates after names appear, and Advanced offers optional Founder Signal analysis on the complete batch. The score annotates rather than filters, and sorting by score is always an explicit choice." },
       { question: "Why do so many Namelix names turn out to be unavailable?", answer: "Two reasons. Namelix does not perform a live registry check on every name at generation time, so its availability indicators lag reality. And because the tool has trained a generation of founders to pull from the same narrow creative zone, the strongest sounding names in that zone were registered years ago. A tool that verifies availability live and generates across more distinct style modes avoids both problems." },
-      { question: "Is NamoLux free to use?", answer: "Yes. The free tier includes AI name generation, Founder Signal scoring, and live .com availability checks. You can find and register a strong name without paying. The Pro upgrade is a one off £15 lifetime fee that unlocks unlimited generation, brand palette generation, and tagline tools for founders who want the full end to end brand pack." },
-      { question: "Should I use Squadhelp or NamoLux?", answer: "Different problems. NamoLux is a generator you use to create a name from scratch, with scoring and live availability. Squadhelp is a marketplace of pre vetted premium names you buy outright. If you have budget between one thousand and fifty thousand pounds and want a curated ready made brand, Squadhelp is strong. If you want to generate and own the name you pick, NamoLux is the right tool." },
+      { question: "Is NamoLux free to use?", answer: "Yes. Quick Generate has no monthly quota, and free includes three Advanced batches plus one complete Founder Signal batch each month. NamoLux Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Should I use Squadhelp or NamoLux?", answer: "They solve different problems. NamoLux helps you explore original directions first, then optionally apply Founder Signal and live domain checks to your shortlist. Squadhelp is a marketplace of pre-vetted premium names you buy outright. Choose NamoLux to create and evaluate your own direction; choose a marketplace when you want to purchase a curated name." },
       { question: "Can Lean Domain Search replace Namelix?", answer: "Only if you specifically want descriptive two word domains. Lean Domain Search is a keyword combiner, not a brand builder — it pairs your keyword with a large dictionary of prefixes and suffixes and shows only the combinations with an available .com. Every result is available, but every result also feels templated. Use it as a supplement when a descriptive domain fits, not as a primary generator." },
-      { question: "How many names should I generate before deciding?", answer: "Aim for a shortlist of ten scored candidates inside ten minutes of active use. Beyond that, diminishing returns set in — volume without scoring is the Namelix trap, and more names rarely produces a better decision. Trust the top third of a well scored list, stress test your top three with real people, and register the same day." },
+      { question: "How many names should I generate before deciding?", answer: "Explore enough styles to find at least eight genuinely usable candidates, then narrow to three or four through raw-name review, domain and trademark checks, Founder Signal evidence, and real-person testing. More volume is not automatically better, but neither should an early score prevent an attractive idea from appearing." },
       { question: "Are AI name generators worth using in 2026 at all?", answer: "Yes, if the tool does more than generate. The value is not in producing names — any model can do that — it is in evaluating them, filtering out unavailable ones, and helping you make a confident decision quickly. Generators that score, verify, and explain are worth the time. Generators that only produce unranked walls of suggestions are increasingly a step backwards." },
     ],
   },
@@ -7350,7 +7551,10 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "Before you commit, read the name aloud in the setting it will actually live in. A B2B name in a procurement call. A B2C name in a friend recommending your app. If it feels wrong in either setting, the name is wrong for the audience." },
       { type: "heading", level: 2, content: "When the Audience Straddles Both" },
       { type: "paragraph", content: "Many modern tools sell bottom up. A developer finds the product, brings it into their company, and eventually a B2B contract is signed. These products need names that work as consumer brands first and pass the enterprise test second. Notion, Linear, and Figma all do this. Names that sound professional enough not to get rejected, but distinctive enough to spread." },
-      { type: "callout", calloutType: "cta", content: "Generate scored, availability checked names built for your specific audience — whether you're selling to consumers, teams, or enterprise.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "links", content: "Structure the brand", links: [
+        { text: "Company Name vs Product Name", href: "/blog/company-name-vs-product-name-brand-architecture" },
+      ] },
+      { type: "callout", calloutType: "cta", content: "Generate audience-specific names first, then add availability evidence and optional scoring when the shortlist is ready.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
     ],
     faqs: [
       { question: "Should a B2B startup avoid invented words?", answer: "Not entirely, but the invented word needs to feel like a plausible word, not a random construct. Invented names like Stripe, Figma, and Veeva all work in enterprise settings because they sound like they could be real words. Overly constructed names like 'Xylextra' struggle in the same setting because they trip up the buyer the first time they have to say them out loud." },
@@ -7383,7 +7587,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "The biggest risk is losing the search authority and word of mouth you built under the old name. Keep the old domain live with redirects indefinitely — dropping it breaks every old backlink overnight. Announce the rebrand clearly on your blog and pin the announcement on every social profile for at least a quarter. For the first six months, reference the old name in context: '[New Name], formerly [Old Name]'. It preserves recognition while the new name takes root." },
       { type: "heading", level: 2, content: "Picking the New Name" },
       { type: "paragraph", content: "A rebrand is the one time you cannot afford to pick the wrong name a second time. Use the process seriously: generate a broad set of candidates, score them on memorability, availability, trademark risk, and spoken clarity, and shortlist before attaching any emotion to the options. If the old name failed because it was limiting, the new one must be deliberately open ended." },
-      { type: "callout", calloutType: "cta", content: "If you're rebranding, generate scored candidates with live .com availability. Pick a name built to outlast your first rebrand, not cause your next one.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "links", content: "Make the architecture and migration explicit", links: [
+        { text: "Company Name vs Product Name", href: "/blog/company-name-vs-product-name-brand-architecture" },
+        { text: "Business Name vs Legal Name vs DBA", href: "/blog/business-name-vs-legal-company-name-vs-dba" },
+        { text: "Transfer a Domain Without Downtime", href: "/blog/transfer-domain-without-downtime" },
+      ] },
+      { type: "callout", calloutType: "cta", content: "If you are rebranding, explore broadly, watch live .com checks update, and score the shortlist before committing. Pick a name built to outlast the rebrand.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
     ],
     faqs: [
       { question: "How long does a startup rebrand take?", answer: "Plan for six to twelve weeks of active work and another three months before the new name feels settled. The name decision itself can be made in a week with the right process. Everything after — technical migration, customer communication, asset updates, and search authority recovery — is where most of the time goes." },
@@ -7419,6 +7628,12 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Skip the rest. Registering fifty extensions to stop squatters is a game you cannot win." },
       { type: "heading", level: 2, content: "Step 5: Monitor and Maintain" },
       { type: "paragraph", content: "Set calendar reminders for every domain renewal a month in advance. Enable auto renew where you trust the registrar. Turn on trademark watch services if you are in a high risk category — the free ones catch most cases. Once a quarter, search your brand name on Google, on each social platform, and in the app stores. Impersonators are easier to remove in week one than in year three." },
+      { type: "links", content: "Complete the protection workflow", links: [
+        { text: "Run the Four-Database Business Name Check", href: "/blog/how-to-check-if-business-name-is-taken" },
+        { text: "Understand Legal Names, Trading Names and DBAs", href: "/blog/business-name-vs-legal-company-name-vs-dba" },
+        { text: "Choose Defensive Domains by Risk", href: "/blog/defensive-domain-strategy" },
+        { text: "Compare Domain Registrars for Startups", href: "/blog/best-domain-registrars-for-startups" },
+      ] },
       { type: "callout", calloutType: "cta", content: "Before you lock in your brand, make sure the name holds up across every surface. Generate and score candidates with live availability checks.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
     ],
     faqs: [
@@ -7453,7 +7668,7 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "Count syllables, not just characters. A three syllable nine character name almost always outperforms a two syllable nine character name on memorability. 'Notion' (no-tion, 2 syllables) sticks faster than 'Nomenta' (no-men-ta, 3 syllables) even at similar length." },
       { type: "heading", level: 2, content: "What to Actually Aim For" },
       { type: "paragraph", content: "Target a name between five and nine characters that reads as either one clean word or two words pressed together. Below five, only chase the name if you have the budget for an aftermarket premium. Above nine, require the name to pass the single hearing test. Anything beyond twelve characters needs a compelling, specific reason." },
-      { type: "callout", calloutType: "cta", content: "NamoLux scores every generated name on length, memorability, and phonetic strength, so you're not guessing whether a name lands in the sweet spot.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
+      { type: "callout", calloutType: "cta", content: "Explore names freely, then run Founder Signal on an Advanced shortlist when you want evidence on length, memorability, and phonetic strength.", ctaLink: "/generate", ctaText: "Generate Names Free →" },
     ],
     faqs: [
       { question: "Is a shorter domain always better for SEO?", answer: "Not directly. Google does not reward shorter domains with higher rankings. What shorter domains do better is generate branded search traffic, direct traffic, and word of mouth — all of which feed SEO indirectly. The SEO benefit of a short domain is a second order effect of being more shareable and memorable, not a ranking factor on its own." },
@@ -7461,27 +7676,517 @@ export const blogPosts: BlogPost[] = [
       { question: "What's the longest a startup domain should reasonably be?", answer: "Twelve characters is a soft ceiling. Beyond that, you're fighting against mobile typing, verbal memorability, and social handle friction. There are successful brands above twelve — 'Salesforce' and 'Mailchimp' both exceed it comfortably — but they compensate with strong phonetic rhythm and real word recognition. Without those advantages, stay under twelve." },
     ],
   },
+  {
+    slug: "why-paying-for-namolux-beats-free-namelix",
+    title: "Why Paying for NamoLux Beats Free Namelix When the Name Really Matters",
+    description: "Namelix is useful for free brainstorming, but serious founders need scoring, availability checks, and a decision workflow. Here's why NamoLux is worth paying for.",
+    seoTitle: "Why Paid NamoLux Beats Free Namelix for Serious Naming",
+    metaDescription: "Namelix gives free name ideas. NamoLux adds unlimited Quick exploration, optional Founder Signal analysis, live domain updates, and paid decision tools.",
+    category: "Tool Comparisons",
+    readTime: 8,
+    publishedAt: "2026-06-21",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Free feels attractive when you are naming a business. Namelix gives founders a fast way to generate short, brandable name ideas and see them in a visual context. That has value. The problem is that a business name is not a casual brainstorm. It is a decision you may carry through your domain, customer emails, social profiles, invoices, investor decks, search results, and product UI for years." },
+      { type: "paragraph", content: "That is the difference between Namelix and NamoLux. Both support free exploration. NamoLux then adds a deliberate decision workflow: check domains without blocking ideation, run Founder Signal only when a shortlist is ready, compare the evidence, and move into brand tools after the name earns that investment." },
+      { type: "heading", level: 2, content: "Free Names Are Not the Same as a Free Decision" },
+      { type: "paragraph", content: "A free generator can show you more options than you had before. It does not automatically solve the expensive parts of naming: which names are actually available, which are memorable, which sound credible in your category, and which are worth registering before someone else takes them." },
+      { type: "paragraph", content: "The hidden cost of a free naming session is usually time. You generate names, copy favourites into a registrar, discover several are taken, check social handles, argue with yourself over which one sounds better, then restart when the shortlist falls apart. The tool was free, but the process was not." },
+      { type: "heading", level: 2, content: "What You Are Paying For with NamoLux" },
+      { type: "paragraph", content: "NamoLux does not charge because name ideas are scarce. Quick exploration has no monthly quota. Pro charges for repeated decision work: unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { type: "list", content: "The paid value is concentrated in five places:", items: [
+        "Unlimited fair-use Advanced generation, so you can test focused briefs without rationing batches",
+        "Unlimited Founder Signal scoring when repeated shortlists need consistent evidence",
+        "Live .com availability checks, so you avoid falling in love with names you cannot register",
+        "Bulk checks and shortlisting, so you can move from a messy idea set to a usable decision list quickly",
+        "Brand palette access, so the visual identity follows a validated name rather than distracting you before the name is proven"
+      ]},
+      { type: "callout", calloutType: "cta", content: "Quick Generate has no monthly quota. Free also includes three Advanced batches and one complete Founder Signal batch each month. Pro is GBP 7.99/month for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.", ctaLink: "/pricing", ctaText: "See NamoLux Pricing" },
+      { type: "heading", level: 2, content: "Why This Matters More Than Logo Mockups" },
+      { type: "paragraph", content: "A polished logo mockup can make a weak name look better than it is. That is dangerous during naming because founders are visual. A clean wordmark, a nice gradient, and a tidy colour palette can create false confidence before the basic name checks have passed." },
+      { type: "paragraph", content: "NamoLux deliberately puts the name decision first. Does the word sound right? Is the .com available? Is it short enough? Does it avoid obvious brand risk? Does it fit the market? Only after that should a palette or visual direction enter the workflow." },
+      { type: "heading", level: 2, content: "Namelix vs NamoLux: The Practical Difference" },
+      { type: "table", content: "", headers: ["Question", "Namelix", "NamoLux"], rows: [
+        ["What is the core job?", "Generate lots of free name ideas", "Explore freely, then make a defensible decision"],
+        ["What happens after generation?", "You evaluate and verify manually", "Domain checks update; scoring is an explicit next step"],
+        ["How is quality judged?", "Mostly by your taste and visual mockups", "Human judgement plus optional Founder Signal evidence"],
+        ["When do visuals matter?", "Very early in the browsing flow", "After the name passes the core checks"],
+        ["Best fit", "Early browsing and inspiration", "Serious naming when you want to commit"]
+      ]},
+      { type: "heading", level: 2, content: "The Better Buying Question" },
+      { type: "paragraph", content: "The question is not, 'Why pay when Namelix gives free names?' The better question is, 'How much is a confident naming decision worth if it saves me a week and prevents a weak domain choice?'" },
+      { type: "paragraph", content: "If you are naming a disposable weekend project, a free tool may be enough. If you are naming a company, product, agency, app, or offer you want to build for years, the cost of indecision is higher than the cost of NamoLux Pro. One month of a focused naming workflow is cheaper than one bad domain purchase, one abandoned premium name, or one rebrand after launch." },
+      { type: "heading", level: 2, content: "Where NamoLux Wins" },
+      { type: "list", content: "", items: [
+        "You can generate more strategically because you are not limited to one generic keyword pass",
+        "You can compare a complete shortlist by score when you choose",
+        "You can see .com evidence without availability suppressing creative ideas",
+        "You can move into brand palette work only when the name has earned it",
+        "You leave the session with a decision, not just a folder of maybes"
+      ]},
+      { type: "heading", level: 2, content: "The Bottom Line" },
+      { type: "paragraph", content: "Namelix is a useful free brainstorming tool. NamoLux competes on both exploration and decision support. It does not remove names because of availability or score; it preserves the creative shortlist, attaches evidence as it arrives, and lets the founder choose when to evaluate or reorder it." },
+      { type: "callout", calloutType: "cta", content: "Use the free tier to test the workflow. Upgrade when you are ready to generate without limits and turn a strong name into a complete brand direction.", ctaLink: "/generate", ctaText: "Generate with NamoLux" },
+    ],
+    faqs: [
+      { question: "Is Namelix bad because it is free?", answer: "No. Namelix is useful for fast inspiration and early browsing. The limitation is that free name generation still leaves founders doing much of the evaluation work themselves: availability checks, quality judgement, shortlisting, and confidence building. NamoLux is built for that decision layer." },
+      { question: "Why should I pay for NamoLux if I can generate names elsewhere?", answer: "Quick exploration is already free. Pro is for repeated decision work: unlimited fair-use Advanced generation and Founder Signal scoring, comparison, stress tests, exports, brand tools, and an ad-free experience. Free users still get one complete scored batch each month before deciding whether that toolkit is worth upgrading for." },
+      { question: "Should I still use Namelix?", answer: "You can. Use it for inspiration if you like its visual browsing experience. Use NamoLux when you want free creative exploration plus live domain evidence and optional Founder Signal analysis without a score filtering the ideas first." },
+    ],
+  },
+
+  {
+    slug: "brand-palette-cannot-fix-weak-name",
+    title: "A Brand Palette Cannot Fix a Weak Name: NamoLux vs Namelix's Visual-First Trap",
+    description: "A beautiful palette can make a weak name look stronger than it is. Here's why NamoLux puts name quality before visual identity.",
+    seoTitle: "Why a Brand Palette Cannot Fix a Weak Name | NamoLux vs Namelix",
+    metaDescription: "Namelix can make names look polished through visuals. NamoLux focuses on name quality first, then brand palette, so founders build identity on a stronger foundation.",
+    category: "Tool Comparisons",
+    readTime: 7,
+    publishedAt: "2026-06-21",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "A weak name can look convincing when it is placed beside a clean logo, a confident colour palette, and a neat mockup. That is the danger of visual-first naming tools. They make the brand feel finished before the name has been stress tested." },
+      { type: "paragraph", content: "Namelix is good at making name ideas feel visually alive. Its connection to the Brandmark ecosystem means a founder can move quickly from name browsing into logo and identity exploration. That is useful after the name is right. It is risky before the name is right." },
+      { type: "heading", level: 2, content: "The Sequence Matters" },
+      { type: "paragraph", content: "Branding has an order. First comes the name. Then comes ownership, meaning, positioning, visual identity, and launch assets. If you reverse that order, the palette starts doing emotional work the name should have done on its own." },
+      { type: "list", content: "A strong name should pass these checks before any palette matters:", items: [
+        "It can be said aloud without explanation",
+        "It can be spelled after one hearing",
+        "It has a clean or defensible .com path",
+        "It does not sound like three competitors in the same category",
+        "It carries a meaning, metaphor, or emotional signal that fits the product",
+        "It still looks credible in plain text with no logo beside it"
+      ]},
+      { type: "callout", calloutType: "warning", content: "If a name only feels good when it is dressed in a logo, the problem is the name. The logo is masking the weakness." },
+      { type: "heading", level: 2, content: "What a Palette Can and Cannot Fix" },
+      { type: "table", content: "", headers: ["Problem", "Can a palette fix it?", "What actually fixes it"], rows: [
+        ["The name is hard to spell", "No", "Choose a cleaner phonetic structure"],
+        ["The .com is taken", "No", "Find a registrable name or negotiate the domain"],
+        ["The name feels generic", "Rarely", "Add stronger meaning, metaphor, or distinctiveness"],
+        ["The tone feels slightly off", "Sometimes", "Refine positioning and visual direction"],
+        ["The brand lacks mood", "Yes", "Use palette, typography, imagery, and voice"],
+        ["The shortlist feels too similar", "No", "Generate across different naming styles"]
+      ]},
+      { type: "heading", level: 2, content: "The NamoLux Order: Prove the Name, Then Build the Brand" },
+      { type: "paragraph", content: "NamoLux keeps the workflow disciplined. Generate names, check availability, score quality, shortlist the best candidates, and only then use the brand palette. That order matters because the palette becomes a reward for a validated name, not a distraction from an untested one." },
+      { type: "paragraph", content: "This is why the paid plan bundles unlimited usage with brand palette access. Unlimited naming helps you explore enough territory to find a strong option. The palette then turns that strong option into a direction you can use for a landing page, deck, product UI, or launch campaign." },
+      { type: "heading", level: 2, content: "Why Visual Bias Costs Founders Money" },
+      { type: "paragraph", content: "Founders often choose the name attached to the best-looking mockup. That feels rational in the moment because the brand suddenly looks real. But customers do not experience your brand as a static mockup. They hear it in conversation, type it into search, read it in an ad, receive it in an email, and compare it against competitors. If the name fails those contexts, the palette cannot rescue it." },
+      { type: "paragraph", content: "The cost shows up later as lower recall, misspelled searches, weaker direct traffic, and a nagging sense that the brand needs a refresh before it has even grown. NamoLux is designed to prevent that by judging the name on its own before visual polish enters the room." },
+      { type: "heading", level: 2, content: "A Better Way to Use Brand Palette Tools" },
+      { type: "list", content: "", items: [
+        "Generate at least 30 candidates across different styles",
+        "Shortlist by availability and Founder Signal score first",
+        "Say the top five aloud in real sales, product, and support contexts",
+        "Choose the top two or three plain-text names before opening palette work",
+        "Use palette generation to express the winning name, not to decide whether the name is good"
+      ]},
+      { type: "heading", level: 2, content: "The Bottom Line" },
+      { type: "paragraph", content: "Namelix can make name ideas look polished quickly. That is useful for inspiration, but it can also make founders overrate weak options. NamoLux is the better workflow when you want the name itself to earn confidence before you spend energy on colours, logos, and launch assets." },
+      { type: "callout", calloutType: "cta", content: "Find the name first. Then build the palette around a name that has already passed scoring and availability checks.", ctaLink: "/pricing", ctaText: "Unlock NamoLux Pro" },
+    ],
+    faqs: [
+      { question: "Is a brand palette still useful?", answer: "Yes. A brand palette is useful once the name is strong. It helps turn a naming decision into a visual direction for landing pages, pitch decks, social graphics, and product UI. It is not a substitute for name quality." },
+      { question: "Why does NamoLux put brand palette behind the paid plan?", answer: "Because brand palette work is most useful after a founder has generated enough candidates to find a serious name. The paid plan supports that full workflow: unlimited naming, stronger shortlisting, and then brand palette access for the name you actually plan to build around." },
+      { question: "What is the simplest test for visual bias?", answer: "Write your top three names in plain black text with no logo, no colour, and no tagline. If one name still feels clear, memorable, and credible, it is probably stronger than the option that only looked good in a mockup." },
+    ],
+  },
+
+  {
+    slug: "founder-signal-score-explained",
+    title: "Founder Signal Scoring Explained: How to Analyse a Shortlist Before You Buy",
+    description: "Founder Signal adds evidence to a creative shortlist without filtering or reordering it by default. Here is what the score means and how founders should use it.",
+    seoTitle: "Founder Signal Score Explained | NamoLux Name Scoring",
+    metaDescription: "Learn how NamoLux Founder Signal scoring evaluates startup names across availability, memorability, length, phonetics, risk, and strategic fit.",
+    category: "Domain Strategy",
+    readTime: 8,
+    publishedAt: "2026-06-21",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Most founders compare names by feeling. That is natural, but it breaks down quickly. After twenty names, everything starts to blur. After fifty, the loudest name in the list often wins, not the strongest one." },
+      { type: "paragraph", content: "Founder Signal exists to make the evaluation pass more objective after creative generation is complete. It does not replace human judgement, decide which candidates are admitted, or change their original order unless you explicitly choose to sort by score." },
+      { type: "heading", level: 2, content: "What Founder Signal Is Measuring" },
+      { type: "paragraph", content: "A strong startup name has to work across several contexts at once. It has to be short enough to remember, distinct enough to own, clear enough to say aloud, and available enough to register or defend. Founder Signal rolls those pressures into a single score from 0 to 100." },
+      { type: "list", content: "The score weighs six practical dimensions:", items: [
+        "Availability: whether the .com path is available or realistic",
+        "Memorability: whether the name sticks after one exposure",
+        "Phonetics: whether the sound is clean, pronounceable, and category-appropriate",
+        "Length: whether the name is short enough for search, speech, mobile typing, and display URLs",
+        "Brand risk: whether the name looks generic, confusing, overused, or too close to competitors",
+        "Strategic fit: whether the name matches the industry, tone, and commercial use case"
+      ]},
+      { type: "heading", level: 2, content: "How to Read the Score" },
+      { type: "table", content: "", headers: ["Score", "Meaning", "What to do"], rows: [
+        ["90-100", "Excellent candidate", "Stress test it with customers and register quickly if it still fits"],
+        ["80-89", "Strong candidate", "Shortlist it and compare against your top few options"],
+        ["70-79", "Workable but imperfect", "Keep it only if the meaning or market fit is unusually strong"],
+        ["60-69", "Likely compromised", "Use it as inspiration, not as the final name"],
+        ["Below 60", "Weak candidate", "Move on unless you have a very specific reason"]
+      ]},
+      { type: "heading", level: 2, content: "Why Optional Scoring Helps a Shortlist" },
+      { type: "paragraph", content: "The most common failure mode in naming is volume. Founders ask for more and more ideas because none feel obvious. But more names often create less clarity. A score changes the workflow from scrolling to triage." },
+      { type: "paragraph", content: "NamoLux keeps the creative order after scoring so you can inspect how the analysis changes your view without letting it rewrite the brainstorm. If a score-led view helps, use the explicit sort control, compare the evidence, then restore creative order whenever you want to revisit the original ideas." },
+      { type: "callout", calloutType: "tip", content: "Use the score as evidence, not a gate. A 92 that feels wrong for your audience should lose to an 86 that customers understand instantly." },
+      { type: "heading", level: 2, content: "The Score Also Protects Against Emotional Mistakes" },
+      { type: "paragraph", content: "Founders fall in love with names for reasons that do not survive launch. A name reminds them of a personal story. A mockup looks good. A friend likes it. The word feels clever. None of that is useless, but none of it proves the name will work in public." },
+      { type: "paragraph", content: "Founder Signal pulls the conversation back to usable evidence. Can people spell it? Is it short enough? Is the .com available? Does it sound credible? Is it different enough? Those are the questions that still matter after the excitement fades." },
+      { type: "heading", level: 2, content: "A Practical Shortlisting Workflow" },
+      { type: "list", content: "", items: [
+        "Generate names across at least two styles, such as invented and metaphor",
+        "Run Founder Signal on the complete Advanced batch only after the names are visible",
+        "Review every score and rationale before choosing whether to sort",
+        "Remove names that are hard to say, too narrow, or too similar to competitors",
+        "Run the remaining three to five through customer, search, and trademark checks",
+        "Register the winner before continuing into brand palette or landing page work"
+      ]},
+      { type: "heading", level: 2, content: "Why NamoLux Still Needs Your Judgement" },
+      { type: "paragraph", content: "No score can know your full founder context. A name may score lower because it is longer, but still fit if your audience already understands the phrase. A short invented word may score high, but still feel too cold for a warm consumer brand. Treat Founder Signal as a senior reviewer, not an automatic decision maker." },
+      { type: "paragraph", content: "The best decisions happen when broad generation, structured analysis, and audience knowledge remain distinct stages. Founder Signal adds evidence to the shortlist; the founder still decides which evidence matters." },
+      { type: "callout", calloutType: "cta", content: "Generate the shortlist first, then run Founder Signal and live .com checks in the same decision workspace.", ctaLink: "/generate", ctaText: "Try NamoLux" },
+    ],
+    faqs: [
+      { question: "Should I only choose names above 90?", answer: "No. A score above 90 is rare and valuable, but many excellent names sit in the 80s. Use 80 as the practical strong-candidate threshold, then apply customer, trademark, and market judgement before deciding." },
+      { question: "Can a low-scoring name still work?", answer: "Sometimes, but you should know why it scored low. If the only weakness is length and the name is a memorable two-word phrase, it may still work. If it is hard to spell, unavailable, generic, and confusing, the low score is telling you to move on." },
+      { question: "Does Founder Signal check trademarks?", answer: "Founder Signal can flag obvious brand risk signals, but it is not legal advice and does not replace a trademark search. Before committing to a serious company name, search relevant trademark databases and speak to a qualified professional if the brand has meaningful commercial risk." },
+    ],
+  },
+
+  {
+    slug: "brand-name-paid-ads-cac",
+    title: "How Your Brand Name Affects Paid Ads, Click-Through Rate, and CAC",
+    description: "A brand name is not just an SEO decision. It changes how people read your ads, remember your display URL, and search for you later.",
+    seoTitle: "How Brand Names Affect Paid Ads, CTR and CAC",
+    metaDescription: "Your brand name affects paid ad performance, click-through rate, branded search, recall, and customer acquisition cost. Here's how to choose a name that helps ads work harder.",
+    category: "Builder Insights",
+    readTime: 7,
+    publishedAt: "2026-06-21",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "Founders usually think about brand names through SEO, domains, and logo design. Paid ads rarely enter the conversation. That is a mistake. Your name appears inside search ads, social ads, display URLs, landing page headlines, retargeting campaigns, invoices, and branded search queries. A name that is hard to process makes every paid click slightly more expensive." },
+      { type: "paragraph", content: "Customer acquisition cost is not only a media buying problem. It is also a memory problem. If people cannot remember who you are after seeing the ad, your retargeting, direct search, and word-of-mouth loops all get weaker." },
+      { type: "heading", level: 2, content: "The Display URL Test" },
+      { type: "paragraph", content: "In search ads, the display URL is often the first brand signal a user sees. A clean domain like vectra.com or lumenpay.com reads quickly. A long, hyphenated, or awkward domain slows the scan and makes the ad feel less established before the user has even read the headline." },
+      { type: "list", content: "Good paid-ad domains tend to be:", items: [
+        "Short enough to read in one glance",
+        "Spelled exactly as they sound",
+        "Free of hyphens and numbers",
+        "Distinct from category keywords so the brand is not confused with the ad copy",
+        "Credible enough to click even when the user has never heard of the company"
+      ]},
+      { type: "heading", level: 2, content: "Click-Through Rate Starts With Trust" },
+      { type: "paragraph", content: "A paid ad is a trust decision made at speed. Users ask themselves, often subconsciously, 'Does this look real?' The name helps answer that. A credible, clean, brandable name can make a new company feel less risky. A strange spelling, spammy keyword domain, or crowded suffix can do the opposite." },
+      { type: "paragraph", content: "This matters most in high-intent categories: fintech, health, B2B SaaS, legal, insurance, security, and anything involving money or private data. The more trust your category requires, the less room you have for a name that feels disposable." },
+      { type: "heading", level: 2, content: "Recall Reduces Retargeting Waste" },
+      { type: "paragraph", content: "Not every paid click converts immediately. Many users see an ad, visit once, leave, then search the brand later. If your name is memorable and easy to spell, that later search can become a cheap branded click or direct visit. If the name is forgettable, you have to keep paying to reintroduce yourself." },
+      { type: "callout", calloutType: "tip", content: "A good paid-ad name creates branded search after the first impression. A weak name forces every future visit to be bought again." },
+      { type: "heading", level: 2, content: "Names That Hurt Paid Performance" },
+      { type: "list", content: "", items: [
+        "Keyword-stuffed names that make the ad look like an affiliate site",
+        "Clever spellings users cannot reproduce in search",
+        "Names that are too close to competitors, causing comparison leakage",
+        "Very long domains that get truncated or ignored on mobile",
+        "Names with unclear pronunciation, which weaken podcast, influencer, and video ad recall"
+      ]},
+      { type: "heading", level: 2, content: "Names That Help Paid Performance" },
+      { type: "paragraph", content: "The best paid-ad names work like compressed positioning. They are not necessarily descriptive, but they create enough of an impression that the ad feels anchored. Stripe sounds precise. Linear sounds organised. Calm sounds like the result it sells. The name does not do all the work, but it makes the paid message easier to believe." },
+      { type: "heading", level: 2, content: "How to Check Before You Spend" },
+      { type: "list", content: "", items: [
+        "Put the domain beside three competitor domains and see which one feels most clickable",
+        "Write a search ad headline with the name in the display URL",
+        "Say the name once, wait ten minutes, then ask someone to spell it",
+        "Mock up a mobile ad and check whether the name still reads at small size",
+        "Search the name and see whether Google autocorrects it or confuses it with an existing brand"
+      ]},
+      { type: "paragraph", content: "This is not about perfection. It is about removing friction before you spend real money buying attention." },
+      { type: "heading", level: 2, content: "How NamoLux Helps" },
+      { type: "paragraph", content: "NamoLux scores names on the qualities that influence paid performance indirectly: length, memorability, pronounceability, brand risk, and .com availability. Those signals do not guarantee a lower CAC, but they improve the odds that your ad budget is building a brand people can remember rather than renting attention one click at a time." },
+      { type: "callout", calloutType: "cta", content: "Before you spend on ads, explore a memorable shortlist and use Founder Signal when you are ready to compare it.", ctaLink: "/generate", ctaText: "Explore Names" },
+    ],
+    faqs: [
+      { question: "Can a brand name really lower CAC?", answer: "Indirectly, yes. A better name can improve recall, trust, branded search, direct traffic, and word-of-mouth. Those effects reduce how often you need to pay to reintroduce the brand. The name will not fix bad ads or weak positioning, but it can remove friction from every paid impression." },
+      { question: "Should paid-ad brands use exact-match keyword domains?", answer: "Usually not for long-term companies. Exact-match domains can look relevant, but they often feel generic or affiliate-like in ads. A brandable name with clear ad copy usually builds more trust and better recall over time." },
+      { question: "What is the fastest paid-ad name test?", answer: "Create a fake search ad with the domain as the display URL, then place it next to two competitors. If your name feels harder to trust or remember before anyone reads the landing page, keep looking." },
+    ],
+  },
+
+  {
+    slug: "international-brand-name-checks",
+    title: "International Brand Name Checks: Avoid Meanings That Break Trust in Other Markets",
+    description: "A name can sound premium in English and awkward somewhere else. Use this checklist before registering a brand you may take global.",
+    seoTitle: "International Brand Name Checks Before You Register a Domain",
+    metaDescription: "Avoid accidental meanings, pronunciation issues, and market-specific trust problems with this international brand name checklist for founders.",
+    category: "Domain Strategy",
+    readTime: 8,
+    publishedAt: "2026-06-21",
+    author: "NamoLux Team",
+    content: [
+      { type: "paragraph", content: "A name can pass every English-language test and still create problems in another market. Sometimes the issue is meaning. Sometimes it is pronunciation. Sometimes it is visual similarity to a local competitor, a slang term, or a word that feels unserious in a category where trust matters." },
+      { type: "paragraph", content: "Most early startups do not need a full international naming agency. They do need a practical check before registering a domain they may carry into new markets. Fixing a name before launch is cheap. Fixing it after customers, backlinks, and legal documents exist is painful." },
+      { type: "heading", level: 2, content: "Start With Your Likely Markets" },
+      { type: "paragraph", content: "Do not try to check every language on earth. Start with the markets you realistically might enter in the next three years. For many founders, that means English-speaking markets plus the EU, Latin America, India, or the Middle East depending on the product." },
+      { type: "list", content: "Create a simple market list:", items: [
+        "Primary launch country",
+        "Top two expansion markets",
+        "Countries where your target customers already operate",
+        "Markets where your paid ads may run by default",
+        "Languages spoken by your own customer support or sales team"
+      ]},
+      { type: "heading", level: 2, content: "The Meaning Check" },
+      { type: "paragraph", content: "Run the name through basic translation and slang searches for each priority language. Exact translations are only part of the risk. You are also looking for near matches, homophones, and common phrases that could create confusion." },
+      { type: "list", content: "Search for:", items: [
+        "The exact name in quotation marks",
+        "The name plus 'meaning'",
+        "The name plus 'slang'",
+        "The name split into likely word parts",
+        "Phonetic spellings if the name is invented"
+      ]},
+      { type: "heading", level: 2, content: "The Pronunciation Check" },
+      { type: "paragraph", content: "Some names look clean in English but become awkward in languages that do not use the same consonant clusters or vowel sounds. If people in an important market cannot say the name comfortably, the brand will rely on written discovery and lose word-of-mouth momentum." },
+      { type: "callout", calloutType: "tip", content: "Ask native speakers to say the name aloud before you explain it. Do not ask whether they like it first. Ask what they would call it naturally." },
+      { type: "heading", level: 2, content: "The Search Result Check" },
+      { type: "paragraph", content: "Google the name from different country settings or add the country name to the search. You are checking whether the name is already associated with a local brand, public figure, product, meme, or controversy. A clean result in your country does not guarantee a clean result globally." },
+      { type: "heading", level: 2, content: "The Visual Similarity Check" },
+      { type: "paragraph", content: "International risk is not only about words. Some names look too similar to existing brands when written in lowercase, in a sans serif font, or as a domain. This is especially common with invented words that share startup-style suffixes. Compare your shortlist visually against competitors in every priority market." },
+      { type: "heading", level: 2, content: "The Category Trust Check" },
+      { type: "paragraph", content: "A playful name may travel well in consumer categories but fail in markets where your product touches money, health, security, education, or government. Tone does not translate evenly. A name that feels friendly in one country may feel childish in another." },
+      { type: "list", content: "Raise the bar for:", items: [
+        "Fintech and payments",
+        "Healthcare and wellness",
+        "Cybersecurity and identity",
+        "Legal, tax, and compliance",
+        "Education and children's products",
+        "B2B tools sold into conservative industries"
+      ]},
+      { type: "heading", level: 2, content: "A Fast International Naming Checklist" },
+      { type: "list", content: "", items: [
+        "Check exact meaning and slang in your top expansion languages",
+        "Ask at least two native speakers to pronounce and react to the name",
+        "Search local results for brands, people, memes, and negative associations",
+        "Compare the lowercase domain against local competitor names",
+        "Check whether the tone still fits your category in each market",
+        "Avoid names that require a long explanation to survive outside English"
+      ]},
+      { type: "heading", level: 2, content: "How NamoLux Fits Into the Process" },
+      { type: "paragraph", content: "NamoLux helps you generate and score names before registration, but international checks still deserve human review. Use the score to narrow the shortlist, then run the top candidates through meaning, pronunciation, and search checks in your priority markets. The combination is much faster than trying to globally validate every raw idea." },
+      { type: "paragraph", content: "The goal is not to find a name that is perfect everywhere. That rarely exists. The goal is to avoid names with obvious meanings, pronunciation failures, or trust problems in places you are likely to sell." },
+      { type: "callout", calloutType: "cta", content: "Generate a shortlist first, then run international checks only on the names strong enough to register.", ctaLink: "/generate", ctaText: "Generate Global-Ready Names" },
+    ],
+    faqs: [
+      { question: "Do small startups need international name checks?", answer: "If the business will stay local, a light check is enough. If you may sell software, content, services, or products internationally, run at least basic meaning, pronunciation, and search checks before registering the domain." },
+      { question: "How many languages should I check?", answer: "Check the languages tied to markets you realistically may enter in the next three years. For many startups, that is three to six languages, not every possible market." },
+      { question: "Can AI translation replace native speaker checks?", answer: "No. AI translation is a useful first pass, but it often misses slang, tone, humour, pronunciation, and market-specific associations. Use AI to narrow risk, then ask native speakers about serious finalists." },
+    ],
+  },
 ]
+
+const CURRENT_DECISION_WORKSPACE_OFFER = [
+  "NamoLux is a name decision workspace for solo founders.",
+  PUBLIC_PRODUCT_COPY.freePlanSummary,
+  `Pro is ${PLAN_CONFIG.pro.price}/month.`,
+  PUBLIC_PRODUCT_COPY.proPlanSummary,
+  "Pro also includes saved projects, CSV exports, shareable decision reports, and an ad-free workspace.",
+].join(" ")
+
+const CURRENT_DECISION_WORKSPACE_TABLE_COPY = `Free: ${PUBLIC_PRODUCT_COPY.freePlanSummary} Pro: ${PLAN_CONFIG.pro.price}/month with ${PUBLIC_PRODUCT_COPY.proPlanSummary}`
+const CURRENT_VISUAL_WORK_COPY = "NamoLux focuses on checking and comparing shortlisted names. Visual identity work happens outside the live decision workspace."
+const CURRENT_SITE_SERVICE_COPY = "NamoLux focuses on name decisions in the public product. Site-performance services are not part of this workspace."
+const CURRENT_NAME_TESTING_COPY = "NamoLux focuses on Bulk Check and Founder Signal, with the evidence founders need to compare a shortlist."
+const CURRENT_CTA_COPY = "Bring your shortlist to NamoLux. Check six domain extensions, then use Founder Signal to compare finalists on a consistent primary TLD."
+
+const LEGACY_PRODUCT_ASSERTION = /\b(?:quick(?:\s+(?:generate|exploration))?|advanced(?:\s+(?:batch(?:es)?|generate|generation|shortlist|filtering))?|unlimited(?:\s+fair[- ]use)?|fair[- ]use|brand palettes?|brand tools?|stress tests?|seo monitoring|(?:generated|generate(?:s|d)?)\s+(?:names?|candidates?|shortlists?)|(?:ai|business|domain|name)?\s*generators?|name generation)\b/i
+const LEGACY_PRODUCT_CONTEXT = /\b(?:namolux|founder signal|quick generate|quick exploration|advanced (?:batch|batches|generate|generation|shortlist|filtering)|pro)\b/i
+const UNAMBIGUOUS_LEGACY_OFFER = /\b(?:quick generate|quick exploration|advanced (?:batch|batches|generate|generation|shortlist|filtering)|unlimited fair[- ]use|brand palette access|stress tests?|seo monitoring)\b/i
+
+function isRetiredProductHref(href?: string) {
+  if (!href) return false
+  const pathname = href.split("?")[0]?.split("#")[0]?.replace(/\/+$/, "") || "/"
+  return pathname === "/generate" || pathname.startsWith("/generate/") || pathname === "/preview-gen" || pathname === "/seo-audit"
+}
+
+/** A published article route must be a safe, stable lower-case path segment. */
+export function isValidBlogSlug(value: unknown): value is string {
+  return typeof value === "string"
+    && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+    && value !== "null"
+    && value !== "undefined"
+}
+
+function hasLegacyProductAssertion(text: string) {
+  return (LEGACY_PRODUCT_ASSERTION.test(text) && LEGACY_PRODUCT_CONTEXT.test(text)) || UNAMBIGUOUS_LEGACY_OFFER.test(text)
+}
+
+function currentReplacementFor(text: string) {
+  if (/brand palettes?|visual brand assets?/i.test(text)) return CURRENT_VISUAL_WORK_COPY
+  if (/seo monitoring/i.test(text)) return CURRENT_SITE_SERVICE_COPY
+  if (/stress tests?/i.test(text)) return CURRENT_NAME_TESTING_COPY
+  return CURRENT_DECISION_WORKSPACE_OFFER
+}
+
+function preserveEditorialLead(text: string, replacement: string) {
+  const productIndex = text.search(/\b(?:NamoLux|Founder Signal|Quick Generate|Quick exploration|Advanced (?:batch|batches|generate|generation|shortlist|filtering)|Pro)\b/i)
+  if (productIndex <= 0) return replacement
+
+  const lead = text.slice(0, productIndex)
+  const sentenceEnd = Math.max(lead.lastIndexOf(". "), lead.lastIndexOf("? "), lead.lastIndexOf("! "))
+  if (sentenceEnd < 0) return replacement
+
+  return `${lead.slice(0, sentenceEnd + 1).trim()} ${replacement}`
+}
+
+function normalizeRetiredProductLinks(text: string) {
+  return text.replace(
+    /\[[^\]]+\]\(\/(?:generate(?:\/[^)]*)?|preview-gen(?:\/[^)]*)?|seo-audit(?:\/[^)]*)?)\)/gi,
+    "[Use Bulk Check](/bulk-domain-check)",
+  )
+}
+
+function normalizePublicBlogText(text: string) {
+  const linkedText = normalizeRetiredProductLinks(text)
+  if (!hasLegacyProductAssertion(linkedText)) return linkedText
+
+  return preserveEditorialLead(linkedText, currentReplacementFor(linkedText))
+}
+
+function normalizePublicBlogTitle(title: string) {
+  if (!/\bNamoLux\b/i.test(title) || !hasLegacyProductAssertion(title)) return title
+  if (/brand palettes?/i.test(title)) return "Why the Name Decision Comes Before Visual Identity | NamoLux"
+
+  const versus = title.match(/^(.+?)\s+vs\.?\s+(.+?)(?::|$)/i)
+  if (versus) {
+    const [, left, right] = versus
+    if (/namolux/i.test(left)) return `NamoLux vs ${right.trim()}: Decision Workspace vs Name Generator`
+    if (/namolux/i.test(right)) return `${left.trim()} vs NamoLux: Name Generator vs Decision Workspace`
+  }
+
+  return "NamoLux: A Name Decision Workspace for Founder Shortlists"
+}
+
+function normalizePublicBlogFaq(faq: BlogFaq): BlogFaq {
+  const combined = `${faq.question} ${faq.answer}`
+  if (!hasLegacyProductAssertion(combined)) return faq
+
+  if (/brand palettes?|visual brand assets?/i.test(combined)) {
+    return {
+      question: "Does NamoLux include visual identity tools?",
+      answer: CURRENT_VISUAL_WORK_COPY,
+    }
+  }
+
+  if (/seo monitoring/i.test(combined)) {
+    return {
+      question: "What does NamoLux focus on?",
+      answer: CURRENT_SITE_SERVICE_COPY,
+    }
+  }
+
+  if (/stress tests?/i.test(combined)) {
+    return {
+      question: "How does NamoLux help founders compare names?",
+      answer: CURRENT_NAME_TESTING_COPY,
+    }
+  }
+
+  return {
+    question: hasLegacyProductAssertion(faq.question)
+      ? "How does NamoLux help founders choose a name?"
+      : faq.question,
+    answer: normalizePublicBlogText(faq.answer),
+  }
+}
+
+function normalizePublicBlogSection(section: BlogSection): BlogSection {
+  const hasRetiredCta = isRetiredProductHref(section.ctaLink) || isRetiredProductHref(section.ctaLink2)
+  const namoluxColumn = section.headers?.findIndex((header) => /\bNamoLux\b/i.test(header)) ?? -1
+
+  return {
+    ...section,
+    content: hasRetiredCta ? CURRENT_CTA_COPY : normalizePublicBlogText(section.content),
+    items: section.items?.map(normalizePublicBlogText),
+    headers: section.headers?.map(normalizePublicBlogText),
+    rows: section.rows?.map((row) => {
+      const rowIsNamoLux = row.some((cell) => /\bNamoLux\b/i.test(cell))
+      return row.map((cell, index) => {
+        const isNamoLuxOfferCell = rowIsNamoLux || index === namoluxColumn
+        return isNamoLuxOfferCell && LEGACY_PRODUCT_ASSERTION.test(cell)
+          ? CURRENT_DECISION_WORKSPACE_TABLE_COPY
+          : normalizePublicBlogText(cell)
+      })
+    }),
+    links: section.links?.map((link) => isRetiredProductHref(link.href)
+      ? { href: "/bulk-domain-check", text: "Use Bulk Check" }
+      : { ...link, text: normalizePublicBlogText(link.text) }),
+    ctaLink: isRetiredProductHref(section.ctaLink) ? "/bulk-domain-check" : section.ctaLink,
+    ctaText: isRetiredProductHref(section.ctaLink) ? "Check your shortlist" : section.ctaText,
+    ctaLink2: isRetiredProductHref(section.ctaLink2) ? "/bulk-domain-check" : section.ctaLink2,
+    ctaText2: isRetiredProductHref(section.ctaLink2) ? "Check your shortlist" : section.ctaText2,
+    alt: section.alt ? normalizePublicBlogText(section.alt) : section.alt,
+    caption: section.caption ? normalizePublicBlogText(section.caption) : section.caption,
+  }
+}
+
+function normalizeBlogPostForProduction(post: BlogPost): BlogPost {
+  return {
+    ...post,
+    title: normalizePublicBlogTitle(post.title),
+    description: normalizePublicBlogText(post.description),
+    seoTitle: post.seoTitle ? normalizePublicBlogTitle(post.seoTitle) : post.seoTitle,
+    metaDescription: post.metaDescription ? normalizePublicBlogText(post.metaDescription) : post.metaDescription,
+    content: post.content.map(normalizePublicBlogSection),
+    faqs: post.faqs?.map(normalizePublicBlogFaq),
+  }
+}
+
+const publicBlogPosts = blogPosts.map(normalizeBlogPostForProduction)
+
+// Keep the public Journal deliberately small while older archive content is
+// reviewed. These pages have either passed the sourced editorial contract or
+// have demonstrated useful Search Console demand / first-hand founder value.
+const PROVEN_EVERGREEN_BLOG_SLUGS = new Set([
+  "why-i-built-namolux",
+  "best-namelix-alternatives-2026",
+  "bust-a-name-vs-namolux",
+  "how-to-name-saas-product",
+  "namify-vs-namolux",
+  "domain-name-after-pivot",
+  "two-word-domain-names-guide",
+  "godaddy-domain-generator-vs-namolux",
+  "seo-friendly-startup-name",
+  "best-domain-extensions-2026",
+])
+
+export function isPublicBlogPost(post: BlogPost): boolean {
+  return post.qualityTier === "priority" || PROVEN_EVERGREEN_BLOG_SLUGS.has(post.slug)
+}
+
+export function isMonetizableBlogPost(post: BlogPost): boolean {
+  return post.qualityTier === "priority" || post.slug === "why-i-built-namolux"
+}
 
 // Utility functions
 export function getAllPosts(): BlogPost[] {
-  return blogPosts.sort((a, b) => 
+  return publicBlogPosts.filter((post) => isValidBlogSlug(post.slug)).sort((a, b) =>
     new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   )
 }
 
+export function getPublicPosts(): BlogPost[] {
+  return getAllPosts().filter(isPublicBlogPost)
+}
+
 export function getPostBySlug(slug: string): BlogPost | undefined {
-  return blogPosts.find(post => post.slug === slug)
+  if (!isValidBlogSlug(slug)) return undefined
+  return publicBlogPosts.find(post => post.slug === slug)
 }
 
 export function getPostsByCategory(category: BlogCategory): BlogPost[] {
-  return blogPosts
+  return publicBlogPosts
     .filter(post => post.category === category)
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 }
 
 export function getFeaturedPosts(): BlogPost[] {
-  return blogPosts.filter(post => post.featured)
+  return publicBlogPosts.filter(post => post.featured)
 }
 
 export function getAllCategories(): BlogCategory[] {
@@ -7491,10 +8196,63 @@ export function getAllCategories(): BlogCategory[] {
 export function getRelatedPosts(currentSlug: string, limit: number = 3): BlogPost[] {
   const currentPost = getPostBySlug(currentSlug)
   if (!currentPost) return []
-  
-  return blogPosts
-    .filter(post => post.slug !== currentSlug)
-    .filter(post => post.category === currentPost.category)
-    .slice(0, limit)
+
+  const explicit = (currentPost.relatedSlugs || [])
+    .map(getPostBySlug)
+    .filter((post): post is BlogPost => post !== undefined)
+    .filter((post) => post.slug !== currentSlug && isPublicBlogPost(post))
+
+  const currentTerms = new Set(normalizeRelatedTerms(currentPost))
+  const scored = publicBlogPosts
+    .filter((post) => isPublicBlogPost(post))
+    .filter((post) => post.slug !== currentSlug && !explicit.some((item) => item.slug === post.slug))
+    .map((post) => {
+      const sharedTerms = normalizeRelatedTerms(post).filter((term) => currentTerms.has(term)).length
+      const sharedTags = (post.tags || []).filter((tag) => currentPost.tags?.includes(tag)).length
+      const score = sharedTerms + sharedTags * 3 + (post.category === currentPost.category ? 4 : 0)
+      return { post, score }
+    })
+    .sort((a, b) => b.score - a.score
+      || new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime()
+      || a.post.slug.localeCompare(b.post.slug))
+    .map(({ post }) => post)
+
+  return [...explicit, ...scored].slice(0, limit)
+}
+
+const RELATED_STOP_WORDS = new Set([
+  "about", "after", "before", "best", "business", "complete", "domain", "domains", "from",
+  "guide", "help", "into", "name", "names", "startup", "startups", "that", "their", "this",
+  "what", "when", "where", "which", "with", "your",
+])
+
+function normalizeRelatedTerms(post: BlogPost): string[] {
+  return `${post.title} ${post.description} ${post.primaryKeyword || ""}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(/\s+/)
+    .filter((term) => term.length > 3 && !RELATED_STOP_WORDS.has(term))
+}
+
+export function getPostWordCount(post: BlogPost): number {
+  const sectionText = post.content.flatMap((section) => [
+    section.content,
+    ...(section.items || []),
+    ...(section.headers || []),
+    ...(section.rows || []).flat(),
+  ])
+  const faqText = (post.faqs || []).flatMap((faq) => [faq.question, faq.answer])
+
+  return [...sectionText, ...faqText]
+    .join(" ")
+    .replace(/\[[^\]]+\]\([^)]+\)/g, (link) => link.replace(/\]\([^)]+\)$/, "").replace(/^\[/, ""))
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .length
+}
+
+export function getPostReadTime(post: BlogPost, wordsPerMinute = 220): number {
+  return Math.max(1, Math.ceil(getPostWordCount(post) / wordsPerMinute))
 }
 

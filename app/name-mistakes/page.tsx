@@ -3,7 +3,10 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { AdBanner } from "@/components/ad-banner"
 import { ArrowRight } from "lucide-react"
+import { Fragment } from "react"
+import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 
 export const metadata: Metadata = {
   title: "7 Startup Naming Mistakes Founders Regret | NamoLux",
@@ -48,6 +51,9 @@ const mistakes = [
   },
 ]
 
+const GUIDE_BRIEF = "I am naming a new startup and want to avoid a crowded, trendy, hard-to-spell, or overly narrow name. I need candidates that are memorable, easy to say, scalable, and suitable for a credible domain."
+const SHORTLIST_HREF = "/bulk-domain-check"
+
 export default function NameMistakesPage() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -61,26 +67,54 @@ export default function NameMistakesPage() {
             These aren't obvious on day one. They show up when you try to grow.
           </p>
 
+          <AdBanner placement="guide-after-intro" />
+
           {/* Mistakes List */}
           <div className="space-y-8">
             {mistakes.map((mistake, idx) => (
-              <section
-                key={idx}
-                className="rounded-xl border border-border/50 bg-card/30 p-6"
-              >
-                <div className="mb-1 text-sm font-medium text-primary">
-                  Mistake #{idx + 1}
-                </div>
-                <h2 className="mb-3 text-xl font-semibold text-foreground">
-                  {mistake.title}
-                </h2>
-                <p className="mb-3 text-muted-foreground">
-                  {mistake.explanation}
-                </p>
-                <p className="text-sm text-orange-400">
-                  Why this hurts later: {mistake.consequence}
-                </p>
-              </section>
+              <Fragment key={mistake.title}>
+                <section className="rounded-xl border border-border/50 bg-card/30 p-6">
+                  <div className="mb-1 text-sm font-medium text-primary">
+                    Mistake #{idx + 1}
+                  </div>
+                  <h2 className="mb-3 text-xl font-semibold text-foreground">
+                    {mistake.title}
+                  </h2>
+                  <p className="mb-3 text-muted-foreground">
+                    {mistake.explanation}
+                  </p>
+                  <p className="text-sm text-orange-400">
+                    Why this hurts later: {mistake.consequence}
+                  </p>
+                </section>
+
+                {idx === 0 ? (
+                  <ContextualMiniGenerator
+                    source="guide"
+                    contentSlug="name-mistakes"
+                    topic="startup naming mistakes"
+                    defaultBrief={GUIDE_BRIEF}
+                    heading="Check names against these warning signs"
+                    ctaId="guide-name-mistakes"
+                  />
+                ) : null}
+
+                {idx === 1 ? (
+                  <aside aria-label="Related naming guidance" className="border-y border-border/40 py-5">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Build a stronger shortlist</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Link href="/how-to-name-a-startup" className="inline-flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-muted/40 hover:text-primary">
+                        Follow the startup naming framework
+                        <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+                      </Link>
+                      <Link href="/founder-signal" className="inline-flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-muted/40 hover:text-primary">
+                        Evaluate names with Founder Signal
+                        <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+                      </Link>
+                    </div>
+                  </aside>
+                ) : null}
+              </Fragment>
             ))}
           </div>
 
@@ -91,7 +125,7 @@ export default function NameMistakesPage() {
               <br />
               They show up when you try to grow.
             </p>
-            <Link href="/generate">
+            <Link href={SHORTLIST_HREF}>
               <Button size="lg" className="gap-2">
                 Check your name with Founder Signal™
                 <ArrowRight className="h-4 w-4" />
@@ -104,4 +138,3 @@ export default function NameMistakesPage() {
     </div>
   )
 }
-

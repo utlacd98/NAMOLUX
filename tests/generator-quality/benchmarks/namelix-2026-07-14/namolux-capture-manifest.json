@@ -1,0 +1,3685 @@
+{
+  "schemaVersion": 1,
+  "benchmarkVersion": "namelix-2026-07-14-v1",
+  "capturedProvider": "NamoLux",
+  "captureTarget": "current-local-working-tree",
+  "buildUrl": null,
+  "captureMethod": "Sequential direct calls to generateGroqQuickCandidates using the exact frozen brief, style, creativity and maximum length; no domains or Founder Signal.",
+  "selectionRule": "All candidates returned in generation order, capped at 16; no manual filtering, reordering or replacement.",
+  "rawResponseBodiesRetained": true,
+  "normalizedResponseHashSemantics": "SHA-256 of compact JSON containing provider, model, counts and the retained candidate name/rationale/style/root records.",
+  "preferenceProfile": {
+    "likedStyles": [],
+    "dislikedStyles": [],
+    "preferredSounds": [],
+    "avoidedSounds": []
+  },
+  "gitHead": "a1c0991b92d979a6719b9991acf1e4993590f17c",
+  "gitBranch": "test/name-generator",
+  "workingTreeDirty": true,
+  "gitStatusSha256": "1e553d11ba3d99e189ca3be0e96b756fc52fc99f1676ad1e51499185942ecfe2",
+  "generatorImplementationFiles": [
+    "lib/domainGen/filters.ts",
+    "lib/domainGen/generatedName.ts",
+    "lib/domainGen/quickGenerate.ts",
+    "lib/domainGen/quickGenerateGroq.ts",
+    "lib/domainGen/realness.ts"
+  ],
+  "generatorImplementationSha256": "8193788ff82b08b6faf2be6a0a85a72c998989acf31575f5762367e30f2560ef",
+  "startedAt": "2026-07-14T14:42:00.840Z",
+  "completedAt": "2026-07-14T14:43:36.578Z",
+  "cases": [
+    {
+      "caseId": "investigative-podcast",
+      "vibeGroup": "bold",
+      "brief": "independent investigative journalism podcast about corporate power",
+      "canonicalStyle": "Auto",
+      "canonicalCreativity": "Exploratory",
+      "style": "auto",
+      "creativity": "exploratory",
+      "maxLength": 12,
+      "seed": "namelix-2026-07-14-v1:investigative-podcast:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:04.056Z",
+      "durationMs": 3214,
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "ready",
+          "durationMs": 3044
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 10,
+      "fallbackCandidateCount": 6,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "a94477ceb03c0ac2f17e4033a9da7638eea3d4d10f9908503258e991d2055ca8",
+      "candidates": [
+        {
+          "name": "gavelgrn",
+          "rationale": "Blends the authority of a gavel with the organic nature of community growth, suggesting independent voices rising against corporate power structures through collective press.",
+          "style": "brandable",
+          "fitRoots": [
+            "press",
+            "voice"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "voxclan",
+          "rationale": "Uses 'vox' for voice and 'clan' for community, evoking a tight-knit group of listeners and reporters bound by shared investigative stories and mutual trust.",
+          "style": "non_english",
+          "fitRoots": [
+            "story",
+            "voice"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "trutharc",
+          "rationale": "Suggests the narrative arc of truth uncovered over time, framing investigative journalism as a journey where the community follows the signal to reveal corporate secrets.",
+          "style": "evocative",
+          "fitRoots": [
+            "story",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "wrdswap",
+          "rationale": "Renders 'Word Swap' as a stylized label, emphasizing the exchange of information and stories within a community of listeners and independent journalists.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "press",
+            "voice"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "signtrope",
+          "rationale": "Combines signal and trope, suggesting recognizable patterns in corporate behavior that the community identifies and discusses, turning complex investigations into shared narratives.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "story",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "folkpress",
+          "rationale": "Merges 'folk' for community with 'press' for journalism, emphasizing independent, grassroots reporting that elevates the voices of ordinary people against big corporate power.",
+          "style": "compound",
+          "fitRoots": [
+            "press",
+            "voice"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "chorus",
+          "rationale": "Represents many voices singing together, metaphorically describing the chorus of investigative reporters and listeners who amplify signals of corporate misconduct.",
+          "style": "real_word",
+          "fitRoots": [
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "truesy",
+          "rationale": "A coined term blending truth and story, suggesting a platform where the community gathers to share and validate true stories of corporate accountability.",
+          "style": "brandable",
+          "fitRoots": [
+            "story",
+            "voice"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "deepdig",
+          "rationale": "Evokes the act of digging deep into stories, inviting the community to join the investigative process and uncover buried signals of corporate malfeasance together.",
+          "style": "evocative",
+          "fitRoots": [
+            "story",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "infotribe",
+          "rationale": "Combines information with tribe, framing the audience as a cohesive community united by their pursuit of truth and shared investigative stories about corporate power.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "story",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "probestory",
+          "rationale": "Probestory carries a clear “story” cue for credible storytelling, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "compound",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "probesignal",
+          "rationale": "Probesignal carries a clear “story” cue for credible storytelling, while “signal” adds clarity. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "brandable",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "storyprobe",
+          "rationale": "Storyprobe carries a clear “story” cue for credible storytelling, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "compound",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "signalprobe",
+          "rationale": "Signalprobe carries a clear “story” cue for credible storytelling, while “signal” adds clarity. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "compound",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "storypress",
+          "rationale": "Storypress carries a clear “story” cue for credible storytelling, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "compound",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        },
+        {
+          "name": "scopestory",
+          "rationale": "Scopestory carries a clear “story” cue for credible storytelling, while “scope” adds visibility. That combination feels decisive and energetic for independent professionals and helps the brand feel distinctive while preserving editorial trust.",
+          "style": "compound",
+          "fitRoots": [
+            "story",
+            "press",
+            "voice",
+            "signal"
+          ],
+          "fitCues": [
+            "credible storytelling"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "recycled-gold-jewellery",
+      "vibeGroup": "premium",
+      "brief": "fine jewellery made from recycled gold for modern heirlooms",
+      "canonicalStyle": "Auto",
+      "canonicalCreativity": "Direct",
+      "style": "auto",
+      "creativity": "direct",
+      "maxLength": 12,
+      "seed": "namelix-2026-07-14-v1:recycled-gold-jewellery:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:12.648Z",
+      "durationMs": 3487,
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "ready",
+          "durationMs": 3378
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "c56b9aff89b85a9198d756776a7109d1e928e4b205a84023b7c16a710f8f72a3",
+      "candidates": [
+        {
+          "name": "gilded",
+          "rationale": "A complete dictionary word evoking polished metal; its golden sheen signals premium recycled jewellery while referencing the approved gold and gilt themes.",
+          "style": "real_word",
+          "fitRoots": [
+            "gold",
+            "gilt"
+          ],
+          "fitCues": [
+            "craft and personal style"
+          ]
+        },
+        {
+          "name": "leafthread",
+          "rationale": "Merges leaf and thread to suggest sustainable weaving of precious material; the compound conveys eco‑conscious craft aimed at modern heirloom seekers.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "greenweave",
+          "rationale": "A concise phrase pairing green with weave, highlighting environmental renewal and the artisanal process that creates contemporary, lasting jewellery pieces.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "weave",
+            "green"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "solarglow",
+          "rationale": "Evokes the radiant energy of the sun on recycled gold; the metaphor of light suggests progress, purity and premium allure for discerning buyers.",
+          "style": "evocative",
+          "fitRoots": [
+            "gold",
+            "solar"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "renewelle",
+          "rationale": "A smooth, memorable brandable form blending renew with an elegant suffix; it signals continuous renewal of gold while sounding upscale and timeless.",
+          "style": "brandable",
+          "fitRoots": [
+            "gold",
+            "renew"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "gilted",
+          "rationale": "An intentional alternate spelling of \"gilded\" preserving pronunciation; it ties directly to the gilt theme while feeling fresh and distinctive.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "gold",
+            "gilt"
+          ],
+          "fitCues": [
+            "craft and personal style"
+          ]
+        },
+        {
+          "name": "goldgilt",
+          "rationale": "Goldgilt carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "goldcraft",
+          "rationale": "Goldcraft carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "brandable",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "jilt",
+          "rationale": "Jilt carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "giltgold",
+          "rationale": "Giltgold carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "craftgold",
+          "rationale": "Craftgold carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "heirgilt",
+          "rationale": "Heirgilt carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "heircraft",
+          "rationale": "Heircraft carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "brandable",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "goldform",
+          "rationale": "Goldform carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "brandable",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "formgold",
+          "rationale": "Formgold carries a clear “thread” cue for craft and personal style, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "compound",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "goldpath",
+          "rationale": "Goldpath carries a clear “thread” cue for craft and personal style, while “path” adds guided progress. That combination feels considered and high-value for the intended customer and helps the brand signal considered materials and lasting design.",
+          "style": "brandable",
+          "fitRoots": [
+            "thread",
+            "weave",
+            "gold",
+            "gilt",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "craft and personal style",
+            "measurable environmental progress"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "carbon-accounting",
+      "vibeGroup": "clean",
+      "brief": "auditable carbon accounting for mid market manufacturers",
+      "canonicalStyle": "Compound",
+      "canonicalCreativity": "Balanced",
+      "style": "compound",
+      "creativity": "balanced",
+      "maxLength": 12,
+      "seed": "namelix-2026-07-14-v1:carbon-accounting:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:20.519Z",
+      "durationMs": 2814,
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "ready",
+          "durationMs": 2751
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 5,
+      "fallbackCandidateCount": 11,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "44629a93ee4a60bc9aee1aaf10b7be5d2b9e3528716074f51369faeb4f43ea88",
+      "candidates": [
+        {
+          "name": "paygreen",
+          "rationale": "Directly links financial transactions to environmental outcomes. This name implies that carbon accounting is an integral part of the payment and procurement process for manufacturers. It positions sustainability as a tangible cost or investment rather than an abstract metric, fostering a sense of community responsibili",
+          "style": "compound",
+          "fitRoots": [
+            "pay",
+            "green"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "leafpay",
+          "rationale": "Merges natural imagery with financial action. The juxtaposition of 'leaf' and 'pay' creates a memorable, clean brand identity that suggests eco-friendly financial practices. It appeals to manufacturers who view sustainability as a core business value, offering a human-centric approach to carbon accounting that emphasiz",
+          "style": "compound",
+          "fitRoots": [
+            "pay",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "solarpay",
+          "rationale": "Connects clean energy sources with financial transactions. This name implies a forward-thinking approach to carbon accounting, where energy efficiency and financial health are intertwined. It appeals to manufacturers investing in renewable resources, fostering a sense of community among industry leaders who prioritize ",
+          "style": "compound",
+          "fitRoots": [
+            "pay",
+            "solar"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "greenfiling",
+          "rationale": "Emphasizes the organizational aspect of carbon accounting. The name suggests a systematic, clean approach to managing environmental data, making it accessible and auditable. It appeals to manufacturers who value order and clarity, positioning sustainability as a structured, community-driven effort to maintain accurate ",
+          "style": "compound",
+          "fitRoots": [
+            "filing",
+            "green"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "renewpay",
+          "rationale": "Links sustainability with financial commitment. The name implies that investing in carbon accounting is a step toward renewal and long-term success. It resonates with mid-market manufacturers who view sustainability as a strategic advantage, fostering a sense of community among businesses dedicated to transparent, audi",
+          "style": "compound",
+          "fitRoots": [
+            "pay",
+            "renew"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "carbonaudit",
+          "rationale": "Carbonaudit carries a clear “ledger” cue for orderly financial work, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "auditcarbon",
+          "rationale": "Auditcarbon carries a clear “ledger” cue for orderly financial work, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "pathcarbon",
+          "rationale": "Pathcarbon carries a clear “ledger” cue for orderly financial work, while “path” adds guided progress. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "auditledger",
+          "rationale": "Auditledger carries a clear “ledger” cue for orderly financial work, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "ledgeraudit",
+          "rationale": "Ledgeraudit carries a clear “ledger” cue for orderly financial work, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "carbonwise",
+          "rationale": "Carbonwise carries a clear “ledger” cue for orderly financial work, while “wise” adds good judgement. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "brandable",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "ledjer",
+          "rationale": "Ledjer carries a clear “ledger” cue for orderly financial work, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "ledgerwise",
+          "rationale": "Ledgerwise carries a clear “ledger” cue for orderly financial work, while “wise” adds good judgement. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "brandable",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "wisecarbon",
+          "rationale": "Wisecarbon carries a clear “ledger” cue for orderly financial work, while “wise” adds good judgement. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "carbonpath",
+          "rationale": "Carbonpath carries a clear “ledger” cue for orderly financial work, while “path” adds guided progress. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "brandable",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        },
+        {
+          "name": "carbonpilot",
+          "rationale": "Carbonpilot carries a clear “ledger” cue for orderly financial work, while “pilot” adds guidance. That combination feels clear and understated for the intended customer and helps the brand make routine money administration feel simpler.",
+          "style": "evocative",
+          "fitRoots": [
+            "ledger",
+            "books",
+            "filing",
+            "pay",
+            "green",
+            "solar",
+            "renew",
+            "leaf"
+          ],
+          "fitCues": [
+            "orderly financial work",
+            "measurable environmental progress"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "welsh-farm-market",
+      "vibeGroup": "friendly",
+      "brief": "Welsh language marketplace connecting family farms with local schools",
+      "canonicalStyle": "Non-English",
+      "canonicalCreativity": "Balanced",
+      "style": "non_english",
+      "creativity": "balanced",
+      "maxLength": 12,
+      "seed": "namelix-2026-07-14-v1:welsh-farm-market:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:27.063Z",
+      "durationMs": 1212,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "outcome": "ready",
+          "durationMs": 1081
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 5,
+      "fallbackCandidateCount": 11,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "e462ce456186da94ff0f38455afc856d072bb23ae481366a70fd9cdb422659ef",
+      "candidates": [
+        {
+          "name": "gwynne",
+          "rationale": "Gwynne, meaning ‘white’ or ‘fair’, symbolizes purity of education and wholesome family connections, resonating with schools and farms.",
+          "style": "non_english",
+          "fitRoots": [
+            "welsh",
+            "family"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support"
+          ]
+        },
+        {
+          "name": "hiraeth",
+          "rationale": "Hiraeth conveys longing and belonging, creating an emotional tie to local farms and fostering a caring learning environment.",
+          "style": "non_english",
+          "fitRoots": [
+            "welsh",
+            "kind"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support"
+          ]
+        },
+        {
+          "name": "brynca",
+          "rationale": "Brynca carries a clear “welsh” cue for Welsh identity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "non_english",
+          "fitRoots": [
+            "welsh",
+            "spark"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "learning and progress"
+          ]
+        },
+        {
+          "name": "cwmio",
+          "rationale": "Cwmio mixes ‘cwm’ (valley) with a friendly suffix, reflecting fertile grounds where family farms and schools grow together.",
+          "style": "non_english",
+          "fitRoots": [
+            "family",
+            "water"
+          ],
+          "fitCues": [
+            "family support",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "sylfa",
+          "rationale": "Sylfa draws on ‘sylf’ (seed), suggesting growth and sparks of curiosity between families and learners.",
+          "style": "non_english",
+          "fitRoots": [
+            "welsh",
+            "spark"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "learning and progress"
+          ]
+        },
+        {
+          "name": "cymruhaven",
+          "rationale": "Cymruhaven carries a clear “welsh” cue for Welsh identity, while “haven” adds safety. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "evocative",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "havencymru",
+          "rationale": "Havencymru carries a clear “welsh” cue for Welsh identity, while “haven” adds safety. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "evocative",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "cymrubridge",
+          "rationale": "Cymrubridge carries a clear “welsh” cue for Welsh identity, while “bridge” adds access. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "brandable",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "carecymru",
+          "rationale": "Carecymru carries a clear “welsh” cue for Welsh identity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "compound",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "schul",
+          "rationale": "Schul carries a clear “welsh” cue for Welsh identity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "schoolhaven",
+          "rationale": "Schoolhaven carries a clear “welsh” cue for Welsh identity, while “haven” adds safety. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "evocative",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "havenschool",
+          "rationale": "Havenschool carries a clear “welsh” cue for Welsh identity, while “haven” adds safety. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "evocative",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "schoolbridge",
+          "rationale": "Schoolbridge carries a clear “welsh” cue for Welsh identity, while “bridge” adds access. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "brandable",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "nestschool",
+          "rationale": "Nestschool carries a clear “welsh” cue for Welsh identity, while “nest” adds a welcoming base. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "compound",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "cymrucare",
+          "rationale": "Cymrucare carries a clear “welsh” cue for Welsh identity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "brandable",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "cymruguide",
+          "rationale": "Cymruguide carries a clear “welsh” cue for Welsh identity, while “guide” adds helpful direction. That combination feels warm and approachable for families and helps the brand feel rooted in its community.",
+          "style": "brandable",
+          "fitRoots": [
+            "welsh",
+            "care",
+            "kind",
+            "family",
+            "haven",
+            "learn",
+            "mentor",
+            "study",
+            "spark",
+            "water",
+            "field",
+            "grow"
+          ],
+          "fitCues": [
+            "Welsh identity",
+            "family support",
+            "learning and progress",
+            "healthy growth"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "cyber-threat-analytics",
+      "vibeGroup": "bold",
+      "brief": "cybersecurity analytics platform for enterprise threat detection teams",
+      "canonicalStyle": "Evocative",
+      "canonicalCreativity": "Exploratory",
+      "style": "evocative",
+      "creativity": "exploratory",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:cyber-threat-analytics:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:34.718Z",
+      "durationMs": 2564,
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "ready",
+          "durationMs": 2474
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "f895bd2009c7d4b1555b1437d24884dc63e356eb77d36ebc52dd0ef8cfd4be82",
+      "candidates": [
+        {
+          "name": "zenith",
+          "rationale": "Represents the highest point in the sky directly above an observer, serving as a strong spatial metaphor for top-tier protection and oversight. It positions the platform as the peak of defensive capability, offering a commanding view of the enterprise perimeter to ensure nothing slips beneath the protective umbrella.",
+          "style": "evocative",
+          "fitRoots": [
+            "shield",
+            "secure"
+          ],
+          "fitCues": [
+            "protection and trust"
+          ]
+        },
+        {
+          "name": "strata",
+          "rationale": "Refers to layers of rock or earth, metaphorically representing the layered architecture of enterprise security and the deep-seated nature of threat intelligence. It suggests that the platform digs through the geological layers of data to find foundational risks, providing a solid, structured basis for defense.",
+          "style": "evocative",
+          "fitRoots": [
+            "guard",
+            "data"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "beacon",
+          "rationale": "A fixed light used for navigation or warning in dark or unclear environments. This spatial metaphor emphasizes the platform's role in illuminating threats within the dark web of complex networks, guiding teams to danger zones with clear signals rather than noisy alerts, ensuring precise and reliable detection.",
+          "style": "evocative",
+          "fitRoots": [
+            "signal",
+            "detect"
+          ],
+          "fitCues": [
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "radial",
+          "rationale": "Suggests outward expansion from a central core, akin to radar or sonar waves scanning for targets. This aligns with the exploratory nature of threat hunting, where the platform scans the perimeter and internal networks from the center outward, ensuring comprehensive coverage and immediate identification of breaches.",
+          "style": "evocative",
+          "fitRoots": [
+            "trace",
+            "scope"
+          ],
+          "fitCues": [
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "nexus",
+          "rationale": "Denotes a central or focal point where multiple connections converge. As a spatial metaphor, it highlights the platform's ability to aggregate disparate signals from across the enterprise into a single, coherent view, allowing security teams to identify critical connection points and vulnerabilities in the network topo",
+          "style": "evocative",
+          "fitRoots": [
+            "guard",
+            "signal"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "orbit",
+          "rationale": "Refers to the curved path of a celestial object around a star. Metaphorically, it suggests continuous, cyclical monitoring of network assets around a central core. It implies that the platform keeps threats within its field of view, constantly tracking and evaluating potential risks without leaving any sector unguarded",
+          "style": "evocative",
+          "fitRoots": [
+            "trace",
+            "data"
+          ],
+          "fitCues": [
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "detectpilot",
+          "rationale": "Detectpilot carries a clear “guard” cue for protection and trust, while “pilot” adds guidance. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "evocative",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "signal",
+            "trace",
+            "scope",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "pilotdetect",
+          "rationale": "Pilotdetect carries a clear “guard” cue for protection and trust, while “pilot” adds guidance. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "evocative",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "signal",
+            "trace",
+            "scope",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "pilotcyber",
+          "rationale": "Pilotcyber carries a clear “guard” cue for protection and trust, while “pilot” adds guidance. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "evocative",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "signal",
+            "trace",
+            "scope",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "cybermax",
+          "rationale": "Cybermax carries a clear “guard” cue for protection and trust, while “max” adds ambition. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "cyberdata",
+          "rationale": "Cyberdata carries a clear “guard” cue for protection and trust, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "dataworks",
+          "rationale": "Dataworks carries a clear “guard” cue for protection and trust, while “works” adds practical capability. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "detectmax",
+          "rationale": "Detectmax carries a clear “guard” cue for protection and trust, while “max” adds ambition. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "datathreat",
+          "rationale": "Datathreat carries a clear “guard” cue for protection and trust, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "bravecyber",
+          "rationale": "Bravecyber carries a clear “guard” cue for protection and trust, while its compact shape keeps the idea easy to say and remember. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "cyber",
+            "signal",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        },
+        {
+          "name": "layerdetect",
+          "rationale": "Layerdetect carries a clear “guard” cue for protection and trust, while “layer” adds a protective layer. That combination feels decisive and energetic for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "signal",
+            "trace",
+            "scope",
+            "data",
+            "detect"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "clearer signals and insight"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "alpine-skincare",
+      "vibeGroup": "premium",
+      "brief": "premium skincare made with alpine botanicals and mineral water",
+      "canonicalStyle": "Real word",
+      "canonicalCreativity": "Exploratory",
+      "style": "real_word",
+      "creativity": "exploratory",
+      "maxLength": 12,
+      "seed": "namelix-2026-07-14-v1:alpine-skincare:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:42.521Z",
+      "durationMs": 2627,
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "ready",
+          "durationMs": 2532
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 7,
+      "fallbackCandidateCount": 9,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "aa9d68751b6062ce360cd4669f6c649b7d6970d0a4f398ce13d28e1a16faefd5",
+      "candidates": [
+        {
+          "name": "verdant",
+          "rationale": "Verdant evokes lush alpine foliage, linking the product to green, thriving plants; it suggests a premium, nurturing ritual for radiant skin.",
+          "style": "real_word",
+          "fitRoots": [
+            "flora",
+            "green"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "cascade",
+          "rationale": "Cascade conjures flowing mineral water over alpine fields, mirroring a cleansing habit that refreshes skin with pure, cascading hydration.",
+          "style": "real_word",
+          "fitRoots": [
+            "water",
+            "field"
+          ],
+          "fitCues": [
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "glimmer",
+          "rationale": "Glimmer reflects the subtle shine of healthy skin, inspired by floral light and the ritual of daily luminous care.",
+          "style": "real_word",
+          "fitRoots": [
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "blooming",
+          "rationale": "Blooming captures the habit of nurturing skin to full floral flourish, aligning the brand with growth, vitality, and premium botanicals.",
+          "style": "real_word",
+          "fitRoots": [
+            "flora",
+            "grow"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "sprout",
+          "rationale": "Sprout signifies new, vibrant skin life, echoing alpine soil richness and the everyday ritual of renewing the complexion.",
+          "style": "real_word",
+          "fitRoots": [
+            "grow",
+            "soil"
+          ],
+          "fitCues": [
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "freshen",
+          "rationale": "Freshen describes the invigorating habit of cleansing with alpine water, promising a crisp, premium experience for skin care enthusiasts.",
+          "style": "real_word",
+          "fitRoots": [
+            "care",
+            "water"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "emerald",
+          "rationale": "Emerald alludes to verdant alpine meadows, positioning the brand as a luxurious, nature‑infused ritual that enriches skin tone.",
+          "style": "real_word",
+          "fitRoots": [
+            "flora",
+            "green"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "alpine",
+          "rationale": "Alpine carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "real_word",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "florawise",
+          "rationale": "Florawise carries a clear “hair” cue for visible care and renewal, while “wise” adds good judgement. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "florapath",
+          "rationale": "Florapath carries a clear “hair” cue for visible care and renewal, while “path” adds guided progress. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "alpinewise",
+          "rationale": "Alpinewise carries a clear “hair” cue for visible care and renewal, while “wise” adds good judgement. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "wisealpine",
+          "rationale": "Wisealpine carries a clear “hair” cue for visible care and renewal, while “wise” adds good judgement. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "mineralpath",
+          "rationale": "Mineralpath carries a clear “hair” cue for visible care and renewal, while “path” adds guided progress. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "pathmineral",
+          "rationale": "Pathmineral carries a clear “hair” cue for visible care and renewal, while “path” adds guided progress. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "mineralworks",
+          "rationale": "Mineralworks carries a clear “hair” cue for visible care and renewal, while “works” adds practical capability. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        },
+        {
+          "name": "worksmineral",
+          "rationale": "Worksmineral carries a clear “hair” cue for visible care and renewal, while “works” adds practical capability. That combination feels considered and high-value for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora",
+            "water",
+            "field",
+            "grow",
+            "green",
+            "soil"
+          ],
+          "fitCues": [
+            "visible care and renewal",
+            "healthy growth"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "cozy-puzzle-studio",
+      "vibeGroup": "playful",
+      "brief": "cozy puzzle game studio making thoughtful games for adults",
+      "canonicalStyle": "Brandable",
+      "canonicalCreativity": "Exploratory",
+      "style": "brandable",
+      "creativity": "exploratory",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:cozy-puzzle-studio:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:42:54.274Z",
+      "durationMs": 6651,
+      "provider": "deterministic",
+      "model": null,
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "http_error",
+          "status": 429,
+          "durationMs": 138,
+          "retryAfterMs": 3000
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-4.1-mini",
+          "outcome": "timeout",
+          "durationMs": 4033
+        },
+        {
+          "provider": "vercel_gateway",
+          "model": "google/gemini-2.5-flash",
+          "outcome": "missing_key",
+          "durationMs": 0
+        },
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "timeout",
+          "durationMs": 2372
+        },
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "outcome": "timeout",
+          "durationMs": 0
+        }
+      ],
+      "modelBacked": false,
+      "modelCandidateCount": 0,
+      "fallbackCandidateCount": 16,
+      "fallbackReason": "groq_budget_exhausted",
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "a39c74baee505c5f7adf0c82e6846752eb449f9af7fb9e0b82ecf61e76cc9c4e",
+      "candidates": [
+        {
+          "name": "cozyplay",
+          "rationale": "Cozyplay carries a clear “frame” cue for creative craft, while “play” adds discovery. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "playcozy",
+          "rationale": "Playcozy carries a clear “frame” cue for creative craft, while “play” adds discovery. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "cozymark",
+          "rationale": "Cozymark carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "brandable",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "markcozy",
+          "rationale": "Markcozy carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "cozyloom",
+          "rationale": "Cozyloom carries a clear “frame” cue for creative craft, while “loom” adds craft. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "evocative",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "loomcozy",
+          "rationale": "Loomcozy carries a clear “frame” cue for creative craft, while “loom” adds craft. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "evocative",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "cozyframe",
+          "rationale": "Cozyframe carries a clear “frame” cue for creative craft, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "brandable",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "framecozy",
+          "rationale": "Framecozy carries a clear “frame” cue for creative craft, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "playpuzzle",
+          "rationale": "Playpuzzle carries a clear “frame” cue for creative craft, while “play” adds discovery. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "puzzleplay",
+          "rationale": "Puzzleplay carries a clear “frame” cue for creative craft, while “play” adds discovery. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "playmark",
+          "rationale": "Playmark carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "brandable",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "markplay",
+          "rationale": "Markplay carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "playloom",
+          "rationale": "Playloom carries a clear “frame” cue for creative craft, while “loom” adds craft. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "evocative",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "loomplay",
+          "rationale": "Loomplay carries a clear “frame” cue for creative craft, while “loom” adds craft. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "evocative",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "puzzlemark",
+          "rationale": "Puzzlemark carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "brandable",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        },
+        {
+          "name": "markpuzzle",
+          "rationale": "Markpuzzle carries a clear “frame” cue for creative craft, while “mark” adds distinctiveness. That combination feels lively without feeling childish for the intended customer and helps the brand leave room for a strong visual identity.",
+          "style": "compound",
+          "fitRoots": [
+            "frame",
+            "muse",
+            "craft",
+            "form",
+            "play"
+          ],
+          "fitCues": [
+            "creative craft",
+            "play and discovery"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "rural-telehealth",
+      "vibeGroup": "clean",
+      "brief": "telehealth access for rural patients and community clinics",
+      "canonicalStyle": "Short phrase",
+      "canonicalCreativity": "Direct",
+      "style": "short_phrase",
+      "creativity": "direct",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:rural-telehealth:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:43:03.058Z",
+      "durationMs": 3544,
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "ready",
+          "durationMs": 3481
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 11,
+      "fallbackCandidateCount": 5,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "fb262c54804c01ce61296e4338cf966ed3913caaad9c5a37feb389a6a4c11c5b",
+      "candidates": [
+        {
+          "name": "careflow",
+          "rationale": "Combines care with flow to suggest smooth, continuous health access; evokes motion, fits rural telehealth audiences seeking reliable support.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "care",
+            "pulse"
+          ],
+          "fitCues": [
+            "reassuring care"
+          ]
+        },
+        {
+          "name": "vitalstep",
+          "rationale": "Pairs vital with step, implying progressive health milestones; conveys forward motion for patients and clinics advancing telehealth connectivity.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "vital",
+            "join"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection"
+          ]
+        },
+        {
+          "name": "mendmove",
+          "rationale": "Mend plus move signals healing that travels; highlights the mobile, progressive nature of remote care for remote communities.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "pulse",
+            "mend"
+          ],
+          "fitCues": [
+            "reassuring care"
+          ]
+        },
+        {
+          "name": "clinicrun",
+          "rationale": "Clinic merged with run evokes a fast, ongoing service stream; reflects a clean, efficient telehealth route for rural sites.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "pulse",
+            "clinic"
+          ],
+          "fitCues": [
+            "reassuring care"
+          ]
+        },
+        {
+          "name": "joinpath",
+          "rationale": "Join and path together suggest collaborative routes to care; emphasizes community linkage and forward motion toward health access.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "join",
+            "near"
+          ],
+          "fitCues": [
+            "human connection"
+          ]
+        },
+        {
+          "name": "pulsepush",
+          "rationale": "Pulse plus push signals energetic, forward‑driving health signals; aligns with a clean, dynamic telehealth experience for patients.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "pulse",
+            "vital"
+          ],
+          "fitCues": [
+            "reassuring care"
+          ]
+        },
+        {
+          "name": "circlego",
+          "rationale": "Circle and go together imply a continuous, moving loop of care; reflects community clinics looping health resources to rural users.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "join",
+            "circle"
+          ],
+          "fitCues": [
+            "human connection"
+          ]
+        },
+        {
+          "name": "kindtrack",
+          "rationale": "Kind merged with track suggests compassionate monitoring; conveys steady progress and gentle guidance for remote health journeys.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "vital",
+            "kind"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection"
+          ]
+        },
+        {
+          "name": "bondrise",
+          "rationale": "Bond plus rise evokes strengthening connections that ascend; highlights collaborative growth and upward momentum in rural telehealth networks.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "vital",
+            "bond"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection"
+          ]
+        },
+        {
+          "name": "caretrail",
+          "rationale": "Care combined with trail paints a guided path of health; signals clear, progressive navigation for patients and clinics alike.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "care",
+            "near"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection"
+          ]
+        },
+        {
+          "name": "vitalrise",
+          "rationale": "Vital and rise together suggest health that lifts upward; reinforces a clean, forward‑moving image of accessible telehealth services.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "pulse",
+            "vital"
+          ],
+          "fitCues": [
+            "reassuring care"
+          ]
+        },
+        {
+          "name": "reachclinic",
+          "rationale": "Reachclinic carries a clear “care” cue for reassuring care, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for a local community and helps the brand feel credible, human and supportive in a sensitive category.",
+          "style": "compound",
+          "fitRoots": [
+            "care",
+            "pulse",
+            "vital",
+            "mend",
+            "clinic",
+            "join",
+            "bond",
+            "circle",
+            "kind",
+            "near",
+            "field"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection",
+            "rural reach"
+          ]
+        },
+        {
+          "name": "clinicreach",
+          "rationale": "Clinicreach carries a clear “care” cue for reassuring care, while its compact shape keeps the idea easy to say and remember. That combination feels clear and understated for a local community and helps the brand feel credible, human and supportive in a sensitive category.",
+          "style": "compound",
+          "fitRoots": [
+            "care",
+            "pulse",
+            "vital",
+            "mend",
+            "clinic",
+            "join",
+            "bond",
+            "circle",
+            "kind",
+            "near",
+            "field"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection",
+            "rural reach"
+          ]
+        },
+        {
+          "name": "reachbond",
+          "rationale": "Reachbond carries a clear “care” cue for reassuring care, while “bond” adds connection. That combination feels clear and understated for a local community and helps the brand feel credible, human and supportive in a sensitive category.",
+          "style": "brandable",
+          "fitRoots": [
+            "care",
+            "pulse",
+            "vital",
+            "mend",
+            "clinic",
+            "join",
+            "bond",
+            "circle",
+            "kind",
+            "near",
+            "field"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection",
+            "rural reach"
+          ]
+        },
+        {
+          "name": "bondreach",
+          "rationale": "Bondreach carries a clear “care” cue for reassuring care, while “bond” adds connection. That combination feels clear and understated for a local community and helps the brand feel credible, human and supportive in a sensitive category.",
+          "style": "compound",
+          "fitRoots": [
+            "care",
+            "pulse",
+            "vital",
+            "mend",
+            "clinic",
+            "join",
+            "bond",
+            "circle",
+            "kind",
+            "near",
+            "field"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection",
+            "rural reach"
+          ]
+        },
+        {
+          "name": "pathclinic",
+          "rationale": "Pathclinic carries a clear “care” cue for reassuring care, while “path” adds guided progress. That combination feels clear and understated for a local community and helps the brand feel credible, human and supportive in a sensitive category.",
+          "style": "compound",
+          "fitRoots": [
+            "care",
+            "pulse",
+            "vital",
+            "mend",
+            "clinic",
+            "join",
+            "bond",
+            "circle",
+            "kind",
+            "near",
+            "field"
+          ],
+          "fitCues": [
+            "reassuring care",
+            "human connection",
+            "rural reach"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "family-budgeting",
+      "vibeGroup": "friendly",
+      "brief": "simple household budgeting and savings app for young families",
+      "canonicalStyle": "Evocative",
+      "canonicalCreativity": "Direct",
+      "style": "evocative",
+      "creativity": "direct",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:family-budgeting:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:43:09.333Z",
+      "durationMs": 1055,
+      "provider": "groq",
+      "model": "openai/gpt-oss-20b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "outcome": "ready",
+          "durationMs": 926
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 8,
+      "fallbackCandidateCount": 8,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "6c9ec895d927ca984fcf042b49fcd5a21f5cd926cbdc014bdfee62bcdeb5ecf9",
+      "candidates": [
+        {
+          "name": "mintnest",
+          "rationale": "Combines mint’s freshness with nest’s coziness, evoking a safe, nurturing space for families to grow savings.",
+          "style": "evocative",
+          "fitRoots": [
+            "mint",
+            "family"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "savvyden",
+          "rationale": "Savvy denotes smart budgeting while den implies a private, secure spot for families to manage household funds.",
+          "style": "evocative",
+          "fitRoots": [
+            "save",
+            "family"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "fundhug",
+          "rationale": "Fund conveys financial building blocks; hug adds warmth, signaling a caring, supportive budgeting tool for young families.",
+          "style": "evocative",
+          "fitRoots": [
+            "fund",
+            "care"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "ledgerhug",
+          "rationale": "Ledger’s structure paired with hug’s comfort creates an image of a friendly, reliable budgeting companion.",
+          "style": "evocative",
+          "fitRoots": [
+            "ledger",
+            "care"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "mintkind",
+          "rationale": "Mint’s crispness meets kind’s gentle tone, projecting a friendly, encouraging app for family savings.",
+          "style": "evocative",
+          "fitRoots": [
+            "mint",
+            "kind"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "fundnest",
+          "rationale": "Fund’s financial foundation combined with nest’s homely sense signals a safe, nurturing savings environment.",
+          "style": "evocative",
+          "fitRoots": [
+            "fund",
+            "family"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "savvyhaven",
+          "rationale": "Savvy’s smart edge meets haven’s refuge, implying a secure, user‑friendly place for families to budget.",
+          "style": "evocative",
+          "fitRoots": [
+            "save",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "ledgerkind",
+          "rationale": "Ledger’s systematic nature with kind’s warmth suggests a structured yet caring budgeting experience.",
+          "style": "evocative",
+          "fitRoots": [
+            "ledger",
+            "kind"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "youngsaver",
+          "rationale": "Youngsaver carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "saveryoung",
+          "rationale": "Saveryoung carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "yowng",
+          "rationale": "Yowng carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "youngflow",
+          "rationale": "Youngflow carries a clear “ledger” cue for financial clarity, while “flow” adds an easier process. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "brandable",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "flowyoung",
+          "rationale": "Flowyoung carries a clear “ledger” cue for financial clarity, while “flow” adds an easier process. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "saverbudget",
+          "rationale": "Saverbudget carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "budgetsaver",
+          "rationale": "Budgetsaver carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "compound",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        },
+        {
+          "name": "budjet",
+          "rationale": "Budjet carries a clear “ledger” cue for financial clarity, while its compact shape keeps the idea easy to say and remember. That combination feels warm and approachable for families and helps the brand help people feel informed and in control of money.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "ledger",
+            "fund",
+            "save",
+            "mint",
+            "care",
+            "kind",
+            "family",
+            "haven"
+          ],
+          "fitCues": [
+            "financial clarity",
+            "family support"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "ai-scheduling-founders",
+      "vibeGroup": "tech",
+      "brief": "AI scheduling assistant for busy startup founders",
+      "canonicalStyle": "Compound",
+      "canonicalCreativity": "Direct",
+      "style": "compound",
+      "creativity": "direct",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:ai-scheduling-founders:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:43:16.996Z",
+      "durationMs": 2538,
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "ready",
+          "durationMs": 2479
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 6,
+      "fallbackCandidateCount": 10,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "316999a49679f0e4411539617c4765436f1ed5023969ff81ddffc6e45791d261",
+      "candidates": [
+        {
+          "name": "timeslot",
+          "rationale": "Combines the core concept of chronological management (time) with a discrete allocation unit (slot), signalling precise, founder‑focused scheduling in a crisp, tech‑savvy tone.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "slot"
+          ],
+          "fitCues": [
+            "faster scheduling"
+          ]
+        },
+        {
+          "name": "meetpilot",
+          "rationale": "Merges the act of gathering (meet) with guidance (pilot), portraying the assistant as a navigational co‑pilot steering busy founders through their calendar.",
+          "style": "compound",
+          "fitRoots": [
+            "meet",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "logicmind",
+          "rationale": "Joins analytical reasoning (logic) with the founder’s mental bandwidth (mind), suggesting an AI that extends cognitive capacity for scheduling decisions.",
+          "style": "compound",
+          "fitRoots": [
+            "logic",
+            "mind"
+          ],
+          "fitCues": [
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "signaltempo",
+          "rationale": "Pairs communicative cues (signal) with rhythmic pacing (tempo), evoking a steady, reliable beat that synchronises meetings for time‑pressed entrepreneurs.",
+          "style": "compound",
+          "fitRoots": [
+            "tempo",
+            "signal"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "pilotslot",
+          "rationale": "Frames the assistant as a flight‑deck operator (pilot) assigning precise time windows (slot), reinforcing confidence and control for startup leaders.",
+          "style": "compound",
+          "fitRoots": [
+            "slot",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "timepilot",
+          "rationale": "Blends chronological oversight (time) with directional expertise (pilot), positioning the tool as a trusted captain navigating founders through dense schedules.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "slotfounder",
+          "rationale": "Slotfounder carries a clear “time” cue for faster scheduling, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "fownder",
+          "rationale": "Fownder carries a clear “time” cue for faster scheduling, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "founderflow",
+          "rationale": "Founderflow carries a clear “time” cue for faster scheduling, while “flow” adds an easier process. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "brandable",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "founderwise",
+          "rationale": "Founderwise carries a clear “time” cue for faster scheduling, while “wise” adds good judgement. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "brandable",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "slotagenda",
+          "rationale": "Slotagenda carries a clear “time” cue for faster scheduling, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "ajenda",
+          "rationale": "Ajenda carries a clear “time” cue for faster scheduling, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "alternate_spelling",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "agendaguide",
+          "rationale": "Agendaguide carries a clear “time” cue for faster scheduling, while “guide” adds helpful direction. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "brandable",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "founderslot",
+          "rationale": "Founderslot carries a clear “time” cue for faster scheduling, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "flowfounder",
+          "rationale": "Flowfounder carries a clear “time” cue for faster scheduling, while “flow” adds an easier process. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "compound",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        },
+        {
+          "name": "wisefounder",
+          "rationale": "Wisefounder carries a clear “time” cue for faster scheduling, while “wise” adds good judgement. That combination feels modern and product-confident for founders and helps the brand remove calendar friction and save time.",
+          "style": "short_phrase",
+          "fitRoots": [
+            "time",
+            "slot",
+            "tempo",
+            "meet",
+            "logic",
+            "mind",
+            "signal",
+            "pilot"
+          ],
+          "fitCues": [
+            "faster scheduling",
+            "intelligent assistance"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "privacy-saas",
+      "vibeGroup": "tech",
+      "brief": "privacy compliance SaaS for European ecommerce teams",
+      "canonicalStyle": "Brandable",
+      "canonicalCreativity": "Balanced",
+      "style": "brandable",
+      "creativity": "balanced",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:privacy-saas:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:43:24.885Z",
+      "durationMs": 2825,
+      "provider": "groq",
+      "model": "qwen/qwen3.6-27b",
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "ready",
+          "durationMs": 2779
+        }
+      ],
+      "modelBacked": true,
+      "modelCandidateCount": 4,
+      "fallbackCandidateCount": 12,
+      "fallbackReason": null,
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "cae98142685648443e11bb4e07214bf5a73e72ec5485d6a1921b5827c6a9ea5b",
+      "candidates": [
+        {
+          "name": "guardia",
+          "rationale": "A rhythmic, liquid evolution of guard that feels like a standing order for protection. It suggests an automatic, habitual layer of security for European merchants, balancing the tech vibe with a human, attentive tone that implies constant, seamless oversight of compliance rituals.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard"
+          ],
+          "fitCues": [
+            "protection and trust"
+          ]
+        },
+        {
+          "name": "vaulten",
+          "rationale": "Merges vault with a soft, tech-friendly ending to suggest a secure repository for data. It evokes the ritual of locking away sensitive information, providing a sense of calm and order for ecommerce operators who must regularly audit and safeguard customer data against regulatory scrutiny.",
+          "style": "brandable",
+          "fitRoots": [
+            "vault"
+          ],
+          "fitCues": [
+            "protection and trust"
+          ]
+        },
+        {
+          "name": "cartly",
+          "rationale": "Connects directly to the ecommerce action of the shopping cart, implying that protection travels with every transaction. It frames privacy as an integral part of the checkout ritual, ensuring that each sale is compliant by design. The name is friendly, functional, and instantly recognizable to online sellers.",
+          "style": "brandable",
+          "fitRoots": [
+            "cart"
+          ],
+          "fitCues": [
+            "easy commerce"
+          ]
+        },
+        {
+          "name": "shelfer",
+          "rationale": "Reimagines the product shelf as a controlled, secure zone. It implies that every item listed is vetted and protected, turning inventory management into a compliance ritual. This name offers a tangible, organized feel for ecommerce teams, suggesting that safety is built into the very structure of their storefront.",
+          "style": "brandable",
+          "fitRoots": [
+            "shelf"
+          ],
+          "fitCues": [
+            "easy commerce"
+          ]
+        },
+        {
+          "name": "eurowatch",
+          "rationale": "Eurowatch carries a clear “guard” cue for protection and trust, while “watch” adds active vigilance. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "euroscope",
+          "rationale": "Euroscope carries a clear “guard” cue for protection and trust, while “scope” adds visibility. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "trusteuro",
+          "rationale": "Trusteuro carries a clear “guard” cue for protection and trust, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "watcheuro",
+          "rationale": "Watcheuro carries a clear “guard” cue for protection and trust, while “watch” adds active vigilance. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "trustlayer",
+          "rationale": "Trustlayer carries a clear “guard” cue for protection and trust, while “layer” adds a protective layer. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "layertrust",
+          "rationale": "Layertrust carries a clear “guard” cue for protection and trust, while “layer” adds a protective layer. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "watchtrust",
+          "rationale": "Watchtrust carries a clear “guard” cue for protection and trust, while “watch” adds active vigilance. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "privacybase",
+          "rationale": "Privacybase carries a clear “guard” cue for protection and trust, while “base” adds a dependable foundation. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "baseprivacy",
+          "rationale": "Baseprivacy carries a clear “guard” cue for protection and trust, while “base” adds a dependable foundation. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "eurotrust",
+          "rationale": "Eurotrust carries a clear “guard” cue for protection and trust, while its compact shape keeps the idea easy to say and remember. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "euroframe",
+          "rationale": "Euroframe carries a clear “guard” cue for protection and trust, while “frame” adds structure. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "brandable",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        },
+        {
+          "name": "patheuro",
+          "rationale": "Patheuro carries a clear “guard” cue for protection and trust, while “path” adds guided progress. That combination feels modern and product-confident for professional teams and helps the brand make risk feel controlled and dependable.",
+          "style": "compound",
+          "fitRoots": [
+            "guard",
+            "shield",
+            "vault",
+            "secure",
+            "cyber",
+            "cart",
+            "market",
+            "trade",
+            "shelf",
+            "code",
+            "stack",
+            "trace"
+          ],
+          "fitCues": [
+            "protection and trust",
+            "easy commerce",
+            "technical fluency"
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "curly-hair-beauty",
+      "vibeGroup": "playful",
+      "brief": "inclusive hair care brand for curls coils and textured hair",
+      "canonicalStyle": "Alternate spelling",
+      "canonicalCreativity": "Balanced",
+      "style": "alternate_spelling",
+      "creativity": "balanced",
+      "maxLength": 11,
+      "seed": "namelix-2026-07-14-v1:curly-hair-beauty:frozen-first-batch",
+      "capturedAt": "2026-07-14T14:43:36.542Z",
+      "durationMs": 6573,
+      "provider": "deterministic",
+      "model": null,
+      "providerAttempts": [
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "outcome": "http_error",
+          "status": 429,
+          "durationMs": 123,
+          "retryAfterMs": 1000
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-4.1-mini",
+          "outcome": "timeout",
+          "durationMs": 4010
+        },
+        {
+          "provider": "vercel_gateway",
+          "model": "google/gemini-2.5-flash",
+          "outcome": "missing_key",
+          "durationMs": 0
+        },
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b",
+          "outcome": "timeout",
+          "durationMs": 2371
+        },
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "outcome": "timeout",
+          "durationMs": 0
+        }
+      ],
+      "modelBacked": false,
+      "modelCandidateCount": 0,
+      "fallbackCandidateCount": 16,
+      "fallbackReason": "groq_budget_exhausted",
+      "transportRetryCount": 0,
+      "transportRetryReason": null,
+      "normalizedResponseSha256": "51b02e331e6c196d75386a3d9a98c30de41c84b6eae1dd1f583ee979ae0b0e73",
+      "candidates": [
+        {
+          "name": "coiltexture",
+          "rationale": "Coiltexture carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "texturecoil",
+          "rationale": "Texturecoil carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "wellcoil",
+          "rationale": "Wellcoil carries a clear “hair” cue for visible care and renewal, while “well” adds wellbeing. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "coilbloom",
+          "rationale": "Coilbloom carries a clear “hair” cue for visible care and renewal, while “bloom” adds growth. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "evocative",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "bloomcoil",
+          "rationale": "Bloomcoil carries a clear “hair” cue for visible care and renewal, while “bloom” adds growth. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "evocative",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "coilglow",
+          "rationale": "Coilglow carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "glowcoil",
+          "rationale": "Glowcoil carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "coilcare",
+          "rationale": "Coilcare carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "curltexture",
+          "rationale": "Curltexture carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "welltexture",
+          "rationale": "Welltexture carries a clear “hair” cue for visible care and renewal, while “well” adds wellbeing. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "textureglow",
+          "rationale": "Textureglow carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "glowtexture",
+          "rationale": "Glowtexture carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "compound",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "texturecare",
+          "rationale": "Texturecare carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "textureskip",
+          "rationale": "Textureskip carries a clear “hair” cue for visible care and renewal, while “skip” adds lightness. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "curlbloom",
+          "rationale": "Curlbloom carries a clear “hair” cue for visible care and renewal, while “bloom” adds growth. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "evocative",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        },
+        {
+          "name": "curlglow",
+          "rationale": "Curlglow carries a clear “hair” cue for visible care and renewal, while its compact shape keeps the idea easy to say and remember. That combination feels lively without feeling childish for the intended customer and helps the brand feel sensorial, considered and easy to remember.",
+          "style": "brandable",
+          "fitRoots": [
+            "hair",
+            "curl",
+            "care",
+            "glow",
+            "flora"
+          ],
+          "fitCues": [
+            "visible care and renewal"
+          ]
+        }
+      ]
+    }
+  ]
+}

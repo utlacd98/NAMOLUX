@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/queues/bulk-availability/route.ts": {
+      "experimentalTriggers": [
+        {
+          "type": "queue/v2beta",
+          "topic": "bulk-availability-v1",
+          "retryAfterSeconds": 15,
+          "initialDelaySeconds": 0
+        }
+      ]
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/seo-daily",
+      "schedule": "17 * * * *"
+    },
+    {
+      "path": "/api/cron/seo-weekly",
+      "schedule": "17 * * * 1"
+    }
+  ]
+}

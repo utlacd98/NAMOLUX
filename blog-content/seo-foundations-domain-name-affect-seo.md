@@ -74,8 +74,8 @@ The honest answer: your domain name matters a lot for brand building and a littl
 
 ---
 
-✨ *NamoLux scores every generated name on brand strength, memorability, and phonetic quality with Founder Signal™ — so you can choose a name that builds search authority over time, not just one that's available.*
+✨ *Bring candidate names to NamoLux, check the relevant domain extensions, then run Founder Signal™ when you want evidence on brand strength, memorability, and phonetic quality.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

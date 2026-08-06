@@ -1,0 +1,223 @@
+{
+  "raterId": "rater-3",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestwise": "shortlist",
+        "pennypath": "shortlist",
+        "brightbud": "reject",
+        "coinkind": "usable",
+        "pocketgrow": "usable",
+        "moneymate": "usable",
+        "homestead": "reject",
+        "safebloom": "usable",
+        "savorra": "reject",
+        "cashgarden": "usable",
+        "wiseplan": "usable",
+        "allowance": "reject",
+        "clearthrift": "usable",
+        "provision": "usable",
+        "headroom": "usable",
+        "margin": "reject"
+      },
+      "scores": {
+        "relevance": 7.8,
+        "pronounceabilityNaturalness": 8.3,
+        "distinctiveness": 5.6,
+        "vibeFit": 7.7
+      },
+      "topTwo": [
+        "nestwise",
+        "pennypath"
+      ],
+      "criticalDefects": [
+        "Too many names rely on familiar financial words or generic dictionary terms, limiting ownability.",
+        "Several entries drift away from household budgeting or feel colder and more transactional than the friendly brief."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "nestfold": "shortlist",
+        "glimmer": "usable",
+        "daydream": "usable",
+        "tactile": "usable",
+        "cosycraft": "usable",
+        "mindgarden": "shortlist",
+        "playmuse": "usable",
+        "quizzical": "shortlist",
+        "softspot": "usable",
+        "cozypuzzle": "reject",
+        "jigsaw": "reject",
+        "playfulplay": "reject",
+        "brainwave": "usable",
+        "rebus": "usable",
+        "willow": "usable",
+        "logicnest": "usable"
+      },
+      "scores": {
+        "relevance": 7.2,
+        "pronounceabilityNaturalness": 8.5,
+        "distinctiveness": 5.7,
+        "vibeFit": 8.1
+      },
+      "topTwo": [
+        "mindgarden",
+        "quizzical"
+      ],
+      "criticalDefects": [
+        "The set leans heavily on common dictionary words that sound pleasant but offer weak category distinction.",
+        "The weakest names are literal category labels or redundant constructions rather than credible studio brands."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "montavelle": "shortlist",
+        "silvaris": "usable",
+        "elevane": "usable",
+        "everfrost": "reject",
+        "alpineveil": "shortlist",
+        "lucentia": "shortlist",
+        "springtide": "usable",
+        "snowmelt": "usable",
+        "pureascent": "usable",
+        "glacial": "reject",
+        "serenity": "reject",
+        "purealpine": "reject",
+        "purity": "reject",
+        "silken": "usable",
+        "floraritual": "usable",
+        "mineraldew": "shortlist"
+      },
+      "scores": {
+        "relevance": 7.8,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 6.2,
+        "vibeFit": 8.0
+      },
+      "topTwo": [
+        "montavelle",
+        "alpineveil"
+      ],
+      "criticalDefects": [
+        "Cold terms such as everfrost and glacial can imply harshness or discomfort, an avoidable liability for skincare.",
+        "Pure and generic spa-language options are too descriptive or clichéd for a premium brand."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "cadentra": "shortlist",
+        "foundry": "reject",
+        "orbitask": "usable",
+        "calendra": "shortlist",
+        "focusway": "usable",
+        "harbor": "reject",
+        "swayline": "reject",
+        "routina": "usable",
+        "headroom": "reject",
+        "northstar": "reject",
+        "flowstate": "usable",
+        "smartslot": "usable",
+        "slotmind": "shortlist",
+        "readyagenda": "reject",
+        "sequence": "usable",
+        "diary": "reject"
+      },
+      "scores": {
+        "relevance": 6.7,
+        "pronounceabilityNaturalness": 7.8,
+        "distinctiveness": 5.5,
+        "vibeFit": 6.8
+      },
+      "topTwo": [
+        "cadentra",
+        "slotmind"
+      ],
+      "criticalDefects": [
+        "A large share of the set uses generic startup and productivity metaphors without signaling scheduling.",
+        "Several coined compounds are syntactically awkward, while the clearest scheduling names become generic or overly literal."
+      ],
+      "mechanicalFamilies": []
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "cashbook": "usable",
+        "accrual": "usable",
+        "bookwork": "reject",
+        "bookkeep": "reject",
+        "receipt": "reject",
+        "balance": "usable",
+        "daybook": "shortlist",
+        "journal": "reject",
+        "reckoning": "reject",
+        "worksheet": "reject",
+        "invoicegrid": "usable",
+        "soloscope": "shortlist",
+        "invoicecore": "reject",
+        "invoicetax": "reject",
+        "wiseinvoice": "reject",
+        "simplebooks": "usable"
+      },
+      "scores": {
+        "relevance": 7.6,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 3.9,
+        "vibeFit": 6.2
+      },
+      "topTwo": [
+        "daybook",
+        "soloscope"
+      ],
+      "criticalDefects": [
+        "The batch is dominated by generic bookkeeping nouns and keyword compounds, leaving very little proprietary brand territory.",
+        "Some options are grammatically clipped, intimidating, or negatively loaded rather than clean and freelancer-friendly."
+      ],
+      "mechanicalFamilies": [
+        "invoice template: invoicegrid, invoicecore, invoicetax, wiseinvoice"
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "nightwatch": "shortlist",
+        "threatloom": "shortlist",
+        "signalforge": "shortlist",
+        "intellic": "reject",
+        "vigilant": "usable",
+        "beaconry": "usable",
+        "shadowmap": "shortlist",
+        "riskweave": "shortlist",
+        "firebreak": "shortlist",
+        "sentrynet": "usable",
+        "detector": "reject",
+        "sharpthreat": "reject",
+        "spectrum": "usable",
+        "livethreat": "reject",
+        "firewall": "reject",
+        "vigilance": "usable"
+      },
+      "scores": {
+        "relevance": 8.5,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 6.6,
+        "vibeFit": 8.3
+      },
+      "topTwo": [
+        "signalforge",
+        "shadowmap"
+      ],
+      "criticalDefects": [
+        "Several entries are generic security vocabulary rather than differentiable platform names.",
+        "The weakest compounds sound mechanically assembled or truncated, which undermines enterprise credibility."
+      ],
+      "mechanicalFamilies": []
+    }
+  ]
+}

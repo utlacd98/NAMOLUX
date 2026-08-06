@@ -1,0 +1,429 @@
+{
+  "raterId": "rater-1",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestory": "shortlist",
+        "pocketa": "usable",
+        "hushbank": "reject",
+        "hearthwise": "shortlist",
+        "littlemore": "usable",
+        "softlanding": "usable",
+        "homelytics": "reject",
+        "safekeep": "usable",
+        "breadbasket": "reject",
+        "allowance": "reject",
+        "patchwork": "usable",
+        "harborlight": "usable",
+        "smallsteps": "usable",
+        "groweasy": "reject",
+        "steward": "usable",
+        "wiseplan": "reject"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "nestory",
+        "hearthwise"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "domestic or safety root joined to a competence or finance cue",
+          "names": [
+            "nestory",
+            "hushbank",
+            "hearthwise",
+            "homelytics",
+            "safekeep",
+            "harborlight"
+          ]
+        },
+        {
+          "pattern": "modest progress or financial-comfort phrase",
+          "names": [
+            "littlemore",
+            "softlanding",
+            "smallsteps",
+            "groweasy"
+          ]
+        },
+        {
+          "pattern": "bare common household or responsibility noun",
+          "names": [
+            "breadbasket",
+            "allowance",
+            "patchwork",
+            "steward"
+          ]
+        },
+        {
+          "pattern": "category stem with an ornamental suffix or generic qualifier",
+          "names": [
+            "pocketa",
+            "wiseplan"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "morrowink": "shortlist",
+        "puzzello": "reject",
+        "amblefern": "usable",
+        "softparlor": "reject",
+        "candlewick": "reject",
+        "lucidnest": "shortlist",
+        "sloworbit": "usable",
+        "kindreday": "reject",
+        "hearthside": "usable",
+        "riddance": "reject",
+        "daydream": "usable",
+        "afterglow": "usable",
+        "savoring": "reject",
+        "jigsaw": "reject",
+        "cozypuzzle": "reject",
+        "logicnest": "usable"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "morrowink",
+        "lucidnest"
+      ],
+      "criticalDefects": [
+        "candlewick is the exact name of an established creative-industry publisher."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "atmospheric literary, botanical, or warm-light imagery",
+          "names": [
+            "morrowink",
+            "amblefern",
+            "candlewick",
+            "daydream",
+            "afterglow"
+          ]
+        },
+        {
+          "pattern": "soft, slow, or hearthside leisure language",
+          "names": [
+            "softparlor",
+            "sloworbit",
+            "hearthside",
+            "savoring"
+          ]
+        },
+        {
+          "pattern": "puzzle category or cognition cue with a suffix or cozy container",
+          "names": [
+            "puzzello",
+            "lucidnest",
+            "jigsaw",
+            "cozypuzzle",
+            "logicnest"
+          ]
+        },
+        {
+          "pattern": "forced alteration of a familiar word or phrase",
+          "names": [
+            "kindreday",
+            "riddance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "alverine": "reject",
+        "vesperia": "usable",
+        "altivelle": "shortlist",
+        "silvarin": "usable",
+        "orivane": "usable",
+        "snowmelt": "usable",
+        "stoneveil": "shortlist",
+        "cloudpine": "usable",
+        "springmoss": "usable",
+        "watershed": "reject",
+        "headwater": "reject",
+        "evergreen": "reject",
+        "alpenglow": "usable",
+        "fountain": "reject",
+        "snowline": "usable",
+        "quietspring": "usable"
+      },
+      "scores": {
+        "relevance": 8,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "stoneveil",
+        "altivelle"
+      ],
+      "criticalDefects": [
+        "alverine is the exact name of a well-established pharmaceutical drug, creating an unsafe medical association."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "romance-language premium coinage",
+          "names": [
+            "alverine",
+            "vesperia",
+            "altivelle",
+            "silvarin",
+            "orivane"
+          ]
+        },
+        {
+          "pattern": "literal snow, alpine-light, or mountain-botanical imagery",
+          "names": [
+            "snowmelt",
+            "cloudpine",
+            "alpenglow",
+            "snowline"
+          ]
+        },
+        {
+          "pattern": "mineral, water, or botanical noun compound",
+          "names": [
+            "stoneveil",
+            "springmoss",
+            "watershed",
+            "headwater",
+            "quietspring"
+          ]
+        },
+        {
+          "pattern": "bare generic nature or water noun",
+          "names": [
+            "evergreen",
+            "fountain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "appointment": "reject",
+        "sequence": "usable",
+        "chronology": "reject",
+        "diary": "reject",
+        "cadence": "shortlist",
+        "timekeeper": "reject",
+        "timetable": "reject",
+        "calendar": "reject",
+        "scheduler": "reject",
+        "planner": "reject",
+        "slotmind": "shortlist",
+        "signalslot": "usable",
+        "foundercore": "reject",
+        "foundergrid": "reject",
+        "smartslot": "reject",
+        "readyagenda": "reject"
+      },
+      "scores": {
+        "relevance": 9,
+        "pronounceabilityNaturalness": 10,
+        "distinctiveness": 2,
+        "vibeFit": 5
+      },
+      "topTwo": [
+        "cadence",
+        "slotmind"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "bare scheduling, calendar, or ordering vocabulary",
+          "names": [
+            "appointment",
+            "sequence",
+            "chronology",
+            "diary",
+            "cadence",
+            "timekeeper",
+            "timetable",
+            "calendar",
+            "scheduler",
+            "planner"
+          ]
+        },
+        {
+          "pattern": "slot noun joined to an AI or readiness cue",
+          "names": [
+            "slotmind",
+            "signalslot",
+            "smartslot"
+          ]
+        },
+        {
+          "pattern": "founder qualifier plus generic platform noun",
+          "names": [
+            "foundercore",
+            "foundergrid"
+          ]
+        },
+        {
+          "pattern": "generic readiness qualifier plus calendar noun",
+          "names": [
+            "readyagenda"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "daymark": "usable",
+        "clearward": "usable",
+        "evenkeel": "shortlist",
+        "pactline": "usable",
+        "duenorth": "shortlist",
+        "balansa": "usable",
+        "earnest": "usable",
+        "truecourse": "usable",
+        "fairfold": "reject",
+        "tideline": "reject",
+        "netpath": "usable",
+        "accord": "usable",
+        "reckon": "usable",
+        "cashbook": "reject",
+        "wiseinvoice": "reject",
+        "invoicegrid": "reject"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 6,
+        "vibeFit": 8
+      },
+      "topTwo": [
+        "duenorth",
+        "evenkeel"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "stability, balance, or navigation metaphor",
+          "names": [
+            "daymark",
+            "clearward",
+            "evenkeel",
+            "duenorth",
+            "truecourse",
+            "tideline",
+            "netpath"
+          ]
+        },
+        {
+          "pattern": "trust or agreement vocabulary",
+          "names": [
+            "pactline",
+            "earnest",
+            "accord"
+          ]
+        },
+        {
+          "pattern": "coined balance or organization construction",
+          "names": [
+            "balansa",
+            "fairfold"
+          ]
+        },
+        {
+          "pattern": "literal accounting verb, category, or category compound",
+          "names": [
+            "reckon",
+            "cashbook",
+            "wiseinvoice",
+            "invoicegrid"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "semaphore": "usable",
+        "nightglass": "shortlist",
+        "corvanta": "shortlist",
+        "understory": "reject",
+        "sentryline": "usable",
+        "nocturne": "usable",
+        "signalkeep": "usable",
+        "blackfin": "usable",
+        "wardmark": "usable",
+        "velum": "usable",
+        "thrum": "usable",
+        "crosswind": "usable",
+        "threatloom": "usable",
+        "detector": "reject",
+        "sharpthreat": "reject",
+        "detectmax": "reject"
+      },
+      "scores": {
+        "relevance": 7,
+        "pronounceabilityNaturalness": 9,
+        "distinctiveness": 7,
+        "vibeFit": 9
+      },
+      "topTwo": [
+        "nightglass",
+        "corvanta"
+      ],
+      "criticalDefects": [],
+      "mechanicalFamilies": [
+        {
+          "pattern": "darkness, night, or black-animal imagery",
+          "names": [
+            "nightglass",
+            "nocturne",
+            "blackfin"
+          ]
+        },
+        {
+          "pattern": "signal, guarding, or threat noun compound",
+          "names": [
+            "semaphore",
+            "sentryline",
+            "signalkeep",
+            "wardmark",
+            "threatloom"
+          ]
+        },
+        {
+          "pattern": "abstract invented or atmospheric noun",
+          "names": [
+            "corvanta",
+            "understory",
+            "velum",
+            "thrum",
+            "crosswind"
+          ]
+        },
+        {
+          "pattern": "literal threat or detection terminology with generic modifier",
+          "names": [
+            "detector",
+            "sharpthreat",
+            "detectmax"
+          ]
+        }
+      ]
+    }
+  ]
+}

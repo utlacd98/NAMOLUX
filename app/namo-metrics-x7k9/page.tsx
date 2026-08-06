@@ -1,21 +1,22 @@
 "use client"
 
-import { useState, useEffect, useMemo, type FormEvent } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
-  RefreshCw, TrendingUp, TrendingDown, Users, MousePointerClick,
-  Activity, Zap, Search, FileSearch, Download, Copy,
+  RefreshCw, TrendingUp, TrendingDown, Users,
+  Activity, Zap, Search, Download, Copy,
   LayoutDashboard, Filter, Globe, ChevronLeft, ChevronRight, Menu, X,
-  Megaphone, Linkedin, Facebook, Send, Calendar, FileText, MessageSquare, Sparkles, CheckCircle, AlertCircle,
-  PenTool, Plus, Trash2, Eye, Code, Mail, UserPlus, Tag, MailCheck, MailX,
+  Megaphone, BriefcaseBusiness, MessagesSquare, Calendar, FileText, MessageSquare, Sparkles, CheckCircle, AlertCircle,
+  PenTool, Trash2, Eye, Code, Mail, UserPlus, MailCheck, MailX,
   Target, LineChart as LineChartIcon, AlertTriangle, Trophy, ArrowUpRight, ArrowDownRight,
   Crosshair, BarChart3, Award, Gauge, Lightbulb, Link, ExternalLink, Clock, Clapperboard, Play,
-  LockKeyhole, LogOut
+  LogOut, Save
 } from "lucide-react"
 import NextLink from "next/link"
+import { isValidBlogSlug } from "@/lib/blog"
 import { adCampaigns, generateAdScript, type AdCampaign } from "@/lib/ads-data"
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-  ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, LabelList
 } from "recharts"
 
 interface DashboardData {
@@ -26,12 +27,80 @@ interface DashboardData {
   avgActionsPerSession: number
   eventGrowth: number
   sessionGrowth: number
-  eventCounts: { nameGeneration: number; bulkCheck: number; seoAudit: number; affiliateClick: number; pageView: number }
+  eventCounts: {
+    nameGeneration: number
+    bulkCheck: number
+    seoAudit: number
+    affiliateClick: number
+    partnerCtaSeen: number
+    shortlistCreated: number
+    launchKitStarted: number
+    domainRegisterClicked: number
+    brandExportClicked: number
+    pageView: number
+  }
+  decisionWorkspace: {
+    bulkChecks: number
+    completedBulkChecks: number
+    partialBulkChecks: number
+    failedBulkChecks: number
+    candidatesSubmitted: number
+    domainResults: number
+    availableDomains: number
+    takenDomains: number
+    verificationRequired: number
+    providerChecks: number
+    cachedChecks: number
+    providerFailures: number
+    founderSignalRuns: number
+    savedDecisions: number
+    savedCandidates: number
+    scoredCandidatesSaved: number
+    winnersChosen: number
+    decisionReports: number
+    reportShares: number
+    daily: Array<{ date: string; bulkChecks: number; domainResults: number; availableDomains: number; savedDecisions: number; decisionReports: number }>
+  }
+  partnerMetrics: {
+    outboundCtr: number
+    resultCardCtr: number
+    shortlistCtr: number
+    launchKitConversion: number
+    topClickedDomains: Array<{ domain: string; clicks: number }>
+  }
   deviceCounts: { desktop: number; mobile: number; tablet: number; unknown: number }
   topCountries: Array<{ country: string; count: number }>
-  trends: Array<{ date: string; nameGeneration: number; bulkCheck: number; seoAudit: number; affiliateClick: number; total: number }>
+  trends: Array<{ date: string; nameGeneration: number; bulkCheck: number; seoAudit: number; affiliateClick: number; domainRegisterClicked: number; launchKitStarted: number; brandExportClicked: number; total: number }>
   funnel: Array<{ step: string; count: number; rate: number }>
   dropOffs: Record<string, number>
+  funnelSegments: Record<string, Array<{
+    dimension: string
+    value: string
+    sessions: number
+    engaged: number
+    generated: number
+    results: number
+    decision: number
+    paidIntent: number
+    checkout: number
+  }>>
+  feedback: {
+    totalLikes: number
+    totalDislikes: number
+    likeRate: number
+    saveRate: number
+    domainCheckRate: number
+    moreLikeThisRate: number
+    byStyleVibe: Array<{ namingStyle: string; vibe: string; likes: number; dislikes: number; likeRate: number }>
+    dislikeReasons: Array<{ reason: string; count: number }>
+    highPositiveNames: Array<{ name: string; positive: number; negative: number }>
+    weakBriefs: Array<{ briefId: string; dislikes: number; likes: number }>
+    promptModelComparisons: Array<{ promptVersion: string; modelName: string; likes: number; dislikes: number; likeRate: number }>
+    founderVsGeneral: {
+      founder: { positive: number; negative: number; likeRate: number }
+      general: { positive: number; negative: number; likeRate: number }
+    }
+  }
 }
 
 interface EventData {
@@ -41,7 +110,7 @@ interface EventData {
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "funnel", label: "Funnels", icon: Filter },
+  { id: "funnel", label: "Decision Funnel", icon: Filter },
   { id: "geo", label: "Geo & Devices", icon: Globe },
   { id: "events", label: "Events", icon: Activity },
   { id: "email-list", label: "Email List", icon: Mail },
@@ -74,15 +143,64 @@ interface BlogSectionState {
 const COLORS = { gold: "#D6B27C", blue: "#3b82f6", green: "#22c55e", muted: "#8F7A55", orange: "#f97316", cyan: "#06b6d4", pink: "#ec4899" }
 const DEVICE_COLORS = [COLORS.blue, COLORS.muted, COLORS.cyan, "#6b7280"]
 const EVENT_COLORS = [COLORS.gold, COLORS.blue, COLORS.green, COLORS.muted]
+const COUNTRY_NAME_FORMATTER = typeof Intl !== "undefined" && "DisplayNames" in Intl
+  ? new Intl.DisplayNames(["en"], { type: "region" })
+  : null
+
+function formatCountryLabel(country: string) {
+  if (!country || country === "Unknown") return "Unknown"
+
+  const countryCode = country.toUpperCase()
+  if (!/^[A-Z]{2}$/.test(countryCode)) return country
+
+  const countryName = COUNTRY_NAME_FORMATTER?.of(countryCode)
+  return countryName && countryName !== countryCode ? `${countryName} (${countryCode})` : countryCode
+}
 
 const ACTION_LABELS: Record<string, string> = {
   name_generation: "Generate", bulk_check: "Bulk Check", seo_audit: "SEO Audit",
-  affiliate_click: "Buy Click", page_view: "Page View",
+  quick_generate: "Quick Generate", quick_generate_started: "Quick Started", quick_generate_results: "Quick Results",
+  affiliate_click: "Affiliate Click", domain_register_clicked: "Register Click",
+  partner_cta_seen: "Partner CTA Seen", shortlist_created: "Shortlist Created",
+  launch_kit_started: "Launch Kit Started", brand_export_clicked: "Brand Export",
+  page_view: "Page View", engaged_10s: "Engaged 10s", engaged_30s: "Engaged 30s",
+  scroll_50: "Scrolled 50%", scroll_90: "Scrolled 90%",
+  content_cta_seen: "Content CTA Seen", content_cta_clicked: "Content CTA Clicked",
+  brief_submitted: "Brief Submitted", pricing_viewed: "Pricing Viewed",
+  checkout_intent: "Checkout Intent", decision_action: "Decision Action",
+  names_visible: "Names Visible", save: "Name Saved", dislike: "Name Disliked",
+  more_like_this: "More Like This", advanced_started: "Advanced Started",
+  founder_signal_clicked: "Founder Signal Clicked", founder_signal_scored: "Founder Signal Scored", batch_scored: "Batch Scored",
+  decision_saved: "Decision Saved", decision_report_created: "Report Created", report_share_created: "Report Link Created",
+  score_sort_used: "Score Sort Used", pricing_clicked: "Pricing Clicked",
 }
 const ACTION_COLORS: Record<string, string> = {
   name_generation: "bg-amber-600/20 text-amber-400", bulk_check: "bg-blue-500/20 text-blue-400",
+  quick_generate: "bg-yellow-500/20 text-yellow-300", quick_generate_started: "bg-yellow-500/20 text-yellow-300",
+  quick_generate_results: "bg-yellow-500/20 text-yellow-300",
   seo_audit: "bg-green-500/20 text-green-400", affiliate_click: "bg-amber-500/20 text-amber-300",
-  page_view: "bg-gray-500/20 text-gray-400",
+  domain_register_clicked: "bg-emerald-500/20 text-emerald-300", partner_cta_seen: "bg-cyan-500/20 text-cyan-300",
+  shortlist_created: "bg-purple-500/20 text-purple-300", launch_kit_started: "bg-pink-500/20 text-pink-300",
+  brand_export_clicked: "bg-orange-500/20 text-orange-300",
+  page_view: "bg-gray-500/20 text-gray-400", engaged_10s: "bg-cyan-500/20 text-cyan-300",
+  engaged_30s: "bg-cyan-500/20 text-cyan-300", scroll_50: "bg-sky-500/20 text-sky-300",
+  scroll_90: "bg-sky-500/20 text-sky-300", content_cta_seen: "bg-indigo-500/20 text-indigo-300",
+  content_cta_clicked: "bg-indigo-500/20 text-indigo-300", brief_submitted: "bg-yellow-500/20 text-yellow-300",
+  pricing_viewed: "bg-violet-500/20 text-violet-300", checkout_intent: "bg-emerald-500/20 text-emerald-300",
+  decision_action: "bg-purple-500/20 text-purple-300",
+  names_visible: "bg-cyan-500/20 text-cyan-300",
+  save: "bg-emerald-500/20 text-emerald-300",
+  dislike: "bg-slate-500/20 text-slate-300",
+  more_like_this: "bg-fuchsia-500/20 text-fuchsia-300",
+  advanced_started: "bg-indigo-500/20 text-indigo-300",
+  founder_signal_clicked: "bg-amber-500/20 text-amber-300",
+  founder_signal_scored: "bg-amber-500/20 text-amber-200",
+  batch_scored: "bg-yellow-500/20 text-yellow-300",
+  decision_saved: "bg-purple-500/20 text-purple-300",
+  decision_report_created: "bg-sky-500/20 text-sky-300",
+  report_share_created: "bg-emerald-500/20 text-emerald-300",
+  score_sort_used: "bg-orange-500/20 text-orange-300",
+  pricing_clicked: "bg-green-500/20 text-green-300",
 }
 
 // ============ SEO INTELLIGENCE MOCK DATA ============
@@ -311,78 +429,11 @@ async function readApiError(res: Response, fallback: string) {
   }
 }
 
-function AdminUnlockPanel({
-  token,
-  error,
-  loading,
-  onTokenChange,
-  onSubmit,
-}: {
-  token: string
-  error: string | null
-  loading: boolean
-  onTokenChange: (token: string) => void
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
-}) {
-  return (
-    <div className="mx-auto flex min-h-[calc(100vh-140px)] max-w-xl items-center justify-center py-10">
-      <form
-        onSubmit={onSubmit}
-        className="w-full rounded-2xl border border-primary/20 bg-card/40 p-6 shadow-2xl shadow-black/20 backdrop-blur"
-      >
-        <div className="mb-6 flex items-start gap-4">
-          <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 text-primary">
-            <LockKeyhole className="h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">Admin access required</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Enter the NamoLux admin token once to unlock analytics, exports, email lists, and marketing tools in this browser.
-            </p>
-          </div>
-        </div>
-
-        <label htmlFor="admin-token" className="mb-2 block text-sm font-medium text-muted-foreground">
-          Admin token
-        </label>
-        <input
-          id="admin-token"
-          type="password"
-          value={token}
-          onChange={(event) => onTokenChange(event.target.value)}
-          autoComplete="current-password"
-          className="w-full rounded-xl border border-border/60 bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary"
-          placeholder="Paste admin token"
-        />
-
-        {error && (
-          <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <LockKeyhole className="h-4 w-4" />
-          {loading ? "Unlocking..." : "Unlock analytics"}
-        </button>
-      </form>
-    </div>
-  )
-}
-
 export default function MetricsPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [events, setEvents] = useState<EventData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [adminLocked, setAdminLocked] = useState(false)
-  const [adminToken, setAdminToken] = useState("")
-  const [adminAuthError, setAdminAuthError] = useState<string | null>(null)
-  const [adminAuthLoading, setAdminAuthLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [days, setDays] = useState<7 | 30 | 90>(7)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -390,10 +441,10 @@ export default function MetricsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [showGenerate, setShowGenerate] = useState(true)
   const [showBulk, setShowBulk] = useState(true)
-  const [showAudit, setShowAudit] = useState(true)
-  const [showAffiliate, setShowAffiliate] = useState(true)
+  const [showAvailability, setShowAvailability] = useState(true)
+  const [showDecisions, setShowDecisions] = useState(true)
+  const [showReports, setShowReports] = useState(true)
 
   // Marketing Agent State
   const [maPlatform, setMaPlatform] = useState<"linkedin" | "facebook">("linkedin")
@@ -472,9 +523,9 @@ export default function MetricsPage() {
 
   const readProtectedJson = async (res: Response, fallback: string) => {
     if (res.status === 401) {
-      setAdminLocked(true)
       setData(null)
       setError(null)
+      window.location.assign("/sign-in?next=/namo-metrics-x7k9")
       throw new Error("Admin access required")
     }
 
@@ -485,50 +536,12 @@ export default function MetricsPage() {
     return res.json()
   }
 
-  const handleAdminUnlock = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const token = adminToken.trim()
-
-    if (!token) {
-      setAdminAuthError("Enter the admin token.")
-      return
-    }
-
-    setAdminAuthLoading(true)
-    setAdminAuthError(null)
-
-    try {
-      const res = await fetch("/api/metrics/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ token }),
-      })
-
-      if (!res.ok) {
-        throw new Error(await readApiError(res, "Invalid admin token"))
-      }
-
-      setAdminToken("")
-      setAdminLocked(false)
-      setError(null)
-      await fetchData(days)
-      if (activeTab === "events") await fetchEvents(1)
-      if (activeTab === "blog-analytics") await fetchBlogAnalytics()
-      if (activeTab === "email-list" || activeTab === "signups") await fetchEmailList()
-    } catch (e: any) {
-      setAdminAuthError(e.message || "Unable to unlock analytics")
-    } finally {
-      setAdminAuthLoading(false)
-    }
-  }
-
   const handleAdminSignOut = async () => {
     await fetch("/api/metrics/auth", { method: "DELETE", credentials: "include" }).catch(() => null)
-    setAdminLocked(true)
     setData(null)
     setEvents([])
     setError(null)
+    window.location.assign("/sign-in?next=/namo-metrics-x7k9")
   }
 
   const fetchEmailList = async () => {
@@ -607,7 +620,6 @@ export default function MetricsPage() {
       const res = await fetch(`/api/metrics/summary?days=${d}`)
       const json = await readProtectedJson(res, "Failed to fetch metrics")
       setData(json)
-      setAdminLocked(false)
     } catch (e: any) {
       if (e.message !== "Admin access required") {
         setError(e.message)
@@ -643,7 +655,8 @@ export default function MetricsPage() {
   const handleExport = () => { window.open(`/api/metrics/export?days=${days}`, "_blank") }
   const handleCopySummary = async () => {
     if (!data) return
-    const summary = `NamoLux Metrics (${days} days)\n━━━━━━━━━━━━━━━━━━━━━━━━\n📊 Total Events: ${data.totalEvents}\n👥 Unique Sessions: ${data.uniqueSessions}\n🔄 Returning: ${data.returningSessions}\n💰 Affiliate Rate: ${data.affiliateClickRate}%\n⚡ Avg Actions: ${data.avgActionsPerSession}`
+    const workspace = data.decisionWorkspace
+    const summary = `NamoLux Decision Metrics (${days} days)\n────────────────────────\nBulk Check runs: ${workspace.bulkChecks}\nDomains resolved: ${workspace.domainResults}\nAvailable domains: ${workspace.availableDomains}\nFounder Signal runs: ${workspace.founderSignalRuns}\nSaved decisions: ${workspace.savedDecisions}\nDecision reports: ${workspace.decisionReports}\nShare links: ${workspace.reportShares}`
     await navigator.clipboard.writeText(summary)
     alert("Summary copied!")
   }
@@ -850,10 +863,10 @@ export default function MetricsPage() {
   const featureMixData = useMemo(() => {
     if (!data) return []
     return [
-      { name: "Generate", value: data.eventCounts.nameGeneration },
-      { name: "Bulk Check", value: data.eventCounts.bulkCheck },
-      { name: "SEO Audit", value: data.eventCounts.seoAudit },
-      { name: "Buy Click", value: data.eventCounts.affiliateClick },
+      { name: "Bulk checks", value: data.decisionWorkspace.bulkChecks },
+      { name: "Available", value: data.decisionWorkspace.availableDomains },
+      { name: "Saved decisions", value: data.decisionWorkspace.savedDecisions },
+      { name: "Reports", value: data.decisionWorkspace.decisionReports },
     ].filter(d => d.value > 0)
   }, [data])
 
@@ -883,7 +896,7 @@ export default function MetricsPage() {
             <button onClick={() => setMobileNavOpen(!mobileNavOpen)} className="lg:hidden p-2 hover:bg-muted/50 rounded-lg">
               {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
-            <h1 className="text-xl font-bold text-foreground">📊 NamoLux Analytics</h1>
+            <h1 className="text-xl font-bold text-foreground">NamoLux Decision Metrics</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex gap-1 bg-muted/30 rounded-lg p-1">
@@ -897,19 +910,15 @@ export default function MetricsPage() {
             <button onClick={() => fetchData()} className="p-2 hover:bg-muted/50 rounded-lg" title="Refresh">
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </button>
-            {!adminLocked && (
-              <>
-                <button onClick={handleExport} className="p-2 hover:bg-muted/50 rounded-lg" title="Export CSV">
-                  <Download className="h-4 w-4" />
-                </button>
-                <button onClick={handleCopySummary} className="p-2 hover:bg-muted/50 rounded-lg" title="Copy Summary">
-                  <Copy className="h-4 w-4" />
-                </button>
-                <button onClick={handleAdminSignOut} className="p-2 hover:bg-muted/50 rounded-lg" title="Lock dashboard">
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </>
-            )}
+            <button onClick={handleExport} className="p-2 hover:bg-muted/50 rounded-lg" title="Export CSV">
+              <Download className="h-4 w-4" />
+            </button>
+            <button onClick={handleCopySummary} className="p-2 hover:bg-muted/50 rounded-lg" title="Copy Summary">
+              <Copy className="h-4 w-4" />
+            </button>
+            <button onClick={handleAdminSignOut} className="p-2 hover:bg-muted/50 rounded-lg" title="Sign out">
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
@@ -945,26 +954,28 @@ export default function MetricsPage() {
 
         {/* Main Content */}
         <main className="flex-1 p-6">
-          {adminLocked && (
-            <AdminUnlockPanel
-              token={adminToken}
-              error={adminAuthError}
-              loading={adminAuthLoading}
-              onTokenChange={setAdminToken}
-              onSubmit={handleAdminUnlock}
-            />
-          )}
-          {!adminLocked && error && <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-red-400">Error: {error}</div>}
+          {error && <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-red-400">Error: {error}</div>}
 
           {/* OVERVIEW TAB */}
-          {!adminLocked && activeTab === "overview" && data && (
+          {activeTab === "overview" && data && (
             <div className="space-y-6">
               {/* Metric Cards */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <MetricCard title="Total Events" value={data.totalEvents} icon={Activity} trend={data.eventGrowth} />
-                <MetricCard title="Generates" value={data.eventCounts.nameGeneration} icon={Zap} color="text-primary" />
-                <MetricCard title="Bulk Checks" value={data.eventCounts.bulkCheck} icon={Search} color="text-blue-400" />
-                <MetricCard title="SEO Audits" value={data.eventCounts.seoAudit} icon={FileSearch} color="text-green-400" />
+                <MetricCard title="Bulk Check runs" value={data.decisionWorkspace.bulkChecks} icon={Search} color="text-blue-400" />
+                <MetricCard title="Domains resolved" value={data.decisionWorkspace.domainResults} icon={CheckCircle} color="text-cyan-400" />
+                <MetricCard title="Available domains" value={data.decisionWorkspace.availableDomains} icon={Globe} color="text-green-400" />
+                <MetricCard title="Founder Signal runs" value={data.decisionWorkspace.founderSignalRuns} icon={Sparkles} color="text-primary" />
+                <MetricCard title="Saved decisions" value={data.decisionWorkspace.savedDecisions} icon={Save} color="text-purple-400" />
+                <MetricCard title="Scored candidates saved" value={data.decisionWorkspace.scoredCandidatesSaved} icon={Award} color="text-amber-400" />
+                <MetricCard title="Decision reports" value={data.decisionWorkspace.decisionReports} icon={FileText} color="text-sky-400" />
+                <MetricCard title="Share links created" value={data.decisionWorkspace.reportShares} icon={Link} color="text-emerald-400" />
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-4">
+                <MetricCard title="Checks completed" value={data.decisionWorkspace.completedBulkChecks + data.decisionWorkspace.partialBulkChecks} icon={CheckCircle} color="text-green-400" />
+                <MetricCard title="Needs verification" value={data.decisionWorkspace.verificationRequired} icon={AlertTriangle} color="text-amber-400" />
+                <MetricCard title="Winners chosen" value={data.decisionWorkspace.winnersChosen} icon={Trophy} color="text-purple-400" />
+                <MetricCard title="Cache hit rate" value={`${data.decisionWorkspace.providerChecks + data.decisionWorkspace.cachedChecks > 0 ? Math.round((data.decisionWorkspace.cachedChecks / (data.decisionWorkspace.providerChecks + data.decisionWorkspace.cachedChecks)) * 100) : 0}%`} icon={Gauge} color="text-cyan-400" />
               </div>
 
               {/* Charts Row */}
@@ -972,44 +983,44 @@ export default function MetricsPage() {
                 {/* Trend Chart */}
                 <div className="lg:col-span-2 rounded-xl border border-border/40 bg-card/30 p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-foreground">📈 Daily Trend</h3>
+                    <h3 className="font-semibold text-foreground">Decision workspace activity</h3>
                     <div className="flex gap-2 text-xs">
                       <label className="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" checked={showGenerate} onChange={(e) => setShowGenerate(e.target.checked)} className="rounded" />
-                        <span style={{ color: COLORS.gold }}>Generate</span>
-                      </label>
-                      <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={showBulk} onChange={(e) => setShowBulk(e.target.checked)} className="rounded" />
-                        <span style={{ color: COLORS.blue }}>Bulk</span>
+                        <span style={{ color: COLORS.gold }}>Bulk checks</span>
                       </label>
                       <label className="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" checked={showAudit} onChange={(e) => setShowAudit(e.target.checked)} className="rounded" />
-                        <span style={{ color: COLORS.green }}>Audit</span>
+                        <input type="checkbox" checked={showAvailability} onChange={(e) => setShowAvailability(e.target.checked)} className="rounded" />
+                        <span style={{ color: COLORS.green }}>Available</span>
                       </label>
                       <label className="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" checked={showAffiliate} onChange={(e) => setShowAffiliate(e.target.checked)} className="rounded" />
-                        <span style={{ color: COLORS.pink }}>Buy</span>
+                        <input type="checkbox" checked={showDecisions} onChange={(e) => setShowDecisions(e.target.checked)} className="rounded" />
+                        <span style={{ color: COLORS.muted }}>Saved</span>
+                      </label>
+                      <label className="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" checked={showReports} onChange={(e) => setShowReports(e.target.checked)} className="rounded" />
+                        <span style={{ color: COLORS.cyan }}>Reports</span>
                       </label>
                     </div>
                   </div>
                   <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={data.trends} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <LineChart data={data.decisionWorkspace.daily} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                       <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={11}
                         tickFormatter={(v) => { const d = new Date(v); return `${d.getDate()}/${d.getMonth()+1}` }} />
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} allowDecimals={false} />
                       <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }} />
-                      {showGenerate && <Line type="monotone" dataKey="nameGeneration" name="Generate" stroke={COLORS.gold} strokeWidth={2} dot={false} />}
-                      {showBulk && <Line type="monotone" dataKey="bulkCheck" name="Bulk" stroke={COLORS.blue} strokeWidth={2} dot={false} strokeDasharray="5 5" />}
-                      {showAudit && <Line type="monotone" dataKey="seoAudit" name="Audit" stroke={COLORS.green} strokeWidth={2} dot={false} />}
-                      {showAffiliate && <Line type="monotone" dataKey="affiliateClick" name="Buy" stroke={COLORS.pink} strokeWidth={2} dot={false} strokeDasharray="3 3" />}
+                      {showBulk && <Line type="monotone" dataKey="bulkChecks" name="Bulk checks" stroke={COLORS.gold} strokeWidth={2} dot={false} />}
+                      {showAvailability && <Line type="monotone" dataKey="availableDomains" name="Available domains" stroke={COLORS.green} strokeWidth={2} dot={false} strokeDasharray="5 5" />}
+                      {showDecisions && <Line type="monotone" dataKey="savedDecisions" name="Saved decisions" stroke={COLORS.muted} strokeWidth={2} dot={false} />}
+                      {showReports && <Line type="monotone" dataKey="decisionReports" name="Reports" stroke={COLORS.cyan} strokeWidth={2} dot={false} strokeDasharray="3 3" />}
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
 
                 {/* Feature Mix Pie */}
                 <div className="rounded-xl border border-border/40 bg-card/30 p-4">
-                  <h3 className="font-semibold text-foreground mb-4">🎯 Feature Mix</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Decision output mix</h3>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie data={featureMixData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value">
@@ -1032,14 +1043,15 @@ export default function MetricsPage() {
           )}
 
           {/* FUNNEL TAB */}
-          {!adminLocked && activeTab === "funnel" && data && (
+          {activeTab === "funnel" && data && (
             <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-foreground">🔄 Conversion Funnel</h2>
+              <h2 className="text-lg font-semibold text-foreground">Decision workspace funnel</h2>
               {data.funnel.every(f => f.count === 0) ? (
                 <div className="rounded-xl border border-border/40 bg-card/30 p-6 text-center">
-                  <p className="text-muted-foreground">No session data yet. Use the site to generate funnel data.</p>
+                  <p className="text-muted-foreground">No decision-workspace session data yet. Run a Bulk Check to begin collecting it.</p>
                 </div>
               ) : (
+                <>
                 <div className="rounded-xl border border-border/40 bg-card/30 p-6">
                   <div className="space-y-8">
                     {data.funnel.map((f, i) => {
@@ -1052,17 +1064,176 @@ export default function MetricsPage() {
                     })}
                   </div>
                 </div>
+                <div className="grid gap-4 xl:grid-cols-2">
+                  {Object.entries(data.funnelSegments || {}).map(([dimension, rows]) => (
+                    <div key={dimension} className="overflow-hidden rounded-xl border border-border/40 bg-card/30">
+                      <h3 className="border-b border-border/40 px-4 py-3 text-sm font-semibold capitalize text-foreground">
+                        By {dimension.replace(/([A-Z])/g, " $1")}
+                      </h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[520px] text-xs">
+                          <thead className="text-muted-foreground">
+                            <tr className="border-b border-border/30">
+                              <th className="px-3 py-2 text-left">Segment</th>
+                              <th className="px-2 py-2 text-right">Sessions</th>
+                              <th className="px-2 py-2 text-right">Engaged</th>
+                                <th className="px-2 py-2 text-right">Signal</th>
+                                <th className="px-2 py-2 text-right">Record</th>
+                              <th className="px-3 py-2 text-right">Checkout</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.slice(0, 8).map((row) => (
+                              <tr key={row.value} className="border-b border-border/20 last:border-0">
+                                <td className="max-w-[180px] truncate px-3 py-2 text-foreground" title={row.value}>{row.value}</td>
+                                <td className="px-2 py-2 text-right">{row.sessions}</td>
+                                <td className="px-2 py-2 text-right">{row.engaged}</td>
+                                <td className="px-2 py-2 text-right">{row.results}</td>
+                                <td className="px-2 py-2 text-right">{row.decision}</td>
+                                <td className="px-3 py-2 text-right">{row.checkout}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                </>
               )}
             </div>
           )}
 
+          {/* FEEDBACK TAB */}
+          {activeTab === "feedback" && data && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-foreground">Name Feedback</h2>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+                <MetricCard title="Likes" value={data.feedback.totalLikes} icon={CheckCircle} color="text-green-400" />
+                <MetricCard title="Dislikes" value={data.feedback.totalDislikes} icon={AlertTriangle} color="text-red-400" />
+                <MetricCard title="Like Rate" value={`${data.feedback.likeRate}%`} icon={TrendingUp} color="text-primary" />
+                <MetricCard title="Save Rate" value={`${data.feedback.saveRate}%`} icon={Trophy} color="text-purple-400" />
+                <MetricCard title="Domain Check" value={`${data.feedback.domainCheckRate}%`} icon={ExternalLink} color="text-blue-400" />
+                <MetricCard title="More Like This" value={`${data.feedback.moreLikeThisRate}%`} icon={Sparkles} color="text-amber-400" />
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="overflow-hidden rounded-xl border border-border/40 bg-card/30">
+                  <h3 className="border-b border-border/40 px-4 py-3 text-sm font-semibold text-foreground">Like rate by style and vibe</h3>
+                  <table className="w-full text-xs">
+                    <thead className="text-muted-foreground">
+                      <tr className="border-b border-border/30">
+                        <th className="px-3 py-2 text-left">Style</th>
+                        <th className="px-3 py-2 text-left">Vibe</th>
+                        <th className="px-2 py-2 text-right">Likes</th>
+                        <th className="px-2 py-2 text-right">Dislikes</th>
+                        <th className="px-3 py-2 text-right">Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.feedback.byStyleVibe.map((row) => (
+                        <tr key={`${row.namingStyle}-${row.vibe}`} className="border-b border-border/20 last:border-0">
+                          <td className="px-3 py-2 text-foreground">{row.namingStyle}</td>
+                          <td className="px-3 py-2 text-muted-foreground">{row.vibe}</td>
+                          <td className="px-2 py-2 text-right">{row.likes}</td>
+                          <td className="px-2 py-2 text-right">{row.dislikes}</td>
+                          <td className="px-3 py-2 text-right text-primary">{row.likeRate}%</td>
+                        </tr>
+                      ))}
+                      {data.feedback.byStyleVibe.length === 0 && <tr><td colSpan={5} className="px-4 py-6 text-center text-muted-foreground">No feedback yet</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                  <h3 className="text-sm font-semibold text-foreground">Most common dislike reasons</h3>
+                  <div className="mt-4 space-y-3">
+                    {data.feedback.dislikeReasons.map((row) => (
+                      <div key={row.reason}>
+                        <div className="mb-1 flex justify-between text-xs">
+                          <span className="capitalize text-muted-foreground">{row.reason.replace(/_/g, " ")}</span>
+                          <span className="text-foreground">{row.count}</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-muted/40">
+                          <div className="h-full rounded-full bg-red-400" style={{ width: `${Math.min(100, row.count * 12)}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                    {data.feedback.dislikeReasons.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No dislike reasons yet</p>}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                  <h3 className="text-sm font-semibold text-foreground">Names with high positive engagement</h3>
+                  <div className="mt-3 space-y-2">
+                    {data.feedback.highPositiveNames.map((row) => (
+                      <div key={row.name} className="flex items-center justify-between rounded-lg bg-background/40 px-3 py-2 text-sm">
+                        <span className="font-medium text-foreground">{row.name}</span>
+                        <span className="text-xs text-muted-foreground">{row.positive} positive / {row.negative} negative</span>
+                      </div>
+                    ))}
+                    {data.feedback.highPositiveNames.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No standout names yet</p>}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                  <h3 className="text-sm font-semibold text-foreground">Weak satisfaction briefs</h3>
+                  <div className="mt-3 space-y-2">
+                    {data.feedback.weakBriefs.map((row) => (
+                      <div key={row.briefId} className="flex items-center justify-between rounded-lg bg-background/40 px-3 py-2 text-sm">
+                        <span className="max-w-[220px] truncate text-foreground" title={row.briefId}>{row.briefId}</span>
+                        <span className="text-xs text-muted-foreground">{row.dislikes} dislikes / {row.likes} likes</span>
+                      </div>
+                    ))}
+                    {data.feedback.weakBriefs.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No weak brief clusters yet</p>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="overflow-hidden rounded-xl border border-border/40 bg-card/30">
+                  <h3 className="border-b border-border/40 px-4 py-3 text-sm font-semibold text-foreground">Prompt and model comparison</h3>
+                  <table className="w-full text-xs">
+                    <thead className="text-muted-foreground"><tr className="border-b border-border/30"><th className="px-3 py-2 text-left">Prompt</th><th className="px-3 py-2 text-left">Model</th><th className="px-2 py-2 text-right">Like rate</th></tr></thead>
+                    <tbody>
+                      {data.feedback.promptModelComparisons.map((row) => (
+                        <tr key={`${row.promptVersion}-${row.modelName}`} className="border-b border-border/20 last:border-0">
+                          <td className="px-3 py-2 text-foreground">{row.promptVersion}</td>
+                          <td className="px-3 py-2 text-muted-foreground">{row.modelName}</td>
+                          <td className="px-2 py-2 text-right text-primary">{row.likeRate}%</td>
+                        </tr>
+                      ))}
+                      {data.feedback.promptModelComparisons.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-center text-muted-foreground">No comparison data yet</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="rounded-xl border border-border/40 bg-card/30 p-4">
+                  <h3 className="text-sm font-semibold text-foreground">Founder vs general feedback</h3>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-lg bg-background/40 p-4">
+                      <p className="text-xs text-muted-foreground">Founder feedback</p>
+                      <p className="mt-2 text-2xl font-semibold text-foreground">{data.feedback.founderVsGeneral.founder.likeRate}%</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{data.feedback.founderVsGeneral.founder.positive} positive / {data.feedback.founderVsGeneral.founder.negative} negative</p>
+                    </div>
+                    <div className="rounded-lg bg-background/40 p-4">
+                      <p className="text-xs text-muted-foreground">General users</p>
+                      <p className="mt-2 text-2xl font-semibold text-foreground">{data.feedback.founderVsGeneral.general.likeRate}%</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{data.feedback.founderVsGeneral.general.positive} positive / {data.feedback.founderVsGeneral.general.negative} negative</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* GEO & DEVICES TAB */}
-          {!adminLocked && activeTab === "geo" && data && (() => {
+          {activeTab === "geo" && data && (() => {
             // Clean up country data - handle nil/null/Unknown
             const cleanedCountries = data.topCountries
               .map(c => ({
                 ...c,
-                country: c.country && c.country !== "nil" && c.country !== "null" ? c.country : "Unknown"
+                country: c.country && c.country !== "nil" && c.country !== "null" ? c.country : "Unknown",
+                countryLabel: formatCountryLabel(c.country && c.country !== "nil" && c.country !== "null" ? c.country : "Unknown"),
               }))
               .slice(0, 10)
 
@@ -1078,15 +1249,34 @@ export default function MetricsPage() {
                     </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={250}>
-                      <BarChart data={cleanedCountries} layout="vertical" margin={{ left: 50, right: 20, top: 10, bottom: 10 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} horizontal={false} />
-                        <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis type="category" dataKey="country" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} width={45} />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }}
-                          cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
+                      <BarChart data={cleanedCountries} layout="vertical" margin={{ left: 10, right: 46, top: 10, bottom: 10 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.25} horizontal={false} />
+                        <XAxis
+                          type="number"
+                          stroke="#FFFFFF"
+                          tick={{ fill: "#FFFFFF", fontSize: 12, fontWeight: 600 }}
+                          tickLine={false}
+                          axisLine={false}
                         />
-                        <Bar dataKey="count" fill={COLORS.gold} radius={[0, 4, 4, 0]} barSize={20} />
+                        <YAxis
+                          type="category"
+                          dataKey="countryLabel"
+                          stroke="#FFFFFF"
+                          tick={{ fill: "#FFFFFF", fontSize: 13, fontWeight: 700 }}
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={10}
+                          width={140}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "8px", color: "#FFFFFF" }}
+                          labelStyle={{ color: "#FFFFFF", fontWeight: 700 }}
+                          itemStyle={{ color: "#FFFFFF" }}
+                          cursor={{ fill: "var(--muted)", opacity: 0.3 }}
+                        />
+                        <Bar dataKey="count" fill={COLORS.gold} radius={[0, 4, 4, 0]} barSize={20}>
+                          <LabelList dataKey="count" position="right" fill="#FFFFFF" fontSize={12} fontWeight={700} />
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   )}
@@ -1118,7 +1308,7 @@ export default function MetricsPage() {
           )})()}
 
           {/* EVENTS TAB */}
-          {!adminLocked && activeTab === "events" && (
+          {activeTab === "events" && (
             <div className="space-y-4">
               {/* Filters */}
               <div className="flex flex-wrap gap-3">
@@ -1193,7 +1383,7 @@ export default function MetricsPage() {
           )}
 
           {/* EMAIL LIST TAB */}
-          {!adminLocked && activeTab === "email-list" && (
+          {activeTab === "email-list" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1413,7 +1603,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* SIGNUPS TAB */}
-          {!adminLocked && activeTab === "signups" && (() => {
+          {activeTab === "signups" && (() => {
             const signupList = emailList.filter(e => e.source === "signup")
             const todaySignups = signupList.filter(e => new Date(e.created_at).toDateString() === new Date().toDateString()).length
             const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7)
@@ -1511,7 +1701,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           })()}
 
           {/* SEO INTELLIGENCE TAB */}
-          {!adminLocked && activeTab === "seo-intel" && (
+          {activeTab === "seo-intel" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1640,7 +1830,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* CONTENT PERFORMANCE TAB */}
-          {!adminLocked && activeTab === "content-perf" && (
+          {activeTab === "content-perf" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1753,7 +1943,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* COMPETITOR MONITOR TAB */}
-          {!adminLocked && activeTab === "competitor" && (
+          {activeTab === "competitor" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -1870,7 +2060,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* SYSTEMATIC VALUE SCORE TAB */}
-          {!adminLocked && activeTab === "value-score" && (
+          {activeTab === "value-score" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2031,7 +2221,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* MARKETING AGENT TAB */}
-          {!adminLocked && activeTab === "marketing" && (
+          {activeTab === "marketing" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2056,11 +2246,11 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
                       <div className="flex gap-2">
                         <button onClick={() => setMaPlatform("linkedin")}
                           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${maPlatform === "linkedin" ? "border-primary bg-primary/10 text-primary" : "border-border/40 text-muted-foreground hover:border-border"}`}>
-                          <Linkedin className="h-4 w-4" /> LinkedIn
+                          <BriefcaseBusiness className="h-4 w-4" /> LinkedIn
                         </button>
                         <button onClick={() => setMaPlatform("facebook")}
                           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors ${maPlatform === "facebook" ? "border-primary bg-primary/10 text-primary" : "border-border/40 text-muted-foreground hover:border-border"}`}>
-                          <Facebook className="h-4 w-4" /> Facebook
+                          <MessagesSquare className="h-4 w-4" /> Facebook
                         </button>
                       </div>
                     </div>
@@ -2208,7 +2398,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* BLOG ANALYTICS TAB */}
-          {!adminLocked && activeTab === "blog-analytics" && (
+          {activeTab === "blog-analytics" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2285,9 +2475,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-bold text-primary">{article.views} views</span>
-                              <a href={`/blog/${article.slug}`} target="_blank" rel="noopener noreferrer" className="p-1 text-muted-foreground hover:text-primary">
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
+                              {isValidBlogSlug(article.slug) ? <a href={`/blog/${article.slug}`} target="_blank" rel="noopener noreferrer" className="p-1 text-muted-foreground hover:text-primary"><ExternalLink className="h-4 w-4" /></a> : null}
                             </div>
                           </div>
                         ))
@@ -2308,10 +2496,10 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
                       {blogAnalytics.keywordSuggestions.map((item) => (
                         <div key={item.slug} className="p-4 rounded-lg bg-background/50 border border-border/30">
                           <div className="flex items-center justify-between mb-2">
-                            <a href={`/blog/${item.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:text-primary flex items-center gap-1">
+                            {isValidBlogSlug(item.slug) ? <a href={`/blog/${item.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:text-primary flex items-center gap-1">
                               {item.article.length > 60 ? item.article.slice(0, 60) + "..." : item.article}
                               <ExternalLink className="h-3 w-3" />
-                            </a>
+                            </a> : <span className="text-sm font-medium text-muted-foreground">{item.article.length > 60 ? item.article.slice(0, 60) + "..." : item.article}</span>}
                             <div className="flex items-center gap-2">
                               <div className="w-16 h-2 bg-muted/30 rounded-full overflow-hidden">
                                 <div className="h-full bg-gradient-to-r from-amber-500 to-green-500 rounded-full" style={{ width: `${item.score}%` }} />
@@ -2342,7 +2530,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* BLOG EDITOR TAB */}
-          {!adminLocked && activeTab === "blog" && (
+          {activeTab === "blog" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -2601,7 +2789,7 @@ CREATE POLICY "Service role can manage emails" ON email_subscribers
           )}
 
           {/* ADS LIBRARY TAB */}
-          {!adminLocked && activeTab === "ads" && (
+          {activeTab === "ads" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">

@@ -1,27 +1,32 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getDashboardMetrics, getEnhancedTrends, getFunnelData } from "@/lib/metrics"
+import { getDashboardMetrics, getDecisionWorkspaceMetrics, getEnhancedTrends, getFeedbackAnalytics, getFunnelData } from "@/lib/metrics"
 import { requireAdminRequest } from "@/lib/admin-auth"
 
 export async function GET(request: NextRequest) {
   try {
-    const unauthorized = requireAdminRequest(request)
+    const unauthorized = await requireAdminRequest(request)
     if (unauthorized) return unauthorized
 
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get("days") || "7")
 
-    const [dashboard, trends, funnel] = await Promise.all([
+    const [dashboard, decisionWorkspace, trends, funnel, feedback] = await Promise.all([
       getDashboardMetrics(days),
+      getDecisionWorkspaceMetrics(days),
       getEnhancedTrends(days),
       getFunnelData(days),
+      getFeedbackAnalytics(days),
     ])
 
     // Set cache header (60s)
     const response = NextResponse.json({
       ...dashboard,
+      decisionWorkspace,
       trends,
       funnel: funnel.funnel,
       dropOffs: funnel.dropOffs,
+      funnelSegments: funnel.segments,
+      feedback,
     })
     response.headers.set("Cache-Control", "private, max-age=60")
 

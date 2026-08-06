@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { X, Download, ChevronDown, ChevronUp, Star, Clock, Archive } from "lucide-react"
 import { namecheapLink } from "@/lib/affiliateLink"
+import { trackAffiliateClick, trackEvent } from "@/lib/analytics"
 
 export type NameTier = "love" | "maybe" | "backup"
 
@@ -109,6 +110,18 @@ export function SavedNamesBoard({ legacyShortlist = [], onClose }: SavedNamesBoa
     a.href = URL.createObjectURL(blob)
     a.download = "namolux-saved-names.txt"
     a.click()
+    trackEvent({
+      action: "brand_export_clicked",
+      metadata: { source: "saved_names_board_txt", count: board.length },
+    })
+  }
+
+  function trackRegister(domain: string) {
+    trackAffiliateClick(domain, { source: "saved_names_board" })
+    trackEvent({
+      action: "domain_register_clicked",
+      metadata: { domain, source: "saved_names_board" },
+    })
   }
 
   const total = board.length
@@ -207,9 +220,10 @@ export function SavedNamesBoard({ legacyShortlist = [], onClose }: SavedNamesBoa
                           }}
                         >
                           <a
-                            href={namecheapLink(saved.domain)}
+                            href={namecheapLink(saved.domain, { source: "saved_names_board", content: saved.tier })}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => trackRegister(saved.domain)}
                             className="text-[11px] font-semibold text-white/70 transition-colors hover:text-white"
                             title={`Register ${saved.domain}`}
                           >

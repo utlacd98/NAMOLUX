@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Clock, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { BlogPost } from "@/lib/blog"
+import { isValidBlogSlug, type BlogPost } from "@/lib/blog"
 
 interface BlogCardProps {
   post: BlogPost
@@ -15,6 +15,7 @@ const categoryColors: Record<string, string> = {
 }
 
 export function BlogCard({ post, featured = false }: BlogCardProps) {
+  const href = isValidBlogSlug(post.slug) ? `/blog/${post.slug}` : null
   return (
     <article
       className={cn(
@@ -47,9 +48,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
             featured ? "text-xl md:text-2xl" : "text-lg"
           )}
         >
-          <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
-            {post.title}
-          </Link>
+          {href ? <Link href={href} className="after:absolute after:inset-0">{post.title}</Link> : post.title}
         </h2>
 
         {/* Description */}
@@ -66,4 +65,3 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
     </article>
   )
 }
-

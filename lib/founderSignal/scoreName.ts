@@ -1,6 +1,16 @@
-import { getRealnessScore } from "../domainGen/realness"
+import { getRealnessScore, isKeywordClone } from "../domainGen/realness"
 import { hasRandomSyllablePattern, hasUnsafeBrandMeaning } from "../domainGen/filters"
 import { computeBrandInstinct } from "./brandInstinct"
+import {
+  assessBrandCollision,
+  FOUNDER_SIGNAL_CONFIDENCE,
+  FOUNDER_SIGNAL_EVALUATED_ON,
+  FOUNDER_SIGNAL_VERSION,
+  getFounderSignalBand,
+  getFounderSignalDimensionWeight,
+  type BrandCollisionAssessment,
+  type FounderSignalBand,
+} from "./spec"
 
 export type FounderLabel = "Pronounceable" | "Brandable"
 export type BrandVibe = "luxury" | "futuristic" | "playful" | "trustworthy" | "minimal" | ""
@@ -17,9 +27,17 @@ export interface ScoreNameInput {
 
 export interface ScoreNameResult {
   score: number
+  band: FounderSignalBand
   label: FounderLabel
   reasons: string[]
+  version: typeof FOUNDER_SIGNAL_VERSION
+  evaluatedOn: typeof FOUNDER_SIGNAL_EVALUATED_ON
+  confidence: typeof FOUNDER_SIGNAL_CONFIDENCE
+  collision: BrandCollisionAssessment
   breakdown: {
+    /** Canonical Clarity contribution (length + realness, 35 points maximum). */
+    clarityScore: number
+    /** @deprecated Use clarityScore. Retained for current consumers. */
     lengthScore: number
     pronounceScore: number
     memorabilityScore: number
@@ -30,6 +48,8 @@ export interface ScoreNameResult {
   }
   /** Raw 0-100 scores before weighting - for UI display */
   rawScores: {
+    clarity: number
+    realness: number
     length: number
     pronounceability: number
     memorability: number
@@ -50,18 +70,6 @@ const INDUSTRY_CLICHES = [
   "cloud", "sync", "data", "tech", "digital", "smart", "ai", "ml",
   "pixel", "wealth", "finance", "health", "crypto", "block", "chain",
   "solutions", "global", "group", "systems", "pro", "plus", "max"
-]
-
-// Known major brands for conflict detection
-const KNOWN_BRANDS = [
-  "google", "apple", "amazon", "microsoft", "facebook", "meta", "netflix", "spotify",
-  "stripe", "slack", "notion", "figma", "linear", "vercel", "supabase", "prisma",
-  "twilio", "sendgrid", "mailchimp", "hubspot", "zendesk", "asana", "trello",
-  "dropbox", "zoom", "shopify", "square", "paypal", "venmo", "uber", "lyft",
-  "airbnb", "tiktok", "snapchat", "twitter", "instagram", "whatsapp", "telegram",
-  "discord", "reddit", "pinterest", "linkedin", "youtube", "twitch",
-  "mycloud", "icloud", "onedrive", "gdrive", // cloud services
-  "pornhub", "redtube", "xvideos" // adult content to avoid phonetic similarity
 ]
 
 // Common dictionary words (exact match penalty)
@@ -250,13 +258,22 @@ function hasChildishOrRandomTone(name: string): boolean {
 }
 
 /** Return a zero-score result for hard-rejected names */
-function zeroScoreResult(reasons: string[], tld: string): ScoreNameResult {
+function zeroScoreResult(
+  reasons: string[],
+  tld: string,
+  collision: BrandCollisionAssessment,
+): ScoreNameResult {
   return {
     score: 0,
+    band: getFounderSignalBand(0),
     label: "Brandable",
     reasons,
-    breakdown: { lengthScore: 0, pronounceScore: 0, memorabilityScore: 0, extensionScore: 0, characterScore: 0, brandRiskScore: 0, vibeModifier: 0 },
-    rawScores: { length: 0, pronounceability: 0, memorability: 0, extension: TLD_STRENGTH[tld] || 30, characterQuality: 0, brandRisk: 0 },
+    version: FOUNDER_SIGNAL_VERSION,
+    evaluatedOn: FOUNDER_SIGNAL_EVALUATED_ON,
+    confidence: FOUNDER_SIGNAL_CONFIDENCE,
+    collision,
+    breakdown: { clarityScore: 0, lengthScore: 0, pronounceScore: 0, memorabilityScore: 0, extensionScore: 0, characterScore: 0, brandRiskScore: 0, vibeModifier: 0 },
+    rawScores: { clarity: 0, realness: 0, length: 0, pronounceability: 0, memorability: 0, extension: TLD_STRENGTH[tld] || 30, characterQuality: 0, brandRisk: 0 },
   }
 }
 
@@ -287,34 +304,6 @@ function startsWithGenericPrefix(name: string): boolean {
 
 function endsWithGenericSuffix(name: string): boolean {
   return GENERIC_SUFFIXES.some(suffix => name.endsWith(suffix) && name.length > suffix.length + 2)
-}
-
-function hasPhoneticSimilarityToBrand(name: string): string | null {
-  for (const brand of KNOWN_BRANDS) {
-    // Check if name is too similar to a known brand
-    if (name === brand) continue
-
-    // Check prefix similarity (first 4+ chars)
-    const prefixLen = Math.min(4, Math.min(name.length, brand.length))
-    if (prefixLen >= 3 && name.slice(0, prefixLen) === brand.slice(0, prefixLen)) {
-      return brand
-    }
-
-    // Check if name contains the brand or vice versa
-    if (name.length >= 4 && brand.includes(name)) return brand
-    if (brand.length >= 4 && name.includes(brand)) return brand
-
-    // Phonetic similarity check for "hub" names (avoid pawhub->pornhub confusion)
-    if (name.endsWith("hub") && brand.endsWith("hub")) {
-      const nameRoot = name.slice(0, -3)
-      const brandRoot = brand.slice(0, -3)
-      if (nameRoot.length >= 2 && brandRoot.length >= 2) {
-        // Simple phonetic: first letter + vowel pattern
-        if (nameRoot[0] === brandRoot[0]) return brand
-      }
-    }
-  }
-  return null
 }
 
 // ============================================================================
@@ -476,10 +465,10 @@ function calculateCharacterQualityScore(name: string): number {
 }
 
 /**
- * 6. Brand Risk Score (weight: 0.25) - THE MOST IMPORTANT FACTOR
+ * 6. Brand Risk Score (weight: 0.17)
  * Start at 100, apply penalties for generic patterns, brand conflicts, clichés
  */
-function calculateBrandRiskScore(name: string): number {
+function calculateBrandRiskScore(name: string, collision: BrandCollisionAssessment): number {
   let score = 100
 
   // Generic prefix (my-, get-, try-, go-, use-): -15
@@ -500,12 +489,11 @@ function calculateBrandRiskScore(name: string): number {
     }
   }
 
-  // Phonetic similarity to major existing brand: -25
-  const similarBrand = hasPhoneticSimilarityToBrand(name)
-  if (similarBrand) {
+  // A close active-brand match is also handled by the canonical severe score cap.
+  if (collision.type === "close-match") {
     score -= 25
     // Extra penalty for adult content similarity
-    if (["pornhub", "redtube", "xvideos"].includes(similarBrand)) {
+    if (collision.matchedBrand && ["pornhub", "redtube", "xvideos"].includes(collision.matchedBrand)) {
       score -= 15 // total -40 for adult content similarity
     }
   }
@@ -617,46 +605,32 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const name = normalise(input.name)
   const tld = normalise(input.tld || "com") || "com"
   const vibe = input.vibe || ""
+  const collision = assessBrandCollision(name)
 
   const reasons: string[] = []
 
+  if (collision.action === "disqualify") {
+    reasons.push(`Exact active-brand collision: ${collision.matchedBrand}`)
+    return zeroScoreResult(reasons, tld, collision)
+  }
+
   if (hasUnsafeBrandMeaning(name)) {
     reasons.push("Unsafe or accidental meaning")
-    return zeroScoreResult(reasons, tld)
+    return zeroScoreResult(reasons, tld, collision)
   }
 
   if (hasRandomSyllablePattern(name)) {
     reasons.push("Random syllable pattern")
-    return zeroScoreResult(reasons, tld)
+    return zeroScoreResult(reasons, tld, collision)
   }
 
   // ── Keyword mutation hard block ──
   // If keywords were provided, any name containing a keyword root scores 0.
   // This is the last line of defence — names should already be rejected by
   // filters, but this ensures they never appear with a real score.
-  if (input.keywords && input.keywords.length > 0) {
-    for (const kw of input.keywords) {
-      const root = kw.toLowerCase().replace(/[^a-z]/g, "")
-      if (root.length <= 3) {
-        if (name.includes(root)) {
-          reasons.push("Keyword mutation detected")
-          return zeroScoreResult(reasons, tld)
-        }
-      } else if (root.length >= 4) {
-        // Check full and truncated prefix (4+ chars)
-        if (name.includes(root)) {
-          reasons.push("Keyword mutation detected")
-          return zeroScoreResult(reasons, tld)
-        }
-        const minPre = Math.min(4, root.length - 1)
-        for (let len = root.length - 1; len >= minPre; len--) {
-          if (name.includes(root.slice(0, len))) {
-            reasons.push("Keyword mutation detected")
-            return zeroScoreResult(reasons, tld)
-          }
-        }
-      }
-    }
+  if (input.keywords && input.keywords.length > 0 && isKeywordClone(name, input.keywords)) {
+    reasons.push("Low-effort keyword mutation detected")
+    return zeroScoreResult(reasons, tld, collision)
   }
 
   // Calculate raw scores (0-100 each)
@@ -665,26 +639,23 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const rawMemorability = calculateMemorabilityScore(name)
   const rawExtension = calculateExtensionScore(tld)
   const rawCharacterQuality = calculateCharacterQualityScore(name)
-  const rawBrandRisk = calculateBrandRiskScore(name)
+  const rawBrandRisk = calculateBrandRiskScore(name, collision)
   const rawRealness = getRealnessScore(name)
 
-  // Weighted formula (extended to include realness):
-  //   realness      22%  (distinguishes real/brand-plausible from gibberish)
-  //   brand risk    17%
-  //   memorability  17%
-  //   length        13%
-  //   pronounce     11%
-  //   extension     10%
-  //   char quality  10%
+  // Canonical Clarity combines the established length (13%) and realness (22%)
+  // contributions. Keeping those components unchanged preserves existing scores.
   const weightedLength = rawLength * 0.13
-  const weightedPronounce = rawPronounceability * 0.11
-  const weightedMemorability = rawMemorability * 0.17
-  const weightedExtension = rawExtension * 0.10
-  const weightedCharacter = rawCharacterQuality * 0.10
-  const weightedBrandRisk = rawBrandRisk * 0.17
   const weightedRealness = rawRealness * 0.22
+  const weightedClarity = weightedLength + weightedRealness
+  const clarityWeight = getFounderSignalDimensionWeight("clarity") / 100
+  const rawClarity = clarityWeight > 0 ? weightedClarity / clarityWeight : 0
+  const weightedPronounce = rawPronounceability * (getFounderSignalDimensionWeight("pronunciation") / 100)
+  const weightedMemorability = rawMemorability * (getFounderSignalDimensionWeight("memorability") / 100)
+  const weightedExtension = rawExtension * (getFounderSignalDimensionWeight("extensionStrength") / 100)
+  const weightedCharacter = rawCharacterQuality * (getFounderSignalDimensionWeight("characterQuality") / 100)
+  const weightedBrandRisk = rawBrandRisk * (getFounderSignalDimensionWeight("brandRisk") / 100)
 
-  const baseScore = weightedLength + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk + weightedRealness
+  const baseScore = weightedClarity + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk
 
   // Apply vibe modifier
   const vibeModifier = calculateVibeModifier(name, vibe)
@@ -745,6 +716,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
     cap = Math.min(cap, 94)
   }
 
+  if (collision.action === "severe-cap" && collision.scoreCap !== null) {
+    cap = Math.min(cap, collision.scoreCap)
+  }
+
   // Apply the cap
   combinedScore = Math.min(combinedScore, cap)
 
@@ -775,6 +750,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   if (rawMemorability >= 80) reasons.push("Highly memorable")
   else if (rawMemorability < 50) reasons.push("Low memorability")
 
+  if (collision.type === "close-match") {
+    reasons.push(`Close active-brand match: ${collision.matchedBrand} (score capped at ${collision.scoreCap})`)
+  }
+
   if (rawBrandRisk < 60) reasons.push("Brand risk concerns")
   if (rawBrandRisk < 40) reasons.push("High brand risk")
 
@@ -795,9 +774,15 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   return {
     score: totalScore,
+    band: getFounderSignalBand(totalScore),
     label,
     reasons,
+    version: FOUNDER_SIGNAL_VERSION,
+    evaluatedOn: FOUNDER_SIGNAL_EVALUATED_ON,
+    confidence: FOUNDER_SIGNAL_CONFIDENCE,
+    collision,
     breakdown: {
+      clarityScore: Math.round(weightedClarity),
       lengthScore: Math.round(weightedLength),
       pronounceScore: Math.round(weightedPronounce),
       memorabilityScore: Math.round(weightedMemorability),
@@ -807,6 +792,8 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
       vibeModifier,
     },
     rawScores: {
+      clarity: Math.round(rawClarity),
+      realness: rawRealness,
       length: rawLength,
       pronounceability: rawPronounceability,
       memorability: rawMemorability,

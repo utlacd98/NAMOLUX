@@ -6,28 +6,86 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Breadcrumbs, generateBreadcrumbSchema, BlogCard, Callout, BlogTracker } from "@/components/blog"
 import { Button } from "@/components/ui/button"
-import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog"
+import { getAllPosts, getPostBySlug, getPostReadTime, getRelatedPosts, isMonetizableBlogPost, isPublicBlogPost, isValidBlogSlug, type BlogPost } from "@/lib/blog"
+import { planArticleAds } from "@/lib/article-ad-plan"
 import { Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react"
+import { Fragment } from "react"
+import { AdBanner } from "@/components/ad-banner"
+import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 
 interface BlogPostPageProps {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug?: string }>
+}
+
+// Every published article is generated at build time. Unknown paths (including
+// /blog/null) must 404 before any fallback document can be rendered or cached.
+export const dynamicParams = false
+
+function contextualGeneratorFor(post: BlogPost) {
+  const topic = post.primaryKeyword || post.title
+
+  switch (post.category) {
+    case "Domain Strategy":
+      return {
+        topic,
+        heading: "Check a shortlist for this idea",
+        defaultBrief: `I need to compare a credible, memorable shortlist for a startup related to ${topic}. The candidates should be easy to pronounce, work internationally, and suit a strong domain.`,
+      }
+    case "Tool Comparisons":
+      return {
+        topic,
+        heading: "Test the same shortlist in NamoLux",
+        defaultBrief: `I am naming a startup related to ${topic}. I want to compare distinctive, professional candidates for memorability, pronunciation, and domain fit.`,
+      }
+    case "SEO Foundations":
+      return {
+        topic,
+        heading: "Create a name built for brand and search",
+        defaultBrief: `I need a brandable business name related to ${topic}. It should be memorable, search-distinctive, easy to spell, and suitable for a clean domain.`,
+      }
+    default:
+      return {
+        topic,
+        heading: "Turn this business concept into a shortlist",
+        defaultBrief: `I am building a business related to ${topic}. I want a professional, scalable name that feels credible to customers and investors.`,
+      }
+  }
+}
+
+function findActivationIndexes(post: BlogPost, adIndexes: Set<number>) {
+  const majorHeadings = post.content.flatMap((section, index) =>
+    section.type === "heading" && section.level === 2 ? [index] : [],
+  )
+  const firstSectionEnd = majorHeadings[1] !== undefined
+    ? majorHeadings[1] - 1
+    : Math.min((majorHeadings[0] ?? 0) + 2, post.content.length - 1)
+  const miniGeneratorIndex = adIndexes.has(firstSectionEnd)
+    ? Math.min(firstSectionEnd + 1, post.content.length - 1)
+    : firstSectionEnd
+  const internalLinksIndex = majorHeadings[2] !== undefined
+    ? majorHeadings[2] - 1
+    : post.content.length - 1
+
+  return { miniGeneratorIndex, internalLinksIndex }
 }
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
-  const posts = getAllPosts()
+  const posts = getAllPosts().filter((post) => isValidBlogSlug(post.slug))
   return posts.map((post) => ({ slug: post.slug }))
 }
 
 // Generate metadata for each post
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params
+  if (!isValidBlogSlug(slug)) notFound()
   const post = getPostBySlug(slug)
-  if (!post) return { title: "Post Not Found | NamoLux" }
+  if (!post) notFound()
 
   const url = `https://www.namolux.com/blog/${post.slug}`
   const metaTitle = post.seoTitle || `${post.title} | NamoLux`
   const metaDescription = post.metaDescription || post.description
+  const socialImage = post.heroImage || "/opengraph-image"
 
   return {
     title: metaTitle,
@@ -42,33 +100,88 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       modifiedTime: post.updatedAt || post.publishedAt,
       authors: [post.author],
       section: post.category,
+      images: [{ url: socialImage, alt: post.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.seoTitle || post.title,
       description: metaDescription,
+      images: [socialImage],
     },
     alternates: {
       canonical: `/blog/${post.slug}`,
     },
+    robots: isPublicBlogPost(post)
+      ? { index: true, follow: true }
+      : { index: false, follow: true, noarchive: true },
   }
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
+  if (!isValidBlogSlug(slug)) notFound()
   const post = getPostBySlug(slug)
   if (!post) notFound()
 
   const relatedPosts = getRelatedPosts(slug, 2)
+  const readTime = getPostReadTime(post)
+  const adPlan = planArticleAds(post, isMonetizableBlogPost(post))
+  const inlineAdsBySection = new Map(
+    adPlan.inline.map((ad) => [ad.afterSectionIndex, ad.placement]),
+  )
+  const showBeforeRelatedAd = adPlan.beforeRelated && relatedPosts.length > 0
+  const activation = contextualGeneratorFor(post)
+  const { miniGeneratorIndex, internalLinksIndex } = findActivationIndexes(
+    post,
+    new Set(adPlan.inline.map((ad) => ad.afterSectionIndex)),
+  )
   const articleUrl = `https://www.namolux.com/blog/${post.slug}`
   const breadcrumbItems = [
-    { label: "Blog", href: "/blog" },
+    { label: "Journal", href: "/blog" },
     { label: post.title },
   ]
+  const articleCta = post.category === "Domain Strategy"
+    ? { href: "/bulk-domain-check", label: "Check a shortlist", heading: "Bring your shortlist into one view.", body: "Compare domain states and the trade-offs behind each candidate." }
+      : post.category === "Tool Comparisons"
+        ? { href: "/founder-signal", label: "Explore Founder Signal", heading: "See how the decision layer works.", body: "Review the scoring method before you trust a number with your final choice." }
+        : { href: "/bulk-domain-check", label: "Check a shortlist", heading: "Bring the candidates into one view.", body: "Check domains and compare the strongest options together." }
 
   // Generate schema markup
-  const articleSchema = {
-    "@context": "https://schema.org",
+  const isAndrewBarrett = post.author === "Andrew Barrett"
+  const authorUrl = isAndrewBarrett
+    ? "https://www.namolux.com/journal/andrew-barrett"
+    : "https://www.namolux.com/about"
+  const organizationSchema = {
+    "@type": "Organization",
+    "@id": "https://www.namolux.com/#organization",
+    name: "NamoLux",
+    url: "https://www.namolux.com",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://www.namolux.com/icon.png",
+    },
+    ...(isAndrewBarrett ? { founder: { "@id": "https://www.namolux.com/journal/andrew-barrett#person" } } : {}),
+  }
+  const authorSchema = isAndrewBarrett
+    ? {
+        "@type": "Person",
+        "@id": "https://www.namolux.com/journal/andrew-barrett#person",
+        name: "Andrew Barrett",
+        url: authorUrl,
+        sameAs: [
+          "https://andrewbarrett.dev/",
+          "https://www.linkedin.com/in/andrew-barrett-587a21390/",
+        ],
+        jobTitle: "Founder and Developer",
+        worksFor: { "@id": "https://www.namolux.com/#organization" },
+        homeLocation: { "@type": "Place", name: "Rhyl, North Wales, United Kingdom" },
+      }
+    : {
+        "@type": "Organization",
+        name: post.author,
+        url: authorUrl,
+      }
+  const articleNode = {
     "@type": "BlogPosting",
     "@id": `${articleUrl}#article`,
     url: articleUrl,
@@ -78,26 +191,31 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       "@id": articleUrl,
     },
     description: post.description,
-    author: {
-      "@type": "Person",
-      name: post.author,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "NamoLux",
-      url: "https://www.namolux.com",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://www.namolux.com/icon.png",
-        width: 563,
-        height: 563,
-      },
-    },
-    image: ["https://www.namolux.com/opengraph-image"],
+    author: isAndrewBarrett ? { "@id": "https://www.namolux.com/journal/andrew-barrett#person" } : authorSchema,
+    publisher: { "@id": "https://www.namolux.com/#organization" },
+    image: [`https://www.namolux.com${post.heroImage || "/opengraph-image"}`],
     datePublished: post.publishedAt,
     dateModified: post.updatedAt || post.publishedAt,
-    inLanguage: "en-US",
+    inLanguage: isAndrewBarrett ? "en-GB" : "en-US",
+    ...(post.sources?.length ? { citation: post.sources.map((source) => source.url) } : {}),
   }
+  const articleSchema = isAndrewBarrett
+    ? {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://www.namolux.com/#website",
+            name: "NamoLux",
+            url: "https://www.namolux.com/",
+            publisher: { "@id": "https://www.namolux.com/#organization" },
+          },
+          organizationSchema,
+          authorSchema,
+          { ...articleNode, isPartOf: { "@id": "https://www.namolux.com/#website" } },
+        ],
+      }
+    : { "@context": "https://schema.org", ...articleNode }
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems)
   const faqSchema = post.faqs?.length
@@ -138,7 +256,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         />
       )}
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <article className="px-4 pt-24 pb-16 sm:pt-28">
           <div className="mx-auto max-w-3xl">
             {/* Breadcrumbs */}
@@ -160,7 +278,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
-                  {post.readTime} min read
+                  {readTime} min read
                 </span>
               </div>
 
@@ -172,27 +290,87 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {post.description}
               </p>
             </header>
+          </div>
 
-            {/* Content */}
+          <div className="relative mx-auto max-w-3xl">
+            {/* Content column */}
             <div className="prose prose-invert prose-lg max-w-none">
-              {post.content.map((section, index) => (
-                <BlogSection key={index} section={section} />
-              ))}
+              {post.content.map((section, index) => {
+                const placement = inlineAdsBySection.get(index)
+                return (
+                  <Fragment key={`${section.type}-${index}`}>
+                    <BlogSection section={section} />
+                    {placement ? (
+                      <AdBanner placement={placement} className="not-prose my-10" />
+                    ) : null}
+                    {index === miniGeneratorIndex ? (
+                      <ContextualMiniGenerator
+                        source="article"
+                        contentSlug={post.slug}
+                        topic={activation.topic}
+                        defaultBrief={activation.defaultBrief}
+                        heading={activation.heading}
+                        ctaId={`article-${post.slug}`}
+                      />
+                    ) : null}
+                    {index === internalLinksIndex && relatedPosts.length > 0 ? (
+                      <aside aria-label="Continue exploring" className="not-prose my-10 border-y border-border/40 py-5">
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          Continue exploring
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {relatedPosts.slice(0, 2).map((relatedPost) => (
+                            <Link
+                              key={`context-${relatedPost.slug}`}
+                              href={`/blog/${relatedPost.slug}`}
+                              className="group inline-flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-muted/40 hover:text-primary"
+                            >
+                              <span>{relatedPost.title}</span>
+                              <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                            </Link>
+                          ))}
+                        </div>
+                      </aside>
+                    ) : null}
+                  </Fragment>
+                )
+              })}
             </div>
+
+            {adPlan.sidebar ? (
+              <div className="absolute inset-y-0 left-full ml-12 hidden w-[18.75rem] 2xl:block">
+                <div className="sticky top-28">
+                  <AdBanner
+                    placement="article-sidebar"
+                    className="min-h-[600px] w-full"
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mx-auto max-w-3xl">
 
             {/* Author & Share */}
             <footer className="mt-12 border-t border-border/30 pt-8">
               <p className="text-sm text-muted-foreground">
                 Written by{" "}
-                <a
-                  href="https://www.facebook.com/profile.php?id=61553948283148"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={post.author === "Andrew Barrett" ? "/journal/andrew-barrett" : "/about"}
                   className="font-medium text-foreground hover:text-primary transition-colors"
                 >
-                  Andrew Barrett
-                </a>
+                  {post.author}
+                </Link>
               </p>
+              {post.updatedAt && post.updatedAt !== post.publishedAt ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Last reviewed {new Date(post.updatedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              ) : null}
             </footer>
 
             {post.faqs?.length ? (
@@ -209,9 +387,30 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </section>
             ) : null}
 
+            {post.sources?.length ? (
+              <section className="mt-12 border-t border-border/30 pt-8" aria-labelledby="article-sources">
+                <h2 id="article-sources" className="mb-4 text-lg font-bold text-foreground">Sources and further reading</h2>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {post.sources.map((source) => (
+                    <li key={source.url}>
+                      <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80">
+                        {source.title}
+                      </a>
+                      {source.authority ? <span> — {source.authority}</span> : null}
+                      {source.lastVerified ? <span className="text-xs"> (verified {source.lastVerified})</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {showBeforeRelatedAd ? (
+              <AdBanner placement="article-before-related" className="mt-16" />
+            ) : null}
+
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
-              <section className="mt-16">
+              <section className={showBeforeRelatedAd ? "mt-12" : "mt-16"}>
                 <h2 className="mb-6 text-xl font-bold text-foreground">Related Articles</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {relatedPosts.map((relatedPost) => (
@@ -224,27 +423,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {/* CTA */}
             <section className="mt-16 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-8 text-center">
               <h2 className="mb-2 text-xl font-bold text-foreground">
-                Ready to find your perfect domain?
+                {articleCta.heading}
               </h2>
               <p className="mb-6 text-muted-foreground">
-                Generate brandable names with Founder Signal™ scoring.
+                {articleCta.body}
               </p>
-              <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <Button asChild className="gap-2">
-                  <Link href="/generate">
-                    Generate Names Free
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="gap-2">
-                  <Link href="/seo-audit">
-                    Run SEO Audit
-                  </Link>
-                </Button>
-              </div>
+              <Button asChild className="gap-2">
+                <Link href={articleCta.href}>
+                  {articleCta.label}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </section>
 
-            {/* Back to Blog */}
+            {/* Back to Journal */}
             <div className="mt-12">
               <Link
                 href="/blog"
@@ -264,6 +456,39 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
 // Blog Section Renderer
 import type { BlogSection as BlogSectionType } from "@/lib/blog"
+
+const DECISION_WORKSPACE_CTA = {
+  content: "Bring your shortlist to NamoLux. Check six domain extensions, then use Founder Signal to compare the finalists on a consistent primary TLD.",
+  href: "/bulk-domain-check",
+  label: "Check your shortlist",
+} as const
+
+function isRetiredProductHref(href?: string) {
+  if (!href) return false
+  const pathname = href.split("?")[0]?.split("#")[0]?.replace(/\/+$/, "") || "/"
+  return pathname === "/generate" || pathname.startsWith("/generate/") || pathname === "/preview-gen" || pathname === "/seo-audit"
+}
+
+function visibleProductHref(href: string) {
+  return isRetiredProductHref(href) ? DECISION_WORKSPACE_CTA.href : href
+}
+
+function visibleProductLinkText(href: string, text: string) {
+  return isRetiredProductHref(href) ? "Use Bulk Check" : text
+}
+
+function visibleBlogCta(section: BlogSectionType) {
+  if (!isRetiredProductHref(section.ctaLink) && !isRetiredProductHref(section.ctaLink2)) return section
+
+  return {
+    ...section,
+    content: DECISION_WORKSPACE_CTA.content,
+    ctaLink: isRetiredProductHref(section.ctaLink) ? DECISION_WORKSPACE_CTA.href : section.ctaLink,
+    ctaText: isRetiredProductHref(section.ctaLink) ? DECISION_WORKSPACE_CTA.label : section.ctaText,
+    ctaLink2: isRetiredProductHref(section.ctaLink2) ? DECISION_WORKSPACE_CTA.href : section.ctaLink2,
+    ctaText2: isRetiredProductHref(section.ctaLink2) ? DECISION_WORKSPACE_CTA.label : section.ctaText2,
+  }
+}
 
 function BlogSection({ section }: { section: BlogSectionType }) {
   switch (section.type) {
@@ -290,8 +515,8 @@ function BlogSection({ section }: { section: BlogSectionType }) {
           const [, text, href] = match
           const isInternal = href.startsWith("/")
           return isInternal ? (
-            <Link key={i} href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
-              {text}
+            <Link key={i} href={visibleProductHref(href)} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+              {visibleProductLinkText(href, text)}
             </Link>
           ) : (
             <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
@@ -322,12 +547,26 @@ function BlogSection({ section }: { section: BlogSectionType }) {
     case "table":
       if (!section.headers?.length || !section.rows?.length) return null
       return (
-        <div className="my-6 overflow-x-auto">
+        <div className="my-6">
+          <div className="space-y-3 md:hidden">
+            {section.rows.map((row, rowIndex) => (
+              <dl key={`${row[0]}-mobile-${rowIndex}`} className="border border-border/50 bg-muted/20 p-4">
+                {row.map((cell, cellIndex) => (
+                  <div key={`${row[0]}-mobile-${cellIndex}`} className="grid grid-cols-[minmax(7rem,0.7fr)_1fr] gap-3 border-b border-border/30 py-2 last:border-0">
+                    <dt className="text-xs font-semibold text-foreground">{section.headers?.[cellIndex]}</dt>
+                    <dd className="text-sm text-muted-foreground">{cell}</dd>
+                  </div>
+                ))}
+              </dl>
+            ))}
+          </div>
+          <div className="hidden overflow-x-auto md:block" role="region" aria-label="Article comparison table" tabIndex={0}>
           <table className="min-w-full border-collapse text-left text-sm">
+            <caption className="sr-only">Comparison data for this section</caption>
             <thead>
               <tr className="border-b border-border/60">
                 {section.headers.map((header) => (
-                  <th key={header} className="px-3 py-2 font-semibold text-foreground">
+                  <th key={header} scope="col" className="px-3 py-2 font-semibold text-foreground">
                     {header}
                   </th>
                 ))}
@@ -336,53 +575,58 @@ function BlogSection({ section }: { section: BlogSectionType }) {
             <tbody>
               {section.rows.map((row, rowIndex) => (
                 <tr key={`${row[0]}-${rowIndex}`} className="border-b border-border/30 align-top">
-                  {row.map((cell, cellIndex) => (
-                    <td key={`${row[0]}-${cellIndex}`} className="px-3 py-2 text-muted-foreground">
-                      {cell}
-                    </td>
+                  {row.map((cell, cellIndex) => cellIndex === 0 ? (
+                    <th key={`${row[0]}-${cellIndex}`} scope="row" className="px-3 py-2 font-medium text-foreground">{cell}</th>
+                  ) : (
+                    <td key={`${row[0]}-${cellIndex}`} className="px-3 py-2 text-muted-foreground">{cell}</td>
                   ))}
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )
 
     case "buttonCta":
       if (!section.ctaLink || !section.ctaText) return null
+      {
+        const cta = visibleBlogCta(section)
       return (
         <div className="my-8">
-          {section.content ? (
-            <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{section.content}</p>
+          {cta.content ? (
+            <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{cta.content}</p>
           ) : null}
           <Button asChild className="gap-2">
-            <Link href={section.ctaLink}>
-              {section.ctaText}
+            <Link href={cta.ctaLink!}>
+              {cta.ctaText}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
       )
+      }
 
-    case "dualCta":
+    case "dualCta": {
+      const cta = visibleBlogCta(section)
       return (
         <div className="my-8 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-6 text-center">
-          {section.content ? (
-            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{section.content}</p>
+          {cta.content ? (
+            <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{cta.content}</p>
           ) : null}
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            {section.ctaLink && section.ctaText && (
+            {cta.ctaLink && cta.ctaText && (
               <Button asChild className="gap-2">
-                <Link href={section.ctaLink}>
-                  {section.ctaText}
+                <Link href={cta.ctaLink}>
+                  {cta.ctaText}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             )}
-            {section.ctaLink2 && section.ctaText2 && (
+            {cta.ctaLink2 && cta.ctaText2 && (
               <Button asChild variant="outline" className="gap-2">
-                <Link href={section.ctaLink2}>
-                  {section.ctaText2}
+                <Link href={cta.ctaLink2}>
+                  {cta.ctaText2}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -390,17 +634,20 @@ function BlogSection({ section }: { section: BlogSectionType }) {
           </div>
         </div>
       )
+    }
 
-    case "callout":
+    case "callout": {
+      const cta = visibleBlogCta(section)
       return (
         <Callout
-          type={section.calloutType || "tip"}
-          ctaLink={section.ctaLink}
-          ctaText={section.ctaText}
+          type={cta.calloutType || "tip"}
+          ctaLink={cta.ctaLink}
+          ctaText={cta.ctaText}
         >
-          {section.content}
+          {cta.content}
         </Callout>
       )
+    }
 
     case "links":
       if (!section.links?.length) return null
@@ -415,8 +662,8 @@ function BlogSection({ section }: { section: BlogSectionType }) {
             {section.links.map((link) => (
               <li key={link.href} className="flex items-start gap-2">
                 <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <Link href={link.href} className="text-sm text-foreground hover:text-primary transition-colors underline-offset-2 hover:underline">
-                  {link.text}
+                <Link href={visibleProductHref(link.href)} className="text-sm text-foreground hover:text-primary transition-colors underline-offset-2 hover:underline">
+                  {visibleProductLinkText(link.href, link.text)}
                 </Link>
               </li>
             ))}
@@ -463,5 +710,3 @@ function BlogSection({ section }: { section: BlogSectionType }) {
       return null
   }
 }
-
-

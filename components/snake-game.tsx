@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useEffectEvent, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -62,23 +62,23 @@ export function SnakeGame() {
   const isMobile = useIsMobile()
   const [game, setGame] = useState<SnakeState>(createGame)
 
-  const queueDirection = useEffectEvent((direction: SnakeDirection) => {
+  const queueDirection = useCallback((direction: SnakeDirection) => {
     setGame((previousGame) => startSnake(setNextDirection(previousGame, direction)))
-  })
+  }, [])
 
-  const togglePause = useEffectEvent(() => {
+  const togglePause = useCallback(() => {
     setGame((previousGame) => (previousGame.status === "running" ? pauseSnake(previousGame) : startSnake(previousGame)))
-  })
+  }, [])
 
-  const restartGame = useEffectEvent(() => {
+  const restartGame = useCallback(() => {
     setGame(createGame())
-  })
+  }, [])
 
-  const tick = useEffectEvent(() => {
+  const tick = useCallback(() => {
     setGame((previousGame) => stepSnake(previousGame))
-  })
+  }, [])
 
-  const handleKeyDown = useEffectEvent((event: KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.repeat) {
       return
     }
@@ -119,7 +119,7 @@ export function SnakeGame() {
       event.preventDefault()
       restartGame()
     }
-  })
+  }, [queueDirection, restartGame, togglePause])
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => handleKeyDown(event)

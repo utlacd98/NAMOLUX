@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error calculating SEO potential:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to calculate SEO potential" },
+      { error: "Failed to calculate SEO potential" },
       { status: 500 }
     )
   }
@@ -216,4 +216,3 @@ export async function POST(request: NextRequest) {
 
 // Also export the function for inline use
 export { calculateSeoPotential }
-

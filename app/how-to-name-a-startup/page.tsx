@@ -3,12 +3,17 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { AdBanner } from "@/components/ad-banner"
 import { ArrowRight } from "lucide-react"
+import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 
 export const metadata: Metadata = {
   title: "How to Name a Startup | NamoLux",
   description: "A practical guide to choosing a strong startup name. Learn what makes names brandable, scalable, and memorable.",
 }
+
+const GUIDE_BRIEF = "I am naming a new startup and want a professional, memorable name that is easy to pronounce, can scale beyond the first product, and has a strong domain."
+const SHORTLIST_HREF = "/bulk-domain-check"
 
 export default function HowToNameStartupPage() {
   return (
@@ -29,6 +34,8 @@ export default function HowToNameStartupPage() {
               But names have long-term consequences. They affect how people perceive you, whether they remember you, and how easily you can grow beyond your first product.
             </p>
           </section>
+
+          <AdBanner placement="guide-after-intro" />
 
           {/* What makes a strong name */}
           <section className="mb-12">
@@ -59,6 +66,15 @@ export default function HowToNameStartupPage() {
               </div>
             </div>
           </section>
+
+          <ContextualMiniGenerator
+            source="guide"
+            contentSlug="how-to-name-a-startup"
+            topic="startup naming strategy"
+            defaultBrief={GUIDE_BRIEF}
+            heading="Turn your startup idea into a professional shortlist"
+            ctaId="guide-how-to-name"
+          />
 
           {/* Common mistakes */}
           <section className="mb-12">
@@ -95,6 +111,20 @@ export default function HowToNameStartupPage() {
             </div>
           </section>
 
+          <aside aria-label="Related naming guidance" className="mb-12 border-y border-border/40 py-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Keep refining your decision</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Link href="/name-mistakes" className="inline-flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-muted/40 hover:text-primary">
+                Avoid the seven common naming mistakes
+                <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+              </Link>
+              <Link href="/founder-signal" className="inline-flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition hover:bg-muted/40 hover:text-primary">
+                Learn how to evaluate a shortlist
+                <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+              </Link>
+            </div>
+          </aside>
+
           {/* How to evaluate */}
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-semibold text-foreground">
@@ -114,6 +144,8 @@ export default function HowToNameStartupPage() {
             </p>
           </section>
 
+          <AdBanner placement="guide-before-conclusion" />
+
           {/* Closing */}
           <section className="mb-12 rounded-xl border border-border/50 bg-card/30 p-6">
             <p className="text-lg font-medium text-foreground">
@@ -123,9 +155,9 @@ export default function HowToNameStartupPage() {
 
           {/* CTA */}
           <div className="text-center">
-            <Link href="/generate">
+            <Link href={SHORTLIST_HREF}>
               <Button size="lg" className="gap-2">
-                Try NamoLux
+                Check your shortlist
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -136,4 +168,3 @@ export default function HowToNameStartupPage() {
     </div>
   )
 }
-

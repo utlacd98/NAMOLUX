@@ -67,14 +67,14 @@ If every good name you think of has a taken .com, you have three options:
 
 1. **Add a qualifier** — GetMailer, UseNotion, TryFigma. Works at launch, ideally you drop the qualifier as you grow.
 2. **Try a different TLD** — .io, .ai, or .co depending on your audience.
-3. **Let an AI generate alternatives** — give it your core concept and iterate. The name you end up with is often not your first idea, and rarely your tenth.
+3. **Bring in another source of ideas** — use a workshop, agency, or generator to widen the pool, then return to the shortlist that best fits your decision criteria.
 
 The goal is to find something that feels right, passes the five-point check, and doesn't limit where you can take the business.
 
 ---
 
-✨ *NamoLux generates brandable domain names with instant availability checks. Run your keyword through the generator and get 10 scored results in under 30 seconds — each rated for brand strength and memorability.*
+✨ *NamoLux helps you compare the names you already have. Check up to 50 candidates across six domain extensions, then use Founder Signal™ when you need an explained score.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

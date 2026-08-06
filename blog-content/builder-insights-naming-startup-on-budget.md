@@ -49,15 +49,15 @@ Agencies charge partly because name evaluation is genuinely hard. But the framew
 
 This is what a good naming agency does in a £30,000 engagement — except they interview more people, run linguistic analysis, and check trademark in 40+ territories. For a bootstrapped startup, the 80% version above is enough.
 
-💡 **The Founder Signal shortcut:** Instead of manually applying each test, tools like NamoLux score names across these dimensions automatically. The Founder Signal™ score aggregates phonetic strength, memorability, brand risk, and domain quality into a single number. Not a replacement for judgment, but a strong first filter.
+💡 **The Founder Signal decision layer:** Build a shortlist however you like, then score it when you are ready to evaluate it. Founder Signal™ combines phonetic strength, memorability, brand risk, and domain quality into a single decision aid. It is not a replacement for legal or customer research.
 
-## The One-Time Purchase Advantage
+## The Limited Free Tier Advantage
 
 Subscription pricing is everywhere in software. Monthly recurring charges for tools that become background infrastructure. Most founders don't think about this until the bill is annoying.
 
-A name generator that charges monthly creates the wrong incentive structure: you pay every month regardless of how often you generate names. A one-time purchase model aligns better with how founders actually use naming tools — intensively during a naming sprint, then rarely after.
+A naming decision tool needs to balance a useful free allowance with the cost of live checks. A limited free tier lets founders verify candidates before deciding whether saved work, more capacity, exports, and Founder Signal scoring are worth paying for.
 
-NamoLux is priced as a one-time purchase for this reason. You pay once, you have access when you need it, and you're not charged for the months where your naming work is done.
+NamoLux Free includes three Bulk Check runs and one Founder Signal run per UTC calendar month. The GBP 7.99/month Pro tier includes 120 Bulk Check runs and 120 Founder Signal runs, plus saved projects, CSV exports, shareable reports, and an ad-free workspace.
 
 ## Getting to a Shortlist Fast
 
@@ -73,8 +73,8 @@ The whole process takes a day, not months. And you won't need to spend £30,000 
 
 ---
 
-✨ *NamoLux generates brandable startup names with instant domain checking and Founder Signal™ scoring — for free. No subscription. No account required for your first generation.*
+✨ *NamoLux Free includes three Bulk Check runs and one Founder Signal™ run per UTC calendar month. Pro adds 120 of each, saved decisions, exports, and an ad-free workspace.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

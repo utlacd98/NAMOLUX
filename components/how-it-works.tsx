@@ -4,21 +4,21 @@ import { cn } from "@/lib/utils"
 const steps = [
   {
     number: "01",
-    title: "Paste your shortlist",
+    title: "Explore creative directions",
     description:
-      "Drop up to 50 candidate names into NamoLux. Your ideas, your AI output, names from a consultant — all welcome.",
+      "Start with Quick for open-ended exploration or use Advanced for a focused batch. Names stay in their original creative order.",
   },
   {
     number: "02",
-    title: "We score & verify each one",
+    title: "Check, then score when ready",
     description:
-      "Every name gets a Founder Signal™ score out of 100 and live availability checks across .com, .io, .co, .ai, .app and .dev — with reasoning you can defend.",
+      "Live checks update without blocking the shortlist. Founder Signal™ is an optional decision layer with a score and reasoning for every name in the batch.",
   },
   {
     number: "03",
     title: "Pick the winner with evidence",
     description:
-      "Rank by score, filter by availability, export the report. Walk into your next meeting with a decision, not a guess.",
+      "Keep creative order or explicitly sort a scored batch, compare the evidence, and export the report. Walk into your next meeting with a decision, not a guess.",
   },
 ]
 
@@ -39,7 +39,7 @@ export function HowItWorks() {
           kicker="The Process"
           headingId="how-it-works-heading"
           heading="How it works"
-          sub="From a list of candidate names to a scored, verified shortlist — the work of a brand consultant, done in seconds."
+          sub="Explore creative directions first, then apply Founder Signal and live domain checks when the shortlist is ready for a decision."
         />
 
         <div className="relative mt-14 sm:mt-20">

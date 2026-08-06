@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">NamoLux</title>
+  <desc id="desc">NamoLux gold N mark on a deep charcoal background.</desc>
+  <defs>
+    <radialGradient id="background" cx="50%" cy="18%" r="100%">
+      <stop offset="0" stop-color="#211a10"/>
+      <stop offset="0.52" stop-color="#11100d"/>
+      <stop offset="1" stop-color="#080807"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="108" y1="102" x2="404" y2="412" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a86624"/>
+      <stop offset="0.27" stop-color="#f7d778"/>
+      <stop offset="0.56" stop-color="#d19a3d"/>
+      <stop offset="0.78" stop-color="#ffe69a"/>
+      <stop offset="1" stop-color="#aa6827"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#background)"/>
+  <rect x="22" y="22" width="468" height="468" rx="91" fill="none" stroke="#765024" stroke-opacity=".64" stroke-width="3"/>
+  <g fill="none" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)">
+    <path d="M142 376V136" stroke-width="52"/>
+    <path d="M143 136L370 376" stroke-width="52"/>
+    <path d="M370 376V136" stroke-width="52"/>
+  </g>
+  <path d="M142 376V136M143 136L370 376M370 376V136" fill="none" stroke="#fff4bf" stroke-opacity=".3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

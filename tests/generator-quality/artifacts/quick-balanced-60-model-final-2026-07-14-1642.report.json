@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 3,
+  "audit": "NamoLux frozen balanced-60 Quick model audit — final post-patch run",
+  "runStartedAt": "2026-07-14T16:42:18+01:00",
+  "runCompletedAt": "2026-07-14T16:54:34+01:00",
+  "artifacts": {
+    "raw": "tests/generator-quality/artifacts/quick-balanced-60-model-final-2026-07-14-1642.raw.jsonl",
+    "clean": "tests/generator-quality/artifacts/quick-balanced-60-model-final-2026-07-14-1642.clean.jsonl",
+    "report": "tests/generator-quality/artifacts/quick-balanced-60-model-final-2026-07-14-1642.report.json"
+  },
+  "integrity": {
+    "gitHead": "a1c0991b92d979a6719b9991acf1e4993590f17c",
+    "implementationFiles": [
+      "lib/domainGen/filters.ts",
+      "lib/domainGen/generatedName.ts",
+      "lib/domainGen/quickGenerate.ts",
+      "lib/domainGen/quickGenerateGroq.ts",
+      "lib/domainGen/realness.ts"
+    ],
+    "implementationSha256Before": "2862b5cb0a8c158ec3a2178e32e0ea61c7128ffbbf505532fb4846d31e7bb1ec",
+    "implementationSha256After": "2862b5cb0a8c158ec3a2178e32e0ea61c7128ffbbf505532fb4846d31e7bb1ec",
+    "auditHarnessSha256": "de794235b7d0ae54bc3086173a5d927c4d4f0fe49aa16667a641daeb0dedb08e",
+    "rawSha256": "90bf30e433a1fd0c4ac67a6637010e1eb15fd5c117f214197e575ddc204d5fbb",
+    "cleanSha256": "b768297203b3bb630818a928c44ccfcf0286b5429b517c8949df47f0e32b569e",
+    "implementationChangedDuringRun": false
+  },
+  "protocol": {
+    "briefs": 60,
+    "batchSize": 1,
+    "delayBetweenTopLevelRequestsMs": 8000,
+    "externalRetries": 0,
+    "regeneratedOrCherryPickedCases": 0,
+    "candidateSelection": "All returned candidates retained in generation order.",
+    "providerBehaviour": "Each top-level call used the frozen production provider failover chain. Groq 429 responses caused internal provider attempts; no case was called again by the audit harness."
+  },
+  "overallPass": false,
+  "objectiveSummary": {
+    "totalCandidates": 960,
+    "exactSixteenUniqueBriefs": 60,
+    "modelBackedBriefs": 25,
+    "modelBackedRatePercent": 41.7,
+    "modelCandidates": 180,
+    "fallbackCandidates": 780,
+    "modelCandidateSharePercent": 18.8,
+    "fallbackCandidateSharePercent": 81.2,
+    "crossNicheDuplicateOccurrences": 14,
+    "crossNicheDuplicateRatePercent": 1.46,
+    "p95DurationMs": 6628,
+    "maxDurationMs": 6938,
+    "providers": {
+      "groq": 25,
+      "deterministic": 35
+    },
+    "fallbackReasons": {
+      "groq_budget_exhausted": 3,
+      "groq_http_429": 31,
+      "groq_timeout": 1
+    },
+    "styleFulfilledBriefs": 60,
+    "styleShortfalls": 0,
+    "styleCounts": {
+      "brandable": 336,
+      "evocative": 171,
+      "compound": 318,
+      "short_phrase": 81,
+      "real_word": 20,
+      "alternate_spelling": 23,
+      "non_english": 11
+    }
+  },
+  "crossNicheDuplicates": [
+    { "name": "carehaven", "briefs": ["urban-cat-sitting", "multilingual-french"] },
+    { "name": "caremint", "briefs": ["family-budgeting", "nurse-recruitment"] },
+    { "name": "carenest", "briefs": ["teen-therapy", "family-business-consulting"] },
+    { "name": "cedarbend", "briefs": ["postpartum-fitness", "alpine-skincare"] },
+    { "name": "chargepilot", "briefs": ["ev-charging", "rural-auto-repair"] },
+    { "name": "clearwater", "briefs": ["kenya-irrigation", "ngo-water-quality"] },
+    { "name": "garden", "briefs": ["nurse-recruitment", "welsh-farm-market"] },
+    { "name": "greenrise", "briefs": ["balcony-gardening", "alpine-skincare"] },
+    { "name": "harbor", "briefs": ["nurse-recruitment", "coastal-coffee"] },
+    { "name": "homepath", "briefs": ["urban-cat-sitting", "insurance-claims"] },
+    { "name": "repairpath", "briefs": ["ev-charging", "rural-auto-repair"] },
+    { "name": "roam", "briefs": ["restaurant-booking", "solo-women-travel"] },
+    { "name": "studyspark", "briefs": ["student-meal-delivery", "exam-prep"] },
+    { "name": "tenanthouse", "briefs": ["interior-design", "berlin-renter-proptech"] }
+  ],
+  "manualReview": {
+    "coverage": "All 60 briefs and all 960 candidate name/rationale/style surfaces reviewed in three fixed 20-brief tranches.",
+    "criticalCandidateSurfaces": 181,
+    "falseOrMateriallyMisattributedRationales": 140,
+    "clearStyleMetadataMismatches": 25,
+    "minimumPresentationReadyCandidatesInAnyBrief": 0,
+    "briefsWithZeroPresentationReadySurfaces": [
+      "mortgage-comparison",
+      "ngo-water-quality"
+    ],
+    "scopeNote": "Collision observations are a naming-risk screen, not legal trademark clearance. Generic or unverified collision suspicions are not treated as legal conclusions."
+  },
+  "criticalDefectGroups": [
+    {
+      "rootCause": "Concept-rule contamination and first-signal rationale selection",
+      "examples": [
+        "All 16 mortgage-comparison rationales inherit a place/interior-design cue.",
+        "All 16 ngo-water-quality rationales discuss healthy cultivation instead of humanitarian water monitoring.",
+        "Nine kenya-irrigation rationales switch to place-led discovery and adventure.",
+        "EV charging candidates inherit community/network roots such as kind, near, join and circle.",
+        "Working-dog-treat candidates explain generic pet care rather than treats, protein or working breeds."
+      ]
+    },
+    {
+      "rootCause": "Substring matching is presented as a visible semantic component",
+      "affectedPatterns": [
+        "line inside feline",
+        "one inside stone",
+        "mark inside market",
+        "mate inside climate",
+        "core inside score",
+        "view inside review"
+      ],
+      "representativeNames": [
+        "nestfeline",
+        "stonelegacy",
+        "sunmarket",
+        "clausereview",
+        "stonetide",
+        "plainmarket",
+        "climatepath",
+        "arenascore"
+      ]
+    },
+    {
+      "rootCause": "Literal two-part constructions are described as abstract coined forms",
+      "affectedCandidateCount": 62,
+      "representativeNames": [
+        "soloinvoice",
+        "ruralreach",
+        "auditfield",
+        "acredrip",
+        "tenderpublic",
+        "activecare",
+        "endurephysio",
+        "chaincold",
+        "exactgauge",
+        "braverural"
+      ]
+    },
+    {
+      "rootCause": "Model-declared style and rationale claims are admitted without construction-level verification",
+      "brokenOrDishonestExamples": [
+        "llywra",
+        "bryeet",
+        "wildrthm",
+        "savannac",
+        "giftguid",
+        "giftglid",
+        "joyphul",
+        "plannify",
+        "shyne",
+        "serein",
+        "verda",
+        "tropel"
+      ],
+      "styleMismatchExamples": [
+        "familyforge labelled real_word",
+        "markmate labelled real_word",
+        "nearnest labelled real_word",
+        "terrahome labelled real_word",
+        "roam labelled alternate_spelling",
+        "craftmuse labelled alternate_spelling",
+        "hometide labelled non_english"
+      ]
+    },
+    {
+      "rootCause": "Protected-name admission is incomplete",
+      "highConfidenceExamples": [
+        "drivepilot",
+        "chargepilot",
+        "trustpilot",
+        "ledgerguard",
+        "ledgerproof",
+        "haven"
+      ]
+    },
+    {
+      "rootCause": "Provider token budget exceeds sustained audit throughput",
+      "evidence": "Only 25/60 briefs retained any model candidate. The frozen 16-candidate, 1400-token request contract produced Groq 429s for 31 briefs despite one top-level request per eight seconds."
+    }
+  ],
+  "acceptance": {
+    "exactSixteenUniquePerBrief": true,
+    "modelBackedAtLeast90Percent": false,
+    "crossNicheDuplicationAtMost1Percent": false,
+    "p95NamesVisibleAtMost8Seconds": true,
+    "noCriticalQualityLoss": false,
+    "styleMetadataHonest": false,
+    "rationaleNameBriefFit": false
+  }
+}

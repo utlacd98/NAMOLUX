@@ -1,0 +1,403 @@
+{
+  "raterId": "rater-1",
+  "caseReviews": [
+    {
+      "id": "family-budgeting",
+      "labels": {
+        "nestori": "usable",
+        "pocketgrove": "shortlist",
+        "sunnyside": "usable",
+        "littleways": "shortlist",
+        "kinkeep": "shortlist",
+        "meadow": "reject",
+        "tendril": "usable",
+        "hearthwise": "usable",
+        "pennytrail": "shortlist",
+        "harbor": "reject",
+        "morrow": "usable",
+        "steadily": "usable",
+        "spriglet": "usable",
+        "homeward": "usable",
+        "smallsteps": "usable",
+        "nestegg": "reject"
+      },
+      "scores": {
+        "relevance": 7.8,
+        "pronounceabilityNaturalness": 8.2,
+        "distinctiveness": 6.5,
+        "vibeFit": 8.4
+      },
+      "topTwo": [
+        "kinkeep",
+        "pocketgrove"
+      ],
+      "criticalDefects": [
+        "Several common-word options are friendly but too broad to establish a defensible financial-product identity.",
+        "Nestori has an ambiguous spelling and intended pronunciation, while nestegg is only a generic savings term."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "home, family, or safekeeping imagery",
+          "names": [
+            "nestori",
+            "kinkeep",
+            "hearthwise",
+            "harbor",
+            "homeward",
+            "nestegg"
+          ]
+        },
+        {
+          "pattern": "small-scale growth and nature metaphors",
+          "names": [
+            "pocketgrove",
+            "littleways",
+            "meadow",
+            "tendril",
+            "spriglet"
+          ]
+        },
+        {
+          "pattern": "incremental progress or journey language",
+          "names": [
+            "littleways",
+            "pennytrail",
+            "steadily",
+            "homeward",
+            "smallsteps"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cozy-puzzle-studio",
+      "labels": {
+        "mosslight": "shortlist",
+        "puzzello": "reject",
+        "tinkora": "usable",
+        "softspoken": "usable",
+        "ludelle": "usable",
+        "mirthwork": "shortlist",
+        "hearthink": "shortlist",
+        "ponderkin": "shortlist",
+        "kindling": "usable",
+        "oddments": "shortlist",
+        "daydream": "reject",
+        "meander": "usable",
+        "whimwork": "usable",
+        "mosaic": "usable",
+        "tessera": "shortlist",
+        "pastime": "reject"
+      },
+      "scores": {
+        "relevance": 8.0,
+        "pronounceabilityNaturalness": 8.5,
+        "distinctiveness": 6.9,
+        "vibeFit": 8.7
+      },
+      "topTwo": [
+        "tessera",
+        "mirthwork"
+      ],
+      "criticalDefects": [
+        "Puzzello is a shallow category-root construction rather than an original studio identity.",
+        "Several atmospheric common words fit coziness but do not communicate thoughtful adult puzzle-making strongly enough."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "warm, gentle, or natural atmosphere",
+          "names": [
+            "mosslight",
+            "softspoken",
+            "hearthink",
+            "kindling",
+            "daydream",
+            "meander"
+          ]
+        },
+        {
+          "pattern": "thought, play, and craft constructions",
+          "names": [
+            "puzzello",
+            "mirthwork",
+            "hearthink",
+            "ponderkin",
+            "whimwork",
+            "pastime"
+          ]
+        },
+        {
+          "pattern": "pieces, arrangements, or collected objects",
+          "names": [
+            "oddments",
+            "mosaic",
+            "tessera"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alpine-skincare",
+      "labels": {
+        "snowmelt": "usable",
+        "alpenglow": "usable",
+        "velmora": "shortlist",
+        "silverfern": "reject",
+        "everfrost": "reject",
+        "montara": "usable",
+        "springveil": "shortlist",
+        "clearhaven": "reject",
+        "altavera": "shortlist",
+        "pureascent": "reject",
+        "glacielle": "usable",
+        "stonebloom": "shortlist",
+        "highmeadow": "usable",
+        "watershed": "reject",
+        "montane": "usable",
+        "stillwater": "reject"
+      },
+      "scores": {
+        "relevance": 8.6,
+        "pronounceabilityNaturalness": 8.3,
+        "distinctiveness": 6.3,
+        "vibeFit": 8.2
+      },
+      "topTwo": [
+        "springveil",
+        "stonebloom"
+      ],
+      "criticalDefects": [
+        "The batch repeatedly returns to familiar snow, water, mountain, and purity cues, limiting conceptual range.",
+        "Several polished compounds are generic natural-product constructions rather than ownable premium skincare names."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "snow, ice, and mineral-water imagery",
+          "names": [
+            "snowmelt",
+            "everfrost",
+            "springveil",
+            "glacielle",
+            "watershed",
+            "stillwater"
+          ]
+        },
+        {
+          "pattern": "mountain, altitude, and alpine landscape cues",
+          "names": [
+            "alpenglow",
+            "montara",
+            "altavera",
+            "pureascent",
+            "highmeadow",
+            "montane"
+          ]
+        },
+        {
+          "pattern": "botanical or material landscape compounds",
+          "names": [
+            "silverfern",
+            "stonebloom",
+            "highmeadow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-scheduling-founders",
+      "labels": {
+        "cadentra": "shortlist",
+        "caldrin": "usable",
+        "tessora": "usable",
+        "orivane": "usable",
+        "clearstride": "shortlist",
+        "dayweave": "shortlist",
+        "quietlane": "usable",
+        "openwindow": "shortlist",
+        "timecraft": "usable",
+        "switchyard": "shortlist",
+        "wayfinder": "usable",
+        "breathing": "usable",
+        "keystone": "reject",
+        "whiteboard": "reject",
+        "rightontime": "usable",
+        "makeitfit": "usable"
+      },
+      "scores": {
+        "relevance": 7.8,
+        "pronounceabilityNaturalness": 8.5,
+        "distinctiveness": 6.6,
+        "vibeFit": 7.6
+      },
+      "topTwo": [
+        "dayweave",
+        "cadentra"
+      ],
+      "criticalDefects": [
+        "Several abstract coinages are natural enough to say but provide little scheduling or founder-specific meaning.",
+        "The set leans toward calm productivity and spatial metaphors more than a clearly technological AI-assistant character."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "time, day, and schedule composition",
+          "names": [
+            "cadentra",
+            "dayweave",
+            "openwindow",
+            "timecraft",
+            "rightontime",
+            "makeitfit"
+          ]
+        },
+        {
+          "pattern": "paths, movement, and spatial organization",
+          "names": [
+            "clearstride",
+            "quietlane",
+            "switchyard",
+            "wayfinder"
+          ]
+        },
+        {
+          "pattern": "generic work or planning objects",
+          "names": [
+            "keystone",
+            "whiteboard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "freelance-accounting",
+      "labels": {
+        "tallivo": "shortlist",
+        "sumstead": "shortlist",
+        "clearharbor": "usable",
+        "mintfold": "shortlist",
+        "balancio": "usable",
+        "duetally": "usable",
+        "evenkeel": "usable",
+        "daymark": "usable",
+        "nestegg": "reject",
+        "truecourse": "usable",
+        "sumwise": "reject",
+        "billow": "reject",
+        "reckoner": "usable",
+        "tideline": "reject",
+        "accord": "usable",
+        "faircount": "shortlist"
+      },
+      "scores": {
+        "relevance": 8.0,
+        "pronounceabilityNaturalness": 8.0,
+        "distinctiveness": 6.1,
+        "vibeFit": 7.8
+      },
+      "topTwo": [
+        "mintfold",
+        "sumstead"
+      ],
+      "criticalDefects": [
+        "The list repeatedly combines generic sum, tally, count, balance, and steadiness language rather than opening genuinely different naming territories.",
+        "Several navigation and safety metaphors could describe almost any financial product, weakening freelancer-accounting specificity."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "sum, tally, balance, and counting constructions",
+          "names": [
+            "tallivo",
+            "sumstead",
+            "balancio",
+            "duetally",
+            "sumwise",
+            "reckoner",
+            "faircount"
+          ]
+        },
+        {
+          "pattern": "stability, refuge, and agreement language",
+          "names": [
+            "sumstead",
+            "clearharbor",
+            "evenkeel",
+            "accord"
+          ]
+        },
+        {
+          "pattern": "navigation or boundary metaphors",
+          "names": [
+            "daymark",
+            "truecourse",
+            "tideline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyber-threat-analytics",
+      "labels": {
+        "virelance": "shortlist",
+        "flintwatch": "shortlist",
+        "cinderline": "usable",
+        "signalkeep": "shortlist",
+        "threatloom": "shortlist",
+        "nightglass": "shortlist",
+        "guardrail": "usable",
+        "ironpulse": "usable",
+        "forewarn": "usable",
+        "sightline": "usable",
+        "lumenward": "usable",
+        "redthread": "usable",
+        "earlymark": "usable",
+        "overwatch": "reject",
+        "clearveil": "usable",
+        "knowfirst": "usable"
+      },
+      "scores": {
+        "relevance": 8.5,
+        "pronounceabilityNaturalness": 8.3,
+        "distinctiveness": 7.0,
+        "vibeFit": 8.8
+      },
+      "topTwo": [
+        "nightglass",
+        "flintwatch"
+      ],
+      "criticalDefects": [
+        "Overwatch is the exact name of a globally recognized video-game franchise and is commercially unusable here.",
+        "Several watch, sight, signal, and warning constructions repeat one surveillance thesis instead of providing fully distinct strategic territories."
+      ],
+      "mechanicalFamilies": [
+        {
+          "pattern": "watching, sight, signals, and early warning",
+          "names": [
+            "flintwatch",
+            "signalkeep",
+            "forewarn",
+            "sightline",
+            "earlymark",
+            "overwatch",
+            "knowfirst"
+          ]
+        },
+        {
+          "pattern": "dark or concealed-environment imagery",
+          "names": [
+            "cinderline",
+            "nightglass",
+            "redthread",
+            "clearveil"
+          ]
+        },
+        {
+          "pattern": "strength and protective-boundary language",
+          "names": [
+            "guardrail",
+            "ironpulse",
+            "lumenward"
+          ]
+        }
+      ]
+    }
+  ]
+}

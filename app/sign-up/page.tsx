@@ -1,15 +1,21 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { Suspense, useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { createClient } from "@/lib/supabase/client"
-import { Loader2, Mail, Lock, Eye, EyeOff, User } from "lucide-react"
+import { AuthCard, AuthShowcase, AuthTitle } from "@/components/auth-showcase"
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react"
+import { sanitizeRedirectPath } from "@/lib/safe-redirect"
 
-export default function SignUpPage() {
-  const router = useRouter()
-  
+const inputClass =
+  "h-12 w-full rounded-lg border border-[#D4AF37]/24 bg-white/[0.045] pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-white/32 focus:border-[#D4AF37]/70 focus:bg-white/[0.07] focus:ring-4 focus:ring-[#D4AF37]/12 sm:h-14 sm:pl-12 sm:text-base"
+
+function SignUpForm() {
+  const searchParams = useSearchParams()
+  const redirect = sanitizeRedirectPath(searchParams.get("redirect"), "/dashboard")
+  const signInHref = `/sign-in?redirect=${encodeURIComponent(redirect)}`
+
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -19,7 +25,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,6 +51,7 @@ export default function SignUpPage() {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirect)}`,
         },
       })
 
@@ -54,7 +61,9 @@ export default function SignUpPage() {
       }
 
       if (data.session) {
-        router.push("/generate")
+        // See the sign-in flow: use a document navigation so the newly-issued
+        // session cookies are on the first protected request.
+        window.location.assign(redirect)
         return
       }
 
@@ -68,144 +77,162 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          <div className="flex justify-center mb-8">
-            <Link href="/">
-              <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={320} height={80} className="w-64 h-auto" priority />
-            </Link>
-          </div>
-          <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-8 text-center">
-            <div className="w-16 h-16 bg-[#D4A843]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mail className="h-8 w-8 text-[#D4A843]" />
+      <AuthShowcase variant="sign-up">
+        <AuthCard>
+          <div className="text-center">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/10">
+              <Mail className="h-6 w-6 text-[#F4D779]" />
             </div>
-            <h1 className="text-2xl font-semibold text-white mb-2">Check your email</h1>
-            <p className="text-[#888] mb-6">
-              We've sent a confirmation link to <span className="text-white">{email}</span>
+            <h1 className="text-2xl font-semibold text-white">Check your email</h1>
+            <p className="mt-3 text-sm leading-6 text-white/50">
+              We sent a confirmation link to <span className="font-medium text-white">{email}</span>.
             </p>
             <Link
-              href="/sign-in"
-              className="inline-block bg-[#1a1a1a] hover:bg-[#222] border border-[#2a2a2a] text-white font-medium py-3 px-6 rounded-lg transition"
+              href={signInHref}
+              className="mt-7 inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.055] px-5 text-sm font-semibold text-white transition hover:border-[#D4AF37]/30 hover:text-[#F4D779]"
             >
               Back to sign in
             </Link>
           </div>
-        </div>
-      </div>
+        </AuthCard>
+      </AuthShowcase>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 pt-12 pb-32">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Link href="/">
-            <Image src="/namoluxloginpagelogo.svg" alt="NamoLux" width={320} height={80} className="w-64 h-auto" priority />
+    <AuthShowcase variant="sign-up">
+      <AuthCard>
+        <AuthTitle
+          title="Create your NamoLux account"
+          subtitle="Check, score, and compare the candidate names your team is considering."
+          icon="sparkles"
+        />
+
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-3">
+            <p className="text-center text-sm text-red-300">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <div>
+            <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-white/58">
+              Full name
+            </label>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37] sm:h-5 sm:w-5" />
+              <input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className={inputClass}
+                placeholder="John Doe"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/58">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37] sm:h-5 sm:w-5" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={inputClass}
+                placeholder="you@example.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="password" className="mb-2 block text-sm font-medium text-white/58">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37] sm:h-5 sm:w-5" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={`${inputClass} pr-12`}
+                placeholder="********"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="mt-1.5 text-xs text-white/35">Must be at least 8 characters</p>
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-white/58">
+              Confirm password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D4AF37] sm:h-5 sm:w-5" />
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className={inputClass}
+                placeholder="********"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-gradient-to-b from-[#F4D779] to-[#C89B33] text-sm font-semibold text-black shadow-lg shadow-[#D4AF37]/20 transition hover:from-[#FFE08A] hover:to-[#D4AF37] disabled:cursor-not-allowed disabled:opacity-55 sm:h-14 sm:text-base"
+          >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {loading ? "Creating account..." : "Create account"}
+            {!loading && <ArrowRight className="h-5 w-5" />}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-white/45">
+          Already have an account?{" "}
+          <Link href={signInHref} className="font-medium text-[#F4D779] transition hover:text-[#D4AF37]">
+            Sign in
           </Link>
-        </div>
-
-        <div className="bg-[#141414] border border-[#1f1f1f] rounded-xl p-8">
-          <h1 className="text-2xl font-semibold text-white text-center mb-2">Create an account</h1>
-          <p className="text-[#888] text-center mb-6">Start generating brandable domain names</p>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-6">
-              <p className="text-red-400 text-sm text-center">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div>
-              <label htmlFor="fullName" className="block text-sm text-[#888] mb-2">Full name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#555]" />
-                <input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg pl-10 pr-4 py-3 text-white placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
-                  placeholder="John Doe"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm text-[#888] mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#555]" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg pl-10 pr-4 py-3 text-white placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
-                  placeholder="you@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm text-[#888] mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#555]" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg pl-10 pr-12 py-3 text-white placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555] hover:text-white transition"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              <p className="text-xs text-[#555] mt-1">Must be at least 8 characters</p>
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm text-[#888] mb-2">Confirm password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#555]" />
-                <input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg pl-10 pr-4 py-3 text-white placeholder:text-[#555] focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-transparent transition"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#D4A843] hover:bg-[#c49a3d] text-black font-medium py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {loading ? "Creating account..." : "Create account"}
-            </button>
-          </form>
-
-          {/* Sign in link */}
-          <p className="text-center text-[#888] mt-6">
-            Already have an account?{" "}
-            <Link href="/sign-in" className="text-[#D4A843] hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+        </p>
+      </AuthCard>
+    </AuthShowcase>
   )
 }
 
+function SignUpLoading() {
+  return (
+    <AuthShowcase variant="sign-up">
+      <AuthCard>
+        <div className="flex min-h-64 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#D4AF37]" />
+        </div>
+      </AuthCard>
+    </AuthShowcase>
+  )
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<SignUpLoading />}>
+      <SignUpForm />
+    </Suspense>
+  )
+}

@@ -11,19 +11,19 @@
 
 Namelix has been the default recommendation for AI name generators since it launched in 2017. It's free, fast, and generates attractive-looking brandable names with logo previews. For a long time, it had no real competition.
 
-NamoLux launched with a different philosophy: don't just generate names, score them. Every name gets a Founder Signal™ rating across phonetic strength, memorability, brand risk, and domain quality. The question isn't which tool is flashier — it's which one helps founders make better decisions.
+NamoLux is a decision-first workspace: bring a shortlist from any source, check the relevant domain extensions, and run Founder Signal™ when the finalists are ready for evidence.
 
 ## Feature Comparison
 
 | Feature | NamoLux | Namelix |
 |---|---|---|
-| AI name generation | ✓ | ✓ |
+| AI name generation | — (bring your own shortlist) | ✓ |
 | Domain availability check | ✓ (real-time) | ✓ (limited) |
 | Name quality scoring | ✓ Founder Signal™ (0–100) | ✗ |
 | Logo preview | ✗ | ✓ |
-| Pricing | One-time purchase | Free (with limitations) |
-| Account required | No (free tier) | No |
-| Free generations | 1 per day | Unlimited (with ads) |
+| Pricing | 3 Bulk Check runs and 1 Founder Signal run free each month; Pro at GBP 7.99/month includes 120 of each | Free generation; paid Brandmark assets |
+| Account required | No to start; account needed to save work or use Pro | No |
+| Free checks | 3 Bulk Check runs | Unlimited generation |
 | Extension options | .com, .io, .ai, .co | .com, .io, .co |
 | Brand vibe selection | ✓ | ✓ |
 
@@ -31,7 +31,7 @@ NamoLux launched with a different philosophy: don't just generate names, score t
 
 Namelix is free, supported by ads and an optional premium tier for logo creation. If you're generating casually and don't need a quality signal, Namelix's free tier has no real cost barrier.
 
-NamoLux offers one free generation per day with no account required. Beyond that, it's a one-time purchase — no monthly subscription. For founders who need to do a focused naming sprint and want structured quality data, the one-time model makes more economic sense than ongoing monthly charges elsewhere.
+NamoLux Free includes three Bulk Check runs and one Founder Signal™ run each UTC calendar month. NamoLux Pro is GBP 7.99/month and includes 120 Bulk Check runs and 120 Founder Signal runs, saved projects, CSV exports, shareable reports, and an ad-free workspace.
 
 ## Name Quality and Scoring
 
@@ -41,11 +41,11 @@ Namelix produces interesting names. The style options (short, compound, real wor
 
 What Namelix doesn't do: tell you if a name is any good. You get a list of options with aesthetic variations, but no signal about which one has stronger phonetics, lower brand risk, or better long-term memorability. Evaluation is entirely manual.
 
-NamoLux wraps every name in Founder Signal™ scoring. You don't just get "gloza" as a name — you get a breakdown of why it scores 94/100, what its phonetic strengths are, whether it carries brand risk, and how it performs on memorability criteria. That's the gap between a name generator and a naming tool.
+NamoLux scores only the shortlist you submit. Founder Signal™ compares candidates for phonetic strength, memorability, brand risk, and domain fit, with the score serving as explained decision support rather than a replacement for judgment.
 
 ## Domain Availability
 
-Both tools check domain availability, but with different depth. NamoLux checks availability in real-time across .com, .io, .ai, and .co for every generated name. Namelix's availability checking is present but less integrated into the core workflow.
+Both tools show domain information, but with different workflows. NamoLux checks up to 50 submitted candidates across six extensions in one workspace. Any positive result remains best effort and should be confirmed with a registrar.
 
 ## Who Each Tool Is Best For
 
@@ -58,21 +58,21 @@ Both tools check domain availability, but with different depth. NamoLux checks a
 **NamoLux is better if:**
 - You want objective quality scoring to guide your decision
 - You need real-time domain availability across multiple TLDs
-- You're running a focused naming sprint with a specific brief
-- You prefer a one-time cost over an ad-supported free product
+- You are ready to compare a focused shortlist rather than generate more options
+- You want optional evidence when you are ready to score the shortlist
 
 ## The Honest Verdict
 
 Namelix's logo preview is genuinely useful and NamoLux doesn't have an equivalent. If seeing visual concepts alongside names helps you evaluate options, Namelix has a clear advantage there.
 
-For founders who want to make a naming decision with data rather than gut feel, NamoLux's Founder Signal™ scoring changes the quality of that decision. You're not just picking the name you like — you're picking the name that objectively performs better on the criteria that matter for long-term brand strength.
+For founders who want to make a naming decision with evidence rather than gut feel alone, NamoLux provides a clear evaluation layer. Bring the names you are already considering, then use Founder Signal™ as a second opinion across the shortlist.
 
-The tools serve different parts of the process. Many founders use both: Namelix for broad ideation and visual exploration, NamoLux for the scoring and final decision.
+The tools solve different parts of the process. Namelix remains a generator with visual logo browsing, while NamoLux focuses on checking availability, comparing a shortlist, and explaining the Founder Signal decision layer.
 
 ---
 
-✨ *Try NamoLux free — no account required, one generation per day. See your names scored for brand strength, memorability, and domain quality before you commit.*
+✨ *Bring your shortlist to NamoLux, check six domain extensions, then run Founder Signal™ when you are ready to compare the evidence.*
 
-[Generate Business Names Free →](https://www.namolux.com/generate)
+[Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 
 *Written by Andrew Barrett*

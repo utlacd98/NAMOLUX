@@ -24,7 +24,7 @@ function esc(value) {
     .replace(/>/g, "&gt;")
 }
 
-function base({ width, height, title, subtitle, eyebrow = "NAMOLUX", footer = "namolux.com/generate" }) {
+function base({ width, height, title, subtitle, eyebrow = "NAMOLUX", footer = "namolux.com/bulk-domain-check" }) {
   return `
   <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -74,12 +74,12 @@ const assets = [
     width: 1080,
     height: 1080,
     title: "Names with proof.",
-    subtitle: "Rank startup names by score, fit, and availability.",
+    subtitle: "Compare a shortlist by score, fit, and availability.",
     svg: () => `${base({
       width: 1080,
       height: 1080,
       title: "Names with proof.",
-      subtitle: "Rank startup names by score, fit, and availability.",
+      subtitle: "Compare a shortlist by score, fit, and availability.",
     })}
     <g filter="url(#softShadow)">
       <rect x="96" y="448" width="888" height="350" rx="28" fill="#0B0B0B" stroke="#302718" stroke-width="2"/>
@@ -125,29 +125,29 @@ const assets = [
     id: "pricing-story",
     width: 1080,
     height: 1920,
-    title: "Go Pro for &#163;15.",
-    subtitle: "One-time access. No subscription.",
+    title: "Free to start.",
+    subtitle: "Pro gives you room to check, score, and decide.",
     svg: () => `${base({
       width: 1080,
       height: 1920,
-      title: "Go Pro for &#163;15.",
-      subtitle: "One-time access. No subscription.",
-      eyebrow: "LIMITED SIMPLE PRICING",
+      title: "Free to start.",
+      subtitle: "Pro gives you room to check, score, and decide.",
+      eyebrow: "3 CHECKS + 1 SCORE / MONTH",
       footer: "namolux.com/pricing",
     })}
     <g filter="url(#softShadow)">
       <rect x="92" y="512" width="896" height="730" rx="38" fill="#0B0B0B" stroke="${palette.gold2}" stroke-width="3"/>
-      <text x="144" y="620" font-family="Arial" font-size="54" font-weight="800" fill="${palette.white}">Pro includes</text>
-      <text x="144" y="724" class="bodyStrong">Unlimited domain generation</text>
-      <text x="144" y="816" class="bodyStrong">Founder Signal&#8482; scoring</text>
-      <text x="144" y="908" class="bodyStrong">Bulk domain checking</text>
-      <text x="144" y="1000" class="bodyStrong">SEO potential checks</text>
-      <text x="144" y="1092" class="bodyStrong">Multi-TLD support</text>
+      <text x="144" y="620" font-family="Arial" font-size="54" font-weight="800" fill="${palette.white}">Free tier includes</text>
+      <text x="144" y="724" class="bodyStrong">3 Bulk Check runs / month</text>
+      <text x="144" y="816" class="bodyStrong">1 Founder Signal run / month</text>
+      <text x="144" y="908" class="bodyStrong">Up to 50 names per batch</text>
+      <text x="144" y="1000" class="bodyStrong">Six domain extensions</text>
+      <text x="144" y="1092" class="bodyStrong">Pro: 120 checks + 120 scores</text>
       <rect x="144" y="1340" width="792" height="122" rx="28" fill="url(#gold)"/>
-      <text x="540" y="1418" text-anchor="middle" font-family="Arial" font-size="42" font-weight="900" fill="#080808">Upgrade to Pro</text>
+      <text x="540" y="1418" text-anchor="middle" font-family="Arial" font-size="42" font-weight="900" fill="#080808">Upgrade for GBP 7.99/mo</text>
     </g>
-    <text x="92" y="1598" class="h1Small">Choose once.</text>
-    <text x="92" y="1676" class="h1Small">Build with confidence.</text>
+    <text x="92" y="1598" class="h1Small">Bring the shortlist.</text>
+    <text x="92" y="1676" class="h1Small">Make the call.</text>
   ${end()}`,
   },
   {

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight, Sparkles, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { CTA_LABELS } from "@/lib/site-content"
 
 interface BlogCTAProps {
   variant?: "inline" | "box" | "banner"
@@ -13,10 +14,10 @@ interface BlogCTAProps {
 
 export function BlogCTA({
   variant = "box",
-  title = "Ready to find your perfect domain?",
-  description = "Generate brandable domain ideas with live availability checks and Founder Signal™ scoring.",
-  ctaText = "Try NamoLux Free",
-  ctaLink = "/generate",
+  title = "Ready to check your shortlist?",
+  description = "Check up to 50 candidate names across six extensions, then add Founder Signal™ when you want a ranked decision view.",
+  ctaText = CTA_LABELS.editorial,
+  ctaLink = "/bulk-domain-check",
 }: BlogCTAProps) {
   if (variant === "inline") {
     return (
@@ -115,4 +116,3 @@ export function Callout({ type, children, ctaLink, ctaText }: CalloutProps) {
     </div>
   )
 }
-

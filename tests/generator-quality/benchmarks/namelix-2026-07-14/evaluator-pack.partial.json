@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "packId": "blind-generator-benchmark-2026-07-14-v1",
+  "status": "awaiting_second_batch",
+  "instructions": "Do not distribute this partial pack. Fill the null batch for every case, then remove this status field before blind scoring.",
+  "cases": [
+    {
+      "presentationOrder": 1,
+      "caseId": "investigative-podcast",
+      "brief": "independent investigative journalism podcast about corporate power",
+      "style": "Auto",
+      "creativity": "Exploratory",
+      "maxLength": 12,
+      "batchA": null,
+      "batchB": [
+        "Power Minutes", "Report Root", "Wirewards", "Power Frame", "Ctrl Media", "The Reportable", "Incite Report", "Massmedia",
+        "Infomaniac", "Newsbounties", "Powerlines", "Newsblog", "Capital Eyes", "Investigist", "Claims Up", "Warcast"
+      ]
+    },
+    {
+      "presentationOrder": 2,
+      "caseId": "recycled-gold-jewellery",
+      "brief": "fine jewellery made from recycled gold for modern heirlooms",
+      "style": "Auto",
+      "creativity": "Direct",
+      "maxLength": 12,
+      "batchA": [
+        "Reborn Gold", "Rebound Gold", "Goldsmith Co", "Goldrecycle", "Goldsmith&Co", "Gold Repeat", "Gold Heirloom", "Heirgold",
+        "Recycled Gold", "Eco Goldsmith", "Hearth Gold", "Heir Gold", "Old Gold", "Future Gold", "Heirloom Gold", "Re Gold"
+      ],
+      "batchB": null
+    },
+    {
+      "presentationOrder": 3,
+      "caseId": "carbon-accounting",
+      "brief": "auditable carbon accounting for mid market manufacturers",
+      "style": "Compound",
+      "creativity": "Balanced",
+      "maxLength": 12,
+      "batchA": null,
+      "batchB": [
+        "Ecotracker", "Caccountable", "MarkiGreen", "Manufacturecord", "Ecomauditor", "Midmanuaudit", "Carboreport", "Trackterial",
+        "Midmarketer", "Sustainytics", "Accounthrive", "ManufactuCO", "Sustainables", "Auditree", "Countocraft", "Trailogreen"
+      ]
+    },
+    {
+      "presentationOrder": 4,
+      "caseId": "welsh-farm-market",
+      "brief": "Welsh language marketplace connecting family farms with local schools",
+      "style": "Non-English",
+      "creativity": "Balanced",
+      "maxLength": 12,
+      "batchA": [
+        "Cynhelwyr", "Amaeth Cymru", "LlanTeg", "Ovea", "Crochan", "Conwy Cooperatives", "Mam Cymru", "Gwlana",
+        "Lle Yma", "Ffair Ffermio", "Y Dderwen", "Y Llofft", "Ffermio", "Ffarmio", "Menter Fferm", "MaesMawr"
+      ],
+      "batchB": null
+    },
+    {
+      "presentationOrder": 5,
+      "caseId": "cyber-threat-analytics",
+      "brief": "cybersecurity analytics platform for enterprise threat detection teams",
+      "style": "Evocative",
+      "creativity": "Exploratory",
+      "maxLength": 11,
+      "batchA": [
+        "Analytiverse", "Monarch Drop", "Signal Eight", "Smash Alert", "Cov Alert", "Slack & Wire", "Hivend", "Dark Trace",
+        "Spot Check", "Det Secure", "Bluer Morning", "Red Titan", "Guardian X", "True Fort", "Emerald Squid", "Lair Cipher"
+      ],
+      "batchB": null
+    },
+    {
+      "presentationOrder": 6,
+      "caseId": "alpine-skincare",
+      "brief": "premium skincare made with alpine botanicals and mineral water",
+      "style": "Real word",
+      "creativity": "Exploratory",
+      "maxLength": 12,
+      "batchA": null,
+      "batchB": [
+        "Apico", "Sapori", "Natura", "Stellar", "Haven Beauty", "Supral", "Rivermist", "Rivium",
+        "Enamel", "Belain", "Ardial", "Elysian", "Fauna", "Frisok", "Acqua", "Ridge"
+      ]
+    },
+    {
+      "presentationOrder": 7,
+      "caseId": "cozy-puzzle-studio",
+      "brief": "cozy puzzle game studio making thoughtful games for adults",
+      "style": "Brandable",
+      "creativity": "Exploratory",
+      "maxLength": 11,
+      "batchA": null,
+      "batchB": [
+        "Puzzlio", "Serene Codex", "Puzzel", "Lull Board", "Clara Phase", "Whitecurio", "Krynox", "Parlorly",
+        "Puzzli", "Seeker Puzzle", "Cozycraft", "Snugbox", "Spelhouse", "Qelvet", "Curio Quiz", "Solidel"
+      ]
+    },
+    {
+      "presentationOrder": 8,
+      "caseId": "rural-telehealth",
+      "brief": "telehealth access for rural patients and community clinics",
+      "style": "Short phrase",
+      "creativity": "Direct",
+      "maxLength": 11,
+      "batchA": null,
+      "batchB": [
+        "Village Care", "Access Med", "In the Field", "Our Tele Health", "The Far Side of Care", "In Touch Rural", "Clini Clinic", "Rural Tele Care",
+        "Rural Wellness", "The New Normal", "In Good Hands", "Patient Side Clinic", "Heal From Home", "Rural Care Hub", "Healing Fields Network", "Meet My Doctor"
+      ]
+    },
+    {
+      "presentationOrder": 9,
+      "caseId": "family-budgeting",
+      "brief": "simple household budgeting and savings app for young families",
+      "style": "Evocative",
+      "creativity": "Direct",
+      "maxLength": 11,
+      "batchA": [
+        "Nest Egg Mom", "First Child", "Soft Nest", "Family Nest", "Golden Nest", "Bamboo Budgets", "Save Easy", "Tiny Nest",
+        "Ok Save", "Basic Nest", "Wee Nest", "Simple Seed", "Nest Egg", "Bright Nest", "Glee Jar", "Mum Budget"
+      ],
+      "batchB": null
+    },
+    {
+      "presentationOrder": 10,
+      "caseId": "ai-scheduling-founders",
+      "brief": "AI scheduling assistant for busy startup founders",
+      "style": "Compound",
+      "creativity": "Direct",
+      "maxLength": 11,
+      "batchA": null,
+      "batchB": [
+        "Schedulista", "Schedulevate", "Hustleschedule", "Foundext", "Schedubrain", "AIgenda", "Schedulaborate", "Chronofound",
+        "Schedulex", "Schedulift", "AIssistants", "AIsyncopation", "Founderschedule", "Scheduluxe", "Foundpection", "Foundersync"
+      ]
+    },
+    {
+      "presentationOrder": 11,
+      "caseId": "privacy-saas",
+      "brief": "privacy compliance SaaS for European ecommerce teams",
+      "style": "Brandable",
+      "creativity": "Balanced",
+      "maxLength": 11,
+      "batchA": [
+        "Privisa", "Respective", "Complyrium", "Privantur", "Ecompli", "Privacty", "Privayo", "Privavox",
+        "Civicompliance", "Privivo", "Compliancer", "Compli EU", "Privabl", "Complycia", "Privacore", "Store Data"
+      ],
+      "batchB": null
+    },
+    {
+      "presentationOrder": 12,
+      "caseId": "curly-hair-beauty",
+      "brief": "inclusive hair care brand for curls coils and textured hair",
+      "style": "Alternate spelling",
+      "creativity": "Balanced",
+      "maxLength": 11,
+      "batchA": [
+        "Coilours", "Allurial", "Curlisse", "Curlyclap", "Kinkke", "Curlvious", "Texturr", "Circurl",
+        "Curele", "Koil", "Curala", "Kurlz", "Curldelicious", "Porcurl", "Curll", "Tangles"
+      ],
+      "batchB": null
+    }
+  ]
+}

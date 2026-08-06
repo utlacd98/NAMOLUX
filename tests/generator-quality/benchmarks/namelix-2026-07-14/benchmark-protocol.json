@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "benchmarkVersion": "namelix-2026-07-14-v1",
+  "packId": "blind-generator-benchmark-2026-07-14-v1",
+  "requiredRaters": 3,
+  "raw": {
+    "dimensions": {
+      "relevance": 10,
+      "pronounceability": 10,
+      "distinctiveness": 10,
+      "controlFit": 10,
+      "shortlistDepth": 10
+    },
+    "outrightWinMinimumMedianAdvantage": 3,
+    "matchMaximumAbsoluteMedianDifference": 2,
+    "matchOrBeatMinimumMedianDifference": -2,
+    "minimumForcedPreferencesForWin": 2,
+    "releaseMinimumOutrightWins": 8,
+    "releaseMinimumMatchOrBeat": 10,
+    "releaseMaximumCriticalQualityLosses": 0
+  },
+  "explanations": {
+    "packId": "blind-generator-benchmark-2026-07-14-explanations-v1",
+    "randomizationSeed": "namolux-vs-namelix-explanations-2026-07-14-v1",
+    "dimensions": {
+      "briefSpecificity": 3,
+      "constructionClarity": 2,
+      "positioningUsefulness": 2,
+      "evidenceHonesty": 2,
+      "decisionActionability": 1
+    },
+    "winMinimumMedianAdvantage": 1,
+    "minimumForcedPreferencesForWin": 2,
+    "releaseMinimumWins": 10
+  },
+  "equivalentControls": {
+    "namelixStyle": {
+      "Auto": "default",
+      "Brandable": "brandable",
+      "Evocative": "twowords",
+      "Compound": "compound",
+      "Alternate spelling": "spelling",
+      "Real word": "dictionary",
+      "Short phrase": "threewords",
+      "Non-English": "nonenglish"
+    },
+    "namoluxStyle": {
+      "Auto": "auto",
+      "Brandable": "brandable",
+      "Evocative": "evocative",
+      "Compound": "compound",
+      "Alternate spelling": "alternate_spelling",
+      "Real word": "real_word",
+      "Short phrase": "short_phrase",
+      "Non-English": "non_english"
+    },
+    "namelixCreativity": {
+      "Direct": "low",
+      "Balanced": "medium",
+      "Exploratory": "high"
+    },
+    "namoluxCreativity": {
+      "Direct": "direct",
+      "Balanced": "balanced",
+      "Exploratory": "exploratory"
+    }
+  }
+}

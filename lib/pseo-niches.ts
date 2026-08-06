@@ -1,7 +1,16 @@
+import { scoreName, type ScoreNameResult } from "./founderSignal/scoreName"
+import {
+  FOUNDER_SIGNAL_EVALUATED_ON,
+  FOUNDER_SIGNAL_VERSION,
+  type FounderSignalBand,
+} from "./founderSignal/spec"
+import { DOMAIN_EXTENSIONS, PRODUCT_CAPABILITIES } from "./site-content"
+
 export interface NameIdea {
   name: string
   meaning: string
   score: number
+  band: FounderSignalBand
   domain: string
 }
 
@@ -18,6 +27,14 @@ export interface NicheFaq {
 export interface NicheData {
   slug: string
   niche: string
+  industryName: string
+  industryArticle: "a" | "an"
+  publishedNameCount: number
+  displayedNameCount: number
+  scoreVersion: typeof FOUNDER_SIGNAL_VERSION
+  lastVerified: typeof FOUNDER_SIGNAL_EVALUATED_ON
+  availableExtensions: typeof DOMAIN_EXTENSIONS
+  supportsSocialHandleCheck: false
   metaTitle: string
   metaDescription: string
   h1: string
@@ -29,7 +46,23 @@ export interface NicheData {
   faqs: NicheFaq[]
 }
 
-export const pseoNiches: NicheData[] = [
+type NicheSeed = Omit<
+  NicheData,
+  | "industryName"
+  | "industryArticle"
+  | "publishedNameCount"
+  | "displayedNameCount"
+  | "scoreVersion"
+  | "lastVerified"
+  | "availableExtensions"
+  | "supportsSocialHandleCheck"
+  | "names"
+> & {
+  /** Legacy hand-authored scores are intentionally ignored during publication. */
+  names: Array<Omit<NameIdea, "band">>
+}
+
+const pseoNicheSeeds: NicheSeed[] = [
   {
     slug: "ai",
     niche: "AI & Machine Learning",
@@ -45,7 +78,6 @@ export const pseoNiches: NicheData[] = [
     ],
     names: [
       { name: "LuminaAI", meaning: "Evokes intelligence and illumination — light guiding decisions", score: 92, domain: "lumina.ai" },
-      { name: "Vantiq", meaning: "From 'vantage' — suggests elevated perspective and foresight", score: 88, domain: "vantiq.com" },
       { name: "Nexlor", meaning: "Invented compound of 'next' and 'lor' (light) — forward-looking AI", score: 85, domain: "nexlor.ai" },
       { name: "Prismind", meaning: "Prism + mind — refracts complex data into clear insight", score: 87, domain: "prismind.com" },
       { name: "Orvai", meaning: "Orbital + AI — suggests vast, orbiting intelligence", score: 82, domain: "orvai.ai" },
@@ -53,9 +85,7 @@ export const pseoNiches: NicheData[] = [
       { name: "Synapt", meaning: "Synapse + apt — neural connections that are perfectly suited", score: 86, domain: "synapt.com" },
       { name: "Veloxis", meaning: "Velocity + Latin suffix — fast, precise AI processing", score: 83, domain: "veloxis.ai" },
       { name: "Mindrift", meaning: "Where minds drift into new possibilities — creative AI", score: 79, domain: "mindrift.com" },
-      { name: "Axoniq", meaning: "Axon (neural pathway) — the core signal of intelligent systems", score: 84, domain: "axoniq.ai" },
       { name: "Perceiv", meaning: "Perceive — AI that truly understands context and nuance", score: 88, domain: "perceiv.com" },
-      { name: "Corteva", meaning: "Cortex + nova — a new kind of intelligent core", score: 85, domain: "corteva.ai" },
       { name: "Loopix", meaning: "Loop + ix — iterative intelligence that improves in cycles", score: 81, domain: "loopix.ai" },
       { name: "Synara", meaning: "Synergy + ara — harmonious AI that works alongside humans", score: 87, domain: "synara.ai" },
       { name: "Kognit", meaning: "Cognition — the foundation of genuine understanding", score: 84, domain: "kognit.ai" },
@@ -1006,6 +1036,164 @@ export const pseoNiches: NicheData[] = [
     ],
   },
 ]
+
+const LEGACY_NAME_COUNT_PATTERN = /\b150\b/g
+const COUNT_CLAIM_PATTERN = /\b(\d[\d,]*)\+?\s+(?:(?:[A-Za-z&-]+)\s+){0,8}?(?:name ideas|names)\b/gi
+const LIVE_SOCIAL_CLAIM_PATTERN =
+  /\b(?:live|real[- ]time|instant)\b[^.!?]{0,100}\b(?:social(?: media)?|handles?)\b[^.!?]{0,40}\b(?:availability|checks?|status)\b|\b(?:social(?: media)?|handles?)\b[^.!?]{0,40}\b(?:availability|checks?|status)\b[^.!?]{0,100}\b(?:live|real[- ]time|instant)\b/i
+
+function domainExtension(domain: string): string {
+  return domain.toLowerCase().match(/\.([a-z]{2,})$/)?.[1] ?? "com"
+}
+
+function evaluateName(idea: Pick<NameIdea, "name" | "domain">): ScoreNameResult {
+  return scoreName({ name: idea.name, tld: domainExtension(idea.domain) })
+}
+
+function normaliseCountClaim(value: string, publishedNameCount: number): string {
+  return value.replace(LEGACY_NAME_COUNT_PATTERN, String(publishedNameCount))
+}
+
+function buildNicheData(seed: NicheSeed): NicheData {
+  const names = seed.names.flatMap((idea) => {
+    const result = evaluateName(idea)
+    if (result.collision.type !== "none") return []
+
+    return [{ ...idea, score: result.score, band: result.band }]
+  })
+  const publishedNameCount = names.length
+
+  return {
+    ...seed,
+    industryName: seed.niche,
+    industryArticle: /^[aeiou]/i.test(seed.niche) ? "an" : "a",
+    publishedNameCount,
+    displayedNameCount: names.length,
+    scoreVersion: FOUNDER_SIGNAL_VERSION,
+    lastVerified: FOUNDER_SIGNAL_EVALUATED_ON,
+    availableExtensions: DOMAIN_EXTENSIONS,
+    supportsSocialHandleCheck: PRODUCT_CAPABILITIES.supportsSocialHandleCheck,
+    metaTitle: normaliseCountClaim(seed.metaTitle, publishedNameCount),
+    metaDescription: normaliseCountClaim(seed.metaDescription, publishedNameCount),
+    h1: normaliseCountClaim(seed.h1, publishedNameCount),
+    intro: normaliseCountClaim(seed.intro, publishedNameCount),
+    names,
+  }
+}
+
+export const pseoNiches: NicheData[] = pseoNicheSeeds.map(buildNicheData)
+
+export type PseoIntegrityIssueCode =
+  | "count"
+  | "score-version"
+  | "score"
+  | "collision"
+  | "social-claim"
+
+export interface PseoIntegrityIssue {
+  code: PseoIntegrityIssueCode
+  slug: string
+  message: string
+  name?: string
+}
+
+function countClaims(value: string): number[] {
+  return Array.from(value.matchAll(COUNT_CLAIM_PATTERN), (match) => Number(match[1].replace(/,/g, "")))
+}
+
+function publicCopy(data: NicheData): string[] {
+  return [
+    data.metaTitle,
+    data.metaDescription,
+    data.h1,
+    data.intro,
+    ...data.namingTips,
+    ...data.commonMistakes,
+    ...data.faqs.flatMap((faq) => [faq.q, faq.a]),
+  ]
+}
+
+/**
+ * Build-time integrity guard for published pSEO data.
+ * An empty result means counts, scoring provenance, collisions, and capability
+ * claims all agree with the canonical Founder Signal specification.
+ */
+export function validatePseoContentIntegrity(
+  niches: readonly NicheData[] = pseoNiches,
+): PseoIntegrityIssue[] {
+  const issues: PseoIntegrityIssue[] = []
+
+  for (const data of niches) {
+    if (
+      data.publishedNameCount !== data.names.length ||
+      data.displayedNameCount !== data.names.length
+    ) {
+      issues.push({
+        code: "count",
+        slug: data.slug,
+        message: `Published (${data.publishedNameCount}) and displayed (${data.displayedNameCount}) counts must equal ${data.names.length}.`,
+      })
+    }
+
+    for (const copy of [data.metaTitle, data.metaDescription, data.h1, data.intro]) {
+      for (const claim of countClaims(copy)) {
+        if (claim !== data.publishedNameCount) {
+          issues.push({
+            code: "count",
+            slug: data.slug,
+            message: `Copy claims ${claim} names but ${data.publishedNameCount} are published.`,
+          })
+        }
+      }
+    }
+
+    if (
+      data.scoreVersion !== FOUNDER_SIGNAL_VERSION ||
+      data.lastVerified !== FOUNDER_SIGNAL_EVALUATED_ON
+    ) {
+      issues.push({
+        code: "score-version",
+        slug: data.slug,
+        message: `Expected Founder Signal v${FOUNDER_SIGNAL_VERSION}, evaluated ${FOUNDER_SIGNAL_EVALUATED_ON}.`,
+      })
+    }
+
+    for (const idea of data.names) {
+      const result = evaluateName(idea)
+      if (result.collision.type !== "none") {
+        issues.push({
+          code: "collision",
+          slug: data.slug,
+          name: idea.name,
+          message: `${idea.name} is a ${result.collision.type} match for ${result.collision.matchedBrand}.`,
+        })
+      }
+      if (idea.score !== result.score || idea.band !== result.band) {
+        issues.push({
+          code: "score",
+          slug: data.slug,
+          name: idea.name,
+          message: `${idea.name} does not match Founder Signal v${FOUNDER_SIGNAL_VERSION}.`,
+        })
+      }
+    }
+
+    if (
+      data.supportsSocialHandleCheck !== false ||
+      (!data.supportsSocialHandleCheck && publicCopy(data).some((copy) => LIVE_SOCIAL_CLAIM_PATTERN.test(copy)))
+    ) {
+      issues.push({
+        code: "social-claim",
+        slug: data.slug,
+        message: "Social-handle checking is not supported and must not be presented as live or real-time.",
+      })
+    }
+  }
+
+  return issues
+}
+
+export const validatePseoNiches = validatePseoContentIntegrity
 
 export function getNicheBySlug(slug: string): NicheData | undefined {
   return pseoNiches.find((n) => n.slug === slug)

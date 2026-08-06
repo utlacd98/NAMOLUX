@@ -1,0 +1,16 @@
+# Local secrets must never be included in Vercel deployment source bundles.
+.env
+.env.*
+
+# Local build, test, and agent artifacts.
+.next/
+.next-*/
+*.log
+tmp/
+motion/
+videos/
+test-results/
+playwright-report/
+tests/
+lib/naming-specialist/pilot-excluded-material.ts
+lib/naming-specialist/excluded-material.test.ts

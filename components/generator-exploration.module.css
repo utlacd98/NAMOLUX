@@ -1,0 +1,116 @@
+.splash {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(246, 226, 122, 0.14), transparent 36%),
+    linear-gradient(145deg, rgba(17, 16, 12, 0.985), rgba(4, 5, 6, 0.995));
+}
+
+.splashGrid {
+  background-image:
+    linear-gradient(rgba(212, 175, 55, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.orbit {
+  animation: orbit 2.8s linear infinite;
+}
+
+.pulse {
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+.resultCard {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.048), rgba(255, 255, 255, 0.017)),
+    rgba(5, 5, 5, 0.72);
+}
+
+.wordmark {
+  background:
+    radial-gradient(circle at 22% 18%, rgba(246, 226, 122, 0.1), transparent 42%),
+    linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.018));
+}
+
+.wordmarkBrandable {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.055em;
+}
+
+.wordmarkEvocative,
+.wordmarkRealWord,
+.wordmarkNonEnglish {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 540;
+  letter-spacing: -0.035em;
+}
+
+.wordmarkCompound,
+.wordmarkShortPhrase {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 760;
+  letter-spacing: -0.045em;
+}
+
+.wordmarkAlternateSpelling {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 620;
+  letter-spacing: -0.035em;
+}
+
+.scoringSweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.scoringSweep::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-110%);
+  background: linear-gradient(90deg, transparent, rgba(246, 226, 122, 0.12), transparent);
+  animation: sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes sweep {
+  55%,
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit,
+  .pulse,
+  .scoringSweep::after {
+    animation: none;
+  }
+
+  .resultCard,
+  .resultCard * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}

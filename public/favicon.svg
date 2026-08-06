@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="NamoLux">
+  <defs>
+    <radialGradient id="b" cx="50%" cy="18%" r="100%"><stop offset="0" stop-color="#211a10"/><stop offset=".52" stop-color="#11100d"/><stop offset="1" stop-color="#080807"/></radialGradient>
+    <linearGradient id="g" x1="108" y1="102" x2="404" y2="412" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a86624"/><stop offset=".27" stop-color="#f7d778"/><stop offset=".56" stop-color="#d19a3d"/><stop offset=".78" stop-color="#ffe69a"/><stop offset="1" stop-color="#aa6827"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="108" fill="url(#b)"/>
+  <rect x="22" y="22" width="468" height="468" rx="91" fill="none" stroke="#765024" stroke-opacity=".64" stroke-width="3"/>
+  <path d="M142 376V136M143 136L370 376M370 376V136" fill="none" stroke="url(#g)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M142 376V136M143 136L370 376M370 376V136" fill="none" stroke="#fff4bf" stroke-opacity=".3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

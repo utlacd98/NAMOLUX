@@ -10,6 +10,7 @@ import { generateCandidatePool } from "@/lib/domainGen/generateCandidates"
 import { rankCandidates } from "@/lib/domainGen/scoreCandidates"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
@@ -264,17 +265,8 @@ function isHighQualityName(name: string, maxLength: number): boolean {
 }
 
 export async function POST(req: NextRequest) {
-  const rateLimit = await checkRateLimit(req, "ai-chat")
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      {
-        error: "token_limit_reached",
-        message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.",
-        upgradeUrl: "/pricing",
-      },
-      { status: 429 },
-    )
-  }
+  const labBlockResponse = getGeneratorLabApiBlockResponse(req)
+  if (labBlockResponse) return labBlockResponse
 
   let body: Record<string, unknown>
   try {
@@ -283,14 +275,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
   }
 
-  const description = String(body.description || "").trim()
+  const description = String(body.description || "").trim().slice(0, 1_000)
   const vibe = toBrandVibe(String(body.vibe || "minimal"))
-  const industry = String(body.industry || "").trim()
+  const industry = String(body.industry || "").replace(/[<>]/g, "").trim().slice(0, 80)
   const maxLength = Math.min(Math.max(Number(body.maxLength) || 9, 5), 12)
-  const keywords = String(body.keywords || "").trim()
+  const keywords = String(body.keywords || "").trim().slice(0, 200)
 
   if (description.length < 10) {
     return NextResponse.json({ error: "description too short" }, { status: 400 })
+  }
+
+  const rateLimit = await checkRateLimit(req, "ai-chat")
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      {
+        error: "monthly_usage_limit_reached",
+        message: rateLimit.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+        resetAt: rateLimit.resetAt,
+        tokensUsed: rateLimit.tokensUsed,
+        tokensTotal: rateLimit.tokensTotal,
+        remaining: rateLimit.remaining,
+      },
+      { status: rateLimit.statusCode || 429 },
+    )
   }
 
   const promptKeywords = [keywords, industry, description].filter(Boolean).join(" ")
@@ -419,12 +426,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (!rateLimit.isPro) {
-      logGeneration(req, rateLimit.userId, "ai-chat", description.slice(0, 80), results.length).catch(() => {})
+      logGeneration(req, rateLimit.userId, "ai-chat", undefined, results.length).catch(() => {})
     }
 
     return NextResponse.json({
       success: true,
-      results: results.slice(0, 8).map(({ rankScore: _rankScore, ...result }) => result),
+      isPro: rateLimit.isPro,
+      founderSignalUnlocked: rateLimit.isPro,
+      results: results.slice(0, 8).map(({ rankScore: _rankScore, score, label, reasons, ...result }) =>
+        rateLimit.isPro ? { ...result, score, label, reasons } : result,
+      ),
     })
   } catch (err) {
     console.error("ai-name-chat error:", err)

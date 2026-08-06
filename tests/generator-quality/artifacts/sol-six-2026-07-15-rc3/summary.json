@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "artifactType": "quick-generator-live-provider-audit-summary",
+  "auditManifest": {
+    "schemaVersion": 1,
+    "artifactType": "quick-generator-live-provider-audit",
+    "startedAt": "2026-07-15T14:26:06.959Z",
+    "completedAt": "2026-07-15T14:28:17.067Z",
+    "implementation": {
+      "files": [
+        "lib/domainGen/filters.ts",
+        "lib/domainGen/generatedName.ts",
+        "lib/domainGen/quickGenerate.ts",
+        "lib/domainGen/quickGenerateGroq.ts",
+        "lib/domainGen/quickRationale.ts",
+        "lib/domainGen/quickRationaleAdapter.ts",
+        "lib/domainGen/realness.ts"
+      ],
+      "sha256": "a61796d57b9d0b27ff9134d90d255cff6366c481356c6270d40be415c00de877"
+    },
+    "git": {
+      "head": "a1c0991b92d979a6719b9991acf1e4993590f17c",
+      "branch": "test/name-generator",
+      "workingTreeDirty": true,
+      "statusSha256": "2590b0cbb4bfc53f819ddaedf5d6d9ccc866e43d701ca9fe6baa8ed21a252e44"
+    },
+    "runtime": {
+      "node": "v22.13.1",
+      "platform": "win32",
+      "architecture": "x64"
+    },
+    "environment": {
+      "providerCredentialsPresent": {
+        "groq": false,
+        "openai": true,
+        "vercelGateway": false
+      },
+      "modelOverridePresent": {
+        "groqSingle": false,
+        "groqList": false,
+        "openai": true,
+        "vercelGateway": false
+      },
+      "auditConfig": {
+        "requestedBriefs": 6,
+        "batchSize": 1,
+        "delayMs": 20000,
+        "quiet": true
+      }
+    },
+    "models": {
+      "attempted": [
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "attempts": 1,
+          "outcomes": {
+            "missing_key": 1
+          }
+        },
+        {
+          "provider": "groq",
+          "model": "qwen/qwen3.6-27b",
+          "attempts": 1,
+          "outcomes": {
+            "missing_key": 1
+          }
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.6-sol",
+          "attempts": 6,
+          "outcomes": {
+            "http_error": 1,
+            "ready": 5
+          }
+        },
+        {
+          "provider": "vercel_gateway",
+          "model": "google/gemini-2.5-flash",
+          "attempts": 1,
+          "outcomes": {
+            "missing_key": 1
+          }
+        }
+      ],
+      "successful": [
+        {
+          "provider": "deterministic",
+          "model": null,
+          "briefs": 1
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.6-sol",
+          "briefs": 5
+        }
+      ]
+    },
+    "contributionGate": {
+      "minimumCandidatesPerBrief": 4,
+      "minimumCandidateSharePerBrief": 0.25,
+      "minimumContributedBriefRate": 0.9,
+      "minimumGlobalCandidateShare": 0.25
+    }
+  },
+  "summary": {
+    "briefs": 6,
+    "modelBackedBriefs": 5,
+    "modelBackedRate": 83.3,
+    "modelContributedBriefs": 5,
+    "modelContributedBriefRate": 83.3,
+    "modelCandidates": 69,
+    "fallbackCandidates": 27,
+    "modelCandidateRate": 71.9,
+    "fallbackCandidateRate": 28.1,
+    "crossNicheDuplicateRate": 0,
+    "p95DurationMs": 6351,
+    "maxDurationMs": 6351,
+    "providers": {
+      "deterministic": 1,
+      "openai": 5
+    },
+    "fallbackReasons": {
+      "openai_http_401": 1
+    },
+    "topCrossNicheDuplicates": [],
+    "gates": {
+      "perBriefQualityPassed": false,
+      "crossNicheExactDuplicationAtMost1Percent": true,
+      "meaningfulModelContributionAtLeast90Percent": false,
+      "modelCandidateShareAtLeast25Percent": true,
+      "directGeneratorP95AtMost7Seconds": true
+    },
+    "failures": 3
+  }
+}

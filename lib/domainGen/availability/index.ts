@@ -40,11 +40,16 @@ export async function checkAvailability(
     backoffMs?: number
     dnsTimeoutMs?: number
     rdapTimeoutMs?: number
+    /** Set false when a durable caller owns the cache lifetime itself. */
+    cache?: boolean
   },
 ): Promise<AvailabilityCheckResult> {
   const normalizedDomain = domain.toLowerCase()
-  const cached = getCachedAvailability(normalizedDomain)
-  if (cached) return cached
+  const cacheEnabled = options?.cache !== false
+  if (cacheEnabled) {
+    const cached = getCachedAvailability(normalizedDomain)
+    if (cached) return cached
+  }
 
   const started = Date.now()
   const ttlMs = options?.ttlMs ?? DEFAULT_TTL_MS
@@ -69,7 +74,7 @@ export async function checkAvailability(
             domain: normalizedDomain,
             latencyMs: Date.now() - started,
           }
-          setCachedAvailability(normalizedDomain, mapped, ttlMs)
+          if (cacheEnabled) setCachedAvailability(normalizedDomain, mapped, ttlMs)
           return mapped
         } catch {
           if (attempt >= maxRetries) break
@@ -88,7 +93,7 @@ export async function checkAvailability(
       confidence: "low",
       error: "all_providers_failed",
     }
-    setCachedAvailability(normalizedDomain, degraded, Math.min(ttlMs, 60_000))
+    if (cacheEnabled) setCachedAvailability(normalizedDomain, degraded, Math.min(ttlMs, 60_000))
     return degraded
   }
 
@@ -101,7 +106,7 @@ export async function checkAvailability(
 
     const mapped = mapToAvailabilityResult(result, Date.now() - started)
     const ttl = result.status === "error" ? Math.min(ttlMs, 60_000) : ttlMs
-    setCachedAvailability(normalizedDomain, mapped, ttl)
+    if (cacheEnabled) setCachedAvailability(normalizedDomain, mapped, ttl)
     return mapped
   } catch (err: any) {
     const degraded: AvailabilityCheckResult = {
@@ -112,7 +117,7 @@ export async function checkAvailability(
       confidence: "low",
       error: err?.message || "availability_unknown",
     }
-    setCachedAvailability(normalizedDomain, degraded, 60_000)
+    if (cacheEnabled) setCachedAvailability(normalizedDomain, degraded, 60_000)
     return degraded
   }
 }
@@ -128,13 +133,16 @@ export async function checkAvailabilityBatch(
     concurrency?: number
     dnsTimeoutMs?: number
     rdapTimeoutMs?: number
+    cache?: boolean
+    /** Called after each finished check so durable callers can stream progress. */
+    onResult?: (result: AvailabilityCheckResult) => void | Promise<void>
   },
 ): Promise<AvailabilityCheckResult[]> {
   const uniqueDomains = Array.from(new Set(domains.map((d) => d.toLowerCase())))
   const concurrency = options?.concurrency ?? 5
 
-  return mapWithConcurrency(uniqueDomains, concurrency, (domain) =>
-    checkAvailability(domain, {
+  return mapWithConcurrency(uniqueDomains, concurrency, async (domain) => {
+    const result = await checkAvailability(domain, {
       signal: options?.signal,
       ttlMs: options?.ttlMs,
       providers: options?.providers,
@@ -142,8 +150,11 @@ export async function checkAvailabilityBatch(
       backoffMs: options?.backoffMs,
       dnsTimeoutMs: options?.dnsTimeoutMs,
       rdapTimeoutMs: options?.rdapTimeoutMs,
-    }),
-  )
+      cache: options?.cache,
+    })
+    await options?.onResult?.(result)
+    return result
+  })
 }
 
 export const availabilityProviders = {

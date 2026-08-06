@@ -4,7 +4,15 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { getAllNicheSlugs, getNicheBySlug, pseoNiches } from "@/lib/pseo-niches"
+import {
+  FOUNDER_SIGNAL_BANDS,
+  getFounderSignalBand,
+  type FounderSignalBand,
+} from "@/lib/founderSignal/spec"
 import { Sparkles, ExternalLink, Star, ChevronRight, ArrowRight } from "lucide-react"
+import { CTA_LABELS } from "@/lib/site-content"
+import { AdBanner } from "@/components/ad-banner"
+import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 
 interface NichePageProps {
   params: Promise<{ niche: string }>
@@ -38,16 +46,29 @@ export async function generateMetadata({ params }: NichePageProps): Promise<Meta
   }
 }
 
-function scoreColor(score: number): string {
-  if (score >= 88) return "text-[#D4A843]"
-  if (score >= 80) return "text-emerald-400"
-  return "text-[#888]"
+const SCORE_BAND_STYLES: Record<FounderSignalBand, string> = {
+  Elite: "bg-[#D4A843]/10 border border-[#D4A843]/30 text-[#D4A843]",
+  Strong: "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400",
+  Viable: "bg-sky-500/10 border border-sky-500/30 text-sky-300",
+  Reconsider: "bg-red-500/10 border border-red-500/30 text-red-300",
+}
+
+const SCORE_BAND_TEXT_STYLES: Record<FounderSignalBand, string> = {
+  Elite: "text-[#D4A843]",
+  Strong: "text-emerald-400",
+  Viable: "text-sky-300",
+  Reconsider: "text-red-300",
+}
+
+const SCORE_BAND_DESCRIPTIONS: Record<FounderSignalBand, string> = {
+  Elite: "Exceptional potential",
+  Strong: "High brand potential",
+  Viable: "Worth further review",
+  Reconsider: "Material concerns",
 }
 
 function scoreBadge(score: number): string {
-  if (score >= 88) return "bg-[#D4A843]/10 border border-[#D4A843]/30 text-[#D4A843]"
-  if (score >= 80) return "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-  return "bg-[#1f1f1f] border border-[#2a2a2a] text-[#888]"
+  return SCORE_BAND_STYLES[getFounderSignalBand(score)]
 }
 
 export default async function NichePage({ params }: NichePageProps) {
@@ -56,6 +77,9 @@ export default async function NichePage({ params }: NichePageProps) {
   if (!data) notFound()
 
   const relatedNiches = pseoNiches.filter((n) => n.slug !== niche).slice(0, 6)
+  const availableExtensions = data.availableExtensions.join(", ")
+  const defaultBrief = `I am building ${data.industryArticle} ${data.industryName} business. I want a professional, memorable name that feels credible in this market, is easy to pronounce, and has a strong domain.`
+  const shortlistHref = "/bulk-domain-check"
 
   // JSON-LD structured data
   const jsonLd = {
@@ -72,7 +96,7 @@ export default async function NichePage({ params }: NichePageProps) {
           itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: "https://www.namolux.com" },
             { "@type": "ListItem", position: 2, name: "Startup Name Ideas", item: "https://www.namolux.com/startup-name-ideas" },
-            { "@type": "ListItem", position: 3, name: `${data.niche} Names`, item: `https://www.namolux.com/startup-name-ideas/${data.slug}` },
+            { "@type": "ListItem", position: 3, name: `${data.industryName} Names`, item: `https://www.namolux.com/startup-name-ideas/${data.slug}` },
           ],
         },
       },
@@ -80,7 +104,7 @@ export default async function NichePage({ params }: NichePageProps) {
         "@type": "ItemList",
         name: data.h1,
         description: data.metaDescription,
-        numberOfItems: data.names.length,
+        numberOfItems: data.publishedNameCount,
         itemListElement: data.names.slice(0, 10).map((name, i) => ({
           "@type": "ListItem",
           position: i + 1,
@@ -110,7 +134,7 @@ export default async function NichePage({ params }: NichePageProps) {
       />
       <div className="flex min-h-screen flex-col bg-[#0a0a0a]">
         <Navbar />
-        <main className="flex-1 pt-20">
+        <main id="main-content" className="flex-1 pt-20">
           {/* Breadcrumb */}
           <div className="border-b border-[#1a1a1a]">
             <div className="mx-auto max-w-5xl px-4 py-3">
@@ -119,7 +143,7 @@ export default async function NichePage({ params }: NichePageProps) {
                 <ChevronRight className="h-3.5 w-3.5" />
                 <Link href="/startup-name-ideas" className="hover:text-[#888] transition-colors">Startup Name Ideas</Link>
                 <ChevronRight className="h-3.5 w-3.5" />
-                <span className="text-[#888]">{data.niche}</span>
+                <span className="text-[#888]">{data.industryName}</span>
               </nav>
             </div>
           </div>
@@ -129,7 +153,7 @@ export default async function NichePage({ params }: NichePageProps) {
             <div className="mx-auto max-w-5xl">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-[#D4A843]/10 border border-[#D4A843]/20 px-3 py-1 text-xs text-[#D4A843] mb-6">
                 <Sparkles className="h-3 w-3" />
-                {data.names.length} name ideas
+                {data.displayedNameCount} name ideas
               </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-5 max-w-3xl">
                 {data.h1}
@@ -137,14 +161,14 @@ export default async function NichePage({ params }: NichePageProps) {
               <p className="text-[#888] text-lg max-w-2xl leading-relaxed mb-8">
                 {data.intro}
               </p>
-              <a
-                href="/generate"
+              <Link
+                href={shortlistHref}
                 className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-6 py-3 rounded-lg transition"
               >
                 <Sparkles className="h-4 w-4" />
-                Generate Personalised Names with AI
+                {CTA_LABELS.primary}
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </section>
 
@@ -152,10 +176,12 @@ export default async function NichePage({ params }: NichePageProps) {
             <div className="grid lg:grid-cols-[1fr_300px] gap-10">
               {/* Main content */}
               <div>
+                <AdBanner placement="guide-after-intro" />
+
                 {/* Naming Tips */}
-                <section className="mb-10">
+                <section className="mt-10 mb-10">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    How to Name a {data.niche} Business
+                    How to Name Your {data.industryName} Business
                   </h2>
                   <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5 space-y-2">
                     {data.namingTips.map((tip, i) => (
@@ -169,10 +195,19 @@ export default async function NichePage({ params }: NichePageProps) {
                   </div>
                 </section>
 
+                <ContextualMiniGenerator
+                  source="niche"
+                  contentSlug={data.slug}
+                  topic={data.niche}
+                  defaultBrief={defaultBrief}
+                  heading={`Check a personalised ${data.industryName} shortlist`}
+                  ctaId={`niche-${data.slug}`}
+                />
+
                 {/* Name list */}
                 <section>
                   <h2 className="text-xl font-bold text-white mb-6">
-                    {data.names.length} {data.niche} Name Ideas
+                    {data.displayedNameCount} {data.industryName} Name Ideas
                   </h2>
 
                   <div className="space-y-3">
@@ -196,7 +231,7 @@ export default async function NichePage({ params }: NichePageProps) {
                               <div className="flex items-center gap-2 mt-2 flex-wrap">
                                 <span className="inline-flex items-center gap-1 text-xs text-[#555]">
                                   <ExternalLink className="h-3 w-3" />
-                                  {item.domain}
+                                  Suggested domain: {item.domain}
                                 </span>
                               </div>
                             </div>
@@ -204,9 +239,9 @@ export default async function NichePage({ params }: NichePageProps) {
                           <div className="flex-shrink-0 text-right">
                             <div className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${scoreBadge(item.score)}`}>
                               <Star className="h-3 w-3" />
-                              {item.score}
+                              {item.score} · {getFounderSignalBand(item.score)}
                             </div>
-                            <p className="text-[#444] text-xs mt-1">Founder Signal™</p>
+                            <p className="text-[#444] text-xs mt-1">Founder Signal™ v{data.scoreVersion}</p>
                           </div>
                         </div>
                       </div>
@@ -216,25 +251,27 @@ export default async function NichePage({ params }: NichePageProps) {
                   {/* Mid-list CTA */}
                   <div className="my-8 bg-gradient-to-r from-[#1a1710] to-[#141414] border border-[#D4A843]/20 rounded-xl p-6 text-center">
                     <p className="text-white font-semibold mb-2">
-                      None of these quite right?
+                      Have your own candidates to compare?
                     </p>
                     <p className="text-[#888] text-sm mb-4">
-                      NamoLux generates personalised {data.niche} name ideas based on your exact brand vision — with real-time domain availability checks.
+                      Paste up to 50 names and check domain status across {availableExtensions} in one focused workspace.
                     </p>
-                    <a
-                      href="/generate"
+                    <Link
+                      href={shortlistHref}
                       className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-5 py-2.5 rounded-lg transition text-sm"
                     >
                       <Sparkles className="h-4 w-4" />
-                      Generate Names for My {data.niche} Brand →
-                    </a>
+                      {CTA_LABELS.editorial} <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
                 </section>
+
+                <AdBanner placement="founder-result-after-primary" />
 
                 {/* Real-world brand examples */}
                 <section className="mt-10">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    Real-World {data.niche} Brand Names — and Why They Work
+                    Real-World {data.industryName} Brand Names — and Why They Work
                   </h2>
                   <div className="space-y-3">
                     {data.realWorldExamples.map((ex) => (
@@ -249,7 +286,7 @@ export default async function NichePage({ params }: NichePageProps) {
                 {/* Common mistakes */}
                 <section className="mt-10">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    Common {data.niche} Naming Mistakes to Avoid
+                    Common {data.industryName} Naming Mistakes to Avoid
                   </h2>
                   <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5 space-y-3">
                     {data.commonMistakes.map((mistake, i) => (
@@ -264,7 +301,7 @@ export default async function NichePage({ params }: NichePageProps) {
                 {/* FAQ */}
                 <section className="mt-10">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    {data.niche} Naming FAQs
+                    {data.industryName} Naming FAQs
                   </h2>
                   <div className="space-y-4">
                     {data.faqs.map((faq, i) => (
@@ -276,21 +313,23 @@ export default async function NichePage({ params }: NichePageProps) {
                   </div>
                 </section>
 
+                <AdBanner placement="guide-before-conclusion" />
+
                 {/* Domain tips */}
                 <section className="mt-10 bg-[#111] border border-[#1f1f1f] rounded-xl p-6">
                   <h2 className="text-lg font-bold text-white mb-3">
-                    Getting the Domain for Your {data.niche} Brand
+                    Getting the Domain for Your {data.industryName} Brand
                   </h2>
                   <p className="text-[#888] text-sm leading-relaxed mb-4">
-                    Once you have a shortlist of names, check domain availability immediately — good names get taken fast. Always try to secure the .com first, then .io or .co as alternatives. If the .com is taken, consider adding a short prefix ('get', 'try', 'use') or suffix before settling for a less recognised TLD.
+                    Once you have a shortlist, check the supported extensions ({availableExtensions}) and confirm the result with your registrar before purchasing. Domain availability is separate from company-name, social-handle, and legal trademark checks.
                   </p>
-                  <a
-                    href="/generate"
+                  <Link
+                    href="/bulk-domain-check"
                     className="inline-flex items-center gap-2 text-[#D4A843] hover:text-[#c49a3d] text-sm font-medium transition"
                   >
-                    Check domain availability with NamoLux
+                    {CTA_LABELS.secondaryProduct}
                     <ArrowRight className="h-3.5 w-3.5" />
-                  </a>
+                  </Link>
                 </section>
               </div>
 
@@ -301,35 +340,34 @@ export default async function NichePage({ params }: NichePageProps) {
                   <div className="bg-gradient-to-b from-[#1a1710] to-[#111] border border-[#D4A843]/20 rounded-xl p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <Sparkles className="h-4 w-4 text-[#D4A843]" />
-                      <span className="text-white font-semibold text-sm">AI Name Generator</span>
+                      <span className="text-white font-semibold text-sm">Bulk Domain Check</span>
                     </div>
                     <p className="text-[#888] text-xs leading-relaxed mb-4">
-                      Generate hundreds of personalised {data.niche} name ideas in seconds, with real-time domain and social handle availability.
+                      Compare your {data.industryName} shortlist with best-effort domain checks across {availableExtensions}. Social-handle checks are separate.
                     </p>
-                    <a
-                      href="/generate"
+                    <Link
+                      href={shortlistHref}
                       className="block w-full text-center bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold py-2.5 rounded-lg transition text-sm"
                     >
-                      Generate Names Free →
-                    </a>
+                      {CTA_LABELS.primary} <ArrowRight className="inline h-4 w-4" />
+                    </Link>
                   </div>
 
                   {/* Score legend */}
                   <div className="bg-[#111] border border-[#1f1f1f] rounded-xl p-5">
-                    <h3 className="text-white font-semibold text-sm mb-3">Founder Signal™ Score</h3>
+                    <h3 className="text-white font-semibold text-sm mb-1">Founder Signal™ Score</h3>
+                    <p className="text-[#555] text-xs mb-3">
+                      Version {data.scoreVersion} · evaluated <time dateTime={data.lastVerified}>{data.lastVerified}</time>
+                    </p>
                     <div className="space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#D4A843]">88–100 · Elite</span>
-                        <span className="text-[#555]">Exceptional brand potential</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-emerald-400">80–87 · Strong</span>
-                        <span className="text-[#555]">Highly viable name</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#888]">70–79 · Good</span>
-                        <span className="text-[#555]">Solid starting point</span>
-                      </div>
+                      {FOUNDER_SIGNAL_BANDS.map((band) => (
+                        <div key={band.label} className="flex items-center justify-between gap-3">
+                          <span className={SCORE_BAND_TEXT_STYLES[band.label]}>
+                            {band.min}–{band.max} · {band.label}
+                          </span>
+                          <span className="text-[#555] text-right">{SCORE_BAND_DESCRIPTIONS[band.label]}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -343,7 +381,7 @@ export default async function NichePage({ params }: NichePageProps) {
                           href={`/startup-name-ideas/${n.slug}`}
                           className="flex items-center justify-between py-1.5 text-[#666] hover:text-white text-xs transition group"
                         >
-                          <span>{n.niche}</span>
+                          <span>{n.industryName}</span>
                           <ChevronRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                       ))}
@@ -364,17 +402,17 @@ export default async function NichePage({ params }: NichePageProps) {
           <section className="border-t border-[#1a1a1a] py-14 px-4">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-2xl font-bold text-white mb-3">
-                Ready to Find Your Perfect {data.niche} Name?
+                Ready to Compare Your {data.industryName} Shortlist?
               </h2>
               <p className="text-[#888] mb-6">
-                NamoLux generates AI-powered name ideas tailored to your niche, brand vibe, and industry — with instant domain availability across .com, .io, .ai, and .co.
+                NamoLux checks up to 50 candidate names across {availableExtensions} and adds Founder Signal when you want a ranked decision view.
               </p>
               <a
-                href="/generate"
+                href={shortlistHref}
                 className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-8 py-3.5 rounded-lg transition"
               >
                 <Sparkles className="h-4 w-4" />
-                Generate More {data.niche} Names →
+                Check My Shortlist →
               </a>
             </div>
           </section>

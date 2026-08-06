@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { SeoAudit } from "@/components/seo-audit"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "SEO Audit Tool | NamoLux",
@@ -19,5 +21,13 @@ export const metadata: Metadata = {
 }
 
 export default function SeoAuditPage() {
-  return <SeoAudit />
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <div className="flex-1 pt-[78px]">
+        <SeoAudit />
+      </div>
+      <Footer />
+    </div>
+  )
 }

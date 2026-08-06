@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
+import { AdBanner } from "@/components/ad-banner"
 import { ArrowRight, Check, X } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -79,6 +80,8 @@ export default function DomainVsBrandPage() {
             </p>
           </section>
 
+          <AdBanner placement="comparison-after-summary" />
+
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-semibold text-foreground">
               Extension quick guide
@@ -139,6 +142,8 @@ export default function DomainVsBrandPage() {
             </p>
           </section>
 
+          <AdBanner placement="comparison-before-conclusion" />
+
           <section className="mb-12 rounded-xl border border-border/50 bg-card/50 p-6">
             <p className="text-xl font-medium italic text-foreground">
               "A strong brand on .io beats a weak brand on .com."
@@ -146,7 +151,7 @@ export default function DomainVsBrandPage() {
           </section>
 
           <div className="text-center">
-            <Link href="/generate">
+            <Link href="/bulk-domain-check">
               <Button size="lg" className="gap-2">
                 Find a brandable domain
                 <ArrowRight className="h-4 w-4" />
@@ -159,4 +164,3 @@ export default function DomainVsBrandPage() {
     </div>
   )
 }
-

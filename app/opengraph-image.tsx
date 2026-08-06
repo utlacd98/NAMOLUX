@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "NamoLux - AI Domain Name Generator"
+export const alt = "NamoLux - Bulk Domain Check and Founder Signal"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -118,7 +118,7 @@ export default async function Image() {
             maxWidth: "560px",
           }}
         >
-          AI domain names scored by Founder Signal
+          Bulk domain checks with optional Founder Signal
         </div>
 
         {/* Gold pill badge */}

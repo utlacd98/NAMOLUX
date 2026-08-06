@@ -1,14 +1,18 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { trackMetric } from "@/lib/metrics"
-import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import { checkBurstLimit, checkRateLimit, getEntitlementState, logGeneration } from "@/lib/rate-limit"
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
+import { verifyGenerationWorkflowToken } from "@/lib/generation-workflow-token"
+import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 
 const SUPPORTED_TLDS = ["com", "io", "co", "ai", "app", "dev"]
-const MAX_DOMAINS_PER_REQUEST = 25
+const MAX_DOMAINS_PER_REQUEST = 50
 const MAX_TLDS_PER_REQUEST = 6
-const MAX_EXPANDED_CHECKS = 75
+const MAX_EXPANDED_CHECKS = 300
 const MAX_DOMAIN_LABEL_LENGTH = 63
+const AVAILABILITY_BURST_LIMIT = 30
 
 interface DomainScoreResult {
   /** Founder Signal score (0-100) */
@@ -30,6 +34,27 @@ interface DomainScoreResult {
       brandRisk: number
     }
   }
+}
+
+type DomainAvailabilityResult = {
+  name: string
+  tld: string
+  fullDomain: string
+  available: boolean
+  availabilityProvider: string
+  availabilityLatencyMs: number
+  availabilityCached: boolean
+  availabilityConfidence: string
+  checkStatus: string
+  checkTiers: {
+    dns: { google: string | null; cloudflare: string | null }
+    rdap: unknown
+  } | null
+  length: number
+  score?: number
+  pronounceable?: boolean
+  memorability?: number
+  founderSignal?: DomainScoreResult["founderSignal"]
 }
 
 function scoreDomain(name: string, tld: string, vibe?: BrandVibe): DomainScoreResult {
@@ -61,23 +86,22 @@ function normaliseTld(input: unknown): string | null {
   return SUPPORTED_TLDS.includes(tld) ? tld : null
 }
 
+function generationWorkflowIdentity(request: NextRequest, userId: string | null): string {
+  if (userId) return `user:${userId}`
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+  const ip = forwarded || request.headers.get("x-real-ip")?.trim() || "unknown"
+  return `anonymous:${ip}`
+}
+
 export async function POST(request: NextRequest) {
+  const labBlock = getGeneratorLabApiBlockResponse(request)
+  if (labBlock) return labBlock
+
   try {
-    // Check rate limit first - bulk check feature
-    const rateLimitResult = await checkRateLimit(request, "bulk")
-
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        {
-          error: "token_limit_reached",
-          message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.",
-          upgradeUrl: "/pricing",
-        },
-        { status: 429 }
-      )
-    }
-
-    const { domains, tlds, vibe } = await request.json()
+    const body = await request.json().catch(() => null)
+    const domains = body?.domains
+    const tlds = body?.tlds
+    const vibe = body?.vibe
 
     if (!domains || !Array.isArray(domains)) {
       return NextResponse.json({ error: "Domains array is required" }, { status: 400 })
@@ -108,11 +132,72 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // A signed continuation avoids double-charging a generation workflow, but
+    // it must never become an unlimited provider-work replay token.
+    const burst = await checkBurstLimit(request, "domain-availability", AVAILABILITY_BURST_LIMIT)
+    if (!burst.allowed) {
+      return NextResponse.json(
+        {
+          error: "availability_rate_limited",
+          message: "Please wait a moment before checking more domains.",
+          resetAt: burst.resetAt,
+        },
+        { status: burst.unavailable ? 503 : 429 },
+      )
+    }
+
+    // A signed token proves these names were produced by the immediately
+    // preceding generation request. That continuation is one user workflow,
+    // so it reads entitlement state without consuming a second monthly use.
+    const entitlementState = body?.workflowToken ? await getEntitlementState(request) : null
+    const workflowIdentity = entitlementState
+      ? generationWorkflowIdentity(request, entitlementState.userId)
+      : null
+    const v2WorkflowContinuation = Boolean(
+      entitlementState &&
+      workflowIdentity &&
+      verifyGenerationWorkflowToken(body.workflowToken, cleanDomains, `availability:${workflowIdentity}`),
+    )
+    const legacyWorkflowContinuation = Boolean(
+      entitlementState &&
+      workflowIdentity &&
+      // Tokens issued before the generator redesign remain usable until their
+      // ten-minute expiry so an in-flight generation is never stranded.
+      verifyGenerationWorkflowToken(body.workflowToken, cleanDomains, workflowIdentity),
+    )
+    const workflowContinuation = v2WorkflowContinuation || legacyWorkflowContinuation
+    const rateLimitResult = workflowContinuation && entitlementState
+      ? {
+          ...entitlementState,
+          allowed: true,
+          tokensUsed: 0,
+          tokensTotal: entitlementState.isPro ? -1 : 0,
+          remaining: entitlementState.isPro ? -1 : 0,
+          resetAt: null,
+          canUseBrandPalette: entitlementState.isPro,
+          statusCode: 200 as const,
+        }
+      : await checkRateLimit(request, "bulk")
+
+    if (!workflowContinuation && !rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: "monthly_usage_limit_reached",
+          message: rateLimitResult.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+          resetAt: rateLimitResult.resetAt,
+          tokensUsed: rateLimitResult.tokensUsed,
+          tokensTotal: rateLimitResult.tokensTotal,
+          remaining: rateLimitResult.remaining,
+        },
+        { status: rateLimitResult.statusCode || 429 },
+      )
+    }
+
     const fullDomains = cleanDomains.flatMap((domainName) => tldsToCheck.map((tld) => `${domainName}.${tld}`))
 
     const availabilityResults = await checkAvailabilityBatch(fullDomains, {
       signal: request.signal,
-      concurrency: 8,
+      concurrency: 12,
       maxRetries: 2,
       backoffMs: 120,
       ttlMs: 24 * 60 * 60 * 1000,
@@ -120,15 +205,23 @@ export async function POST(request: NextRequest) {
 
     const availabilityMap = new Map(availabilityResults.map((result) => [result.domain, result]))
 
-    const results = cleanDomains.flatMap((domainName: string) =>
+    const redesignV2 = isGeneratorRedesignEnabled()
+    const candidateFirstContinuation = redesignV2 && v2WorkflowContinuation
+    const founderSignalUnlocked = rateLimitResult.isPro
+      && body?.includeFounderSignal !== false
+      && !candidateFirstContinuation
+
+    const results: DomainAvailabilityResult[] = cleanDomains.flatMap((domainName: string) =>
       tldsToCheck.map((tld: string) => {
         const fullDomain = `${domainName}.${tld}`
         const availability = availabilityMap.get(fullDomain)
         // Pass TLD to scoring so extension strength is factored in
-        const metrics = scoreDomain(domainName, tld, typeof vibe === "string" ? (vibe as BrandVibe) : undefined)
+        const metrics = founderSignalUnlocked
+          ? scoreDomain(domainName, tld, typeof vibe === "string" ? (vibe as BrandVibe) : undefined)
+          : null
 
         const tiered = availability?.tieredDetails
-        return {
+        const baseResult: DomainAvailabilityResult = {
           name: domainName,
           tld,
           fullDomain,
@@ -138,24 +231,36 @@ export async function POST(request: NextRequest) {
           availabilityCached: Boolean(availability?.cached),
           availabilityConfidence: availability?.confidence || "low",
           // Tiered check details — optional UI use for confidence indicators
-          checkStatus: tiered?.status ?? (availability?.available ? "available" : "taken"),
+          checkStatus: tiered?.status ?? (availability?.available ? "available" : availability ? "taken" : "needs_verification"),
           checkTiers: tiered
             ? {
                 dns: { google: tiered.tier1.google, cloudflare: tiered.tier1.cloudflare },
                 rdap: tiered.tier2?.rdap ?? null,
               }
             : null,
-          ...metrics,
+          length: domainName.length,
+        }
+
+        if (!founderSignalUnlocked || !metrics) return baseResult
+
+        return {
+          ...baseResult,
+          score: metrics.score,
+          pronounceable: metrics.pronounceable,
+          memorability: metrics.memorability,
+          founderSignal: metrics.founderSignal,
         }
       }),
     )
 
-    const tldPriority: Record<string, number> = { com: 0, io: 1, co: 2, ai: 3, app: 4, dev: 5 }
-    const sortedResults = results.sort((a, b) => {
-      if (a.available !== b.available) return a.available ? -1 : 1
-      if (a.score !== b.score) return b.score - a.score
-      return (tldPriority[a.tld] || 99) - (tldPriority[b.tld] || 99)
-    })
+    const responseResults = candidateFirstContinuation
+      ? results
+      : results.sort((a, b) => {
+          if (a.available !== b.available) return a.available ? -1 : 1
+          if (founderSignalUnlocked && a.score !== b.score) return (b.score || 0) - (a.score || 0)
+          const tldPriority: Record<string, number> = { com: 0, io: 1, co: 2, ai: 3, app: 4, dev: 5 }
+          return (tldPriority[a.tld] ?? 99) - (tldPriority[b.tld] ?? 99)
+        })
 
     const userAgent = request.headers.get("user-agent") || undefined
     const country = request.headers.get("x-vercel-ip-country") || request.headers.get("cf-ipcountry") || undefined
@@ -166,23 +271,28 @@ export async function POST(request: NextRequest) {
         tldCount: tldsToCheck.length,
         checkedCount: availabilityResults.length,
         providerErrors: availabilityResults.filter((item) => item.error).length,
+        workflowContinuation,
       },
       userAgent,
       country,
     })
 
     // Log generation for rate limiting (only for free users)
-    if (!rateLimitResult.isPro) {
+    if (!workflowContinuation && !rateLimitResult.isPro) {
       logGeneration(request, rateLimitResult.userId, "bulk", undefined, cleanDomains.length).catch(() => {})
     }
 
     return NextResponse.json({
       success: true,
-      results: sortedResults,
+      isPro: rateLimitResult.isPro,
+      founderSignalUnlocked,
+      workflowContinuation,
+      candidateFirstContinuation,
+      results: responseResults,
       tlds: tldsToCheck,
     })
   } catch (error: any) {
     console.error("Error checking domains:", error)
-    return NextResponse.json({ error: error.message || "Failed to check domain availability" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to check domain availability" }, { status: 500 })
   }
 }

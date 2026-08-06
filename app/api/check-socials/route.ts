@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
+import { checkBurstLimit } from "@/lib/rate-limit"
 
 // Social platforms to check
 const PLATFORMS = [
@@ -54,7 +56,18 @@ async function checkHandleAvailability(
 }
 
 export async function POST(request: NextRequest) {
+  const labBlockResponse = getGeneratorLabApiBlockResponse(request)
+  if (labBlockResponse) return labBlockResponse
+
   try {
+    const throttle = await checkBurstLimit(request, "check-socials", 10)
+    if (!throttle.allowed) {
+      return NextResponse.json(
+        { error: throttle.unavailable ? "Social checks are temporarily unavailable" : "Too many social checks", resetAt: throttle.resetAt },
+        { status: throttle.unavailable ? 503 : 429 },
+      )
+    }
+
     const { handle } = await request.json()
 
     if (!handle || typeof handle !== "string") {
@@ -89,9 +102,8 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Error checking social handles:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to check social handles" },
+      { error: "Failed to check social handles" },
       { status: 500 }
     )
   }
 }
-

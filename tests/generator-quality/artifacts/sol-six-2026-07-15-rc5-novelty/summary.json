@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 3,
+  "artifactType": "quick-generator-live-provider-audit-summary",
+  "auditManifest": {
+    "schemaVersion": 1,
+    "artifactType": "quick-generator-live-provider-audit",
+    "startedAt": "2026-07-15T16:15:34.151Z",
+    "completedAt": "2026-07-15T16:17:48.919Z",
+    "implementation": {
+      "files": [
+        "lib/domainGen/filters.ts",
+        "lib/domainGen/generatedName.ts",
+        "lib/domainGen/quickGenerate.ts",
+        "lib/domainGen/quickGenerateGroq.ts",
+        "lib/domainGen/quickRationale.ts",
+        "lib/domainGen/quickRationaleAdapter.ts",
+        "lib/domainGen/realness.ts"
+      ],
+      "sha256": "130b759ae4e4136e9b2f60c6ec66f3095204a44282b7bc36ff1076e1e3feeabb"
+    },
+    "git": {
+      "head": "a1c0991b92d979a6719b9991acf1e4993590f17c",
+      "branch": "test/name-generator",
+      "workingTreeDirty": true,
+      "statusSha256": "2590b0cbb4bfc53f819ddaedf5d6d9ccc866e43d701ca9fe6baa8ed21a252e44"
+    },
+    "runtime": {
+      "node": "v22.13.1",
+      "platform": "win32",
+      "architecture": "x64"
+    },
+    "environment": {
+      "providerCredentialsPresent": {
+        "groq": false,
+        "openai": true,
+        "vercelGateway": false
+      },
+      "modelOverridePresent": {
+        "groqSingle": false,
+        "groqList": false,
+        "openai": true,
+        "vercelGateway": false
+      },
+      "auditConfig": {
+        "requestedBriefs": 6,
+        "batchSize": 1,
+        "delayMs": 20000,
+        "quiet": true
+      }
+    },
+    "models": {
+      "attempted": [
+        {
+          "provider": "openai",
+          "model": "gpt-5.6-sol",
+          "attempts": 6,
+          "outcomes": {
+            "ready": 5,
+            "timeout": 1
+          }
+        }
+      ],
+      "successful": [
+        {
+          "provider": "deterministic",
+          "model": null,
+          "briefs": 1
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.6-sol",
+          "briefs": 5
+        }
+      ]
+    },
+    "contributionGate": {
+      "minimumCandidatesPerBrief": 4,
+      "minimumCandidateSharePerBrief": 0.25,
+      "minimumContributedBriefRate": 0.9,
+      "minimumGlobalCandidateShare": 0.25
+    }
+  },
+  "summary": {
+    "briefs": 6,
+    "modelBackedBriefs": 5,
+    "modelBackedRate": 83.3,
+    "modelContributedBriefs": 5,
+    "modelContributedBriefRate": 83.3,
+    "modelCandidates": 80,
+    "fallbackCandidates": 16,
+    "modelCandidateRate": 83.3,
+    "fallbackCandidateRate": 16.7,
+    "crossNicheDuplicateRate": 1.04,
+    "p95DurationMs": 7135,
+    "maxDurationMs": 7135,
+    "providers": {
+      "deterministic": 1,
+      "openai": 5
+    },
+    "fallbackReasons": {
+      "openai_timeout": 1
+    },
+    "topCrossNicheDuplicates": [
+      {
+        "name": "keystone",
+        "occurrences": 2,
+        "briefs": [
+          "cyber-threat-analytics",
+          "freelance-accounting"
+        ]
+      }
+    ],
+    "gates": {
+      "perBriefMechanicalPassed": true,
+      "creativeQualityRequiresBlindReview": true,
+      "crossNicheExactDuplicationAtMost1Percent": false,
+      "meaningfulModelContributionAtLeast90Percent": false,
+      "modelCandidateShareAtLeast25Percent": true,
+      "directGeneratorP95AtMost7Seconds": false
+    },
+    "failures": 3
+  }
+}

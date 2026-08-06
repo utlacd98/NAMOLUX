@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
+import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
@@ -8,11 +9,21 @@ export const maxDuration = 30
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY?.trim() })
 
 export async function POST(req: NextRequest) {
+  const labBlockResponse = getGeneratorLabApiBlockResponse(req)
+  if (labBlockResponse) return labBlockResponse
+
   const rateLimit = await checkRateLimit(req, "name-tools")
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "token_limit_reached", message: "You've used all 3 free tokens. Upgrade to Pro for unlimited access.", upgradeUrl: "/pricing" },
-      { status: 429 }
+      {
+        error: "monthly_usage_limit_reached",
+        message: rateLimit.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+        resetAt: rateLimit.resetAt,
+        tokensUsed: rateLimit.tokensUsed,
+        tokensTotal: rateLimit.tokensTotal,
+        remaining: rateLimit.remaining,
+      },
+      { status: rateLimit.statusCode || 429 }
     )
   }
 

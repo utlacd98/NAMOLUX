@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react"
 import { Send, RefreshCw, ExternalLink, Copy, CheckCircle, Sparkles, Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { namecheapLink } from "@/lib/affiliateLink"
+import { trackAffiliateClick, trackEvent } from "@/lib/analytics"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,6 +96,14 @@ function ResultCard({ r }: { r: ChatResult }) {
   const registerTld = r.bestTld
   const registerDomain = registerTld ? `${r.name}.${registerTld}` : r.fullDomain
 
+  function trackRegister(domain: string, source: string, metadata: Record<string, unknown> = {}) {
+    trackAffiliateClick(domain, { source, ...metadata })
+    trackEvent({
+      action: "domain_register_clicked",
+      metadata: { domain, source, ...metadata },
+    })
+  }
+
   function copy() {
     navigator.clipboard.writeText(registerDomain).then(() => {
       setCopied(true)
@@ -163,9 +172,10 @@ function ResultCard({ r }: { r: ChatResult }) {
           </button>
           {r.anyAvailable && registerTld && (
             <a
-              href={namecheapLink(registerDomain)}
+              href={namecheapLink(registerDomain, { source: "ai_name_chat_primary", content: registerTld })}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackRegister(registerDomain, "ai_name_chat_primary", { tld: registerTld, score: r.score })}
               className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-bold text-black transition-all hover:-translate-y-0.5"
               style={{ background: "linear-gradient(135deg, #D4AF37, #F6E27A)" }}
             >
@@ -196,9 +206,10 @@ function ResultCard({ r }: { r: ChatResult }) {
               />
               {isAvail ? (
                 <a
-                  href={namecheapLink(`${r.name}.${tld}`)}
+                  href={namecheapLink(`${r.name}.${tld}`, { source: "ai_name_chat_tld_badge", content: tld })}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackRegister(`${r.name}.${tld}`, "ai_name_chat_tld_badge", { tld, score: r.score })}
                   className="text-[9px] font-semibold transition-opacity hover:opacity-80"
                   style={{ color: "#34d399" }}
                 >
@@ -376,8 +387,7 @@ export function AiNameChat() {
     )
   }, [])
 
-  const advanceStep = useCallback(
-    (stepAnswers: Record<StepId, string>, completedStep: StepId) => {
+  function advanceStep(stepAnswers: Record<StepId, string>, completedStep: StepId) {
       const idx = STEPS.indexOf(completedStep)
       const nextStep = STEPS[idx + 1] as StepId | undefined
 
@@ -391,13 +401,9 @@ export function AiNameChat() {
         addMessage({ role: "bot", text: q.text, choices: q.choices })
         setCurrentStep(nextStep)
       }, 380)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [addMessage]
-  )
+  }
 
-  const handleAnswer = useCallback(
-    (value: string, displayValue?: string) => {
+  function handleAnswer(value: string, displayValue?: string) {
       // Required steps must have a value; optional steps (industry, keywords) can be empty
       if (!value.trim() && currentStep !== "industry" && currentStep !== "keywords") return
       const step = currentStep as StepId
@@ -410,12 +416,9 @@ export function AiNameChat() {
       setTextInput("")
 
       advanceStep(newAnswers, step)
-    },
-    [currentStep, answers, addMessage, markAnswered, advanceStep]
-  )
+  }
 
-  const generateNames = useCallback(
-    async (finalAnswers: Record<StepId, string>) => {
+  async function generateNames(finalAnswers: Record<StepId, string>) {
       setCurrentStep("generating")
       setIsGenerating(true)
       setGenError(null)
@@ -469,9 +472,7 @@ export function AiNameChat() {
       } finally {
         setIsGenerating(false)
       }
-    },
-    [addMessage]
-  )
+  }
 
   const restart = useCallback(() => {
     setMessages([{ id: "0", role: "bot", text: BOT_QUESTIONS.description.text }])

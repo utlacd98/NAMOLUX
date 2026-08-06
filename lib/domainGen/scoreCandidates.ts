@@ -201,7 +201,9 @@ export function brandabilityScore(
   const vibeLetterScore = getVibeLetterScore(name, options.vibe)
 
   const strategyBonus =
-    options.strategy === "vibe_compound" || options.strategy === "emotive_modifier" || options.strategy === "mood_pairing"
+    options.strategy === "verified_concept_compound"
+      ? 8
+      : options.strategy === "vibe_compound" || options.strategy === "emotive_modifier" || options.strategy === "mood_pairing"
       ? 0.9
       : options.strategy === "semantic_compound" || options.strategy === "action_noun" || options.strategy === "two_word_compound"
         ? 0.55
@@ -281,9 +283,9 @@ export function scoreCandidate(
     scoreBreakdown: scored.scoreBreakdown,
     whyTag: scored.whyTag,
     qualityBand: scored.qualityBand,
-    meaningScore: scored.meaningScore,
-    meaningBreakdown: scored.meaningBreakdown,
-    whyItWorks: scored.whyItWorks,
+    meaningScore: candidate.meaningScore ?? scored.meaningScore,
+    meaningBreakdown: candidate.meaningBreakdown || scored.meaningBreakdown,
+    whyItWorks: candidate.whyItWorks || scored.whyItWorks,
     pronounceabilityScore: scored.pronounceabilityScore,
     brandableScore: Number(Math.max(1, Math.min(10, scored.score / 2.6)).toFixed(1)),
   }

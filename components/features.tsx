@@ -7,7 +7,7 @@ const features = [
     icon: Star,
     title: "Founder Signal™ scoring",
     description:
-      "Every name graded 0–100 on brand strength, memorability, phonetic punch, and realness. Elite-tier scoring so you can tell a 95 from a 75 at a glance.",
+      "Run it when your Advanced shortlist is ready. Every name in the batch gets a 0–100 score and reasoning without being removed or silently reordered.",
     highlight: true,
     span: "lg:col-span-2 lg:row-span-2",
   },
@@ -72,7 +72,7 @@ export function Features() {
               <span className="text-primary">built into the product</span>
             </>
           }
-          sub="NamoLux scores, verifies, and stress-tests every name on your shortlist — the analysis a consultancy would run, delivered in seconds."
+          sub="Explore broadly first, then choose when to score, compare, and stress-test your shortlist — the analysis a consultancy would run, delivered in seconds."
         />
 
         <div className="mt-12 grid grid-cols-1 gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-4 lg:[grid-auto-rows:minmax(160px,auto)]">

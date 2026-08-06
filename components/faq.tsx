@@ -1,56 +1,56 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Reveal, SectionHeader } from "@/components/landing/reveal"
+import { PUBLIC_PRODUCT_COPY } from "@/lib/site-content"
 
 const faqs = [
   {
     question: "What is NamoLux?",
     answer:
-      "NamoLux is a domain naming consultancy powered by Founder Signal™. You paste your candidate names — from any source — and we score each one on brand strength, memorability, phonetic punch, realness, and live availability across six TLDs. You get the analysis a brand consultant would run, delivered in seconds.",
+      "NamoLux is a name decision workspace for solo founders. Bring candidate names from any source, check them across six domain extensions, and use Founder Signal to compare the strongest options.",
   },
   {
-    question: "What is Founder Signal™?",
+    question: "What is Founder Signal?",
     answer:
-      "Founder Signal™ is our proprietary 0–100 brand scoring system. It weighs realness, memorability, brand risk, length, pronounceability, character quality, and TLD strength — plus context-agnostic originality penalties and elite-tier caps. A name scoring 95+ has earned it; most names sit between 70–85.",
+      "Founder Signal is our 0-100 brand scoring system. It weighs realness, memorability, brand risk, length, pronounceability, character quality, and TLD strength so founders can compare names with evidence.",
   },
   {
-    question: "What do I get with a free account?",
+    question: "What do I get for free?",
     answer:
-      "Free accounts can check and score three shortlists. You get full Founder Signal™ analysis, live availability across six TLDs, and the full reasoning breakdown on every name. Perfect for validating a shortlist before you commit.",
+      "The free plan includes 3 Bulk Check runs and 1 Founder Signal run per UTC calendar month. Each Bulk Check can include up to 50 candidate names across six domain extensions.",
   },
   {
-    question: "What's included in NamoLux Pro?",
+    question: "Is there a paid plan?",
     answer:
-      "Pro is a one-time payment of £15 — no subscription, no monthly fees. You get unlimited shortlist checks, bulk scoring up to 50 names at a time, the full brand consultant toolkit (stress tests, brand story, palette), and CSV export. Forever.",
+      `Yes. Pro is GBP 7.99 per month and includes ${PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved projects, CSV exports, shareable decision reports, and an ad-free workspace.`,
+  },
+  {
+    question: "How does NamoLux make money?",
+    answer:
+      "NamoLux is funded by paid subscriptions and may also earn a commission when users register domains through our Namecheap partner link.",
   },
   {
     question: "Do I have to come with my own names?",
     answer:
-      "The core product scores candidate names you already have — whether you wrote them yourself, got them from an AI tool, or paid a consultant. NamoLux is the independent judge. Many users combine it with AI name generators to filter for the ones actually worth pursuing.",
+      "Yes. NamoLux is built to help you decide between candidate names you already have—from your team, an agency, a workshop, or another tool. Paste up to 50 names into Bulk Check to start.",
   },
   {
     question: "How do you check availability?",
     answer:
-      "We use real-time DNS lookups and RDAP queries across .com, .io, .co, .ai, .app and .dev. Results are best-effort and may vary slightly by registrar — we recommend confirming at your preferred registrar before you purchase.",
+      "We use real-time DNS lookups and RDAP queries across .com, .io, .co, .ai, .app and .dev. Results are best-effort and may vary slightly by registrar, so confirm availability with the registrar before you purchase.",
   },
   {
     question: "Which TLDs do you support?",
     answer:
-      ".com, .io, .co, .ai, .app and .dev. We prioritise .com since it remains the strongest trust signal, but every TLD is scored and verified in the same batch.",
-  },
-  {
-    question: "Is this really a one-time payment?",
-    answer:
-      "Yes — £15 once, Pro access forever. No subscription, no auto-renewal, no hidden fees. Once you pay, your account is upgraded permanently.",
+      ".com, .io, .co, .ai, .app and .dev. We prioritise .com because it remains the strongest trust signal, but every supported TLD is scored and checked in the same batch.",
   },
   {
     question: "Can I export my shortlist?",
     answer:
-      "Yes. Export the full scored shortlist as CSV in one click — with Founder Signal scores, availability for all six TLDs, and the reasoning for each name. Great for team sign-off.",
+      "Pro includes saved projects, CSV exports, and shareable decision reports for registrar handoff and a clear record of the final choice.",
   },
 ]
 
 export function FAQ() {
-  // FAQPage rich-result schema generated from the same copy users read
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

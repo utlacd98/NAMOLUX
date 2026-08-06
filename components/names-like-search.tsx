@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Sparkles, Search, X, Loader2, ExternalLink } from "lucide-react"
 import { namecheapLink } from "@/lib/affiliateLink"
+import { trackAffiliateClick, trackEvent } from "@/lib/analytics"
 
 interface NamesLikeSearchProps {
   /** Pre-fill the inspiration field from a result card name */
@@ -23,6 +24,14 @@ export function NamesLikeSearch({ defaultInspiration = "", onClose, onCheckName 
   const [loading, setLoading] = useState(false)
   const [names, setNames] = useState<GeneratedName[]>([])
   const [error, setError] = useState("")
+
+  function trackRegister(domain: string) {
+    trackAffiliateClick(domain, { source: "names_like_search" })
+    trackEvent({
+      action: "domain_register_clicked",
+      metadata: { domain, source: "names_like_search", inspiration },
+    })
+  }
 
   async function generate() {
     if (!inspiration.trim()) return
@@ -162,9 +171,10 @@ export function NamesLikeSearch({ defaultInspiration = "", onClose, onCheckName 
                       </button>
                     )}
                     <a
-                      href={namecheapLink(`${name}.com`)}
+                      href={namecheapLink(`${name}.com`, { source: "names_like_search", content: name })}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackRegister(`${name}.com`)}
                       className="text-white/20 transition-colors hover:text-emerald-400"
                       title={`Register ${name}.com`}
                     >
