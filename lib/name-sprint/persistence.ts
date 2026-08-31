@@ -59,6 +59,30 @@ export async function persistNameConstitution({
   }
 }
 
+export function summarizeRecentNameSprintFatigue(candidates: ReadonlyArray<{
+  normalized_name?: string | null
+  roots?: readonly string[] | null
+  was_displayed?: boolean | null
+}>): {
+  previouslySeen: string[]
+  recentRootFrequency: Record<string, number>
+} {
+  const recentRootFrequency: Record<string, number> = {}
+  const previouslySeen = new Set<string>()
+  for (const candidate of candidates) {
+    if (candidate.normalized_name) previouslySeen.add(candidate.normalized_name)
+    // Private raw generations must not poison later runs. Root fatigue is a
+    // memory of name families the founder actually saw, while exact-name
+    // suppression can still prevent recycling recent internal output.
+    if (!candidate.was_displayed) continue
+    const normalizedRoots = new Set((candidate.roots || []).map((root) => root.toLowerCase().replace(/[^a-z0-9]/g, "")))
+    for (const normalized of normalizedRoots) {
+      if (normalized.length >= 2) recentRootFrequency[normalized] = (recentRootFrequency[normalized] || 0) + 1
+    }
+  }
+  return { previouslySeen: Array.from(previouslySeen).slice(0, 120), recentRootFrequency }
+}
+
 export async function loadRecentNameSprintFatigue(userId: string): Promise<{
   previouslySeen: string[]
   recentRootFrequency: Record<string, number>
@@ -68,23 +92,14 @@ export async function loadRecentNameSprintFatigue(userId: string): Promise<{
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1_000).toISOString()
     const { data, error } = await service
       .from("candidates")
-      .select("normalized_name,roots")
+      .select("normalized_name,roots,was_displayed")
       .eq("user_id", userId)
       .gte("created_at", since)
       .order("created_at", { ascending: false })
       .limit(2_000)
     if (error) throw error
 
-    const recentRootFrequency: Record<string, number> = {}
-    const previouslySeen = new Set<string>()
-    for (const candidate of data || []) {
-      if (candidate.normalized_name) previouslySeen.add(candidate.normalized_name)
-      for (const root of new Set(candidate.roots || [])) {
-        const normalized = root.toLowerCase().replace(/[^a-z0-9]/g, "")
-        if (normalized.length >= 2) recentRootFrequency[normalized] = (recentRootFrequency[normalized] || 0) + 1
-      }
-    }
-    return { previouslySeen: Array.from(previouslySeen).slice(0, 120), recentRootFrequency }
+    return summarizeRecentNameSprintFatigue(data || [])
   } catch (error) {
     console.error("name-sprint-fatigue-load-failed", { code: errorCode(error) })
     return { previouslySeen: [], recentRootFrequency: {} }
