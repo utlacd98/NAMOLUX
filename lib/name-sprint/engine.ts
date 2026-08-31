@@ -197,6 +197,7 @@ Return only the requested name, territory ID, up to two roots, and a short pronu
 const EDITORIAL_REPAIR_INSTRUCTIONS = `You are the senior naming editor used only when a selective first pass produced too few serious candidates.
 The supplied rejection notes are evidence, not suggestions to relax the standard. Create genuinely new replacements; never respell, prefix, suffix, compound with, or otherwise vary a rejected name.
 Generate 14 to 18 candidates across the supplied semantic territories. At least half must be linguistically coherent invented or suggestive formations that are not ordinary dictionary words. Use arbitrary real words sparingly because short common words are usually commercially saturated.
+Apply the supplied per-strategy rules exactly. Do not default to invented words ending in a, ia, ora, era or via; repeated fashionable endings are not diversity. Use no more than three meaningful compounds and reject any compound whose connection is not immediate when spoken without an explanation.
 Every name must work cold on a sales call, contract, search result and product interface. Reject your own output when the meaning needs a paragraph, when two keywords are visibly glued together, when spelling or pronunciation is unstable, or when the name resembles a known active company, product or supplied competitor.
 Do not make availability or legal-clearance claims. Return only the structured candidate fields and no promotional prose.`
 
@@ -403,7 +404,7 @@ async function generateWithStrategy({
       promptCacheKey: `namolux-name-sprint-${strategy}-v2`,
       userIdentifier,
       signal,
-      reasoningEffort: "none",
+      reasoningEffort: "low",
     })
   return { candidates: parseGeneratedCandidates(response.data, strategy, territories, constitution, attempt), usage: response }
 }
@@ -444,7 +445,7 @@ async function generateEditorialRepair({
       schemaName: "name_sprint_editorial_repair",
       schema: EDITORIAL_REPAIR_SCHEMA as unknown as Record<string, unknown>,
       instructions: EDITORIAL_REPAIR_INSTRUCTIONS,
-      input: `Name Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nRejected finalist notes: ${JSON.stringify(rejectionNotes.slice(0, 18))}\nNever repeat or vary: ${JSON.stringify(excludedNames.slice(-180))}`,
+      input: `Name Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nRejected finalist notes: ${JSON.stringify(rejectionNotes.slice(0, 18))}\nNever repeat or vary: ${JSON.stringify(excludedNames.slice(-180))}`,
       maxOutputTokens,
       promptCacheKey: "namolux-name-sprint-editorial-repair-v1",
       userIdentifier,

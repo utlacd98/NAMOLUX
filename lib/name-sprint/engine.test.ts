@@ -169,7 +169,7 @@ describe("Name Sprint multi-stage engine", () => {
     const admissionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_final_admissions")
     expect(collisionCalls).toHaveLength(0)
     expect(admissionCalls).toHaveLength(0)
-    expect(generationCalls.every(([request]) => request.reasoningEffort === "none" && request.maxOutputTokens === 600)).toBe(true)
+    expect(generationCalls.every(([request]) => request.reasoningEffort === "low" && request.maxOutputTokens === 600)).toBe(true)
     expect(judgeCalls[0][0].maxOutputTokens).toBe(1_400)
     expect(judgeCalls[0][0].input).not.toContain("association")
     expect(mocks.availability).toHaveBeenCalledTimes(1)
@@ -259,7 +259,7 @@ describe("Name Sprint multi-stage engine", () => {
     const metaphoricalCalls = mocks.structured.mock.calls
       .filter(([request]) => request.schemaName === "name_sprint_metaphorical")
     expect(metaphoricalCalls).toHaveLength(1)
-    expect(metaphoricalCalls[0][0].reasoningEffort).toBe("none")
+    expect(metaphoricalCalls[0][0].reasoningEffort).toBe("low")
     expect(result.candidates.length).toBeGreaterThan(0)
     expect(result.attempts).toBe(1)
     expect(consoleSpy).toHaveBeenCalledWith("name-sprint-strategy-modules-incomplete", { failedStrategies: 1 })
