@@ -313,10 +313,10 @@ describe("Name Sprint multi-stage engine", () => {
     expect(mocks.structured.mock.calls.some(([request]) => request.schemaName === "name_sprint_editorial_repair")).toBe(false)
   })
 
-  it("puts verified dot-com options ahead of names with weaker domain evidence", async () => {
+  it("uses a verified exact dot-com when one is available", async () => {
     mocks.availability.mockImplementation(async (domains: string[]) => domains.map((domain) => ({
       domain,
-      available: domain === domains[0] || domain.endsWith(".co"),
+      available: domain.endsWith(".com") || domain.endsWith(".co"),
       provider: "test",
       confidence: "high",
       latencyMs: 1,
@@ -417,6 +417,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(passesControlledCoinedForm("Caldrin", ["calm", "adrift"])).toBe(true)
     expect(passesControlledCoinedForm("Zuqtrix", ["calm", "signal"])).toBe(false)
     expect(passesControlledCoinedForm("Calmora", ["calm", "aura"])).toBe(false)
+    expect(passesControlledCoinedForm("Threaden", ["thread", "continuity"])).toBe(false)
     expect(passesControlledCoinedForm("Tembra", ["signal", "readiness"])).toBe(true)
   })
 

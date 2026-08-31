@@ -253,7 +253,9 @@ For round one, create a focused and diverse starting batch. For later rounds, ex
 
 Treat domain evidence as search guidance, never as a reason to recommend a weak name. Prefer exact .com, .co or .ai viability through distinctive seven-to-twelve-letter formations before relying on a clean modified .com. Never repeat, respell, prefix, suffix, or create a close family of a rejected applicant.
 
-Choose the strategy mix for this round from the supplied per-strategy rules. Silently draft at least three times the requested count, compare the drafts, and return only the strongest applicants. Every result must work cold on a sales call, contract, search result and product interface. Reject your own output if it needs its explanation, sounds like random syllables, visibly glues keywords, resembles a familiar active brand, or has unstable spelling or pronunciation.
+Choose the strategy mix for this round from the supplied per-strategy rules. At least two thirds of the batch must be suggestive, invented or controlled-coined formations of seven to eleven letters. Return no more than two ordinary dictionary words and no more than two compounds. Semantic-territory roots describe meaning; they are not name parts. A territory root reproduced with a cosmetic ending is invalid. Reject faux-Latin endings, root+-en, root+-in, root+-et, root+-um, root+-is, root+-ary, root+-wise, and literal readiness or coordination compounds. Accorda, Cadrel, Threaden, Readyspan, Turnary and similar constructions are failure patterns, not examples.
+
+Silently draft at least three times the requested count, compare the drafts, and return only the strongest applicants. Every result must work cold on a sales call, contract, search result and product interface. Reject your own output if it needs its explanation, sounds like random syllables, visibly glues keywords, resembles a familiar active brand, or has unstable spelling or pronunciation.
 
 Keep the observation and strategyDecision factual and under 30 words each. Do not make domain or legal-clearance claims.`
 
@@ -337,7 +339,9 @@ export function passesControlledCoinedForm(name: string, roots: readonly string[
   if (/(?:ora|era|via|ify|verse|labs|ly|io|ai)$/.test(normalized)) return false
   if (/(.)\1\1|[^aeiouy]{5}|q(?!u)/.test(normalized)) return false
   const meaningfulRoots = roots.map(normalizeName).filter((root) => root.length >= 2).slice(0, 2)
-  return meaningfulRoots.length > 0
+  if (!meaningfulRoots.length) return false
+  if (meaningfulRoots.some((root) => root.length >= 4 && normalized.includes(root))) return false
+  return true
 }
 
 function parseGeneratedCandidates(
@@ -363,7 +367,6 @@ function parseGeneratedCandidates(
     const roots = cleanRoots(item.roots)
     const claimedOrigin = verifiedOrigin(strategy, roots)
     if (strategy === "verified_root" && !claimedOrigin) return []
-    if (strategy === "controlled_coined" && !passesControlledCoinedForm(normalizedName, roots)) return []
     const territory = territories.find((item) => item.id === territoryId)!
     return [{
       id: `${attempt}-${strategy}-${territoryId}-${normalizedName}-${index}`,
@@ -523,7 +526,7 @@ export function buildGuidedSearchFeedback(
     directives.push("Increase structural distinctiveness and avoid every collided root, phonetic family and familiar product-name pattern.")
   }
   if (dominant.has("BELOW_QUALITY_BAR") || dominant.has("SEMANTIC_MISMATCH")) {
-    directives.push("Strengthen the immediate semantic bridge; reject names whose rationale does the branding work.")
+    directives.push("Strengthen the immediate semantic bridge; reject names whose rationale does the branding work. Ban visible territory roots with cosmetic endings and change the word-building method.")
   }
   if (!directives.length) {
     directives.push(round === 1
@@ -569,7 +572,7 @@ async function generateGuidedRound({
     schemaName: "name_sprint_guided_search",
     schema: GUIDED_SEARCH_SCHEMA as unknown as Record<string, unknown>,
     instructions: GUIDED_SEARCH_INSTRUCTIONS,
-    input: `Search round: ${round} of ${GUIDED_ROUND_COUNTS.length}\nCreate exactly ${count} focused applicants.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nFailure evidence: ${JSON.stringify(feedback)}\nNever repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}`,
+    input: `Search round: ${round} of ${GUIDED_ROUND_COUNTS.length}\nCreate exactly ${count} focused applicants.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nLiteral territory roots forbidden inside coined names: ${JSON.stringify(Array.from(new Set(territories.flatMap((territory) => territory.roots))).slice(0, 80))}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nFailure evidence: ${JSON.stringify(feedback)}\nNever repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}`,
     maxOutputTokens: round === 1 ? 3_200 : round === 2 ? 2_400 : 1_800,
     promptCacheKey: "namolux-name-sprint-guided-search-v1",
     userIdentifier,
@@ -942,6 +945,19 @@ export async function runNameSprint({
     const locallyEligible: Array<{ candidate: RawNameCandidate; score: number }> = []
     const admittedSoFar: RawNameCandidate[] = [...existingFamilies]
     for (const candidate of deDuplicateCandidates(novelCandidates)) {
+      if (candidate.strategy === "controlled_coined" && !passesControlledCoinedForm(candidate.normalizedName, candidate.roots)) {
+        rejected.push({
+          ...candidate,
+          eligibility: {
+            status: "reject",
+            failureCodes: ["RANDOM_SYLLABLES"],
+            reasons: ["The controlled coinage copied a semantic root or failed the pronounceable word-shape standard."],
+            scoreCap: 0,
+            matchedBrand: null,
+          },
+        })
+        continue
+      }
       const eligibility = evaluateEligibility(candidate, {
         constitution,
         existingCandidates: admittedSoFar,
