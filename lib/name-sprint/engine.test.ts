@@ -393,6 +393,71 @@ describe("Name Sprint multi-stage engine", () => {
     consoleSpy.mockRestore()
   })
 
+  it("repairs once when final admissions leaves fewer than three shortlist names", async () => {
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+    const normalImplementation = mocks.structured.getMockImplementation()
+    let admissionCalls = 0
+    mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
+      if (request.schemaName === "name_sprint_editorial_repair") {
+        const names = ["Caldrin", "Venset", "Ordan", "Tembra", "Keldan", "Rovant", "Selkin", "Dovren", "Marven", "Tavrin"]
+        return {
+          data: {
+            candidates: names.map((name, index) => ({
+              name,
+              strategy: "invented",
+              territoryId: territories[index % territories.length].id,
+              roots: [name.toLowerCase()],
+              pronunciation: name.toLowerCase(),
+            })),
+          },
+          model: "gpt-5.6-luna",
+          inputTokens: 300,
+          outputTokens: 300,
+          estimatedUsd: 0.00042,
+        }
+      }
+      if (request.schemaName === "name_sprint_final_admissions") {
+        admissionCalls += 1
+        const candidates = JSON.parse(request.input.split("Candidate set: ")[1]) as Array<{ name: string }>
+        const admit = admissionCalls > 1
+        return {
+          data: {
+            decisions: candidates.map(({ name }, index) => ({
+              name,
+              admit: admit && index < 8,
+              reason: admit && index < 8
+                ? "A serious shortlist candidate."
+                : "Not strong enough to shortlist.",
+            })),
+          },
+          model: "gpt-5.6-luna",
+          inputTokens: 160,
+          outputTokens: 120,
+          estimatedUsd: 0.000176,
+        }
+      }
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      return normalImplementation(request)
+    })
+
+    const result = await runNameSprint({
+      constitution,
+      territories,
+      signal: new AbortController().signal,
+      userIdentifier: "test-user",
+    })
+
+    const repairCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_editorial_repair")
+    const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
+    expect(repairCalls).toHaveLength(1)
+    expect(admissionCalls).toBe(2)
+    expect(collisionCalls).toHaveLength(1)
+    expect(result.attempts).toBe(2)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.usage.webSearchCalls).toBe(1)
+    expect(result.usage.estimatedUsd).toBeLessThan(0.025)
+  })
+
   it("records below-bar names in the rejection audit instead of dropping them silently", async () => {
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_editorial_repair") {

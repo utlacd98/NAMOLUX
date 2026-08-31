@@ -726,6 +726,7 @@ export async function runNameSprint({
   const rawCandidates: RawNameCandidate[] = []
   let rawGeneratedCount = 0
   let qualityCandidates: NameSprintCandidate[] = []
+  let admissionCandidates: NameSprintCandidate[] = []
   const rejected: RejectedNameCandidate[] = []
   const evaluatedCandidateIds = new Set<string>()
   let editorialFeedback: string[] = []
@@ -916,45 +917,59 @@ export async function runNameSprint({
       24,
     )
     timingMs.judgeAndEvidence += Date.now() - judgeStarted
-    if (!expensiveRepairEnabled || attempt === maximumAttempts || qualityCandidates.length >= 3) break
-    editorialFeedback = [
-      `Only ${qualityCandidates.length} candidate${qualityCandidates.length === 1 ? "" : "s"} survived the first quality and domain pass.`,
-      ...failedPatterns,
-    ]
-  }
-
-  const admissionStarted = Date.now()
-  const admissionPool = diverseSelection(
-    [...qualityCandidates].sort(compareFinalists),
-    18,
-  )
-  const admissionCandidates: NameSprintCandidate[] = []
-  if (admissionPool.length) {
+    const admissionStarted = Date.now()
+    const admissionPool = diverseSelection(
+      [...qualityCandidates].sort(compareFinalists),
+      18,
+    )
+    const admittedThisAttempt: NameSprintCandidate[] = []
+    const admissionRejectionNotes: string[] = []
     if (!finalAdmissionsEnabled) {
-      admissionCandidates.push(...admissionPool.slice(0, 12))
-    } else {
+      admittedThisAttempt.push(...admissionPool.slice(0, 12))
+    } else if (admissionPool.length) {
       const admissions = await admitFinalists(admissionPool, constitution, signal, userIdentifier)
       addUsage(admissions.usage)
       for (const candidate of admissionPool) {
         const decision = admissions.decisions.get(candidate.normalizedName)
-        if (decision?.admit && admissionCandidates.length < 12) {
-          admissionCandidates.push(candidate)
+        if (decision?.admit && admittedThisAttempt.length < 12) {
+          admittedThisAttempt.push(candidate)
           continue
         }
+        const reason = decision?.reason || "The final admissions editor did not return a complete decision."
+        admissionRejectionNotes.push(`${candidate.name}: ${reason}`)
         rejected.push({
           ...candidate,
           eligibility: {
             status: "review",
             failureCodes: [...candidate.eligibility.failureCodes, "BELOW_QUALITY_BAR"],
-            reasons: [...candidate.eligibility.reasons, decision?.reason || "The final admissions editor did not return a complete decision."],
+            reasons: [...candidate.eligibility.reasons, reason],
             scoreCap: candidate.eligibility.scoreCap === null ? 59 : Math.min(59, candidate.eligibility.scoreCap),
             matchedBrand: candidate.eligibility.matchedBrand,
           },
         })
       }
     }
+    timingMs.judgeAndEvidence += Date.now() - admissionStarted
+
+    const shouldRepair = expensiveRepairEnabled
+      && attempt < maximumAttempts
+      && admittedThisAttempt.length < 3
+    if (!shouldRepair) {
+      admissionCandidates = admittedThisAttempt
+      break
+    }
+
+    // Carry forward the few names that already earned admission, but use the
+    // editor's rejection reasons to create a genuinely different repair wave.
+    // This makes the repair decision reflect the shortlist users would
+    // actually see, not the larger provisional pool before final admissions.
+    qualityCandidates = admittedThisAttempt
+    editorialFeedback = [
+      `Only ${admittedThisAttempt.length} candidate${admittedThisAttempt.length === 1 ? "" : "s"} survived final admissions.`,
+      ...admissionRejectionNotes.slice(0, 12),
+      ...failedPatterns,
+    ]
   }
-  timingMs.judgeAndEvidence += Date.now() - admissionStarted
 
   const collisionStarted = Date.now()
   const collisionCandidates = diverseSelection(
