@@ -98,7 +98,7 @@ export default function Home() {
         description: homeDescription,
         featureList: [
           "Curated AI business name generation with a hard rejection layer",
-          "Verified .com, .co or .ai availability for displayed Name Sprint results",
+          "Verified exact .com, .co or .ai domains or clearly labelled clean .com launch domains",
           "Bulk domain checks for up to 50 candidate names across six extensions",
           "Founder Signal v2 name scoring and shortlist comparison",
           "Official UK IPO, USPTO and EUIPO verification links",

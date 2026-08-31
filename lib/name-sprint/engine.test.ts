@@ -15,7 +15,7 @@ vi.mock("@/lib/domainGen/availability", () => ({
   checkAvailabilityBatch: mocks.availability,
 }))
 
-import { areRelatedNameFamily, runNameSprint } from "./engine"
+import { areRelatedNameFamily, passesControlledCoinedForm, runNameSprint } from "./engine"
 import { NAME_SPRINT_STRATEGIES } from "./types"
 import type { NameConstitution, NameSprintStrategy, SemanticTerritory } from "./types"
 
@@ -23,13 +23,14 @@ const strategyNames: Record<NameSprintStrategy, string[]> = {
   suggestive: ["CedarLane", "AmberField", "NorthRidge", "WillowTide", "QuietArc", "HarborHelm", "GraniteMark", "SilverThread"],
   metaphorical: ["CedarCourse", "AmberFrame", "NorthRill", "WillowGrove", "QuietVale", "HarborCrest", "GraniteShore", "SilverPeak"],
   invented: ["Cedara", "Amberio", "Northen", "Willora", "Quietra", "Harbora", "Granita", "Silvera"],
+  controlled_coined: ["Cedriven", "Ambrinel", "Northrin", "Willoven", "Quielan", "Harbren", "Granivel", "Silvaren"],
   meaningful_compound: ["DawnPath", "OakBeam", "RiverFold", "ClearSpan", "WrenLoom", "MorrowSeed", "FlintCourse", "TideFrame"],
   arbitrary_real_word: ["Cedar", "Amber", "North", "Willow", "Quiet", "Harbor", "Granite", "Silver"],
   verified_root: ["Lumen", "Veralis", "Albora", "Orbis", "Novara", "Vialen", "Meridia", "Alvara"],
 }
 
 const territories: SemanticTerritory[] = [
-  { id: "signals", label: "Signals", meaning: "See change early.", tone: "clear", roots: ["signal"], avoidRoots: [], strategies: ["suggestive", "invented"], phoneticCharacter: "clear and balanced" },
+  { id: "signals", label: "Signals", meaning: "See change early.", tone: "clear", roots: ["signal"], avoidRoots: [], strategies: ["suggestive", "invented", "controlled_coined"], phoneticCharacter: "clear and balanced" },
   { id: "navigation", label: "Navigation", meaning: "Choose a confident path.", tone: "credible", roots: ["course"], avoidRoots: [], strategies: ["metaphorical"], phoneticCharacter: "stable rhythm" },
   { id: "resilience", label: "Resilience", meaning: "Stay ready for change.", tone: "assured", roots: ["harbor"], avoidRoots: [], strategies: ["meaningful_compound"], phoneticCharacter: "grounded" },
   { id: "patterns", label: "Patterns", meaning: "Find useful structure.", tone: "intelligent", roots: ["thread"], avoidRoots: [], strategies: ["arbitrary_real_word", "verified_root"], phoneticCharacter: "memorable" },
@@ -286,7 +287,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.survivorCount).toBe(0)
     expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("NO_PREFERRED_DOMAIN"))).toBe(true)
     const checkedDomains = mocks.availability.mock.calls[0]?.[0] as string[]
-    expect(checkedDomains.length).toBeLessThanOrEqual(48)
+    expect(checkedDomains.length).toBeLessThanOrEqual(128)
     expect(checkedDomains.every((domain) => domain.endsWith(".com") || domain.endsWith(".co") || domain.endsWith(".ai"))).toBe(true)
     expect(new Set(checkedDomains.map((domain) => domain.split(".").at(-1)))).toEqual(new Set(["com", "co", "ai"]))
     expect(result.attempts).toBe(1)
@@ -296,7 +297,7 @@ describe("Name Sprint multi-stage engine", () => {
   it("puts verified dot-com options ahead of names with weaker domain evidence", async () => {
     mocks.availability.mockImplementation(async (domains: string[]) => domains.map((domain) => ({
       domain,
-      available: domain === "cedarlane.com",
+      available: domain === domains[0] || domain.endsWith(".co"),
       provider: "test",
       confidence: "high",
       latencyMs: 1,
@@ -309,8 +310,9 @@ describe("Name Sprint multi-stage engine", () => {
       userIdentifier: "test-user",
     })
 
-    expect(result.candidates[0]?.normalizedName).toBe("cedarlane")
     expect(result.candidates[0]?.domainStatuses[0]).toMatchObject({ tld: "com", status: "available" })
+    expect(result.candidates[0]?.launchDomain.kind).toBe("exact")
+    expect(result.candidates[0]?.launchDomain.domain.endsWith(".com")).toBe(true)
   })
 
   it("calculates domain strength from the verified available TLD", async () => {
@@ -325,6 +327,24 @@ describe("Name Sprint multi-stage engine", () => {
     const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
     expect(result.candidates.length).toBeGreaterThan(0)
     expect(result.candidates.every((candidate) => candidate.founderSignal.dimensions.domainExtension === 78)).toBe(true)
+  })
+
+  it("admits a credible name with a clean modified dot-com and caps modified domains at two", async () => {
+    mocks.availability.mockImplementation(async (domains: string[]) => domains.map((domain) => ({
+      domain,
+      available: domain.startsWith("get") && domain.endsWith(".com"),
+      provider: "test",
+      confidence: "high",
+      latencyMs: 1,
+    })))
+
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.candidates.length).toBeLessThanOrEqual(2)
+    expect(result.candidates.every((candidate) => candidate.launchDomain.kind === "modified")).toBe(true)
+    expect(result.candidates.every((candidate) => candidate.launchDomain.domain.startsWith("get"))).toBe(true)
+    expect(result.candidates.every((candidate) => candidate.founderSignal.dimensions.domainExtension === 60)).toBe(true)
   })
 
   it("treats shared roots, phonetics, and close strings as one related family", () => {
@@ -344,6 +364,12 @@ describe("Name Sprint multi-stage engine", () => {
     expect(areRelatedNameFamily(raw("CedarLane", ["cedar"]), raw("CedarArc", ["cedar"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Novara", ["nova"]), raw("Novaro", ["novaro"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
+  })
+
+  it("requires controlled coinages to preserve semantic-root sounds without cliché endings", () => {
+    expect(passesControlledCoinedForm("Caldrin", ["calm", "adrift"])).toBe(true)
+    expect(passesControlledCoinedForm("Zuqtrix", ["calm", "signal"])).toBe(false)
+    expect(passesControlledCoinedForm("Calmora", ["calm", "aura"])).toBe(false)
   })
 
   it("replaces malformed mixed-script pronunciations with a safe fallback", async () => {

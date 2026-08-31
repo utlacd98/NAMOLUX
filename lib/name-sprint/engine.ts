@@ -1,5 +1,11 @@
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { normalizeName, phoneticKey, COLLISION_REGISTRY_VERSION } from "./collision-registry"
+import {
+  buildNameSprintDomainOptions,
+  selectNameSprintLaunchDomain,
+  selectShortlistWithModifiedDomainCap,
+  type NameSprintDomainEvidence,
+} from "./domain-policy"
 import { evaluateEligibility } from "./eligibility"
 import { scoreFounderSignalV2 } from "./founder-signal-v2"
 import { createStructuredResponse, getNameSprintModel, getNameSprintRepairModel } from "./openai"
@@ -68,6 +74,16 @@ const REPAIR_STRATEGIES = [
   "suggestive",
   "metaphorical",
   "invented",
+  "controlled_coined",
+  "meaningful_compound",
+  "arbitrary_real_word",
+] as const satisfies readonly NameSprintStrategy[]
+
+const LIVE_GENERATION_STRATEGIES = [
+  "suggestive",
+  "metaphorical",
+  "invented",
+  "controlled_coined",
   "meaningful_compound",
   "arbitrary_real_word",
 ] as const satisfies readonly NameSprintStrategy[]
@@ -181,6 +197,7 @@ const STRATEGY_RULES: Record<NameSprintStrategy, string> = {
   suggestive: "Suggest the outcome without describing the category. Prefer one resonant word or one linguistically natural formation over a glued compound. Each name needs a defensible, non-literal connection to the brief. Do not attach bland glue endings such as well, wise or way.",
   metaphorical: "Use one coherent, concrete metaphor from nature, craft, movement, structure, science or culture. Prefer a standalone object, action or phenomenon over joining two metaphor words. Avoid worn startup metaphors, generic navigation language and bland well, wise or way compounds.",
   invented: "Create a single coherent new word with legal sound clusters, one likely pronunciation and one likely spelling in the target language. It must sound intentionally coined rather than like two ordinary words glued together. Never mutate an ordinary root by adding ora, era, ara, ira, via or a similar fashionable suffix.",
+  controlled_coined: "Create a single ownable word of six to twelve letters from one or two supplied semantic roots. Compress or bridge roots at natural sound boundaries so each declared root contributes a recognisable sound fragment. Require one obvious pronunciation and spelling. Reject random syllables, literal glued compounds, and fashionable endings such as ora, era, via, ly, io, ify, ai or verse.",
   meaningful_compound: "Combine exactly two real concepts only when their relationship is surprising, immediately defensible and natural when spoken. Reject the idea yourself if it sounds like a feature label, consultancy phrase or two keywords pushed together. Do not combine category word + generic helper, and do not use well, wise or way as filler.",
   arbitrary_real_word: "Use a less-saturated existing real word with a surprising but defensible second-order brand association. Avoid generic business nouns such as margin, signal, reserve, cushion, compass, beacon, horizon, apex, base, path and point. Do not use famous or active brands.",
   verified_root: `Use only these verified cross-language roots and their supplied meanings: ${JSON.stringify(VERIFIED_ROOT_GLOSSARY)}. Do not invent translations.`,
@@ -225,7 +242,6 @@ This is automated screening, not legal clearance. Return one check for every sup
 const CURRENT_COLLISION_BATCH_SIZE = 8
 const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
 const MAX_ESTIMATED_RUN_USD = 0.025
-const QUALIFYING_DOMAIN_TLDS = new Set<string>(NAME_SPRINT_TLDS)
 const STANDARD_CANDIDATES_PER_STRATEGY = 8
 const STANDARD_JUDGE_POOL_SIZE = 16
 
@@ -274,6 +290,24 @@ function verifiedOrigin(strategy: NameSprintStrategy, roots: readonly string[]) 
   return roots.map((root) => VERIFIED_ROOT_GLOSSARY[root]).join("; ")
 }
 
+function hasRecognisableRootFragment(name: string, root: string) {
+  if (root.length < 2) return false
+  for (let index = 0; index < root.length - 1; index += 1) {
+    if (name.includes(root.slice(index, index + 2))) return true
+  }
+  return false
+}
+
+export function passesControlledCoinedForm(name: string, roots: readonly string[]) {
+  const normalized = normalizeName(name)
+  if (!/^[a-z]{6,12}$/.test(normalized)) return false
+  if ((normalized.match(/[aeiouy]/g) || []).length < 2) return false
+  if (/(?:ora|era|via|ify|verse|labs|ly|io|ai)$/.test(normalized)) return false
+  if (/(.)\1\1|[^aeiouy]{5}/.test(normalized)) return false
+  const meaningfulRoots = roots.map(normalizeName).filter((root) => root.length >= 2).slice(0, 2)
+  return meaningfulRoots.length > 0 && meaningfulRoots.every((root) => hasRecognisableRootFragment(normalized, root))
+}
+
 function parseGeneratedCandidates(
   value: unknown,
   strategy: NameSprintStrategy,
@@ -297,6 +331,7 @@ function parseGeneratedCandidates(
     const roots = cleanRoots(item.roots)
     const claimedOrigin = verifiedOrigin(strategy, roots)
     if (strategy === "verified_root" && !claimedOrigin) return []
+    if (strategy === "controlled_coined" && !passesControlledCoinedForm(normalizedName, roots)) return []
     const territory = territories.find((item) => item.id === territoryId)!
     return [{
       id: `${attempt}-${strategy}-${territoryId}-${normalizedName}-${index}`,
@@ -661,35 +696,32 @@ function currentCollisionRejection(candidate: RawNameCandidate, check: CurrentCo
 }
 
 async function checkCandidateDomains(candidates: readonly RawNameCandidate[], signal: AbortSignal) {
-  const tlds = [...NAME_SPRINT_TLDS]
-  const domains = candidates.slice(0, STANDARD_JUDGE_POOL_SIZE).flatMap((candidate) => tlds.map((tld) => `${candidate.normalizedName}.${tld}`))
-  if (!domains.length || process.env.NAMOLUX_NAME_SPRINT_DOMAIN_CHECKS?.trim().toLowerCase() === "false") return new Map<string, NameSprintCandidate["domainStatuses"]>()
+  const checkedCandidates = candidates.slice(0, STANDARD_JUDGE_POOL_SIZE)
+  const domains = checkedCandidates.flatMap((candidate) => buildNameSprintDomainOptions(candidate.normalizedName).map((option) => option.domain))
+  if (!domains.length || process.env.NAMOLUX_NAME_SPRINT_DOMAIN_CHECKS?.trim().toLowerCase() === "false") return new Map<string, NameSprintDomainEvidence>()
   try {
     const checked = await checkAvailabilityBatch(domains, {
       signal,
-      concurrency: 12,
+      concurrency: 20,
       dnsTimeoutMs: 1_500,
       rdapTimeoutMs: 2_500,
       maxRetries: 0,
       ttlMs: 12 * 60 * 60 * 1_000,
     })
-    const byName = new Map<string, NameSprintCandidate["domainStatuses"]>()
+    const results = new Map<string, { available: boolean; unknown: boolean; checkedAt: string | null }>()
     for (const result of checked) {
-      const separator = result.domain.indexOf(".")
-      const name = separator === -1 ? result.domain : result.domain.slice(0, separator)
-      const tld = separator === -1 ? "" : result.domain.slice(separator + 1)
-      if (!name || !tld) continue
-      const values = byName.get(name) || []
-      values.push({
-        tld,
-        status: result.error ? "unknown" : result.available ? "available" : "unavailable",
+      results.set(result.domain.toLowerCase(), {
+        available: !result.error && result.available,
+        unknown: Boolean(result.error),
         checkedAt: result.error ? null : new Date().toISOString(),
       })
-      byName.set(name, values)
     }
-    return byName
+    return new Map(checkedCandidates.map((candidate) => [
+      candidate.normalizedName,
+      selectNameSprintLaunchDomain(candidate.normalizedName, results),
+    ]))
   } catch {
-    return new Map<string, NameSprintCandidate["domainStatuses"]>()
+    return new Map<string, NameSprintDomainEvidence>()
   }
 }
 
@@ -698,8 +730,9 @@ function emptyDomainStatuses(): NameSprintCandidate["domainStatuses"] {
 }
 
 function domainPriority(candidate: NameSprintCandidate): number {
-  if (candidate.domainStatuses.some((domain) => domain.tld === "com" && domain.status === "available")) return 3
-  if (candidate.domainStatuses.some((domain) => QUALIFYING_DOMAIN_TLDS.has(domain.tld.toLowerCase()) && domain.status === "available")) return 2
+  if (candidate.launchDomain.kind === "exact" && candidate.launchDomain.domain.endsWith(".com")) return 4
+  if (candidate.launchDomain.kind === "exact") return 3
+  if (candidate.launchDomain.kind === "modified") return 2
   if (candidate.domainStatuses.some((domain) => domain.status === "unknown")) return 1
   return 0
 }
@@ -765,7 +798,7 @@ export async function runNameSprint({
     const generationStarted = Date.now()
     let generated: Array<Awaited<ReturnType<typeof generateWithStrategy>>>
     if (attempt === 1) {
-      const settled = await Promise.allSettled(NAME_SPRINT_STRATEGIES.map((strategy) => generateWithStrategy({
+      const settled = await Promise.allSettled(LIVE_GENERATION_STRATEGIES.map((strategy) => generateWithStrategy({
         strategy,
         count: STANDARD_CANDIDATES_PER_STRATEGY,
         constitution,
@@ -841,8 +874,11 @@ export async function runNameSprint({
     const judgments = judgedResult.status === "fulfilled" ? judgedResult.value.judgments : new Map<string, JudgedCandidate>()
     const domainStatuses = domainResult.status === "fulfilled"
       ? domainResult.value
-      : new Map<string, NameSprintCandidate["domainStatuses"]>()
-    const completedDomainChecks = Array.from(domainStatuses.values()).flat().filter((domain) => domain.status !== "unknown").length
+      : new Map<string, NameSprintDomainEvidence>()
+    const completedDomainChecks = Array.from(domainStatuses.values()).reduce(
+      (total, evidence) => total + evidence.domainStatuses.filter((domain) => domain.status !== "unknown").length + (evidence.launchDomain ? 1 : 0),
+      0,
+    )
     if (domainResult.status === "rejected" || completedDomainChecks === 0) {
       throw new Error("name_sprint_domain_screen_incomplete")
     }
@@ -861,18 +897,38 @@ export async function runNameSprint({
         rejected.push({ ...candidate, eligibility })
         return []
       }
-      const domains = domainStatuses.get(candidate.normalizedName) || emptyDomainStatuses()
-      const hasVerifiedLaunchDomain = domains.some((domain) => (
-        QUALIFYING_DOMAIN_TLDS.has(domain.tld.toLowerCase()) && domain.status === "available"
-      ))
-      if (!hasVerifiedLaunchDomain) {
+      const domainEvidence = domainStatuses.get(candidate.normalizedName)
+      const domains = domainEvidence?.domainStatuses || emptyDomainStatuses()
+      const launchDomain = domainEvidence?.launchDomain || null
+      if (!launchDomain) {
         rejected.push({
           ...candidate,
           eligibility: {
             status: "reject",
             failureCodes: [...eligibility.failureCodes, "NO_PREFERRED_DOMAIN"],
-            reasons: [...eligibility.reasons, "No verified .com, .co or .ai domain was available after the live scan."],
+            reasons: [...eligibility.reasons, "No verified exact .com, .co or .ai or clean modified .com launch domain was available after the live scan."],
             scoreCap: 0,
+            matchedBrand: eligibility.matchedBrand,
+          },
+        })
+        return []
+      }
+      const requiresModifiedDomainQualityGate = launchDomain.kind === "modified"
+      if (requiresModifiedDomainQualityGate && (
+        !judgment
+        || judgment.scores.strategicFit < 60
+        || judgment.scores.distinctiveness < 65
+        || judgment.scores.memorability < 60
+        || judgment.scores.pronunciation < 65
+        || judgment.scores.spellingCharacter < 65
+      )) {
+        rejected.push({
+          ...candidate,
+          eligibility: {
+            status: "review",
+            failureCodes: [...eligibility.failureCodes, "BELOW_QUALITY_BAR"],
+            reasons: [...eligibility.reasons, "A modified launch domain cannot rescue a name that did not clear the stronger brand-quality gate."],
+            scoreCap: eligibility.scoreCap === null ? 59 : Math.min(59, eligibility.scoreCap),
             matchedBrand: eligibility.matchedBrand,
           },
         })
@@ -887,6 +943,7 @@ export async function runNameSprint({
         preferredTld: "com",
         domainStatus: primaryStatus,
         availableTlds: domains.filter((domain) => domain.status === "available").map((domain) => domain.tld),
+        launchDomainKind: launchDomain.kind,
         recentRootFrequency,
       })
       if (founderSignal.band === "Reconsider") {
@@ -910,6 +967,7 @@ export async function runNameSprint({
         mainRisk: founderSignal.mainRisk,
         evidenceConfidence: founderSignal.confidence,
         domainStatuses: domains,
+        launchDomain,
       }]
     }).sort(compareFinalists)
 
@@ -981,8 +1039,8 @@ export async function runNameSprint({
   }
 
   const collisionStarted = Date.now()
-  const collisionCandidates = diverseSelection(
-    admissionCandidates,
+  const collisionCandidates = selectShortlistWithModifiedDomainCap(
+    diverseSelection([...admissionCandidates].sort(compareFinalists), 12),
     MAX_FINALISTS_FOR_LIVE_SCREEN,
   )
   const finalCandidates: NameSprintCandidate[] = []

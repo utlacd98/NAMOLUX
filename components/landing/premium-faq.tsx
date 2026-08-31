@@ -15,7 +15,7 @@ export const premiumFaqs = [
   {
     question: "How does Name Sprint choose which names to show?",
     answer:
-      "Name Sprint applies a quality gate for strategic fit, distinctiveness, pronunciation, spelling, generic patterns and known collision signals. It then checks .com, .co and .ai and only displays candidates with at least one verified available launch domain. Fewer names are shown when fewer names pass.",
+      "Name Sprint applies a quality gate for strategic fit, distinctiveness, pronunciation, spelling, generic patterns and known collision signals. Exact .com, .co and .ai domains rank first. A strong name may also qualify with a clearly labelled clean .com launch domain, capped at two results per shortlist. Fewer names are shown when fewer names pass.",
   },
   {
     question: "Can I bring my own shortlist?",

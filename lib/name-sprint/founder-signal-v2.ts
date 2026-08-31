@@ -31,6 +31,7 @@ export interface ScoreFounderSignalV2Input {
   preferredTld?: string
   domainStatus?: "available" | "unavailable" | "unknown"
   availableTlds?: readonly string[]
+  launchDomainKind?: "exact" | "modified"
   liveScreenCompleted?: boolean
   registryFresh?: boolean
   recentRootFrequency?: Readonly<Record<string, number>>
@@ -76,6 +77,7 @@ function usefulMainRisk(candidate: RawNameCandidate, supplied: string | undefine
     suggestive: "The strategic association may not be immediate without supporting brand context.",
     metaphorical: "The metaphor may need explanation before customers connect it to the product.",
     invented: "The coined spelling needs a spoken radio test with target customers.",
+    controlled_coined: "The controlled coinage still needs a spoken radio test with target customers.",
     meaningful_compound: "The compound could feel descriptive if competitors use similar category language.",
     arbitrary_real_word: "The familiar word may be harder to own in search and adjacent markets.",
     verified_root: "The root may already appear across unrelated brands and needs a broader similarity search.",
@@ -161,6 +163,8 @@ export function scoreFounderSignalV2(input: ScoreFounderSignalV2Input): FounderS
       ? 78
       : availableTlds.has("ai")
         ? 72
+        : input.launchDomainKind === "modified"
+          ? 60
         : input.domainStatus === "available"
           ? 70
           : 0

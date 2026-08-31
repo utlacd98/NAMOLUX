@@ -193,10 +193,33 @@ export async function completeNameSprintRun({
           check_type: "domain",
           source: "namolux-tiered-domain-check",
           status: domain.status,
-          result: asJson({ domain: `${candidate.normalizedName}.${domain.tld}`, tld: domain.tld }),
+          result: asJson({
+            domain: `${candidate.normalizedName}.${domain.tld}`,
+            tld: domain.tld,
+            kind: "exact",
+            recommended: candidate.launchDomain.kind === "exact" && candidate.launchDomain.domain === `${candidate.normalizedName}.${domain.tld}`,
+          }),
           checked_at: domain.checkedAt || new Date().toISOString(),
           expires_at: domain.checkedAt ? new Date(new Date(domain.checkedAt).getTime() + 12 * 60 * 60 * 1_000).toISOString() : null,
         }))
+      if (candidate.launchDomain.kind === "modified") {
+        domainChecks.push({
+          user_id: userId,
+          candidate_id: candidateId,
+          check_type: "domain",
+          source: "namolux-tiered-domain-check",
+          status: "available",
+          result: asJson({
+            domain: candidate.launchDomain.domain,
+            tld: "com",
+            kind: "modified",
+            modifier: candidate.launchDomain.modifier,
+            recommended: true,
+          }),
+          checked_at: candidate.launchDomain.checkedAt,
+          expires_at: new Date(new Date(candidate.launchDomain.checkedAt).getTime() + 12 * 60 * 60 * 1_000).toISOString(),
+        })
+      }
       const collisionCheck = candidate.collisionScreen ? [{
         user_id: userId,
         candidate_id: candidateId,

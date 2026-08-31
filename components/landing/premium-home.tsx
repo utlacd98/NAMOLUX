@@ -237,7 +237,7 @@ function ProductProof() {
 
 const processSteps = [
   ["01", "Describe what you are building", "Confirm the audience, promise, tone, market, naming direction, words to include, and exclusions before generation starts."],
-  ["02", "Let the weak names disappear", "NamoLux privately generates a broad working set, rejects generic or risky candidates, and removes names without a verified .com, .co or .ai option."],
+  ["02", "Let the weak names disappear", "NamoLux privately generates a broad working set, rejects generic or risky candidates, and verifies an exact or clean launch domain before a name reaches you."],
   ["03", "Compare the survivors", "Founder Signal ranks the eligible names and keeps pronunciation, domain evidence, collision-screen status, and official verification links visible."],
   ["04", "Launch the winner", "Pro turns a selected name into three palette-led landing-page directions with matching logo concepts and exportable brand assets."],
 ]
@@ -278,7 +278,7 @@ function LaunchKitPreview() {
 
 const comparisonRows = [
   ["Dozens of unfiltered suggestions", "Only candidates that clear the quality gate"],
-  ["Taken domains mixed into the results", "A verified .com, .co or .ai option for every displayed name"],
+  ["Taken domains mixed into the results", "A verified exact domain or clearly labelled clean .com launch route"],
   ["A polished logo before the name is proven", "Founder Signal and evidence before the Launch Kit"],
 ]
 
@@ -297,7 +297,7 @@ export function PremiumHome() {
             <div className={styles.heroCopy}>
               <span className={styles.heroEyebrow}>Selective name intelligence for founders</span>
               <h1 id="hero-heading">The name generator<br />with a <span>quality bar.</span></h1>
-              <p>NamoLux generates, rejects and ranks business names. Every displayed Name Sprint result has a verified .com, .co or .ai option, with Founder Signal and evidence attached.</p>
+              <p>NamoLux generates, rejects and ranks business names. Exact .com, .co and .ai domains rank first; up to two strong names may use a clearly labelled clean .com launch domain.</p>
               <div className={styles.referenceHeroActions}>
                 <Link href="/generate" className={styles.heroPrimaryButton}>Start a Name Sprint <ArrowRight size={22} strokeWidth={1.5} /></Link>
                 <Link href="/bulk-domain-check" className={styles.heroSecondaryButton}>Check a shortlist <span><ArrowRight size={11} strokeWidth={1.5} /></span></Link>

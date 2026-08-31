@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 
 const title = "AI Business Name Generator With a Quality Bar | NamoLux"
-const description = "Turn a business brief into a curated shortlist. NamoLux rejects weak names, verifies available .com, .co or .ai options, screens current brand conflicts, and ranks the survivors with Founder Signal."
+const description = "Turn a business brief into a curated shortlist. NamoLux rejects weak names, verifies exact or clean launch domains, screens current brand conflicts, and ranks the survivors with Founder Signal."
 
 export const metadata: Metadata = {
   title,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 
 const checks = [
   { icon: Layers3, title: "Generate broadly, show selectively", text: "Multiple naming strategies create the private candidate pool. Weak, generic and related-family names are removed before the shortlist appears." },
-  { icon: SearchCheck, title: "Verified launch domains", text: "A result is displayed only when a live check finds an available .com, .co or .ai option. Bulk Check supports six extensions when you want a wider view." },
+  { icon: SearchCheck, title: "Verified launch domains", text: "Exact .com, .co and .ai options rank first. A strong name may also qualify with a clearly labelled clean .com such as get[name].com. Bulk Check supports six extensions when you want a wider view." },
   { icon: ShieldCheck, title: "Evidence before confidence", text: "Finalists receive a bounded current-brand screen and Founder Signal comparison. Official trade-mark registers still need your own review." },
 ] as const
 
@@ -73,7 +73,7 @@ export default function BusinessNameGeneratorPage() {
             <aside className="border border-[#d6b15e]/25 bg-[#0d0e0f] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">What earns a place</p>
               <ul className="mt-5 space-y-4 text-sm leading-6 text-stone-300">
-                {["Fits the confirmed naming brief", "Survives the hard rejection gate", "Is distinct from the other finalists", "Has a verified .com, .co or .ai option", "Clears preliminary current-brand screening"].map((item) => <li key={item} className="flex gap-3"><Check className="mt-1 shrink-0 text-emerald-300" size={16} /><span>{item}</span></li>)}
+                {["Fits the confirmed naming brief", "Survives the hard rejection gate", "Is distinct from the other finalists", "Has a verified exact or clean .com launch domain", "Clears preliminary current-brand screening"].map((item) => <li key={item} className="flex gap-3"><Check className="mt-1 shrink-0 text-emerald-300" size={16} /><span>{item}</span></li>)}
               </ul>
             </aside>
           </div>

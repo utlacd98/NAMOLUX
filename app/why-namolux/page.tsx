@@ -17,7 +17,7 @@ const annoyances = [
   },
   {
     problem: "Hidden availability",
-    take: "Other tools mix taken domains into the suggestion grid. Name Sprint only displays candidates with a verified .com, .co or .ai option.",
+    take: "Other tools mix taken domains into the suggestion grid. Name Sprint requires a verified exact .com, .co or .ai or a clearly labelled clean .com launch domain.",
   },
   {
     problem: "Affiliate-first results",

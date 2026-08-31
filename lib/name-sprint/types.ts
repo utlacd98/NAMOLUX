@@ -1,4 +1,4 @@
-export const NAME_SPRINT_VERSION = "2026.08.31.4" as const
+export const NAME_SPRINT_VERSION = "2026.08.31.5" as const
 export const FOUNDER_SIGNAL_V2_VERSION = "2.0" as const
 export const NAME_SPRINT_TLDS = ["com", "co", "ai"] as const
 
@@ -18,6 +18,7 @@ export const NAME_SPRINT_STRATEGIES = [
   "suggestive",
   "metaphorical",
   "invented",
+  "controlled_coined",
   "meaningful_compound",
   "arbitrary_real_word",
   "verified_root",
@@ -140,6 +141,12 @@ export interface NameSprintCandidate extends RawNameCandidate {
   mainRisk: string
   evidenceConfidence: EvidenceConfidence
   domainStatuses: Array<{ tld: string; status: "available" | "unavailable" | "unknown"; checkedAt: string | null }>
+  launchDomain: {
+    domain: string
+    kind: "exact" | "modified"
+    modifier: string | null
+    checkedAt: string
+  }
   collisionScreen?: {
     status: "clear" | "review" | "not_run"
     summary: string
