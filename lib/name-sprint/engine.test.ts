@@ -198,8 +198,8 @@ describe("Name Sprint multi-stage engine", () => {
     const admissionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_final_admissions")
     expect(collisionCalls).toHaveLength(0)
     expect(admissionCalls).toHaveLength(0)
-    expect(generationCalls[0][0].reasoningEffort).toBe("low")
-    expect(generationCalls[0][0].maxOutputTokens).toBe(2_200)
+    expect(generationCalls[0][0].reasoningEffort).toBe("none")
+    expect(generationCalls[0][0].maxOutputTokens).toBe(3_200)
     expect(judgeCalls[0][0].maxOutputTokens).toBe(1_400)
     expect(judgeCalls[0][0].input).not.toContain("association")
     expect(mocks.availability).toHaveBeenCalledTimes(1)
@@ -283,7 +283,7 @@ describe("Name Sprint multi-stage engine", () => {
 
     const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
     expect(guidedCalls).toHaveLength(1)
-    expect(guidedCalls[0][0].reasoningEffort).toBe("low")
+    expect(guidedCalls[0][0].reasoningEffort).toBe("none")
   })
 
   it("rejects candidates when no verified launch domain is available", async () => {

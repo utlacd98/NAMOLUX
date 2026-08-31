@@ -570,12 +570,12 @@ async function generateGuidedRound({
     schema: GUIDED_SEARCH_SCHEMA as unknown as Record<string, unknown>,
     instructions: GUIDED_SEARCH_INSTRUCTIONS,
     input: `Search round: ${round} of ${GUIDED_ROUND_COUNTS.length}\nCreate exactly ${count} focused applicants.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nFailure evidence: ${JSON.stringify(feedback)}\nNever repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}`,
-    maxOutputTokens: round === 1 ? 2_200 : round === 2 ? 1_700 : 1_300,
+    maxOutputTokens: round === 1 ? 3_200 : round === 2 ? 2_400 : 1_800,
     promptCacheKey: "namolux-name-sprint-guided-search-v1",
     userIdentifier,
     signal,
     model: getNameSprintRepairModel(),
-    reasoningEffort: "low",
+    reasoningEffort: "none",
   })
   return {
     candidates: parseEditorialRepairCandidates(response.data, territories, constitution, round),
