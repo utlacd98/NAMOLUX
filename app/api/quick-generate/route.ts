@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { isSystemReservedName } from "@/lib/reserved-names"
 import { namecheapLink } from "@/lib/affiliateLink"
 import { checkAvailabilityBatch } from "@/lib/domainGen/availability"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
@@ -206,6 +207,7 @@ function publishableCandidateKey(name: string): string {
 function uniquePublishableCandidates(generation: GroqQuickGenerateResult) {
   const seen = new Set<string>()
   return generation.candidates.filter((candidate) => {
+    if (isSystemReservedName(candidate.name)) return false
     const key = publishableCandidateKey(candidate.name)
     if (key.length < 2 || seen.has(key)) return false
     seen.add(key)
@@ -566,7 +568,7 @@ async function handleLegacy(request: NextRequest, input: ParsedQuickRequest) {
   }
   const candidates = input.style === "auto"
     ? publishableCandidates.slice(0, input.count)
-    : generation.candidates
+    : generation.candidates.filter((candidate) => !isSystemReservedName(candidate.name))
   if (candidates.length === 0) {
     return NextResponse.json({ error: "No valid names generated. Try a different description." }, { status: 400 })
   }

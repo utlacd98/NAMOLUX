@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useEffect, useRef } from "react"
 import { ArrowRight, ListChecks } from "lucide-react"
 import { trackEvent } from "@/lib/analytics"
-import type { GeneratorSource } from "@/lib/generator-attribution"
+import { buildGeneratorHref, type GeneratorSource } from "@/lib/generator-attribution"
 
 export interface ContextualMiniGeneratorProps {
   source: Extract<GeneratorSource, "article" | "niche" | "guide">
@@ -19,10 +19,13 @@ export function ContextualMiniGenerator({
   source,
   contentSlug,
   topic,
+  defaultBrief,
+  heading,
   ctaId,
 }: ContextualMiniGeneratorProps) {
   const containerRef = useRef<HTMLElement>(null)
   const hasTrackedView = useRef(false)
+  const generatorHref = buildGeneratorHref({ brief: defaultBrief, source, contentSlug })
 
   useEffect(() => {
     const element = containerRef.current
@@ -60,10 +63,10 @@ export function ContextualMiniGenerator({
             Make the shortlist decision
           </p>
           <h2 id={`${ctaId}-heading`} className="text-xl font-semibold leading-snug text-foreground sm:text-2xl">
-            Ready to compare your own candidate names?
+            {heading}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Paste up to 50 names into Bulk Check, verify six domain extensions, and add Founder Signal when you want a ranked view.
+            Start with a brief tailored to this guide, generate a focused shortlist, then check domains and compare the strongest candidates.
           </p>
         </div>
       </div>
@@ -72,14 +75,23 @@ export function ContextualMiniGenerator({
         <p className="text-xs leading-relaxed text-muted-foreground">
           Availability is best effort and should be confirmed with your registrar before purchase.
         </p>
-        <Link
-          href="/bulk-domain-check"
-          onClick={() => void trackEvent({ action: "content_cta_clicked", metadata: { source, contentSlug, topic, ctaId } })}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        >
-          Check my shortlist
-          <ArrowRight aria-hidden="true" className="h-4 w-4" />
-        </Link>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Link
+            href={generatorHref}
+            onClick={() => void trackEvent({ action: "content_cta_clicked", metadata: { source, contentSlug, topic, ctaId } })}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Generate names
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/bulk-domain-check"
+            onClick={() => void trackEvent({ action: "content_cta_clicked", metadata: { source, contentSlug, topic, ctaId: `${ctaId}-bulk` } })}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-primary/40 hover:text-primary"
+          >
+            Check a shortlist
+          </Link>
+        </div>
       </div>
     </section>
   )

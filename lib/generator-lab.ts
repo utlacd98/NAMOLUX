@@ -3,6 +3,7 @@ export interface GeneratorLabEnvironment {
   VERCEL_ENV?: string
   NAMOLUX_ENABLE_GENERATOR_LAB?: string
   NAMOLUX_GENERATOR_LAB_HOST?: string
+  NAMOLUX_NAME_SPRINT_ENABLED?: string
 }
 
 /**
@@ -12,7 +13,25 @@ export interface GeneratorLabEnvironment {
  */
 export const DEFAULT_GENERATOR_LAB_HOST = "lab.namolux.com"
 
+function getRuntimeGeneratorLabEnvironment(): GeneratorLabEnvironment {
+  // Next.js replaces direct process.env.KEY reads when it compiles Proxy code.
+  // Passing process.env around as an object prevents that replacement and left
+  // the lab permanently disabled in the deployed Proxy runtime.
+  return {
+    NODE_ENV: process.env.NODE_ENV,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    NAMOLUX_ENABLE_GENERATOR_LAB: process.env.NAMOLUX_ENABLE_GENERATOR_LAB,
+    NAMOLUX_GENERATOR_LAB_HOST: process.env.NAMOLUX_GENERATOR_LAB_HOST,
+    NAMOLUX_NAME_SPRINT_ENABLED: process.env.NAMOLUX_NAME_SPRINT_ENABLED,
+  }
+}
+
 const GENERATOR_LAB_PAGES = ["/generate", "/preview-gen"] as const
+
+const PUBLIC_NAME_SPRINT_APIS = new Set([
+  "/api/lab/name-generation",
+  "/api/lab/name-constitution",
+])
 
 const GENERATOR_LAB_APIS = new Set([
   "/api/ai-name-chat",
@@ -26,6 +45,7 @@ const GENERATOR_LAB_APIS = new Set([
   "/api/name-tools",
   "/api/quick-generate",
   "/api/lab/name-generation",
+  "/api/lab/name-constitution",
   "/api/lab/founder-signal",
   "/api/private-download/video",
 ])
@@ -42,7 +62,7 @@ function normaliseHost(value: string | null | undefined): string {
 
 /** Returns the exact hostname allowed to expose generator-only surfaces. */
 export function getGeneratorLabHost(
-  environment: GeneratorLabEnvironment = process.env as GeneratorLabEnvironment,
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
 ): string {
   return normaliseHost(environment.NAMOLUX_GENERATOR_LAB_HOST) || DEFAULT_GENERATOR_LAB_HOST
 }
@@ -52,9 +72,26 @@ export function getGeneratorLabHost(
  * generator routes merely because they are non-production environments.
  */
 export function isGeneratorLabEnabled(
-  environment: GeneratorLabEnvironment = process.env as GeneratorLabEnvironment,
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
 ): boolean {
   return environment.NAMOLUX_ENABLE_GENERATOR_LAB?.trim().toLowerCase() === "true"
+}
+
+/** Emergency production switch for the signed-in Name Sprint surface. */
+export function isPublicNameSprintEnabled(
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
+): boolean {
+  return environment.NAMOLUX_NAME_SPRINT_ENABLED?.trim().toLowerCase() === "true"
+}
+
+export function isPublicNameSprintPagePath(pathname: string): boolean {
+  const path = pathname.toLowerCase().replace(/\/$/, "") || "/"
+  return path === "/generate" || path.startsWith("/generate/")
+}
+
+export function isPublicNameSprintApiPath(pathname: string): boolean {
+  const path = pathname.toLowerCase().replace(/\/$/, "") || "/"
+  return PUBLIC_NAME_SPRINT_APIS.has(path)
 }
 
 /**
@@ -64,7 +101,7 @@ export function isGeneratorLabEnabled(
  */
 export function isGeneratorLabRequestAllowed(
   hostname: string | null | undefined,
-  environment: GeneratorLabEnvironment = process.env as GeneratorLabEnvironment,
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
 ): boolean {
   return isGeneratorLabEnabled(environment)
     && normaliseHost(hostname) === getGeneratorLabHost(environment)
@@ -72,7 +109,7 @@ export function isGeneratorLabRequestAllowed(
 
 /** The lab must never publish an indexable surface, including when deployed as production. */
 export function isGeneratorLabNoIndex(
-  environment: GeneratorLabEnvironment = process.env as GeneratorLabEnvironment,
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
 ): boolean {
   return isGeneratorLabEnabled(environment)
 }
@@ -85,14 +122,16 @@ export function isGeneratorLabNoIndex(
  * hostname with its flag enabled may reach these handlers.
  */
 export function getGeneratorLabApiBlockResponse(
-  request: Pick<Request, "headers">,
-  environment: GeneratorLabEnvironment = process.env as GeneratorLabEnvironment,
+  request: Pick<Request, "headers" | "url">,
+  environment: GeneratorLabEnvironment = getRuntimeGeneratorLabEnvironment(),
 ): Response | null {
   // Unit tests call handlers directly without running the edge proxy. This
   // branch cannot occur in a deployed Vercel runtime and keeps those isolated
   // handler contracts testable without weakening any real environment.
   if (environment.NODE_ENV?.trim().toLowerCase() === "test") return null
   if (isGeneratorLabRequestAllowed(request.headers.get("host"), environment)) return null
+  const pathname = new URL(request.url).pathname
+  if (isPublicNameSprintEnabled(environment) && isPublicNameSprintApiPath(pathname)) return null
 
   return new Response("Not Found", {
     status: 404,

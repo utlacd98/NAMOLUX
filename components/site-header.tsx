@@ -8,10 +8,11 @@ import styles from "./site-shell.module.css"
 
 const MOBILE_BREAKPOINT = "(min-width: 901px)"
 const HOME_NAVIGATION = [
+  { href: "/generate", label: "Name Sprint" },
+  { href: "/bulk-domain-check", label: "Bulk Check" },
   { href: "#process", label: "How it works" },
-  { href: "#features", label: "Features" },
+  { href: "/brand-launch", label: "Launch Kit" },
   { href: "#pricing", label: "Pricing" },
-  { href: "/about", label: "About" },
 ] as const
 
 function MenuIcon() {
@@ -33,7 +34,9 @@ function CloseIcon() {
 function isCurrentPage(pathname: string, href: string) {
   if (href.includes("#")) return false
   if (href === "/blog") return pathname === href || pathname.startsWith(`${href}/`)
+  if (href === "/generate") return pathname === href || pathname.startsWith(`${href}/`)
   if (href === "/bulk-domain-check") return pathname === href || pathname.startsWith(`${href}/`)
+  if (href === "/brand-launch") return pathname === href || pathname.startsWith(`${href}/`)
   return pathname === href
 }
 
@@ -111,7 +114,15 @@ export function SiteHeader() {
   const accountLabel = authState === "unknown" ? "Account" : accountAction.label
   // The landing hero owns its primary action. Keeping the mobile sticky action
   // there covers the shortlist preview and duplicates the visible CTA.
-  const hideStickyAction = pathname === "/" || pathname.startsWith("/generate") || pathname.startsWith("/bulk-domain-check/workspace") || pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up") || pathname.startsWith("/dashboard")
+  const hideStickyAction = pathname === "/"
+    || pathname.startsWith("/generate")
+    || pathname.startsWith("/bulk-domain-check/workspace")
+    || pathname.startsWith("/sign-in")
+    || pathname.startsWith("/sign-up")
+    || pathname.startsWith("/dashboard")
+    || pathname.startsWith("/brand-launch")
+    || pathname === "/about"
+    || pathname === "/blog"
 
   return (
     <header className={styles.siteHeader}>

@@ -3,6 +3,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 import { getSupabaseEnvironment, getSupabaseServiceEnvironment } from "@/lib/env"
 import { SUPABASE_COOKIE_OPTIONS } from "@/lib/supabase/cookie-options"
+import { createSupabaseRetryFetch } from "@/lib/supabase/retry-fetch"
 import type { Database } from "@/lib/supabase/database.types"
 
 export async function createClient() {
@@ -14,6 +15,9 @@ export async function createClient() {
     environment.publishableKey,
     {
       cookieOptions: SUPABASE_COOKIE_OPTIONS,
+      global: {
+        fetch: createSupabaseRetryFetch(),
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()
@@ -43,6 +47,9 @@ export function createServiceClient() {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
+      },
+      global: {
+        fetch: createSupabaseRetryFetch(),
       },
     })
   }

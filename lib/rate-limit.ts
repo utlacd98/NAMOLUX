@@ -69,6 +69,14 @@ export type PlanFeatureQuotaLimits = {
   pro: number
 }
 
+export type QuotaPeriod = "day" | "month"
+export type PlanFeatureQuotaPeriods = {
+  free: QuotaPeriod
+  pro: QuotaPeriod
+}
+
+const MONTHLY_PERIODS: PlanFeatureQuotaPeriods = { free: "month", pro: "month" }
+
 /**
  * Server-only identity used by durable jobs. Do not serialize this to a
  * browser: its opaque subject hash is solely for quota and job ownership.
@@ -126,6 +134,15 @@ function getMonthWindow(now = new Date()): QuotaWindow {
     start: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
     reset: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)),
   }
+}
+
+function getDayWindow(now = new Date()): QuotaWindow {
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  return { start, reset: new Date(start.getTime() + 24 * 60 * 60 * 1_000) }
+}
+
+function getQuotaWindow(period: QuotaPeriod): QuotaWindow {
+  return period === "day" ? getDayWindow() : getMonthWindow()
 }
 
 function getFixedWindow(seconds: number, now = new Date()): QuotaWindow {
@@ -805,11 +822,12 @@ export async function getPlanFeatureQuotaStateForSubject(
   subject: QuotaSubject,
   feature: string,
   limits: PlanFeatureQuotaLimits,
+  periods: PlanFeatureQuotaPeriods = MONTHLY_PERIODS,
 ): Promise<FeatureQuotaResult> {
   if (!/^[a-z0-9-]{3,64}$/.test(feature)) throw new Error("Invalid feature quota configuration")
   validatePlanQuotaLimits(limits)
 
-  const window = getMonthWindow()
+  const window = getQuotaWindow(periods[subject.plan])
   const limit = planQuotaLimit(subject.plan, limits)
   try {
     const used = Math.max(0, Number(await readCounter(subject.subjectType, subject.subjectHash, feature, window)) || 0)
@@ -840,8 +858,9 @@ export async function getPlanFeatureQuotaState(
   request: NextRequest,
   feature: string,
   limits: PlanFeatureQuotaLimits,
+  periods: PlanFeatureQuotaPeriods = MONTHLY_PERIODS,
 ): Promise<FeatureQuotaResult> {
-  return getPlanFeatureQuotaStateForSubject(await getQuotaSubject(request), feature, limits)
+  return getPlanFeatureQuotaStateForSubject(await getQuotaSubject(request), feature, limits, periods)
 }
 
 export async function getPlanFeatureQuotaReplayStateForSubject(
@@ -879,11 +898,12 @@ export async function checkPlanFeatureQuotaIdempotentForSubject(
   feature: string,
   limits: PlanFeatureQuotaLimits,
   idempotencyKey: string,
+  periods: PlanFeatureQuotaPeriods = MONTHLY_PERIODS,
 ): Promise<IdempotentFeatureQuotaResult> {
   validateIdempotency(feature, idempotencyKey)
   validatePlanQuotaLimits(limits)
 
-  const window = getMonthWindow()
+  const window = getQuotaWindow(periods[subject.plan])
   const limit = planQuotaLimit(subject.plan, limits)
   try {
     const result = await consumeCounterIdempotent({
@@ -931,8 +951,9 @@ export async function checkPlanFeatureQuotaIdempotent(
   feature: string,
   limits: PlanFeatureQuotaLimits,
   idempotencyKey: string,
+  periods: PlanFeatureQuotaPeriods = MONTHLY_PERIODS,
 ): Promise<IdempotentFeatureQuotaResult> {
-  return checkPlanFeatureQuotaIdempotentForSubject(await getQuotaSubject(request), feature, limits, idempotencyKey)
+  return checkPlanFeatureQuotaIdempotentForSubject(await getQuotaSubject(request), feature, limits, idempotencyKey, periods)
 }
 
 /**
@@ -943,9 +964,10 @@ export async function refundPlanFeatureQuotaIdempotentForSubject(
   subject: QuotaSubject,
   feature: string,
   idempotencyKey: string,
+  period: QuotaPeriod = "month",
 ): Promise<{ refunded: boolean; unavailable: boolean }> {
   validateIdempotency(feature, idempotencyKey)
-  const window = getMonthWindow()
+  const window = getQuotaWindow(period)
   try {
     const service = createServiceClient()
     const { data, error } = await service.rpc("refund_usage_counter_idempotent", {

@@ -1,51 +1,8 @@
 import { createServiceClient } from "@/lib/supabase/server"
 import type { Json } from "@/lib/supabase/database.types"
+import type { AnalyticsEvent } from "@/lib/analytics-events"
 
-export type MetricAction =
-  | "name_generation"
-  | "bulk_check"
-  | "seo_audit"
-  | "affiliate_click"
-  | "page_view"
-  | "blog_view"
-  | "generate_started"
-  | "quick_generate"
-  | "quick_generate_started"
-  | "quick_generate_results"
-  | "results_seen"
-  | "upgrade_offer_seen"
-  | "upgrade_clicked"
-  | "checkout_started"
-  | "checkout_success"
-  | "rate_limit_seen"
-  | "partner_cta_seen"
-  | "shortlist_created"
-  | "launch_kit_started"
-  | "domain_register_clicked"
-  | "brand_export_clicked"
-  | "engaged_10s"
-  | "engaged_30s"
-  | "scroll_50"
-  | "scroll_90"
-  | "content_cta_seen"
-  | "content_cta_clicked"
-  | "brief_submitted"
-  | "pricing_viewed"
-  | "checkout_intent"
-  | "decision_action"
-  | "names_visible"
-  | "save"
-  | "dislike"
-  | "more_like_this"
-  | "advanced_started"
-  | "founder_signal_clicked"
-  | "founder_signal_scored"
-  | "batch_scored"
-  | "decision_saved"
-  | "decision_report_created"
-  | "report_share_created"
-  | "score_sort_used"
-  | "pricing_clicked"
+export type MetricAction = AnalyticsEvent
 
 const METADATA_STRING_LIMITS = {
   source: 64,
@@ -62,6 +19,10 @@ const METADATA_STRING_LIMITS = {
   model: 80,
   fallbackReason: 96,
   contract: 48,
+  pageType: 32,
+  industry: 64,
+  generatorMode: 32,
+  sourceCta: 64,
 } as const
 
 const METADATA_NUMERIC_LIMITS = {
@@ -180,6 +141,54 @@ export interface DecisionWorkspaceMetrics {
     savedDecisions: number
     decisionReports: number
   }>
+}
+
+/**
+ * A deliberately aggregate-only representation of analytics for the internal
+ * Analytics Copilot. Keep identifiers, user agents, referrers, routes and
+ * event metadata out of this contract: the model needs patterns, not visitor
+ * level data.
+ */
+export interface AnalyticsCopilotSnapshot {
+  generatedAt: string
+  period: {
+    days: number
+    start: string
+    end: string
+  }
+  overview: {
+    totalEvents: number
+    totalSessions: number
+    previousTotalEvents: number
+    previousTotalSessions: number
+    eventGrowthPercent: number | null
+    sessionGrowthPercent: number | null
+    returningSessions: number
+    sessionsWithEngaged10Seconds: number
+    sessionsWithEngaged30Seconds: number
+    sessionsWithScroll50: number
+    sessionsWithScroll90: number
+    sessionsWithProductAction: number
+    suspectedAutomatedSessions: number
+    decisionWorkspace: Omit<DecisionWorkspaceMetrics, "daily">
+  }
+  geoAndDevices: {
+    measurement: "event volume"
+    countries: Array<{ country: string; events: number; sessions: number }>
+    devices: Array<{ device: string; events: number; sessions: number }>
+  }
+  events: {
+    actionCounts: Array<{ action: string; events: number; sessions: number }>
+    daily: Array<{
+      date: string
+      events: number
+      sessions: number
+      productActions: number
+      engaged10Seconds: number
+      engaged30Seconds: number
+    }>
+  }
+  notes: string[]
 }
 
 const MAX_ANALYTICS_ROWS = 50_000
@@ -401,6 +410,218 @@ export async function getDashboardMetrics(days = 7) {
   }
 }
 
+const COPILOT_PRODUCT_ACTIONS = new Set([
+  "name_generation",
+  "bulk_check",
+  "seo_audit",
+  "quick_generate",
+  "quick_generate_started",
+  "quick_generate_results",
+  "results_seen",
+  "shortlist_created",
+  "founder_signal_clicked",
+  "founder_signal_scored",
+  "batch_scored",
+  "decision_saved",
+  "decision_report_created",
+  "report_share_created",
+  "domain_register_clicked",
+  "affiliate_click",
+  "checkout_intent",
+  "checkout_started",
+  "checkout_success",
+])
+
+const COPILOT_AUTOMATION_PATTERN = /(?:bot\b|crawler|spider|headless|curl\/|wget\/|facebookexternalhit|mediapartners|googlebot|bingbot|yandex|baiduspider|semrush|ahrefs|bytespider|petalbot)/i
+
+function percentageChange(current: number, previous: number): number | null {
+  if (previous <= 0) return null
+  return Math.round(((current - previous) / previous) * 1_000) / 10
+}
+
+function stableCountEntries(map: Map<string, number>, limit: number) {
+  return [...map.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+}
+
+/**
+ * Produces the only analytics data the internal AI copilot may receive. This
+ * function derives aggregates from server-only metric rows and never returns
+ * a session identifier, user agent, referrer, route or metadata value.
+ */
+export async function getAnalyticsCopilotSnapshot(days = 7): Promise<AnalyticsCopilotSnapshot> {
+  const safeDays = Math.min(Math.max(Math.floor(days), 1), 90)
+  const start = getStartDate(safeDays)
+  const span = Date.now() - start.getTime()
+  const previousStart = new Date(start.getTime() - span)
+  const [metrics, previousMetrics, decisionWorkspace] = await Promise.all([
+    fetchMetricRows(start),
+    fetchMetricRows(previousStart, start),
+    getDecisionWorkspaceMetrics(safeDays),
+  ])
+
+  const currentSessions = new Map<string, MetricEvent[]>()
+  const previousSessions = new Set<string>()
+  const countryEvents = new Map<string, number>()
+  const countrySessions = new Map<string, Set<string>>()
+  const deviceEvents = new Map<string, number>()
+  const deviceSessions = new Map<string, Set<string>>()
+  const actionEvents = new Map<string, number>()
+  const actionSessions = new Map<string, Set<string>>()
+  const daily = Array.from({ length: safeDays }, (_, index) => ({
+    date: new Date(start.getTime() + index * 86_400_000).toISOString().split("T")[0],
+    events: 0,
+    sessions: new Set<string>(),
+    productActions: 0,
+    engaged10Seconds: 0,
+    engaged30Seconds: 0,
+  }))
+  const dailyByDate = new Map(daily.map((row) => [row.date, row]))
+
+  for (const event of metrics) {
+    const sessionId = event.sessionId
+    if (sessionId) {
+      const rows = currentSessions.get(sessionId) || []
+      rows.push(event)
+      currentSessions.set(sessionId, rows)
+    }
+
+    const country = event.country?.trim().toUpperCase() || "Unknown"
+    const device = event.device?.trim().toLowerCase() || "Unknown"
+    countryEvents.set(country, (countryEvents.get(country) || 0) + 1)
+    deviceEvents.set(device, (deviceEvents.get(device) || 0) + 1)
+    actionEvents.set(event.action, (actionEvents.get(event.action) || 0) + 1)
+
+    if (sessionId) {
+      const countrySet = countrySessions.get(country) || new Set<string>()
+      countrySet.add(sessionId)
+      countrySessions.set(country, countrySet)
+      const deviceSet = deviceSessions.get(device) || new Set<string>()
+      deviceSet.add(sessionId)
+      deviceSessions.set(device, deviceSet)
+      const actionSet = actionSessions.get(event.action) || new Set<string>()
+      actionSet.add(sessionId)
+      actionSessions.set(event.action, actionSet)
+    }
+
+    const day = dailyByDate.get(event.createdAt.toISOString().split("T")[0])
+    if (day) {
+      day.events += 1
+      if (sessionId) day.sessions.add(sessionId)
+      if (COPILOT_PRODUCT_ACTIONS.has(event.action)) day.productActions += 1
+      if (event.action === "engaged_10s") day.engaged10Seconds += 1
+      if (event.action === "engaged_30s") day.engaged30Seconds += 1
+    }
+  }
+
+  for (const event of previousMetrics) {
+    if (event.sessionId) previousSessions.add(event.sessionId)
+  }
+
+  let returningSessions = 0
+  let sessionsWithEngaged10Seconds = 0
+  let sessionsWithEngaged30Seconds = 0
+  let sessionsWithScroll50 = 0
+  let sessionsWithScroll90 = 0
+  let sessionsWithProductAction = 0
+  let suspectedAutomatedSessions = 0
+
+  for (const events of currentSessions.values()) {
+    const actions = new Set(events.map((event) => event.action))
+    if (actions.has("engaged_10s")) sessionsWithEngaged10Seconds += 1
+    if (actions.has("engaged_30s")) sessionsWithEngaged30Seconds += 1
+    if (actions.has("scroll_50")) sessionsWithScroll50 += 1
+    if (actions.has("scroll_90")) sessionsWithScroll90 += 1
+    if (events.some((event) => COPILOT_PRODUCT_ACTIONS.has(event.action))) sessionsWithProductAction += 1
+    if (events.some((event) => COPILOT_AUTOMATION_PATTERN.test(event.userAgent || ""))) suspectedAutomatedSessions += 1
+
+    const daysSeen = new Set(events.map((event) => event.createdAt.toISOString().split("T")[0]))
+    if (daysSeen.size > 1) returningSessions += 1
+  }
+
+  const decisionWorkspaceSummary = {
+    bulkChecks: decisionWorkspace.bulkChecks,
+    completedBulkChecks: decisionWorkspace.completedBulkChecks,
+    partialBulkChecks: decisionWorkspace.partialBulkChecks,
+    failedBulkChecks: decisionWorkspace.failedBulkChecks,
+    candidatesSubmitted: decisionWorkspace.candidatesSubmitted,
+    domainResults: decisionWorkspace.domainResults,
+    availableDomains: decisionWorkspace.availableDomains,
+    takenDomains: decisionWorkspace.takenDomains,
+    verificationRequired: decisionWorkspace.verificationRequired,
+    providerChecks: decisionWorkspace.providerChecks,
+    cachedChecks: decisionWorkspace.cachedChecks,
+    providerFailures: decisionWorkspace.providerFailures,
+    founderSignalRuns: decisionWorkspace.founderSignalRuns,
+    savedDecisions: decisionWorkspace.savedDecisions,
+    savedCandidates: decisionWorkspace.savedCandidates,
+    scoredCandidatesSaved: decisionWorkspace.scoredCandidatesSaved,
+    winnersChosen: decisionWorkspace.winnersChosen,
+    decisionReports: decisionWorkspace.decisionReports,
+    reportShares: decisionWorkspace.reportShares,
+  }
+
+  return {
+    generatedAt: new Date().toISOString(),
+    period: {
+      days: safeDays,
+      start: start.toISOString(),
+      end: new Date().toISOString(),
+    },
+    overview: {
+      totalEvents: metrics.length,
+      totalSessions: currentSessions.size,
+      previousTotalEvents: previousMetrics.length,
+      previousTotalSessions: previousSessions.size,
+      eventGrowthPercent: percentageChange(metrics.length, previousMetrics.length),
+      sessionGrowthPercent: percentageChange(currentSessions.size, previousSessions.size),
+      returningSessions,
+      sessionsWithEngaged10Seconds,
+      sessionsWithEngaged30Seconds,
+      sessionsWithScroll50,
+      sessionsWithScroll90,
+      sessionsWithProductAction,
+      suspectedAutomatedSessions,
+      decisionWorkspace: decisionWorkspaceSummary,
+    },
+    geoAndDevices: {
+      measurement: "event volume",
+      countries: stableCountEntries(countryEvents, 10).map(([country, events]) => ({
+        country,
+        events,
+        sessions: countrySessions.get(country)?.size || 0,
+      })),
+      devices: stableCountEntries(deviceEvents, 5).map(([device, events]) => ({
+        device,
+        events,
+        sessions: deviceSessions.get(device)?.size || 0,
+      })),
+    },
+    events: {
+      actionCounts: stableCountEntries(actionEvents, 24).map(([action, events]) => ({
+        action,
+        events,
+        sessions: actionSessions.get(action)?.size || 0,
+      })),
+      daily: daily.map((row) => ({
+        date: row.date,
+        events: row.events,
+        sessions: row.sessions.size,
+        productActions: row.productActions,
+        engaged10Seconds: row.engaged10Seconds,
+        engaged30Seconds: row.engaged30Seconds,
+      })),
+    },
+    notes: [
+      "This snapshot contains aggregated first-party analytics only; no identifiers, visitor details, names, domains, referrers, routes or event metadata are included.",
+      "Country and device figures describe recorded event volume. Session counts are provided separately where an anonymous session was available.",
+      "Suspected automation is a conservative user-agent pattern estimate and should be treated as a data-quality signal, not a definitive bot classification.",
+      "Small samples and missing client-side events can make changes noisy. Separate observed facts from inferences.",
+    ],
+  }
+}
+
 /**
  * Product metrics for the live NamoLux decision workspace. These values come
  * from durable workspace records rather than legacy generator analytics, so a
@@ -558,11 +779,11 @@ export async function getFunnelData(days = 7) {
   const hasAction = (journey: SessionJourney, actions: string[]) => actions.some((action) => journey.actions.has(action))
   const stageActions = {
     engaged: ["engaged_10s", "engaged_30s", "scroll_50", "scroll_90"],
-    generated: ["bulk_check"],
-    results: ["founder_signal_scored"],
-    decision: ["decision_saved", "decision_report_created", "report_share_created"],
+    generated: ["generator_started", "bulk_check"],
+    results: ["generation_completed", "domain_checked", "founder_signal_scored"],
+    decision: ["result_saved", "decision_saved", "decision_report_created", "report_share_created"],
     paidIntent: ["pricing_viewed", "pricing_clicked", "upgrade_clicked", "checkout_intent"],
-    checkout: ["checkout_started", "checkout_success"],
+    checkout: ["checkout_started", "checkout_success", "trial_started", "purchase_completed"],
   }
   const journeys = [...sessions.values()]
   const sessionCount = (actions: string[]) => journeys.filter((journey) => hasAction(journey, actions)).length

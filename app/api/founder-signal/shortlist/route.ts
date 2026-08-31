@@ -2,6 +2,7 @@ import { createHash } from "node:crypto"
 import { NextRequest, NextResponse } from "next/server"
 
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
+import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
 import { FREE_FOUNDER_SIGNAL_BATCH_LIMIT, PRO_FOUNDER_SIGNAL_BATCH_LIMIT } from "@/lib/plans"
 import {
   checkBurstLimit,
@@ -91,6 +92,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "invalid_founder_signal", message: "Provide a shortlist to score." }, { status: 400 })
     }
     const payload = body as Record<string, unknown>
+    const rawCandidateNames = Array.isArray(payload.names)
+      ? payload.names
+      : Array.isArray(payload.domains)
+        ? payload.domains.map((value) => value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>).name : null)
+        : []
+    if (hasSystemReservedName(rawCandidateNames)) {
+      return NextResponse.json(systemReservedNameError(), { status: 400 })
+    }
     const suppliedPrimaryTld = payload.primaryTld === undefined ? "com" : normaliseTld(payload.primaryTld)
     if (!suppliedPrimaryTld) {
       return NextResponse.json({

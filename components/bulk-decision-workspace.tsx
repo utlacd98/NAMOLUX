@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { trackEvent } from "@/lib/analytics"
+import { isSystemReservedName } from "@/lib/reserved-names"
 
 const ALL_TLDS = ["com", "io", "co", "ai", "app", "dev"] as const
 const DRAFT_KEY = "namolux:bulk-decision-draft:v1"
@@ -225,6 +226,13 @@ function parseCandidateText(value: string): { names: string[]; invalid: string[]
   const seen = new Set<string>()
 
   for (const raw of value.split(/[\n,]+/)) {
+    if (isSystemReservedName(raw)) {
+      if (!seen.has("namolux")) {
+        seen.add("namolux")
+        names.push(raw.trim())
+      }
+      continue
+    }
     const name = normaliseCandidate(raw)
     if (!name) continue
     if (!CANDIDATE_PATTERN.test(name)) {
@@ -475,6 +483,7 @@ function MobileCandidateCard({
   onNote,
   onCompare,
   hasNote,
+  primaryDomain,
 }: {
   name: string
   index: number
@@ -487,6 +496,7 @@ function MobileCandidateCard({
   onNote: () => void
   onCompare: () => void
   hasNote: boolean
+  primaryDomain: string
 }) {
   return (
     <article className="border border-[#c4a15b]/35 bg-black/15 p-4">
@@ -529,6 +539,7 @@ function MobileCandidateCard({
           {compared ? <CheckCircle2 className="h-4 w-4" /> : null} Compare
         </button>
       </div>
+      {score ? <Link href={`/brand-launch?domain=${encodeURIComponent(primaryDomain)}`} className="mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 border border-[#c4a15b]/55 bg-[#c4a15b]/10 px-3 text-xs font-semibold text-[#e1c27f] transition hover:bg-[#c4a15b]/18"><Sparkles className="h-4 w-4" /> Take {primaryDomain} to Launch Kit</Link> : null}
     </article>
   )
 }
@@ -573,6 +584,7 @@ function CompareCandidate({
       <button type="button" onClick={onSetWinner} className="mt-5 inline-flex min-h-10 items-center border border-white/18 px-3 text-xs font-semibold text-white/72 transition hover:border-[#c4a15b]/60 hover:text-[#e1c27f]">
         {isWinner ? "Chosen winner" : "Set as winner"}
       </button>
+      {score && primaryResult?.fullDomain ? <Link href={`/brand-launch?domain=${encodeURIComponent(primaryResult.fullDomain)}`} className="ml-2 mt-5 inline-flex min-h-10 items-center gap-2 border border-[#c4a15b]/55 bg-[#c4a15b]/10 px-3 text-xs font-semibold text-[#e1c27f]"><Sparkles className="h-4 w-4" /> Launch Kit</Link> : null}
     </article>
   )
 }
@@ -1413,8 +1425,8 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-white/10 py-3">
               <div className="flex min-w-0 items-center gap-2 text-sm text-white/66" aria-live="polite">
-                {activeJob || isChecking ? <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-[#c4a15b]" /> : job?.status === "failed" ? <CircleAlert className="h-4 w-4 shrink-0 text-rose-300" /> : job ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" /> : <CircleDashed className="h-4 w-4 shrink-0 text-white/32" />}
-                <span>{job ? `${jobStatusLabel(job.status)} - ${checkedResultCount}/${job.totalChecks} availability results` : "Paste a shortlist to begin"}</span>
+                {activeJob || isChecking ? <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-[#c4a15b]" /> : job?.status === "failed" ? <CircleAlert className="h-4 w-4 shrink-0 text-rose-300" /> : job?.status === "partial" ? <CircleAlert className="h-4 w-4 shrink-0 text-[#e1c27f]" /> : job ? <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" /> : <CircleDashed className="h-4 w-4 shrink-0 text-white/32" />}
+                <span>{job ? `${jobStatusLabel(job.status)} - ${checkedResultCount}/${job.totalChecks} returned results` : "Paste a shortlist to begin"}</span>
               </div>
               {job ? <span className="text-xs text-white/42">Last update {formatCheckedAt(job.completedAt || job.startedAt || job.queuedAt)}</span> : null}
             </div>
@@ -1435,7 +1447,9 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
             {job?.status === "partial" || job?.status === "failed" ? (
               <div className="mt-5 border border-[#c4a15b]/25 bg-[#c4a15b]/[0.06] px-4 py-3 text-sm leading-6 text-white/68">
                 <span className="font-semibold text-[#e1c27f]">{job.status === "partial" ? "Some results need verification." : "This check could not complete."}</span>{" "}
-                {job.errorMessage || "Review the visible results and retry the same shortlist when you are ready."}
+                {job.status === "partial" && job.providerFailures > 0
+                  ? `${job.providerFailures} ${job.providerFailures === 1 ? "provider check was" : "provider checks were"} inconclusive. Confirmed available and taken results remain usable; retry only the marked domains before registering.`
+                  : job.errorMessage || "Review the visible results and retry the same shortlist when you are ready."}
               </div>
             ) : null}
 
@@ -1456,6 +1470,7 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
                       onNote={() => setActiveNoteName(name)}
                       onCompare={() => toggleCompare(name)}
                       hasNote={Boolean(notes[name])}
+                      primaryDomain={resultMap.get(resultKey(name, primaryTld))?.fullDomain || `${name}.${primaryTld}`}
                     />
                   ))}
                 </div>
@@ -1484,7 +1499,7 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
                             <th scope="row" className="border-l border-white/10 px-4 py-3 font-medium text-[#f4efe5]">{name}</th>
                             {ALL_TLDS.map((tld) => <td key={tld} className="border-l border-white/10 px-1 py-3 text-center"><AvailabilityCell result={resultMap.get(resultKey(name, tld))} inProgress={activeJob} /></td>)}
                             <td className="border-l border-white/10 px-3 py-3"><BrandFootprintChecks name={name} results={resultMap} compact /></td>
-                            <td className="border-l border-white/10 px-4 py-3"><ScoreCell score={scores[name]} /></td>
+                            <td className="border-l border-white/10 px-4 py-3"><ScoreCell score={scores[name]} />{scores[name] ? <Link href={`/brand-launch?domain=${encodeURIComponent(resultMap.get(resultKey(name, primaryTld))?.fullDomain || `${name}.${primaryTld}`)}`} className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#e1c27f] hover:underline"><Sparkles className="h-3 w-3" /> Launch Kit</Link> : null}</td>
                             <td className="border-l border-white/10 px-3 py-3">
                               <select value={tier} onChange={(event) => setTiers((current) => ({ ...current, [name]: event.target.value as Tier }))} aria-label={`Tier for ${name}`} className="h-9 w-full border border-white/15 bg-black/25 px-2 text-xs text-white/78 outline-none focus:border-[#c4a15b]">
                                 {TIER_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}

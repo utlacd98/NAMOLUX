@@ -8,6 +8,11 @@ const searchConsolePrioritySlugs = [
   "how-to-name-saas-product",
   "seo-friendly-startup-name",
   "domain-name-after-pivot",
+  "wordoid-vs-namolux",
+  "panabee-vs-namolux",
+  "dot-com-vs-dot-ai-for-startups",
+  "domain-hacks-guide",
+  "namolux-vs-chatgpt-domain-name-generator",
 ] as const
 
 describe("SEO discovery surfaces", () => {
@@ -23,7 +28,14 @@ describe("SEO discovery surfaces", () => {
   it("links the founder entity from the site-wide footer", () => {
     expect(FOOTER_LINKS).toContainEqual({
       href: "/journal/andrew-barrett",
-      label: "Founder",
+      label: "Founder profile",
+    })
+  })
+
+  it("publishes the editorial standards and corrections route site-wide", () => {
+    expect(FOOTER_LINKS).toContainEqual({
+      href: "/editorial-standards",
+      label: "Editorial standards",
     })
   })
 })

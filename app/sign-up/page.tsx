@@ -1,12 +1,14 @@
 "use client"
 
-import { Suspense, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { AuthCard, AuthShowcase, AuthTitle } from "@/components/auth-showcase"
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react"
 import { sanitizeRedirectPath } from "@/lib/safe-redirect"
+import { trackEvent } from "@/lib/analytics"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
 
 const inputClass =
   "h-12 w-full rounded-lg border border-[#D4AF37]/24 bg-white/[0.045] pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-white/32 focus:border-[#D4AF37]/70 focus:bg-white/[0.07] focus:ring-4 focus:ring-[#D4AF37]/12 sm:h-14 sm:pl-12 sm:text-base"
@@ -14,6 +16,8 @@ const inputClass =
 function SignUpForm() {
   const searchParams = useSearchParams()
   const redirect = sanitizeRedirectPath(searchParams.get("redirect"), "/dashboard")
+  const isCheckoutReturn = redirect === PRODUCT_OFFER.checkoutHref
+    || redirect.startsWith(`${PRODUCT_OFFER.checkoutHref}?`)
   const signInHref = `/sign-in?redirect=${encodeURIComponent(redirect)}`
 
   const [fullName, setFullName] = useState("")
@@ -26,6 +30,14 @@ function SignUpForm() {
   const [success, setSuccess] = useState(false)
 
   const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    if (!isCheckoutReturn) return
+    void trackEvent({
+      action: "checkout_auth_required",
+      metadata: { source: "sign-up", mode: "auth-page" },
+    })
+  }, [isCheckoutReturn])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,6 +54,7 @@ function SignUpForm() {
     }
 
     setLoading(true)
+    void trackEvent({ action: "signup_started", metadata: { source: "sign-up", sourceCta: "signup-form" } })
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -61,6 +74,13 @@ function SignUpForm() {
       }
 
       if (data.session) {
+        void trackEvent({ action: "signup_completed", metadata: { source: "sign-up", mode: "immediate-session" } })
+        if (isCheckoutReturn) {
+          await trackEvent({
+            action: "checkout_auth_completed",
+            metadata: { source: "sign-up", mode: "immediate-session" },
+          })
+        }
         // See the sign-in flow: use a document navigation so the newly-issued
         // session cookies are on the first protected request.
         window.location.assign(redirect)
@@ -103,10 +123,18 @@ function SignUpForm() {
     <AuthShowcase variant="sign-up">
       <AuthCard>
         <AuthTitle
-          title="Create your NamoLux account"
-          subtitle="Check, score, and compare the candidate names your team is considering."
+          title={isCheckoutReturn ? "Create your account to start the trial" : "Create your NamoLux account"}
+          subtitle={isCheckoutReturn
+            ? `Continue to secure Stripe checkout for 7 days free, then ${PRODUCT_OFFER.paidPriceLabel}. ${PRODUCT_OFFER.cancellationLabel}`
+            : "Check, score, and compare the candidate names your team is considering."}
           icon="sparkles"
         />
+
+        {isCheckoutReturn && (
+          <div className="mb-6 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-sm leading-6 text-white/62">
+            Your shortlist stays free. Creating an account here preserves your trial choice and sends you directly to Stripe after sign-up.
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-3">

@@ -6,12 +6,13 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Breadcrumbs, generateBreadcrumbSchema, BlogCard, Callout, BlogTracker } from "@/components/blog"
 import { Button } from "@/components/ui/button"
-import { getAllPosts, getPostBySlug, getPostReadTime, getRelatedPosts, isMonetizableBlogPost, isPublicBlogPost, isValidBlogSlug, type BlogPost } from "@/lib/blog"
+import { getPostBySlug, getPostReadTime, getPublicPosts, getRelatedPosts, isMonetizableBlogPost, isPublicBlogPost, isValidBlogSlug, type BlogPost } from "@/lib/blog"
 import { planArticleAds } from "@/lib/article-ad-plan"
 import { Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react"
 import { Fragment } from "react"
 import { AdBanner } from "@/components/ad-banner"
 import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
+import { buildGeneratorHref } from "@/lib/generator-attribution"
 
 interface BlogPostPageProps {
   params: Promise<{ slug?: string }>
@@ -69,9 +70,11 @@ function findActivationIndexes(post: BlogPost, adIndexes: Set<number>) {
   return { miniGeneratorIndex, internalLinksIndex }
 }
 
-// Generate static params for all blog posts
+// Only reviewed public Journal entries are routable. The larger working archive
+// stays in source control while it is edited, but is not published as a crawlable
+// noindex page. This keeps the live site focused on content we actively stand behind.
 export async function generateStaticParams() {
-  const posts = getAllPosts().filter((post) => isValidBlogSlug(post.slug))
+  const posts = getPublicPosts().filter((post) => isValidBlogSlug(post.slug))
   return posts.map((post) => ({ slug: post.slug }))
 }
 
@@ -143,7 +146,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const articleCta = post.category === "Domain Strategy"
     ? { href: "/bulk-domain-check", label: "Check a shortlist", heading: "Bring your shortlist into one view.", body: "Compare domain states and the trade-offs behind each candidate." }
       : post.category === "Tool Comparisons"
-        ? { href: "/founder-signal", label: "Explore Founder Signal", heading: "See how the decision layer works.", body: "Review the scoring method before you trust a number with your final choice." }
+        ? {
+            href: buildGeneratorHref({ brief: activation.defaultBrief, source: "article", contentSlug: post.slug }),
+            label: "Generate my shortlist",
+            heading: "Test the same naming problem in NamoLux.",
+            body: "Start with a tailored brief, generate candidates, then check domains and compare the strongest options.",
+          }
         : { href: "/bulk-domain-check", label: "Check a shortlist", heading: "Bring the candidates into one view.", body: "Check domains and compare the strongest options together." }
 
   // Generate schema markup
@@ -289,6 +297,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
                 {post.description}
               </p>
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border/30 py-3 text-xs text-muted-foreground">
+                <span>{post.sources?.length ? `${post.sources.length} primary or authoritative sources` : "NamoLux editorial guide"}</span>
+                <span aria-hidden="true">·</span>
+                <Link href="/editorial-standards" className="font-medium text-foreground underline decoration-border underline-offset-4 hover:text-primary">
+                  How we prepare our guides
+                </Link>
+              </div>
             </header>
           </div>
 
@@ -371,6 +386,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   })}
                 </p>
               ) : null}
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                NamoLux separates editorial guidance from product claims and advertising. Read our{" "}
+                <Link href="/editorial-standards" className="text-foreground underline underline-offset-2 hover:text-primary">
+                  editorial standards and corrections process
+                </Link>.
+              </p>
             </footer>
 
             {post.faqs?.length ? (

@@ -10,6 +10,7 @@ import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 export const metadata: Metadata = {
   title: "How to Name a Startup | NamoLux",
   description: "A practical guide to choosing a strong startup name. Learn what makes names brandable, scalable, and memorable.",
+  robots: { index: false, follow: true, noarchive: true },
 }
 
 const GUIDE_BRIEF = "I am naming a new startup and want a professional, memorable name that is easy to pronounce, can scale beyond the first product, and has a strong domain."

@@ -14,6 +14,7 @@ import {
 import NextLink from "next/link"
 import { isValidBlogSlug } from "@/lib/blog"
 import { adCampaigns, generateAdScript, type AdCampaign } from "@/lib/ads-data"
+import { AnalyticsCopilot } from "@/components/admin/analytics-copilot"
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, LabelList
@@ -162,12 +163,14 @@ const ACTION_LABELS: Record<string, string> = {
   quick_generate: "Quick Generate", quick_generate_started: "Quick Started", quick_generate_results: "Quick Results",
   affiliate_click: "Affiliate Click", domain_register_clicked: "Register Click",
   partner_cta_seen: "Partner CTA Seen", shortlist_created: "Shortlist Created",
-  launch_kit_started: "Launch Kit Started", brand_export_clicked: "Brand Export",
+  launch_kit_viewed: "Launch Kit Viewed", launch_kit_started: "Launch Kit Started", brand_export_clicked: "Brand Export",
   page_view: "Page View", engaged_10s: "Engaged 10s", engaged_30s: "Engaged 30s",
   scroll_50: "Scrolled 50%", scroll_90: "Scrolled 90%",
   content_cta_seen: "Content CTA Seen", content_cta_clicked: "Content CTA Clicked",
   brief_submitted: "Brief Submitted", pricing_viewed: "Pricing Viewed",
-  checkout_intent: "Checkout Intent", decision_action: "Decision Action",
+  checkout_intent: "Checkout Intent", checkout_auth_required: "Checkout Sign-in Needed",
+  checkout_auth_completed: "Checkout Sign-in Complete", checkout_started: "Stripe Checkout Started",
+  checkout_failed: "Checkout Failed", decision_action: "Decision Action",
   names_visible: "Names Visible", save: "Name Saved", dislike: "Name Disliked",
   more_like_this: "More Like This", advanced_started: "Advanced Started",
   founder_signal_clicked: "Founder Signal Clicked", founder_signal_scored: "Founder Signal Scored", batch_scored: "Batch Scored",
@@ -180,13 +183,18 @@ const ACTION_COLORS: Record<string, string> = {
   quick_generate_results: "bg-yellow-500/20 text-yellow-300",
   seo_audit: "bg-green-500/20 text-green-400", affiliate_click: "bg-amber-500/20 text-amber-300",
   domain_register_clicked: "bg-emerald-500/20 text-emerald-300", partner_cta_seen: "bg-cyan-500/20 text-cyan-300",
-  shortlist_created: "bg-purple-500/20 text-purple-300", launch_kit_started: "bg-pink-500/20 text-pink-300",
+  shortlist_created: "bg-purple-500/20 text-purple-300", launch_kit_viewed: "bg-fuchsia-500/20 text-fuchsia-300",
+  launch_kit_started: "bg-pink-500/20 text-pink-300",
   brand_export_clicked: "bg-orange-500/20 text-orange-300",
   page_view: "bg-gray-500/20 text-gray-400", engaged_10s: "bg-cyan-500/20 text-cyan-300",
   engaged_30s: "bg-cyan-500/20 text-cyan-300", scroll_50: "bg-sky-500/20 text-sky-300",
   scroll_90: "bg-sky-500/20 text-sky-300", content_cta_seen: "bg-indigo-500/20 text-indigo-300",
   content_cta_clicked: "bg-indigo-500/20 text-indigo-300", brief_submitted: "bg-yellow-500/20 text-yellow-300",
   pricing_viewed: "bg-violet-500/20 text-violet-300", checkout_intent: "bg-emerald-500/20 text-emerald-300",
+  checkout_auth_required: "bg-amber-500/20 text-amber-300",
+  checkout_auth_completed: "bg-sky-500/20 text-sky-300",
+  checkout_started: "bg-emerald-500/20 text-emerald-300",
+  checkout_failed: "bg-red-500/20 text-red-300",
   decision_action: "bg-purple-500/20 text-purple-300",
   names_visible: "bg-cyan-500/20 text-cyan-300",
   save: "bg-emerald-500/20 text-emerald-300",
@@ -978,6 +986,8 @@ export default function MetricsPage() {
                 <MetricCard title="Cache hit rate" value={`${data.decisionWorkspace.providerChecks + data.decisionWorkspace.cachedChecks > 0 ? Math.round((data.decisionWorkspace.cachedChecks / (data.decisionWorkspace.providerChecks + data.decisionWorkspace.cachedChecks)) * 100) : 0}%`} icon={Gauge} color="text-cyan-400" />
               </div>
 
+              <AnalyticsCopilot scope="overview" days={days} defaultOpen />
+
               {/* Charts Row */}
               <div className="grid gap-6 lg:grid-cols-3">
                 {/* Trend Chart */}
@@ -1239,6 +1249,8 @@ export default function MetricsPage() {
 
             return (
             <div className="space-y-6">
+              <AnalyticsCopilot scope="geo" days={days} />
+
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Top Countries */}
                 <div className="rounded-xl border border-border/40 bg-card/30 p-4">
@@ -1310,6 +1322,8 @@ export default function MetricsPage() {
           {/* EVENTS TAB */}
           {activeTab === "events" && (
             <div className="space-y-4">
+              <AnalyticsCopilot scope="events" days={days} />
+
               {/* Filters */}
               <div className="flex flex-wrap gap-3">
                 <select value={eventFilter} onChange={(e) => setEventFilter(e.target.value)}

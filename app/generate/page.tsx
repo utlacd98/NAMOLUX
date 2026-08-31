@@ -6,18 +6,19 @@ import { PRODUCT_OFFER } from "@/lib/product-offer"
 import { parseContentSlug, parseGeneratorSource } from "@/lib/generator-attribution"
 import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
 import { isGeneratorLabV3Enabled } from "@/lib/generator-flags"
-import { isGeneratorLabRequestAllowed } from "@/lib/generator-lab"
+import { isGeneratorLabRequestAllowed, isPublicNameSprintEnabled } from "@/lib/generator-lab"
 import { LabNameGenerator } from "@/components/lab-name-generator"
 import { headers } from "next/headers"
-import { permanentRedirect } from "next/navigation"
+import { permanentRedirect, redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Name generator and domain checker | NamoLux",
+  title: "NamoLux Name Sprint | Curated Business Name Generator",
   description:
-    "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
+    "Describe your business and let NamoLux generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
   keywords: [
-    "free domain name generator",
-    "AI domain name generator",
+    "curated business name generator",
+    "AI business name generator",
     "business name generator",
     "startup name generator",
     "domain availability checker",
@@ -26,9 +27,9 @@ export const metadata: Metadata = {
   ],
   robots: { index: false, follow: false },
   openGraph: {
-    title: "Name generator and domain checker | NamoLux",
+    title: "NamoLux Name Sprint | Curated Business Name Generator",
     description:
-      "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
+      "Generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
     url: "https://www.namolux.com/generate",
     type: "website",
     images: [
@@ -36,15 +37,15 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux domain name generator",
+        alt: "NamoLux Name Sprint curated business name generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Name generator and domain checker | NamoLux",
+    title: "NamoLux Name Sprint | Curated Business Name Generator",
     description:
-      "Generate name candidates, check domains, and compare the strongest options in one naming workspace.",
+      "Generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
     images: ["/opengraph-image"],
   },
 }
@@ -53,10 +54,17 @@ type GeneratePageProps = { searchParams?: Promise<Record<string, string | string
 
 export default async function GeneratePage({ searchParams }: GeneratePageProps) {
   const requestHeaders = await headers()
-  if (!isGeneratorLabRequestAllowed(requestHeaders.get("host"))) {
+  const labRequest = isGeneratorLabRequestAllowed(requestHeaders.get("host"))
+  const publicSprint = isPublicNameSprintEnabled()
+  if (!labRequest && !publicSprint) {
     permanentRedirect("/bulk-domain-check")
   }
-  if (isGeneratorLabV3Enabled()) return <LabNameGenerator />
+  if (publicSprint || (labRequest && isGeneratorLabV3Enabled())) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect("/sign-in?redirect=%2Fgenerate")
+    return <LabNameGenerator internalTools={labRequest} />
+  }
   const params = await searchParams
   const rawBrief = params?.q ?? params?.keyword
   const initialBrief = (Array.isArray(rawBrief) ? rawBrief[0] : rawBrief || "").slice(0, 1000)

@@ -1,13 +1,14 @@
-export const FOUNDER_SIGNAL_VERSION = "1.0" as const
-export const FOUNDER_SIGNAL_EVALUATED_ON = "2026-07-10" as const
+export const FOUNDER_SIGNAL_VERSION = "2.0" as const
+export const FOUNDER_SIGNAL_EVALUATED_ON = "2026-08-30" as const
 
 export const FOUNDER_SIGNAL_DIMENSIONS = [
-  { key: "clarity", label: "Clarity", weight: 35 },
-  { key: "memorability", label: "Memorability", weight: 17 },
-  { key: "pronunciation", label: "Pronunciation", weight: 11 },
-  { key: "extensionStrength", label: "Extension strength", weight: 10 },
-  { key: "characterQuality", label: "Character quality", weight: 10 },
-  { key: "brandRisk", label: "Brand risk", weight: 17 },
+  { key: "strategicFit", label: "Strategic fit & meaning depth", weight: 20 },
+  { key: "distinctiveness", label: "Distinctiveness & search uniqueness", weight: 20 },
+  { key: "memorability", label: "Memorability", weight: 15 },
+  { key: "pronunciation", label: "Pronunciation", weight: 10 },
+  { key: "spellingCharacter", label: "Spelling & character quality", weight: 10 },
+  { key: "brandRisk", label: "Brand & collision risk", weight: 20 },
+  { key: "extensionStrength", label: "Domain & extension strength", weight: 5 },
 ] as const
 
 export type FounderSignalDimensionKey = (typeof FOUNDER_SIGNAL_DIMENSIONS)[number]["key"]
@@ -26,7 +27,7 @@ export const CLOSE_MATCH_SCORE_CAP = 59 as const
 
 export const FOUNDER_SIGNAL_CONFIDENCE = {
   level: "moderate",
-  basis: "Deterministic heuristic scoring with a curated active-brand registry",
+  basis: "Founder Signal v2 heuristic scoring with a versioned active-brand registry; evidence confidence is reported separately in Name Sprint",
   dataFreshness: FOUNDER_SIGNAL_EVALUATED_ON,
 } as const
 
@@ -35,6 +36,17 @@ export const FOUNDER_SIGNAL_CONFIDENCE = {
  * Entries are normalised because candidate comparison is case-insensitive.
  */
 export const ACTIVE_BRAND_REGISTRY = [
+  "anker",
+  "actura",
+  "ballast",
+  "cadence",
+  "tidal",
+  "mosaic",
+  "parallax",
+  "accord",
+  "warden",
+  "zenith",
+  "nucleus",
   "google",
   "apple",
   "amazon",
@@ -67,6 +79,7 @@ export const ACTIVE_BRAND_REGISTRY = [
   "uber",
   "lyft",
   "airbnb",
+  "gofundme",
   "tiktok",
   "snapchat",
   "twitter",
@@ -89,6 +102,26 @@ export const ACTIVE_BRAND_REGISTRY = [
   "vantiq",
   "axoniq",
   "corteva",
+  "farline",
+  "holden",
+  "lumen",
+  "meridian",
+  "orbis",
+  "waypoint",
+  "hintline",
+  "telltide",
+  "granary",
+  "mapstone",
+  "tracespan",
+  "clearroute",
+  "setcourse",
+  "telltale",
+  "setguard",
+  "planharbor",
+  "keelward",
+  "handrail",
+  "readout",
+  "coursemark",
 ] as const
 
 export type ActiveBrand = (typeof ACTIVE_BRAND_REGISTRY)[number]

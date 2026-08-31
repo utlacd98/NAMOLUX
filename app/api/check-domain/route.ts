@@ -6,6 +6,7 @@ import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { verifyGenerationWorkflowToken } from "@/lib/generation-workflow-token"
 import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
+import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
 
 const SUPPORTED_TLDS = ["com", "io", "co", "ai", "app", "dev"]
 const MAX_DOMAINS_PER_REQUEST = 50
@@ -105,6 +106,9 @@ export async function POST(request: NextRequest) {
 
     if (!domains || !Array.isArray(domains)) {
       return NextResponse.json({ error: "Domains array is required" }, { status: 400 })
+    }
+    if (hasSystemReservedName(domains)) {
+      return NextResponse.json(systemReservedNameError(), { status: 400 })
     }
 
     const requestedTlds = tlds && Array.isArray(tlds) ? tlds : SUPPORTED_TLDS

@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
@@ -8,6 +8,7 @@ import { AuthCard, AuthShowcase, AuthTitle } from "@/components/auth-showcase"
 import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react"
 import { PRODUCT_OFFER } from "@/lib/product-offer"
 import { sanitizeRedirectPath } from "@/lib/safe-redirect"
+import { trackEvent } from "@/lib/analytics"
 
 const inputClass =
   "h-12 w-full rounded-lg border border-[#D4AF37]/24 bg-white/[0.045] pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-white/32 focus:border-[#D4AF37]/70 focus:bg-white/[0.07] focus:ring-4 focus:ring-[#D4AF37]/12 sm:h-14 sm:pl-12 sm:text-base"
@@ -26,6 +27,14 @@ function SignInForm() {
   const [loading, setLoading] = useState(false)
 
   const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    if (!isCheckoutReturn) return
+    void trackEvent({
+      action: "checkout_auth_required",
+      metadata: { source: "sign-in", mode: "auth-page" },
+    })
+  }, [isCheckoutReturn])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,6 +55,12 @@ function SignInForm() {
       // Supabase writes the browser session cookie before this resolves. A full
       // navigation avoids Next prefetching an authenticated page with a stale,
       // anonymous request during that hand-off.
+      if (isCheckoutReturn) {
+        await trackEvent({
+          action: "checkout_auth_completed",
+          metadata: { source: "sign-in", mode: "password" },
+        })
+      }
       window.location.assign(redirect)
     } catch {
       setError("An unexpected error occurred")

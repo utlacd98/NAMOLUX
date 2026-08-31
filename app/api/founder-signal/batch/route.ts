@@ -5,6 +5,7 @@ import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { ADVANCED_SCORING_TOKEN_TTL_MS, verifyGenerationWorkflowToken } from "@/lib/generation-workflow-token"
 import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
+import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
 import {
   checkBurstLimit,
   checkFeatureQuotaIdempotent,
@@ -60,6 +61,12 @@ export async function POST(request: NextRequest) {
         { error: `Provide a workflow token and between 1 and ${MAX_CANDIDATES} generated candidates.` },
         { status: 400 },
       )
+    }
+    const rawCandidateNames = rawCandidates.map((value: unknown) => value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>).name
+      : null)
+    if (hasSystemReservedName(rawCandidateNames)) {
+      return NextResponse.json(systemReservedNameError(), { status: 400 })
     }
 
     const candidates = rawCandidates.map(normaliseCandidate)

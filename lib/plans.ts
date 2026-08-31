@@ -4,6 +4,9 @@ export const PRO_MONTHLY_BULK_CHECK_LIMIT = 120
 export const FREE_ADVANCED_GENERATION_LIMIT = 3
 export const FREE_FOUNDER_SIGNAL_BATCH_LIMIT = 1
 export const PRO_FOUNDER_SIGNAL_BATCH_LIMIT = 120
+export const FREE_NAME_SPRINT_DAILY_LIMIT = 1
+export const PRO_NAME_SPRINT_MONTHLY_LIMIT = 40
+export const PRO_BRAND_LAUNCH_KIT_LIMIT = 10
 
 /** @deprecated Use FREE_MONTHLY_BULK_CHECK_LIMIT for new decision-workspace code. */
 export const FREE_MONTHLY_USAGE_LIMIT = FREE_MONTHLY_BULK_CHECK_LIMIT
@@ -29,6 +32,10 @@ export type PlanConfig = {
   quickGenerationUnlimited: boolean
   advancedGenerationMonthlyLimit: number
   founderSignalBatchMonthlyLimit: number
+  seoActiveSiteLimit: number
+  seoHistoryDays: number
+  seoDailyPageLimit: number
+  scoutIncludedMonthlyCredits: number
   canUseBrandPalette: boolean
   features: string[]
 }
@@ -40,7 +47,7 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     shortName: "Free",
     price: "\u00a30",
     billingLabel: "free",
-    description: "Three bulk shortlist checks and one complete Founder Signal batch each month.",
+    description: "One curated Name Sprint per UTC day, plus three bulk shortlist checks and one complete Founder Signal batch each month.",
     isPaid: false,
     adFree: false,
     unlimitedUsage: false,
@@ -49,6 +56,10 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     quickGenerationUnlimited: true,
     advancedGenerationMonthlyLimit: FREE_ADVANCED_GENERATION_LIMIT,
     founderSignalBatchMonthlyLimit: FREE_FOUNDER_SIGNAL_BATCH_LIMIT,
+    seoActiveSiteLimit: 1,
+    seoHistoryDays: 30,
+    seoDailyPageLimit: 3,
+    scoutIncludedMonthlyCredits: 0,
     canUseBrandPalette: false,
     features: [
       "3 bulk shortlist checks per month",
@@ -57,6 +68,8 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
       "Live checks across six domain extensions",
       "Clear available, unavailable, or verify states",
       "Advertising-supported",
+      "1 curated Name Sprint per UTC day",
+      "Brand Launch Kit available with Pro",
     ],
   },
   pro: {
@@ -74,14 +87,21 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     quickGenerationUnlimited: true,
     advancedGenerationMonthlyLimit: -1,
     founderSignalBatchMonthlyLimit: PRO_FOUNDER_SIGNAL_BATCH_LIMIT,
-    canUseBrandPalette: false,
+    seoActiveSiteLimit: 5,
+    seoHistoryDays: 365,
+    seoDailyPageLimit: 8,
+    scoutIncludedMonthlyCredits: 1,
+    canUseBrandPalette: true,
     features: [
       "120 bulk shortlist checks per month",
       "120 Founder Signal runs per month",
+      "40 curated Name Sprints per month",
       "Saved projects, notes, tiering, and CSV exports",
       "Immutable decision reports with revocable view-only links",
+      "Daily Launch Signal for up to five verified winning domains",
       "Live checks across six domain extensions",
       "Ad-free experience",
+      "10 Brand Launch Kits per month, including logo concepts and asset exports",
       "Cancel through the billing portal",
     ],
   },

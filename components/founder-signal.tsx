@@ -5,6 +5,10 @@ import { ChevronDown, ChevronUp, Info } from "lucide-react"
 import { getFounderSignalBand, type FounderSignalBand } from "@/lib/founderSignal/spec"
 
 type FounderSignalRawScores = Partial<{
+  strategicFit: number
+  distinctiveness: number
+  spellingCharacter: number
+  domainExtension: number
   clarity: number
   length: number
   pronounceability: number
@@ -50,12 +54,13 @@ function detailRows(rawScores: FounderSignalRawScores | undefined) {
   if (!rawScores) return []
 
   return [
-    { label: "Clarity", value: rawScores.clarity ?? rawScores.length },
+    { label: "Strategic fit & meaning", value: rawScores.strategicFit ?? rawScores.clarity ?? rawScores.length },
+    { label: "Distinctiveness", value: rawScores.distinctiveness ?? rawScores.memorability },
     { label: "Pronunciation", value: rawScores.pronounceability },
     { label: "Memorability", value: rawScores.memorability },
-    { label: "Extension strength", value: rawScores.extension },
-    { label: "Character quality", value: rawScores.characterQuality },
-    { label: "Brand risk", value: rawScores.brandRisk },
+    { label: "Spelling & character", value: rawScores.spellingCharacter ?? rawScores.characterQuality },
+    { label: "Brand & collision risk", value: rawScores.brandRisk },
+    { label: "Domain & extension", value: rawScores.domainExtension ?? rawScores.extension },
   ].filter((row): row is { label: string; value: number } => typeof row.value === "number" && Number.isFinite(row.value))
 }
 

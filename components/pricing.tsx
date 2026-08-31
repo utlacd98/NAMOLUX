@@ -14,7 +14,7 @@ export function Pricing() {
             Simple pricing for naming work
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Start with a focused monthly shortlist allowance. Upgrade for 120 Bulk Check runs and 120 Founder Signal runs each UTC calendar month.
+            Start with one curated Name Sprint per UTC day, plus focused shortlist allowances. Pro adds 40 Name Sprints, 120 Bulk Checks, 120 Founder Signal runs, and 10 Brand Launch Kits each month.
           </p>
         </div>
 
@@ -27,15 +27,15 @@ export function Pricing() {
               <Sparkles className="h-5 w-5" />
             </div>
             <h3 className="text-2xl font-bold text-foreground">{PRODUCT_OFFER.freePlanName}</h3>
-            <p className="mt-2 text-muted-foreground">Bring a shortlist and make a focused decision before spending anything.</p>
+            <p className="mt-2 text-muted-foreground">Generate a curated set or bring a shortlist and make a focused decision before spending anything.</p>
             <div className="mt-6 flex items-baseline gap-2">
               <span className="text-5xl font-bold text-foreground">{PRODUCT_OFFER.tiers[0].price}</span>
               <span className="text-muted-foreground">{PRODUCT_OFFER.tiers[0].billingLabel}</span>
             </div>
             <Button asChild size="lg" variant="outline" className="mt-8 w-full px-8 py-6 text-base font-semibold">
-              <Link href="/bulk-domain-check">
+              <Link href="/generate">
                 <Sparkles className="mr-2 h-5 w-5" />
-                Start free
+                Start a Name Sprint
               </Link>
             </Button>
             <ul className="mt-8 space-y-3">
@@ -56,7 +56,7 @@ export function Pricing() {
               <Zap className="h-5 w-5" />
             </div>
             <h3 className="text-2xl font-bold text-foreground">{PRODUCT_OFFER.paidPlanName}</h3>
-            <p className="mt-2 text-muted-foreground">A defined decision workspace for checking, scoring, saving, and sharing a shortlist.</p>
+            <p className="mt-2 text-muted-foreground">Generate more often, compare and save decisions, then turn the winner into a Brand Launch Kit.</p>
             <div className="mt-6 flex items-baseline gap-2">
               <span className="text-5xl font-bold text-foreground">{PRODUCT_OFFER.paidPrice}</span>
               <span className="text-muted-foreground">/ month</span>
@@ -64,7 +64,7 @@ export function Pricing() {
             <Button asChild size="lg" className="mt-8 w-full px-8 py-6 text-base font-semibold">
               <Link href={PRODUCT_OFFER.paidCheckoutHref}>
                 <Zap className="mr-2 h-5 w-5" />
-                Upgrade to paid
+                Start 7-day free trial
               </Link>
             </Button>
             <ul className="mt-8 space-y-3">
@@ -84,7 +84,7 @@ export function Pricing() {
         >
           <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
             <Lock className="h-4 w-4 text-primary" />
-            Pro is for the shortlist decision, with saved evidence and clear comparisons instead of an oversized suite.
+            Card required. First-time customers get 7 days free, then £7.99/month unless cancelled before renewal.
           </p>
           <p className="text-sm text-muted-foreground">
             Domain registration links may use our Namecheap partner link.{" "}

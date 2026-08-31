@@ -2,36 +2,44 @@ import { NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkRateLimit, logGeneration } from "@/lib/rate-limit"
+import { isSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY?.trim() })
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY?.trim()
+  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured")
+  return new OpenAI({ apiKey })
+}
 
 export async function POST(req: NextRequest) {
   const labBlockResponse = getGeneratorLabApiBlockResponse(req)
   if (labBlockResponse) return labBlockResponse
-
-  const rateLimit = await checkRateLimit(req, "name-tools")
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      {
-        error: "monthly_usage_limit_reached",
-        message: rateLimit.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
-        resetAt: rateLimit.resetAt,
-        tokensUsed: rateLimit.tokensUsed,
-        tokensTotal: rateLimit.tokensTotal,
-        remaining: rateLimit.remaining,
-      },
-      { status: rateLimit.statusCode || 429 }
-    )
-  }
 
   try {
     const { action, name, keyword, vibe, industry } = await req.json()
 
     if (!name || typeof name !== "string") {
       return NextResponse.json({ error: "name is required" }, { status: 400 })
+    }
+    if (isSystemReservedName(name)) {
+      return NextResponse.json(systemReservedNameError(), { status: 400 })
+    }
+
+    const rateLimit = await checkRateLimit(req, "name-tools")
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          error: "monthly_usage_limit_reached",
+          message: rateLimit.message || "Free plan includes 3 uses per month. Upgrade for unlimited access.",
+          resetAt: rateLimit.resetAt,
+          tokensUsed: rateLimit.tokensUsed,
+          tokensTotal: rateLimit.tokensTotal,
+          remaining: rateLimit.remaining,
+        },
+        { status: rateLimit.statusCode || 429 }
+      )
     }
 
     const cleanName = name.trim().toLowerCase().replace(/\.[a-z]+$/, "")
@@ -150,6 +158,7 @@ OUTPUT
 Return only the final brand story paragraph. No headers. No labels. No quotation marks. No analysis — just the story.`
 
 async function handleNarrative(name: string, vibe?: string, industry?: string, keyword?: string) {
+  const openai = getOpenAIClient()
   const userContext = [
     `Name: "${name}"`,
     keyword ? `Keywords: ${keyword}` : `Keywords: (none provided — keep positioning neutral)`,
@@ -248,6 +257,7 @@ OUTPUT
 Exactly 3 taglines. One per line. No labels. No numbers. No quotes. No commentary.`
 
 async function handleTaglines(name: string, vibe?: string, industry?: string, keyword?: string) {
+  const openai = getOpenAIClient()
   const userContext = [
     `Name: "${name}"`,
     keyword ? `Keywords: ${keyword}` : `Keywords: (none provided — keep positioning neutral)`,
@@ -295,6 +305,7 @@ Work through the 6 steps silently, then output only the three final taglines, on
 // ── Names Like ───────────────────────────────────────────────────────────────
 
 async function handleNamesLike(inspirationName: string, keyword?: string) {
+  const openai = getOpenAIClient()
   const keywordContext = keyword ? ` The product is about: ${keyword}.` : ""
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -328,7 +339,7 @@ REJECT: fake-Latin (-ora/-ova/-era), sci-fi endings (-ix/-rix/-trix), meaningles
   const names = raw
     .split("\n")
     .map((l) => l.trim().replace(/^[-•*\d.]+\s*/, "").split(/[^a-zA-Z]/)[0])
-    .filter((n) => n && n.length >= 3 && n.length <= 14)
+    .filter((n) => n && n.length >= 3 && n.length <= 14 && !isSystemReservedName(n))
     .slice(0, 8)
 
   return NextResponse.json({ names })

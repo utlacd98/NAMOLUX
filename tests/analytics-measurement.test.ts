@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { getOrCreateSessionId } from "@/lib/analytics"
 import { sanitizeAnalyticsPath, sanitizeAnalyticsReferrer, sanitizeMetricMetadata } from "@/lib/metrics"
+import { ANALYTICS_EVENTS, isAnalyticsEvent } from "@/lib/analytics-events"
 
 function memoryStorage(initial: Record<string, string> = {}) {
   const values = new Map(Object.entries(initial))
@@ -39,6 +40,17 @@ describe("analytics sessions", () => {
 })
 
 describe("analytics privacy boundary", () => {
+  it("uses one canonical event registry for the complete SEO-to-revenue funnel", () => {
+    expect(ANALYTICS_EVENTS).toEqual(expect.arrayContaining([
+      "seo_landing_view", "generator_opened", "generator_started", "generation_completed",
+      "domain_checked", "founder_signal_viewed", "result_saved", "signup_started",
+      "signup_completed", "checkout_auth_required", "checkout_auth_completed", "checkout_failed",
+      "launch_kit_viewed", "trial_started", "purchase_completed",
+    ]))
+    expect(isAnalyticsEvent("purchase_completed")).toBe(true)
+    expect(isAnalyticsEvent("private_arbitrary_event")).toBe(false)
+  })
+
   it("keeps only approved dimensions and decision values", () => {
     expect(sanitizeMetricMetadata({
       source: "article",

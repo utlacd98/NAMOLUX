@@ -1,6 +1,7 @@
 import { getRealnessScore, isKeywordClone } from "../domainGen/realness"
 import { hasRandomSyllablePattern, hasUnsafeBrandMeaning } from "../domainGen/filters"
 import { computeBrandInstinct } from "./brandInstinct"
+import { isSystemReservedName, SYSTEM_RESERVED_NAME_MESSAGE } from "../reserved-names"
 import {
   assessBrandCollision,
   FOUNDER_SIGNAL_CONFIDENCE,
@@ -35,9 +36,13 @@ export interface ScoreNameResult {
   confidence: typeof FOUNDER_SIGNAL_CONFIDENCE
   collision: BrandCollisionAssessment
   breakdown: {
-    /** Canonical Clarity contribution (length + realness, 35 points maximum). */
+    strategicFitScore: number
+    distinctivenessScore: number
+    spellingCharacterScore: number
+    domainExtensionScore: number
+    /** @deprecated Use strategicFitScore. */
     clarityScore: number
-    /** @deprecated Use clarityScore. Retained for current consumers. */
+    /** @deprecated Length is an input signal, not a standalone v2 dimension. */
     lengthScore: number
     pronounceScore: number
     memorabilityScore: number
@@ -48,6 +53,10 @@ export interface ScoreNameResult {
   }
   /** Raw 0-100 scores before weighting - for UI display */
   rawScores: {
+    strategicFit: number
+    distinctiveness: number
+    spellingCharacter: number
+    domainExtension: number
     clarity: number
     realness: number
     length: number
@@ -272,8 +281,8 @@ function zeroScoreResult(
     evaluatedOn: FOUNDER_SIGNAL_EVALUATED_ON,
     confidence: FOUNDER_SIGNAL_CONFIDENCE,
     collision,
-    breakdown: { clarityScore: 0, lengthScore: 0, pronounceScore: 0, memorabilityScore: 0, extensionScore: 0, characterScore: 0, brandRiskScore: 0, vibeModifier: 0 },
-    rawScores: { clarity: 0, realness: 0, length: 0, pronounceability: 0, memorability: 0, extension: TLD_STRENGTH[tld] || 30, characterQuality: 0, brandRisk: 0 },
+    breakdown: { strategicFitScore: 0, distinctivenessScore: 0, spellingCharacterScore: 0, domainExtensionScore: 0, clarityScore: 0, lengthScore: 0, pronounceScore: 0, memorabilityScore: 0, extensionScore: 0, characterScore: 0, brandRiskScore: 0, vibeModifier: 0 },
+    rawScores: { strategicFit: 0, distinctiveness: 0, spellingCharacter: 0, domainExtension: TLD_STRENGTH[tld] || 30, clarity: 0, realness: 0, length: 0, pronounceability: 0, memorability: 0, extension: TLD_STRENGTH[tld] || 30, characterQuality: 0, brandRisk: 0 },
   }
 }
 
@@ -609,6 +618,11 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
 
   const reasons: string[] = []
 
+  if (isSystemReservedName(input.name)) {
+    reasons.push(SYSTEM_RESERVED_NAME_MESSAGE)
+    return zeroScoreResult(reasons, tld, collision)
+  }
+
   if (collision.action === "disqualify") {
     reasons.push(`Exact active-brand collision: ${collision.matchedBrand}`)
     return zeroScoreResult(reasons, tld, collision)
@@ -642,33 +656,27 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
   const rawBrandRisk = calculateBrandRiskScore(name, collision)
   const rawRealness = getRealnessScore(name)
 
-  // Canonical Clarity combines the established length (13%) and realness (22%)
-  // contributions. Keeping those components unchanged preserves existing scores.
-  const weightedLength = rawLength * 0.13
-  const weightedRealness = rawRealness * 0.22
-  const weightedClarity = weightedLength + weightedRealness
-  const clarityWeight = getFounderSignalDimensionWeight("clarity") / 100
-  const rawClarity = clarityWeight > 0 ? weightedClarity / clarityWeight : 0
+  // V2 keeps the proven phonetic inputs but stops treating literal clarity as
+  // 35% of the verdict. Strategic fit and distinctiveness now carry equal
+  // weight, so descriptive familiarity cannot dominate the score.
+  const instinct = computeBrandInstinct(name)
+  const rawClarity = clamp(rawLength * 0.37 + rawRealness * 0.63, 0, 100)
+  const rawStrategicFit = clamp(rawClarity + (countSemanticRoots(name) >= 2 ? 6 : 0) - (DICTIONARY_WORDS.has(name) ? 8 : 0), 0, 100)
+  const rawDistinctiveness = clamp(rawMemorability + instinct.adjustment * 4 - (INDUSTRY_CLICHES.includes(name) ? 30 : 0), 0, 100)
+  const weightedStrategicFit = rawStrategicFit * (getFounderSignalDimensionWeight("strategicFit") / 100)
+  const weightedDistinctiveness = rawDistinctiveness * (getFounderSignalDimensionWeight("distinctiveness") / 100)
   const weightedPronounce = rawPronounceability * (getFounderSignalDimensionWeight("pronunciation") / 100)
   const weightedMemorability = rawMemorability * (getFounderSignalDimensionWeight("memorability") / 100)
   const weightedExtension = rawExtension * (getFounderSignalDimensionWeight("extensionStrength") / 100)
-  const weightedCharacter = rawCharacterQuality * (getFounderSignalDimensionWeight("characterQuality") / 100)
+  const weightedCharacter = rawCharacterQuality * (getFounderSignalDimensionWeight("spellingCharacter") / 100)
   const weightedBrandRisk = rawBrandRisk * (getFounderSignalDimensionWeight("brandRisk") / 100)
 
-  const baseScore = weightedClarity + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk
+  const baseScore = weightedStrategicFit + weightedDistinctiveness + weightedPronounce + weightedMemorability + weightedExtension + weightedCharacter + weightedBrandRisk
 
   // Apply vibe modifier
   const vibeModifier = calculateVibeModifier(name, vibe)
 
-  // Apply Brand Instinct layer — context-agnostic originality adjustment.
-  // Reduces dominance of generic/overused names and boosts distinctive ones.
-  const instinct = computeBrandInstinct(name)
-
-  let combinedScore = baseScore + vibeModifier + instinct.adjustment
-
-  if (countSemanticRoots(name) >= 2) {
-    combinedScore += 8
-  }
+  let combinedScore = baseScore + vibeModifier
 
   // ── Startup cliché suffix penalty ──
   // Overused endings struggle to exceed 90 unless the name is exceptional.
@@ -782,8 +790,12 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
     confidence: FOUNDER_SIGNAL_CONFIDENCE,
     collision,
     breakdown: {
-      clarityScore: Math.round(weightedClarity),
-      lengthScore: Math.round(weightedLength),
+      strategicFitScore: Math.round(weightedStrategicFit),
+      distinctivenessScore: Math.round(weightedDistinctiveness),
+      spellingCharacterScore: Math.round(weightedCharacter),
+      domainExtensionScore: Math.round(weightedExtension),
+      clarityScore: Math.round(weightedStrategicFit),
+      lengthScore: 0,
       pronounceScore: Math.round(weightedPronounce),
       memorabilityScore: Math.round(weightedMemorability),
       extensionScore: Math.round(weightedExtension),
@@ -792,6 +804,10 @@ export function scoreName(input: ScoreNameInput): ScoreNameResult {
       vibeModifier,
     },
     rawScores: {
+      strategicFit: Math.round(rawStrategicFit),
+      distinctiveness: Math.round(rawDistinctiveness),
+      spellingCharacter: rawCharacterQuality,
+      domainExtension: rawExtension,
       clarity: Math.round(rawClarity),
       realness: rawRealness,
       length: rawLength,

@@ -9,8 +9,12 @@ import {
   isGeneratorLabNoIndex,
   isGeneratorLabPagePath,
   isGeneratorLabRequestAllowed,
+  isPublicNameSprintApiPath,
+  isPublicNameSprintEnabled,
+  isPublicNameSprintPagePath,
 } from "@/lib/generator-lab"
 import { canonicalUrlForPath, isVercelHostname } from "@/lib/site-url"
+import { sanitizeRedirectPath } from "@/lib/safe-redirect"
 
 /**
  * NamoLux request proxy
@@ -98,7 +102,7 @@ const BLOCKED_EXACT_PATHS = new Set<string>([
 // 2. App routing config
 // ─────────────────────────────────────────────────────────────────────────
 
-const PROTECTED_USER_ROUTES = new Set<string>(["/dashboard", "/account"])
+const PROTECTED_USER_ROUTES = new Set<string>(["/dashboard", "/account", "/generate"])
 
 // ─────────────────────────────────────────────────────────────────────────
 // 3. Helpers
@@ -123,6 +127,7 @@ function isProtectedUserPath(path: string): boolean {
     PROTECTED_USER_ROUTES.has(path) ||
     path.startsWith("/dashboard/") ||
     path.startsWith("/account/") ||
+    path.startsWith("/generate/") ||
     path === "/admin" ||
     path.startsWith("/admin/") ||
     path === "/namo-metrics-x7k9" ||
@@ -177,6 +182,7 @@ function applySecurityHeaders(response: NextResponse, hostname?: string): NextRe
 
 export async function proxy(request: NextRequest) {
   const path = normalisePath(request.nextUrl.pathname)
+  const labRequestAllowed = isGeneratorLabRequestAllowed(request.nextUrl.hostname)
 
   // (1) Kill probe traffic immediately — no session, no DB, nothing else runs
   if (isBlockedPath(path)) {
@@ -190,17 +196,19 @@ export async function proxy(request: NextRequest) {
     return hardNotFound()
   }
 
-  // Generator surfaces are available only from the explicitly configured lab
-  // hostname. The public product always stays focused on Bulk Check + Founder
-  // Signal, even if the lab flag is accidentally enabled there.
-  if (!isGeneratorLabRequestAllowed(request.nextUrl.hostname)) {
-    if (isGeneratorLabPagePath(path)) {
+  // The production Name Sprint is a narrowly exposed signed-in surface. All
+  // legacy generator and internal audit routes remain restricted to the exact
+  // lab host even when the public emergency switch is enabled.
+  if (!labRequestAllowed) {
+    const publicSprintPage = isPublicNameSprintEnabled() && isPublicNameSprintPagePath(path)
+    const publicSprintApi = isPublicNameSprintEnabled() && isPublicNameSprintApiPath(path)
+    if (isGeneratorLabPagePath(path) && !publicSprintPage) {
       return applySecurityHeaders(
         NextResponse.redirect(new URL("/bulk-domain-check", request.url), 308),
         request.nextUrl.hostname,
       )
     }
-    if (isGeneratorLabApiPath(path)) {
+    if (isGeneratorLabApiPath(path) && !publicSprintApi) {
       return hardNotFound({ "X-NamoLux-Surface": "generator-lab-disabled" })
     }
   }
@@ -210,7 +218,7 @@ export async function proxy(request: NextRequest) {
   const isSignedIn = Boolean(claims?.sub)
 
   // (3) Authentication gate. Owners re-check authorization server-side.
-  if (isProtectedUserPath(path)) {
+  if (isProtectedUserPath(path) && !(labRequestAllowed && isPublicNameSprintPagePath(path))) {
     if (!isSignedIn) {
       const redirectUrl = new URL("/sign-in", request.url)
       redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
@@ -227,10 +235,18 @@ export async function proxy(request: NextRequest) {
 
   // (4) Signed-in users shouldn't see auth pages
   if (isSignedIn && (path === "/sign-in" || path === "/sign-up")) {
+    const requestedDestination = sanitizeRedirectPath(
+      request.nextUrl.searchParams.get("redirect"),
+      "/dashboard",
+    )
+    const destination = requestedDestination.startsWith("/sign-in")
+      || requestedDestination.startsWith("/sign-up")
+      ? "/dashboard"
+      : requestedDestination
     return applySecurityHeaders(
       preserveSupabaseSessionResponse(
         supabaseResponse,
-        NextResponse.redirect(new URL("/dashboard", request.url)),
+        NextResponse.redirect(new URL(destination, request.url)),
         true,
       ),
       request.nextUrl.hostname,

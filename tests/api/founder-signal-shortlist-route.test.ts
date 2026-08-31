@@ -77,6 +77,20 @@ beforeEach(() => {
 })
 
 describe("/api/founder-signal/shortlist", () => {
+  it.each(["NamoLux", "namo lux", "namo-lux", "namolux.com"])("rejects reserved input %s without using quota", async (name) => {
+    const response = await POST(request({ names: [name], primaryTld: "com" }))
+    const json = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(json).toEqual({
+      error: "system_reserved_name",
+      message: "NamoLux is a reserved platform name and can't be analysed as a candidate.",
+    })
+    expect(mockBurst).not.toHaveBeenCalled()
+    expect(mockScoreName).not.toHaveBeenCalled()
+    expect(mockConsume).not.toHaveBeenCalled()
+  })
+
   it("scores every name on the chosen primary TLD and consumes one isolated allowance", async () => {
     const response = await POST(request({
       names: ["Vaulten", "Northline"],

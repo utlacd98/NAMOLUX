@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { BlogCard } from "./blog-card"
 import type { BlogPost, BlogCategory } from "@/lib/blog"
+import styles from "./journal.module.css"
 
 interface BlogFilterProps {
   posts: BlogPost[]
@@ -24,67 +25,64 @@ export function BlogFilter({ posts, categories, activeCategory, activeTopic, que
   }
 
   return (
-    <>
-      {/* Category Filter */}
-      <section className="border-b border-border/20 px-4 py-4">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-2">
-          <Link
-            href={categoryHref()}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              !activeCategory
-                ? "bg-primary/10 text-primary"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            All Posts
-          </Link>
-          {categories.map((category) => (
-            <Link
-              key={category}
-              href={categoryHref(category)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                activeCategory === category
-                  ? "bg-primary/10 text-primary"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              {category}
-            </Link>
-          ))}
+    <div className={styles.archive}>
+      <section className={styles.categorySection}>
+        <div className={styles.archiveInner}>
+          <div className={styles.archiveHeader}>
+            <div>
+              <span className={styles.archiveLabel}>03 / Journal archive</span>
+              <h2 className={styles.archiveHeading}>Latest thinking</h2>
+            </div>
+            <nav className={styles.categoryNav} aria-label="Filter articles by category">
+              <Link
+                href={categoryHref()}
+                className={`${styles.categoryLink} ${!activeCategory ? styles.categoryLinkActive : ""}`}
+                aria-current={!activeCategory ? "page" : undefined}
+              >
+                All articles
+              </Link>
+              {categories.map((category) => (
+                <Link
+                  key={category}
+                  href={categoryHref(category)}
+                  className={`${styles.categoryLink} ${activeCategory === category ? styles.categoryLinkActive : ""}`}
+                  aria-current={activeCategory === category ? "page" : undefined}
+                >
+                  {category}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       </section>
 
-      {/* Featured Post */}
       {showFeatured && (
-        <section className="px-4 pt-10 sm:pt-12">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Featured
-            </h2>
-            <BlogCard post={featuredPost} featured />
+        <section className={styles.featuredSection}>
+          <div className={styles.archiveInner}>
+            <h2 className={styles.featuredLabel}>Featured essay</h2>
+            <BlogCard post={featuredPost} featured journal />
           </div>
         </section>
       )}
 
-      {/* All Posts Grid */}
-      <section className="px-4 py-10 sm:py-12">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {activeCategory || "All Articles"}
+      <section className={styles.articlesSection}>
+        <div className={styles.archiveInner}>
+          <h2 className={styles.articleListTitle}>
+            {activeCategory || (activeTopic ? "Selected topic" : query ? "Search results" : "All articles")}
           </h2>
           {regularPosts.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className={styles.articleGrid}>
               {regularPosts.map((post) => (
-                <BlogCard key={post.slug} post={post} />
+                <BlogCard key={post.slug} post={post} journal />
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground">
-              No articles found in this category.
+            <p className={styles.emptyState}>
+              No articles found for these filters.
             </p>
           )}
         </div>
       </section>
-    </>
+    </div>
   )
 }

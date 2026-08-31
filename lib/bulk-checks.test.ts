@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from "vitest"
 
 vi.mock("server-only", () => ({}))
 
-import { BULK_CHECK_TLDS, isBulkCheckClaimDeferred, parseBulkCheckInput } from "@/lib/bulk-checks"
+import { BULK_CHECK_TLDS, BulkCheckInputError, isBulkCheckClaimDeferred, parseBulkCheckInput } from "@/lib/bulk-checks"
+import { SYSTEM_RESERVED_NAME_MESSAGE } from "@/lib/reserved-names"
 
 describe("bulk check input contract", () => {
   it("accepts the advertised 50 names across all six extensions (300 checks)", () => {
@@ -25,6 +26,16 @@ describe("bulk check input contract", () => {
   it("keeps the supported extension order deterministic for cache and job fingerprints", () => {
     const input = parseBulkCheckInput({ names: ["vaulten"], tlds: ["dev", "com", "ai"] })
     expect(input.tlds).toEqual(["com", "ai", "dev"])
+  })
+
+  it.each(["NamoLux", "namo lux", "namo-lux", "namolux.com"])("rejects the reserved platform identity %s", (name) => {
+    try {
+      parseBulkCheckInput({ names: [name] })
+      throw new Error("Expected the reserved name to be rejected")
+    } catch (error) {
+      expect(error).toBeInstanceOf(BulkCheckInputError)
+      expect(error).toMatchObject({ code: "system_reserved_name", message: SYSTEM_RESERVED_NAME_MESSAGE })
+    }
   })
 
   it("keeps a duplicate queue delivery alive until a leased job can be reclaimed", () => {

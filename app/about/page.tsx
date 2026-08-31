@@ -1,19 +1,19 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Target, Heart } from "lucide-react"
+import { ArrowRight } from "lucide-react"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 import { CTA_LABELS } from "@/lib/site-content"
+import styles from "./about.module.css"
 
 export const metadata: Metadata = {
   title: "About Us | NamoLux",
   description:
-    "Learn why Andrew Barrett built NamoLux as a decision toolkit for founders choosing a company name.",
+    "Learn why Andrew Barrett built NamoLux to generate, reject, rank and launch business names with evidence.",
   openGraph: {
     title: "About NamoLux",
     description:
-      "NamoLux helps founders move from name ideas to a defensible shortlist.",
+      "NamoLux helps founders move from a business brief to a defensible name and launch-ready brand.",
     type: "website",
     url: "https://www.namolux.com/about",
   },
@@ -21,121 +21,178 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "About NamoLux",
     description:
-      "NamoLux helps founders move from name ideas to a defensible shortlist.",
+      "NamoLux helps founders move from a business brief to a defensible name and launch-ready brand.",
   },
   alternates: {
     canonical: "/about",
   },
 }
 
+const principles = [
+  {
+    title: "Quality over quantity",
+    copy: "Better to have 10 great options than 1,000 mediocre ones.",
+  },
+  {
+    title: "Founder-first",
+    copy: "Built for people who ship, not just people who dream.",
+  },
+  {
+    title: "Transparent by default",
+    copy: "Clear limits, versioned scores, explicit caveats, and no invented certainty.",
+  },
+] as const
+
+function SectionMarker({ number }: { number: string }) {
+  return (
+    <div className={styles.sectionMarker} aria-hidden="true">
+      <span>{number}</span>
+      <div />
+    </div>
+  )
+}
+
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main id="main-content" className="flex-1">
-        {/* Hero Section */}
-        <section className="border-b border-border/30 px-4 pt-28 pb-16 sm:pt-32 sm:pb-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              About NamoLux
+    <div className={styles.aboutPage}>
+      <SiteHeader />
+
+      <main id="main-content">
+        <section className={styles.hero} aria-labelledby="about-heading">
+          <div className={styles.heroInner}>
+            <h1 id="about-heading">
+              Built for the moment a name <span>becomes a decision.</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              We help founders and builders find domain names worth building companies on.
-            </p>
-          </div>
-        </section>
 
-        {/* Mission Section */}
-        <section className="px-4 py-16 sm:py-20">
-          <div className="mx-auto max-w-3xl">
-            <div className="mb-12 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                <Target className="h-6 w-6 text-primary" />
-              </div>
-              <h2 className="mb-4 text-2xl font-bold text-foreground">Our Mission</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Generating options is easy. Choosing one name that can carry a company for years is the harder decision.
-                NamoLux puts the shortlist, domain evidence, scoring rationale, and trade-offs in one calm workspace.
+            <div className={styles.heroSummary}>
+              <p>
+                We help founders generate, reject and compare business names worth building companies on.
               </p>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                Founder Signal v1.0 gives every candidate the same six-dimension heuristic review. Domain availability,
-                company-name collisions, social handles, and legal trademark clearance remain separate checks.
-                <Link href="/founder-signal" className="ml-1 text-primary underline underline-offset-4">Read the methodology.</Link>
-              </p>
-            </div>
-
-            {/* Founder Section */}
-            <div className="rounded-xl border border-border/50 bg-muted/20 p-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
-                <span className="text-2xl font-bold text-primary">AB</span>
-              </div>
-              <h3 className="mb-2 text-xl font-bold text-foreground">Andrew Barrett</h3>
-              <p className="mb-4 text-sm text-primary">Founder</p>
-              <p className="text-muted-foreground leading-relaxed">
-                Andrew built NamoLux after experiencing firsthand how difficult it is to find 
-                the perfect domain name. After spending countless hours on domain research for 
-                various projects, he decided to create a tool that makes the process faster, 
-                smarter, and more reliable for everyone.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Values Section */}
-        <section className="border-t border-border/30 px-4 py-16 sm:py-20">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="mb-10 text-center text-2xl font-bold text-foreground">What We Believe</h2>
-            <div className="grid gap-8 sm:grid-cols-3">
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="mb-2 font-semibold text-foreground">Quality Over Quantity</h3>
-                <p className="text-sm text-muted-foreground">
-                  Better to have 10 great options than 1,000 mediocre ones.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Target className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="mb-2 font-semibold text-foreground">Founder-First</h3>
-                <p className="text-sm text-muted-foreground">
-                  Built for people who ship, not just people who dream.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Heart className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="mb-2 font-semibold text-foreground">Transparent by Default</h3>
-                <p className="text-sm text-muted-foreground">
-                  Clear limits, versioned scores, explicit caveats, and no invented certainty.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="border-t border-border/30 px-4 py-16">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-3 text-2xl font-bold text-foreground">
-              Ready to choose the name worth building on?
-            </h2>
-            <p className="mb-6 text-muted-foreground">
-              Check a full shortlist, compare domain availability, and add Founder Signal when you want a ranked decision view.
-            </p>
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/bulk-domain-check">
-                {CTA_LABELS.primary}
-                <ArrowRight className="h-4 w-4" />
+              <Link href="/founder-signal" className={styles.textLink}>
+                Explore the methodology
+                <ArrowRight aria-hidden="true" size={17} strokeWidth={1.6} />
               </Link>
-            </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.mission} aria-labelledby="mission-heading">
+          <div className={styles.sectionInner}>
+            <SectionMarker number="01" />
+
+            <div className={styles.missionGrid}>
+              <div className={styles.missionIntro}>
+                <h2 id="mission-heading">
+                  The work is not generating more names. It is deciding which ones deserve to survive.
+                </h2>
+                <p>
+                  Name Sprint creates the broad list privately, rejects weak or unavailable options,
+                  and brings the survivors into one calm evidence-led workspace.
+                </p>
+                <Link href="/founder-signal" className={styles.paperLink}>
+                  Read the Founder Signal methodology
+                  <ArrowRight aria-hidden="true" size={17} strokeWidth={1.6} />
+                </Link>
+              </div>
+
+              <ol className={styles.missionLedger}>
+                <li>
+                  <span>01</span>
+                  <div>
+                    <h3>Generation with an admissions policy</h3>
+                    <p>
+                      NamoLux rejects generic, risky or unusable candidates before they reach the founder.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span>02</span>
+                  <div>
+                    <h3>A consistent review</h3>
+                    <p>
+                      Founder Signal v2.0 compares every eligible candidate across seven dimensions.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span>03</span>
+                  <div>
+                    <h3>A path into the brand</h3>
+                    <p>
+                      The paid Launch Kit turns the selected name into palette directions,
+                      landing-page previews, logo concepts, and exportable assets.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.principles} aria-labelledby="principles-heading">
+          <div className={styles.sectionInner}>
+            <SectionMarker number="02" />
+
+            <div className={styles.storyGrid}>
+              <article className={styles.founderStory} aria-labelledby="founder-heading">
+                <div className={styles.founderIdentity}>
+                  <span>Founder, NamoLux</span>
+                  <h2 id="founder-heading">Andrew Barrett</h2>
+                </div>
+                <p>
+                  Andrew built NamoLux after experiencing firsthand how difficult it is to find
+                  the perfect domain name. After spending countless hours on domain research for
+                  various projects, he decided to create a tool that makes the process faster,
+                  smarter, and more reliable for everyone.
+                </p>
+                <Link href="/founder-story" className={styles.paperLink}>
+                  Read the founder story
+                  <ArrowRight aria-hidden="true" size={17} strokeWidth={1.6} />
+                </Link>
+              </article>
+
+              <div className={styles.principlesBlock}>
+                <div className={styles.principlesIntro}>
+                  <h2 id="principles-heading">What we believe.</h2>
+                  <p>
+                    A naming tool should make the trade-offs clearer, without pretending the
+                    final judgment can be automated away.
+                  </p>
+                </div>
+
+                <ol className={styles.principleList}>
+                  {principles.map((principle, index) => (
+                    <li key={principle.title}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <div>
+                        <h3>{principle.title}</h3>
+                        <p>{principle.copy}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.cta} aria-labelledby="cta-heading">
+          <div className={styles.ctaInner}>
+            <div>
+              <h2 id="cta-heading">Choose the name worth building on.</h2>
+              <p>
+                Start from a business brief, admit only serious candidates, and compare the survivors with evidence.
+              </p>
+            </div>
+            <Link href="/generate" className={styles.primaryButton}>
+              {CTA_LABELS.primary}
+              <ArrowRight aria-hidden="true" size={18} strokeWidth={1.7} />
+            </Link>
           </div>
         </section>
       </main>
-      <Footer />
+
+      <SiteFooter />
     </div>
   )
 }

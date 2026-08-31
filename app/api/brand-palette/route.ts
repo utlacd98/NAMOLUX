@@ -423,7 +423,9 @@ Work through the 4 steps silently. Pick ONE sub-style from the brand-type list. 
 
   try {
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      // Luna keeps palette directions inexpensive enough for the free kit
+      // allowance while preserving JSON-mode output through Chat Completions.
+      model: "gpt-5.6-luna",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt },

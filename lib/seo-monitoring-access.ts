@@ -40,16 +40,5 @@ export function monitoringAccessError(principal: SeoMonitoringPrincipal | null) 
     }
   }
 
-  if (!principal.entitlements.isPro) {
-    return {
-      status: 403,
-      body: {
-        error: "upgrade_required",
-        message: "SEO monitoring is included with NamoLux Pro.",
-        accessState: principal.entitlements.accessState,
-      },
-    }
-  }
-
   return null
 }

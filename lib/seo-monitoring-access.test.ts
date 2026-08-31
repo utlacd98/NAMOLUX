@@ -23,20 +23,14 @@ describe("SEO monitoring cron authentication", () => {
   })
 })
 
-describe("SEO monitoring paid access", () => {
+describe("SEO monitoring account access", () => {
   it("requires authentication", () => {
     expect(monitoringAccessError(null)).toMatchObject({ status: 401, body: { error: "authentication_required" } })
   })
 
-  it("fails closed for free and expired accounts", () => {
-    expect(monitoringAccessError({ entitlements: { isPro: false, accessState: "free" } } as never)).toMatchObject({
-      status: 403,
-      body: { error: "upgrade_required", accessState: "free" },
-    })
-    expect(monitoringAccessError({ entitlements: { isPro: false, accessState: "expired" } } as never)).toMatchObject({
-      status: 403,
-      body: { accessState: "expired" },
-    })
+  it("allows authenticated free and lapsed accounts to retain monitoring access", () => {
+    expect(monitoringAccessError({ entitlements: { isPro: false, accessState: "free" } } as never)).toBeNull()
+    expect(monitoringAccessError({ entitlements: { isPro: false, accessState: "expired" } } as never)).toBeNull()
   })
 
   it("allows active paid access", () => {

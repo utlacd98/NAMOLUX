@@ -54,12 +54,12 @@ export function HomeBriefForm({ compact = false }: { compact?: boolean }) {
       ) : null}
       <div className={styles.heroFormActions}>
         <button type="submit" className={`${styles.solidButton} ${styles.buttonBrass}`}>
-          Generate candidates
+          Start Name Sprint
           <ArrowRight size={16} strokeWidth={1.6} />
         </button>
         {!compact ? <Link href="/bulk-domain-check" className={styles.textLink}>Paste a shortlist instead</Link> : null}
       </div>
-      <p className={styles.heroNote}>{PRODUCT_OFFER.freeUsageLabel}. No account required.</p>
+      <p className={styles.heroNote}>{PRODUCT_OFFER.freeQuickUsageLabel}. Sign-in required.</p>
     </form>
   )
 }

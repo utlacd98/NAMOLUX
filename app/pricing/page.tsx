@@ -11,7 +11,7 @@ import { PUBLIC_PRODUCT_COPY } from "@/lib/site-content"
 
 export const metadata: Metadata = {
   title: "Pricing | NamoLux",
-  description: `Start with ${PRODUCT_OFFER.freeUsageLabel} on the ad-supported free plan, or upgrade to ${PRODUCT_OFFER.paidPlanName} for ${PRODUCT_OFFER.paidPriceLabel} with 120 Bulk Check and 120 Founder Signal runs each UTC calendar month.`,
+  description: `Start with one curated Name Sprint per UTC day plus ${PRODUCT_OFFER.freeUsageLabel.toLowerCase()}, or try ${PRODUCT_OFFER.paidPlanName} for seven days before ${PRODUCT_OFFER.paidPriceLabel}. Pro adds 40 Name Sprints and paid Brand Launch Kits.`,
   alternates: {
     canonical: "/pricing",
   },
@@ -41,6 +41,8 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
     ? "bulk domain checks"
     : redirectSource === "founder-signal"
       ? "Founder Signal scoring"
+      : redirectSource === "name-sprint"
+        ? "Name Sprint"
       : "NamoLux tools"
   const checkoutNotice = checkoutStatus === "cancelled"
     ? "Checkout was cancelled. Your plan has not changed."
@@ -64,7 +66,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               Start free. Upgrade when the decision deserves more.
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-[#999]">
-              The ad-supported free tier includes {PRODUCT_OFFER.freeUsageLabel}. {PRODUCT_OFFER.paidPlanName} is a £7.99 decision workspace with {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} Saved decisions, CSV exports, shareable reports, and an ad-free workspace are included.
+              Signed-in Free users receive {PRODUCT_OFFER.freeQuickUsageLabel.toLowerCase()}, plus {PRODUCT_OFFER.freeUsageLabel.toLowerCase()}. Start Pro with a 7-day free trial, then pay £7.99/month. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} Saved decisions, paid Brand Launch Kits, CSV exports, shareable reports, and an ad-free workspace are included.
             </p>
           </div>
 
@@ -74,7 +76,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
                 You have reached the free monthly limit for {sourceLabel}.
               </p>
               <p className="mt-1 text-sm text-[#b9a878]">
-                Upgrade to continue with the full 120-run decision workspace, saved decisions, and exports.
+                Upgrade for the full Pro allowances, saved decisions, Brand Launch Kits, and exports.
               </p>
             </div>
           )}
@@ -95,18 +97,18 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               </div>
               <h2 className="mb-2 text-2xl font-semibold text-white">{PRODUCT_OFFER.freePlanName}</h2>
               <p className="mb-6 text-sm text-[#9aa59f]">
-                Bring a shortlist and make a focused decision with a useful monthly allowance.
+                Generate one curated shortlist per day or bring up to 50 names into the free decision workspace.
               </p>
               <div className="mb-6 flex items-baseline gap-2">
                 <span className="text-5xl font-bold text-white">{PRODUCT_OFFER.tiers[0].price}</span>
                 <span className="text-[#777]">{PRODUCT_OFFER.tiers[0].billingLabel}</span>
               </div>
               <Link
-                href="/bulk-domain-check"
+                href="/generate"
                 className="mb-8 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg border border-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white/5"
               >
                 <Sparkles className="h-4 w-4" />
-                {PRODUCT_OFFER.freeCtaLabel}
+                Start a Name Sprint
               </Link>
               <ul className="space-y-3">
                 {PRODUCT_OFFER.freeFeatures.map((feature) => (
@@ -143,7 +145,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
                 {PRODUCT_OFFER.proCtaLabel}
               </TrackedCheckoutLink>
               <p className="-mt-5 mb-7 text-center text-xs leading-relaxed text-[#8f887c]">
-                Already signed in? You will continue securely to Stripe. Otherwise, sign in or create an account first, then checkout resumes automatically.
+                Card required. First-time customers get 7 days free, then £7.99/month unless cancelled before renewal. Already signed in? You will continue securely to Stripe.
               </p>
               <ul className="space-y-3">
                 {PUBLIC_PRODUCT_COPY.proPlanFeatures.map((feature) => (
@@ -163,14 +165,14 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               <div>
                 <h2 className="text-xl font-semibold text-white">How do the free allowances work?</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#999]">
-                  Free includes {PRODUCT_OFFER.freeMonthlyUses} Bulk Check runs and {PRODUCT_OFFER.freeFounderSignalBatches} Founder Signal run each month. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It adds saved projects, CSV exports, and shareable decision reports. {PUBLIC_PRODUCT_COPY.renewalNote}
+                  Signed-in Free users receive {PRODUCT_OFFER.freeNameSprintDailyRuns} Name Sprint per UTC day, {PRODUCT_OFFER.freeMonthlyUses} Bulk Check runs, and {PRODUCT_OFFER.freeFounderSignalBatches} Founder Signal run each month. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It adds paid Brand Launch Kits, saved projects, CSV exports, and shareable decision reports. {PUBLIC_PRODUCT_COPY.renewalNote}
                 </p>
               </div>
               <Link
-                href="/bulk-domain-check"
+                href="/generate"
                 className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#D4A843]/25 px-4 text-sm font-semibold text-[#D4A843] transition hover:bg-[#D4A843]/10"
               >
-                {PRODUCT_OFFER.freeCtaLabel}
+                Start a Name Sprint
                 <ExternalLink className="h-4 w-4" />
               </Link>
             </div>

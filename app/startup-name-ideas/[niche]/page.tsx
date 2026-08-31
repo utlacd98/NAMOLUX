@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { getAllNicheSlugs, getNicheBySlug, pseoNiches } from "@/lib/pseo-niches"
+import { getAllNicheSlugs, getIndexablePseoNiches, getNicheBySlug, isIndexablePseoNicheSlug, pseoNiches } from "@/lib/pseo-niches"
 import {
   FOUNDER_SIGNAL_BANDS,
   getFounderSignalBand,
@@ -13,6 +13,7 @@ import { Sparkles, ExternalLink, Star, ChevronRight, ArrowRight } from "lucide-r
 import { CTA_LABELS } from "@/lib/site-content"
 import { AdBanner } from "@/components/ad-banner"
 import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
+import { buildGeneratorHref } from "@/lib/generator-attribution"
 
 interface NichePageProps {
   params: Promise<{ niche: string }>
@@ -43,6 +44,9 @@ export async function generateMetadata({ params }: NichePageProps): Promise<Meta
       description: data.metaDescription,
     },
     alternates: { canonical: `/startup-name-ideas/${data.slug}` },
+    robots: isIndexablePseoNicheSlug(data.slug)
+      ? { index: true, follow: true }
+      : { index: false, follow: true, noarchive: true },
   }
 }
 
@@ -76,9 +80,14 @@ export default async function NichePage({ params }: NichePageProps) {
   const data = getNicheBySlug(niche)
   if (!data) notFound()
 
-  const relatedNiches = pseoNiches.filter((n) => n.slug !== niche).slice(0, 6)
+  const indexableRelatedNiches = getIndexablePseoNiches().filter((n) => n.slug !== niche)
+  const relatedNiches = [
+    ...indexableRelatedNiches,
+    ...pseoNiches.filter((n) => n.slug !== niche && !isIndexablePseoNicheSlug(n.slug)),
+  ].slice(0, 6)
   const availableExtensions = data.availableExtensions.join(", ")
   const defaultBrief = `I am building ${data.industryArticle} ${data.industryName} business. I want a professional, memorable name that feels credible in this market, is easy to pronounce, and has a strong domain.`
+  const generatorHref = buildGeneratorHref({ brief: defaultBrief, source: "niche", contentSlug: data.slug })
   const shortlistHref = "/bulk-domain-check"
 
   // JSON-LD structured data
@@ -162,11 +171,11 @@ export default async function NichePage({ params }: NichePageProps) {
                 {data.intro}
               </p>
               <Link
-                href={shortlistHref}
+                href={generatorHref}
                 className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-6 py-3 rounded-lg transition"
               >
                 <Sparkles className="h-4 w-4" />
-                {CTA_LABELS.primary}
+                Generate {data.industryName} names
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -241,7 +250,7 @@ export default async function NichePage({ params }: NichePageProps) {
                               <Star className="h-3 w-3" />
                               {item.score} · {getFounderSignalBand(item.score)}
                             </div>
-                            <p className="text-[#444] text-xs mt-1">Founder Signal™ v{data.scoreVersion}</p>
+                            <p className="text-[#444] text-xs mt-1">Founder Signal™ v{data.scoreVersion} · registry {data.collisionRegistryVersion}</p>
                           </div>
                         </div>
                       </div>

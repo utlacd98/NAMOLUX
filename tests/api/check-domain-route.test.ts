@@ -105,6 +105,20 @@ afterEach(() => {
 })
 
 describe("/api/check-domain", () => {
+  it.each(["NamoLux", "namo lux", "namo-lux", "namolux.com"])("rejects reserved input %s before provider or allowance work", async (name) => {
+    const response = await POST(makeRequest({ domains: [name], tlds: ["com"] }))
+    const json = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(json).toEqual({
+      error: "system_reserved_name",
+      message: "NamoLux is a reserved platform name and can't be analysed as a candidate.",
+    })
+    expect(mockCheckAvailabilityBatch).not.toHaveBeenCalled()
+    expect(mockCheckRateLimit).not.toHaveBeenCalled()
+    expect(mockLogGeneration).not.toHaveBeenCalled()
+  })
+
   it("keeps availability but omits Founder Signal fields for free users", async () => {
     mockCheckRateLimit.mockResolvedValue(rateLimitState(false) as any)
 

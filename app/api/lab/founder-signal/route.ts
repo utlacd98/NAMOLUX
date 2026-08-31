@@ -5,6 +5,7 @@ import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { LAB_TLDS, LAB_TONES, type LabCandidate } from "@/lib/lab-name-generator"
 import { scoreName } from "@/lib/founderSignal/scoreName"
 import { checkBurstLimit, getEntitlementState } from "@/lib/rate-limit"
+import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
 
 export const runtime = "nodejs"
 
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
   if (!burst.allowed) return NextResponse.json({ error: "Please wait a moment before scoring again." }, { status: burst.unavailable ? 503 : 429 })
   const body = await request.json().catch(() => null) as { candidates?: LabCandidate[]; workflowToken?: string; tld?: string; tone?: string } | null
   const candidates = Array.isArray(body?.candidates) ? body.candidates.slice(0, 12) : []
+  if (hasSystemReservedName(candidates.map((candidate) => candidate?.name))) {
+    return NextResponse.json(systemReservedNameError(), { status: 400 })
+  }
   const names = candidates.map((candidate) => String(candidate?.name || "").toLowerCase().replace(/[^a-z]/g, ""))
   const tld = typeof body?.tld === "string" && (LAB_TLDS as readonly string[]).includes(body.tld) ? body.tld : null
   const tone = typeof body?.tone === "string" && (LAB_TONES as readonly string[]).includes(body.tone) ? body.tone : ""

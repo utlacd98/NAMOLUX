@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  getIndexablePseoNiches,
   getNicheBySlug,
   pseoNiches,
   validatePseoContentIntegrity,
@@ -7,6 +8,12 @@ import {
 } from "./pseo-niches"
 
 describe("pSEO niche content integrity", () => {
+  it("indexes only the five industry pages already supported by Search Console evidence", () => {
+    expect(getIndexablePseoNiches().map((niche) => niche.slug)).toEqual([
+      "ai", "fintech", "crypto", "saas", "travel",
+    ])
+  })
+
   it("publishes post-gate counts and canonical Founder Signal scores", () => {
     expect(validatePseoContentIntegrity()).toEqual([])
 
@@ -15,8 +22,9 @@ describe("pSEO niche content integrity", () => {
       expect(niche.displayedNameCount).toBe(niche.names.length)
       expect(niche.industryName).toBe(niche.niche)
       expect(niche.industryArticle).toMatch(/^(a|an)$/)
-      expect(niche.scoreVersion).toBe("1.0")
-      expect(niche.lastVerified).toBe("2026-07-10")
+      expect(niche.scoreVersion).toBe("2.0")
+      expect(niche.collisionRegistryVersion).toBe("2026.08.31.1")
+      expect(niche.lastVerified).toBe("2026-08-31")
       expect(niche.availableExtensions).toEqual([".com", ".io", ".co", ".ai", ".app", ".dev"])
       expect(niche.supportsSocialHandleCheck).toBe(false)
       expect([niche.metaTitle, niche.metaDescription, niche.h1, niche.intro].join(" ")).not.toMatch(/\b150\b/)
@@ -25,6 +33,8 @@ describe("pSEO niche content integrity", () => {
     const aiNames = getNicheBySlug("ai")?.names.map((idea) => idea.name.toLowerCase()) ?? []
     expect(getNicheBySlug("ai")?.industryArticle).toBe("an")
     expect(aiNames).not.toEqual(expect.arrayContaining(["vantiq", "axoniq", "corteva"]))
+    const marketingNames = getNicheBySlug("marketing")?.names.map((idea) => idea.name.toLowerCase()) ?? []
+    expect(marketingNames).not.toEqual(expect.arrayContaining(["anker", "nucleus"]))
   })
 
   it("reports count, version, collision, and unsupported social claims", () => {

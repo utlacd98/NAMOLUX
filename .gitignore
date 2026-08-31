@@ -10,6 +10,7 @@
 /.next-local/
 /.next-codex-build*/
 /.next-codex-dev*/
+/.next-corrupt-*/
 /out/
 /playwright-report/
 /test-results/
@@ -76,3 +77,5 @@ SECURITY_VERIFICATION.md
 BLUEPRINT.md
 
 .vercel
+
+.env*

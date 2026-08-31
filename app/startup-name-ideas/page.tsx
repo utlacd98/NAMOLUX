@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     url: "https://www.namolux.com/startup-name-ideas",
   },
   alternates: { canonical: "/startup-name-ideas" },
+  robots: { index: true, follow: true },
 }
 
 const nicheIcons: Record<string, string> = {

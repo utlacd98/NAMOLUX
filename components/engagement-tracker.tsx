@@ -17,6 +17,15 @@ function contentContext(pathname: string): AnalyticsMetadata {
   return { source: "site" }
 }
 
+function isOrganicSearchReferrer(referrer: string): boolean {
+  try {
+    const host = new URL(referrer).hostname.toLowerCase()
+    return ["google.", "bing.com", "search.yahoo.", "duckduckgo.com", "ecosia.org"].some((engine) => host.includes(engine))
+  } catch {
+    return false
+  }
+}
+
 export function EngagementTracker() {
   const pathname = usePathname()
 
@@ -25,6 +34,9 @@ export function EngagementTracker() {
 
     const metadata = contentContext(pathname)
     trackEvent({ action: "page_view", metadata, route: pathname })
+    if (isOrganicSearchReferrer(document.referrer)) {
+      trackEvent({ action: "seo_landing_view", metadata: { ...metadata, pageType: metadata.source }, route: pathname })
+    }
     const timers = ([
       { duration: 10_000, action: "engaged_10s" as const },
       { duration: 30_000, action: "engaged_30s" as const },

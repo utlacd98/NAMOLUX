@@ -11,7 +11,7 @@ const faqs = [
   {
     question: "What is Founder Signal?",
     answer:
-      "Founder Signal is our 0-100 brand scoring system. It weighs realness, memorability, brand risk, length, pronounceability, character quality, and TLD strength so founders can compare names with evidence.",
+      "Founder Signal v2 is our 0-100 comparison system. It weighs strategic fit, distinctiveness, memorability, pronunciation, spelling and character, brand collision risk, and domain strength so founders can compare eligible names with evidence.",
   },
   {
     question: "What do I get for free?",

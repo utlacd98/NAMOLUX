@@ -73,9 +73,9 @@ function priorityOverlapIssues(posts: BlogPost[]): BlogQualityIssue[] {
 }
 
 /**
- * Existing archive posts remain available while the best 50 are improved.
- * New revenue-focused articles opt into `qualityTier: "priority"` and must
- * meet this stricter publication contract.
+ * Archive drafts remain in source control while they are reviewed, but the
+ * live article route publishes only the curated public set. New priority
+ * articles must meet this stricter publication contract.
  */
 export function auditBlogPosts(posts: BlogPost[]): BlogQualityIssue[] {
   const issues = [

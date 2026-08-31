@@ -78,7 +78,9 @@ export function computeEntitlements(
     isPro: hasPaidAccess,
     adFree,
     showAds: adsEnabled && !adFree && !options.failClosedForAds,
-    canUseBrandPalette: hasPaidAccess && plan.canUseBrandPalette,
+    // A free kit includes one palette direction; Pro changes the number of
+    // directions and adds logo generation rather than gating the tool itself.
+    canUseBrandPalette: plan.canUseBrandPalette,
     unlimitedUsage: hasPaidAccess && plan.unlimitedUsage,
     subscriptionStatus: rawStatus,
     subscriptionEnd: profile?.subscription_end || null,

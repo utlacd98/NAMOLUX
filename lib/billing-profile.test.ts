@@ -22,6 +22,12 @@ describe("billingStateFromSubscription", () => {
     expect(state).toMatchObject({ plan: "pro", subscriptionStatus: "active", stripeStatus: "active" })
   })
 
+  it("grants Pro access while a Stripe trial is active", () => {
+    const state = billingStateFromSubscription(subscription("trialing", "2026-07-17T12:00:00.000Z"), now)
+    expect(state).toMatchObject({ plan: "pro", subscriptionStatus: "active", stripeStatus: "trialing" })
+    expect(state.accessExpiresAt).toBe("2026-07-17T12:00:00.000Z")
+  })
+
   it("keeps canceled subscriptions paid through a future period end", () => {
     const state = billingStateFromSubscription(subscription("canceled", "2026-07-20T12:00:00.000Z"), now)
     expect(state).toMatchObject({ plan: "pro", subscriptionStatus: "cancelled" })

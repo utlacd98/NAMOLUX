@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/client"
 import { PRODUCT_OFFER } from "@/lib/product-offer"
 import { PUBLIC_PRODUCT_COPY } from "@/lib/site-content"
+import { DailyLaunchSignalPanel } from "@/components/daily-launch-signal-panel"
 import { User } from "@supabase/supabase-js"
 import {
   Loader2,
@@ -19,6 +20,7 @@ import {
   CheckCircle,
   Search,
   FileText,
+  Palette,
   ListChecks,
   Check,
 } from "lucide-react"
@@ -119,6 +121,14 @@ function DecisionJourney({ hasSavedDecision }: { hasSavedDecision: boolean }) {
       description: "Save a shortlist, freeze an immutable report, and make a revocable view-only link.",
       href: "/bulk-domain-check/workspace#decision-record",
       done: hasSavedDecision,
+    },
+    {
+      step: 4,
+      icon: Palette,
+      label: "Brand Launch Kit",
+      description: "Turn your chosen name into palettes, a landing page, exportable code, and Pro logo concepts.",
+      href: "/brand-launch",
+      done: false,
     },
   ] as const
 
@@ -746,6 +756,26 @@ function DashboardContent() {
                 />
               </Link>
 
+              <Link
+                href="/brand-launch"
+                className="group flex items-center justify-between gap-4 rounded-2xl px-6 py-4 transition-all hover:-translate-y-0.5"
+                style={{ background: "rgba(244,215,121,0.045)", border: "1px solid rgba(244,215,121,0.18)" }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "rgba(244,215,121,0.11)", border: "1px solid rgba(244,215,121,0.16)" }}>
+                    <Palette className="h-4 w-4" style={{ color: "#F4D779" }} />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-white">Brand Launch Kit</p>
+                      <span className="rounded-full bg-[#D4AF37]/12 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]">Free + Pro</span>
+                    </div>
+                    <p className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Palettes, landing-page preview, code export, and Pro logo concepts</p>
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-white/20 transition-transform group-hover:translate-x-1" />
+              </Link>
+
               {/* ── Account & plan — stays in left col on desktop ── */}
               <div
                 className="rounded-2xl px-6 py-5"
@@ -835,6 +865,7 @@ function DashboardContent() {
               FULL-WIDTH SECTIONS (below the grid on all breakpoints)
           ═══════════════════════════════════════════════════════════════════ */}
           <div className="mt-6 space-y-6">
+            <DailyLaunchSignalPanel />
             <DecisionJourney hasSavedDecision={decisionRecords.length > 0} />
             <DecisionRecordPanel
               isPro={isPro}

@@ -16,6 +16,8 @@ export type BillingProfileUpdate = {
   stripeStatus?: string | null
   accessExpiresAt?: string | null
   cancelAtPeriodEnd?: boolean
+  trialStartedAt?: string | null
+  trialSubscriptionId?: string | null
   eventCreated?: number
 }
 
@@ -94,6 +96,8 @@ export async function updateBillingProfile(update: BillingProfileUpdate): Promis
     ...(update.stripeStatus !== undefined ? { stripe_status: update.stripeStatus } : {}),
     ...(update.accessExpiresAt !== undefined ? { access_expires_at: update.accessExpiresAt } : {}),
     ...(update.cancelAtPeriodEnd !== undefined ? { cancel_at_period_end: update.cancelAtPeriodEnd } : {}),
+    ...(update.trialStartedAt !== undefined ? { trial_started_at: update.trialStartedAt } : {}),
+    ...(update.trialSubscriptionId !== undefined ? { trial_subscription_id: update.trialSubscriptionId } : {}),
     ...(update.eventCreated !== undefined ? { last_stripe_event_created: update.eventCreated } : {}),
   }
 
@@ -152,6 +156,12 @@ export async function syncSubscriptionProfile(input: {
     stripeCustomerId: getStripeId(input.subscription.customer),
     stripeSubscriptionId: input.subscription.id,
     cancelAtPeriodEnd: input.subscription.cancel_at_period_end,
+    ...(typeof input.subscription.trial_start === "number"
+      ? {
+          trialStartedAt: new Date(input.subscription.trial_start * 1000).toISOString(),
+          trialSubscriptionId: input.subscription.id,
+        }
+      : {}),
     eventCreated: input.eventCreated,
   })
 }

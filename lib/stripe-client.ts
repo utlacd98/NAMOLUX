@@ -6,7 +6,7 @@ let stripeClient: Stripe | null = null
 export function getStripeClient(): Stripe {
   if (!stripeClient) {
     stripeClient = new Stripe(getStripeEnvironment().secretKey, {
-      apiVersion: "2026-06-24.dahlia",
+      apiVersion: "2026-08-26.dahlia",
     })
   }
 

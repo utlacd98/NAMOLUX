@@ -14,6 +14,7 @@ import {
 } from "@/lib/rate-limit"
 import { FREE_MONTHLY_BULK_CHECK_LIMIT, PRO_MONTHLY_BULK_CHECK_LIMIT, type PlanId } from "@/lib/plans"
 import { createServiceClient } from "@/lib/supabase/server"
+import { hasSystemReservedName, SYSTEM_RESERVED_NAME_CODE, SYSTEM_RESERVED_NAME_MESSAGE } from "@/lib/reserved-names"
 
 export const BULK_CHECK_TLDS = ["com", "io", "co", "ai", "app", "dev"] as const
 export type BulkCheckTld = (typeof BULK_CHECK_TLDS)[number]
@@ -127,7 +128,12 @@ type CreateJobResult = {
 
 type ClaimResult = { claimed: boolean; reason: string }
 
-export class BulkCheckInputError extends Error {}
+export class BulkCheckInputError extends Error {
+  constructor(message: string, public readonly code = "invalid_bulk_check") {
+    super(message)
+    this.name = "BulkCheckInputError"
+  }
+}
 export class BulkCheckIdempotencyConflictError extends Error {}
 export class BulkCheckQueueDeferredError extends Error {}
 
@@ -173,6 +179,9 @@ export function parseBulkCheckInput(body: unknown): BulkCheckInput {
   const rawNames = asInputNames(payload.names ?? payload.domains)
   if (!rawNames || rawNames.length < 1 || rawNames.length > BULK_CHECK_MAX_NAMES) {
     throw new BulkCheckInputError(`Provide between 1 and ${BULK_CHECK_MAX_NAMES} candidate names.`)
+  }
+  if (hasSystemReservedName(rawNames)) {
+    throw new BulkCheckInputError(SYSTEM_RESERVED_NAME_MESSAGE, SYSTEM_RESERVED_NAME_CODE)
   }
 
   const parsedNames = rawNames.map(normaliseName)

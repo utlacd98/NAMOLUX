@@ -245,6 +245,28 @@ describe("isolated feature allowances", () => {
     expect(mocks.rpc).not.toHaveBeenCalled()
   })
 
+  it("uses a UTC daily window for Free Name Sprint and a monthly window for Pro", async () => {
+    mocks.rpc.mockResolvedValue({ data: [{ allowed: true, used: 1, replayed: false }], error: null })
+    mocks.maybeSingle.mockResolvedValue({
+      data: { usage_count: 1, created_at: "2026-08-31T00:01:00.000Z" },
+      error: null,
+    })
+
+    await checkPlanFeatureQuotaIdempotent(
+      request(),
+      "name-sprint",
+      { free: 1, pro: 40 },
+      "name_sprint_01J2M9NNR3Y6J8QH4T2W7K5P0C",
+      { free: "day", pro: "month" },
+    )
+
+    const payload = mocks.rpc.mock.calls[0]?.[1]
+    const start = new Date(payload.p_window_start)
+    const reset = new Date(payload.p_reset_at)
+    expect(reset.getTime() - start.getTime()).toBe(24 * 60 * 60 * 1_000)
+    expect(payload.p_limit).toBe(1)
+  })
+
   it("fails closed without spending work when the quota database is unavailable", async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: new Error("database unavailable") })
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})

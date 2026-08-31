@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { scoreName } from "./scoreName"
+import { SYSTEM_RESERVED_NAME_MESSAGE } from "../reserved-names"
 import {
   ACTIVE_BRAND_REGISTRY,
   assessBrandCollision,
@@ -10,19 +11,20 @@ import {
   getFounderSignalBand,
 } from "./spec"
 
-describe("Founder Signal v1.0 specification", () => {
-  it("defines the canonical six dimensions and weights", () => {
-    expect(FOUNDER_SIGNAL_SPEC.version).toBe("1.0")
-    expect(FOUNDER_SIGNAL_SPEC.evaluatedOn).toBe("2026-07-10")
+describe("Founder Signal v2.0 specification", () => {
+  it("defines the canonical seven dimensions and weights", () => {
+    expect(FOUNDER_SIGNAL_SPEC.version).toBe("2.0")
+    expect(FOUNDER_SIGNAL_SPEC.evaluatedOn).toBe("2026-08-30")
     expect(FOUNDER_SIGNAL_DIMENSIONS).toEqual([
-      { key: "clarity", label: "Clarity", weight: 35 },
-      { key: "memorability", label: "Memorability", weight: 17 },
-      { key: "pronunciation", label: "Pronunciation", weight: 11 },
-      { key: "extensionStrength", label: "Extension strength", weight: 10 },
-      { key: "characterQuality", label: "Character quality", weight: 10 },
-      { key: "brandRisk", label: "Brand risk", weight: 17 },
+      { key: "strategicFit", label: "Strategic fit & meaning depth", weight: 20 },
+      { key: "distinctiveness", label: "Distinctiveness & search uniqueness", weight: 20 },
+      { key: "memorability", label: "Memorability", weight: 15 },
+      { key: "pronunciation", label: "Pronunciation", weight: 10 },
+      { key: "spellingCharacter", label: "Spelling & character quality", weight: 10 },
+      { key: "brandRisk", label: "Brand & collision risk", weight: 20 },
+      { key: "extensionStrength", label: "Domain & extension strength", weight: 5 },
     ])
-    expect(FOUNDER_SIGNAL_DIMENSIONS).toHaveLength(6)
+    expect(FOUNDER_SIGNAL_DIMENSIONS).toHaveLength(7)
     expect(FOUNDER_SIGNAL_DIMENSIONS.reduce((total, dimension) => total + dimension.weight, 0)).toBe(100)
   })
 
@@ -44,12 +46,10 @@ describe("Founder Signal v1.0 specification", () => {
     expect(getFounderSignalBand(0)).toBe("Reconsider")
   })
 
-  it("discloses Clarity as the unchanged length and realness contribution", () => {
+  it("makes strategic fit and distinctiveness first-class v2 dimensions", () => {
     const result = scoreName({ name: "Vaulten", tld: "com" })
-    const legacyClarityContribution = result.rawScores.length * 0.13 + result.rawScores.realness * 0.22
-
-    expect(result.breakdown.clarityScore).toBe(Math.round(legacyClarityContribution))
-    expect(result.rawScores.clarity).toBe(Math.round(legacyClarityContribution / 0.35))
+    expect(result.breakdown.strategicFitScore).toBe(Math.round(result.rawScores.strategicFit * 0.2))
+    expect(result.breakdown.distinctivenessScore).toBe(Math.round(result.rawScores.distinctiveness * 0.2))
   })
 
   it("allows relevant compounds but rejects shallow keyword mutations", () => {
@@ -62,18 +62,27 @@ describe("Founder Signal v1.0 specification", () => {
   })
 })
 
+describe("Founder Signal system reservation", () => {
+  it.each(["NamoLux", "namo lux", "namo-lux", "namolux.com"])("returns a zero score for %s", (name) => {
+    const result = scoreName({ name, tld: "com" })
+    expect(result.score).toBe(0)
+    expect(result.band).toBe("Reconsider")
+    expect(result.reasons).toContain(SYSTEM_RESERVED_NAME_MESSAGE)
+  })
+})
+
 describe("Founder Signal active-brand collision gate", () => {
   it("contains the audit collisions in the active-brand registry", () => {
-    expect(ACTIVE_BRAND_REGISTRY).toEqual(expect.arrayContaining(["stripe", "vantiq", "axoniq", "corteva"]))
+    expect(ACTIVE_BRAND_REGISTRY).toEqual(expect.arrayContaining(["anker", "nucleus", "stripe", "vantiq", "axoniq", "corteva"]))
   })
 
-  it.each(["Stripe", "Vantiq", "Axoniq", "Corteva"])("hard-rejects the exact active brand %s", (name) => {
+  it.each(["Anker", "Nucleus", "Stripe", "Vantiq", "Axoniq", "Corteva"])("hard-rejects the exact active brand %s", (name) => {
     const result = scoreName({ name, tld: "com" })
 
     expect(result.score).toBe(0)
     expect(result.band).toBe("Reconsider")
-    expect(result.version).toBe("1.0")
-    expect(result.evaluatedOn).toBe("2026-07-10")
+    expect(result.version).toBe("2.0")
+    expect(result.evaluatedOn).toBe("2026-08-30")
     expect(result.collision).toEqual({
       type: "exact",
       action: "disqualify",

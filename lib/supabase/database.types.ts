@@ -32,6 +32,8 @@ export type Database = {
         access_expires_at: string | null
         cancel_at_period_end: boolean
         last_stripe_event_created: number | null
+        trial_started_at: string | null
+        trial_subscription_id: string | null
         created_at: string | null
         updated_at: string | null
       }, {
@@ -50,6 +52,8 @@ export type Database = {
         access_expires_at?: string | null
         cancel_at_period_end?: boolean
         last_stripe_event_created?: number | null
+        trial_started_at?: string | null
+        trial_subscription_id?: string | null
         created_at?: string | null
         updated_at?: string | null
       }>
@@ -169,6 +173,10 @@ export type Database = {
         feedback_reason: string | null
         is_founder_feedback: boolean
         idempotency_key: string
+        name_sprint_candidate_id: string | null
+        name_sprint_run_id: string | null
+        comparison_candidate_id: string | null
+        event_metadata: Json
         created_at: string
         updated_at: string
       }, {
@@ -194,6 +202,212 @@ export type Database = {
         feedback_reason?: string | null
         is_founder_feedback?: boolean
         idempotency_key: string
+        name_sprint_candidate_id?: string | null
+        name_sprint_run_id?: string | null
+        comparison_candidate_id?: string | null
+        event_metadata?: Json
+        created_at?: string
+        updated_at?: string
+      }>
+      naming_briefs: Table<{
+        id: string
+        user_id: string
+        original_description: string
+        compiled_brief: Json
+        naming_mode: string
+        markets: string[]
+        languages: string[]
+        include_terms: string[]
+        exclude_terms: string[]
+        name_sprint_version: string
+        founder_signal_version: string
+        collision_registry_version: string
+        created_at: string
+        updated_at: string
+      }, {
+        id?: string
+        user_id: string
+        original_description: string
+        compiled_brief: Json
+        naming_mode?: string
+        markets?: string[]
+        languages?: string[]
+        include_terms?: string[]
+        exclude_terms?: string[]
+        name_sprint_version: string
+        founder_signal_version: string
+        collision_registry_version: string
+        created_at?: string
+        updated_at?: string
+      }>
+      generation_runs: Table<{
+        id: string
+        user_id: string
+        brief_id: string
+        model: string
+        prompt_version: string
+        founder_signal_version: string
+        collision_registry_version: string
+        input_tokens: number
+        output_tokens: number
+        estimated_cost_usd: number
+        latency_ms: number | null
+        retry_count: number
+        generated_count: number
+        survivor_count: number
+        status: string
+        failure_code: string | null
+        created_at: string
+        completed_at: string | null
+      }, {
+        id?: string
+        user_id: string
+        brief_id: string
+        model: string
+        prompt_version: string
+        founder_signal_version: string
+        collision_registry_version: string
+        input_tokens?: number
+        output_tokens?: number
+        estimated_cost_usd?: number
+        latency_ms?: number | null
+        retry_count?: number
+        generated_count?: number
+        survivor_count?: number
+        status?: string
+        failure_code?: string | null
+        created_at?: string
+        completed_at?: string | null
+      }>
+      candidates: Table<{
+        id: string
+        user_id: string
+        generation_run_id: string
+        display_name: string
+        normalized_name: string
+        phonetic_key: string
+        strategy: string
+        semantic_territory: string
+        roots: string[]
+        pronunciation: string
+        association: string
+        claimed_origin: string | null
+        origin_verified: boolean
+        internal_genericity_score: number
+        eligibility_status: string
+        hard_failure_codes: string[]
+        eligibility_reasons: string[]
+        provisional_dimensions: Json | null
+        final_dimensions: Json | null
+        final_founder_signal: number | null
+        evidence_confidence: string | null
+        was_displayed: boolean
+        display_position: number | null
+        created_at: string
+      }, {
+        id?: string
+        user_id: string
+        generation_run_id: string
+        display_name: string
+        normalized_name: string
+        phonetic_key: string
+        strategy: string
+        semantic_territory: string
+        roots?: string[]
+        pronunciation: string
+        association: string
+        claimed_origin?: string | null
+        origin_verified?: boolean
+        internal_genericity_score?: number
+        eligibility_status: string
+        hard_failure_codes?: string[]
+        eligibility_reasons?: string[]
+        provisional_dimensions?: Json | null
+        final_dimensions?: Json | null
+        final_founder_signal?: number | null
+        evidence_confidence?: string | null
+        was_displayed?: boolean
+        display_position?: number | null
+        created_at?: string
+      }>
+      candidate_checks: Table<{
+        id: string
+        user_id: string
+        candidate_id: string
+        check_type: string
+        source: string
+        status: string
+        result: Json
+        checked_at: string
+        expires_at: string | null
+      }, {
+        id?: string
+        user_id: string
+        candidate_id: string
+        check_type: string
+        source: string
+        status: string
+        result?: Json
+        checked_at?: string
+        expires_at?: string | null
+      }>
+      collision_registry: Table<{
+        id: string
+        normalized_name: string
+        display_name: string
+        alternative_spellings: string[]
+        phonetic_forms: string[]
+        entity_type: string
+        industries: string[]
+        geographies: string[]
+        fame_level: string
+        active_status: boolean
+        verification_source: string
+        registry_version: string
+        last_checked: string
+        created_at: string
+        updated_at: string
+      }, {
+        id?: string
+        normalized_name: string
+        display_name: string
+        alternative_spellings?: string[]
+        phonetic_forms?: string[]
+        entity_type: string
+        industries?: string[]
+        geographies?: string[]
+        fame_level: string
+        active_status?: boolean
+        verification_source: string
+        registry_version: string
+        last_checked: string
+        created_at?: string
+        updated_at?: string
+      }>
+      benchmark_cases: Table<{
+        id: string
+        case_key: string
+        category: string
+        brief: Json
+        known_good_examples: Json
+        known_bad_examples: Json
+        active_brand_traps: string[]
+        expected_failure_codes: string[]
+        source: string
+        active: boolean
+        created_at: string
+        updated_at: string
+      }, {
+        id?: string
+        case_key: string
+        category: string
+        brief: Json
+        known_good_examples?: Json
+        known_bad_examples?: Json
+        active_brand_traps?: string[]
+        expected_failure_codes?: string[]
+        source?: string
+        active?: boolean
         created_at?: string
         updated_at?: string
       }>
@@ -215,6 +429,39 @@ export type Database = {
         business_description?: string | null
         category?: string | null
         locale?: string | null
+        created_at?: string
+        updated_at?: string
+      }>
+      brand_launch_kits: Table<{
+        id: string
+        user_id: string
+        shortlist_entry_id: string | null
+        domain_name: string
+        brand_name: string
+        business_description: string
+        mvp_description: string
+        audience: string | null
+        visual_style: string | null
+        palette_variants: Json
+        selected_palette_index: number | null
+        logo_concepts: Json
+        selected_logo_id: string | null
+        created_at: string
+        updated_at: string
+      }, {
+        id?: string
+        user_id: string
+        shortlist_entry_id?: string | null
+        domain_name: string
+        brand_name: string
+        business_description: string
+        mvp_description: string
+        audience?: string | null
+        visual_style?: string | null
+        palette_variants?: Json
+        selected_palette_index?: number | null
+        logo_concepts?: Json
+        selected_logo_id?: string | null
         created_at?: string
         updated_at?: string
       }>

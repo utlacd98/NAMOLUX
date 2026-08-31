@@ -6,6 +6,7 @@ import { createServiceClient } from "@/lib/supabase/server"
 import { getStripeClient } from "@/lib/stripe-client"
 import { isAllowedNamoLuxSubscription } from "@/lib/stripe-plans"
 import { claimStripeEvent, completeStripeEvent, failStripeEvent } from "@/lib/stripe-events"
+import { trackMetric } from "@/lib/metrics"
 
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature")
@@ -56,6 +57,11 @@ async function processStripeEvent(event: Stripe.Event): Promise<void> {
     event.type === "customer.subscription.deleted"
   ) {
     await handleSubscription(event.data.object as Stripe.Subscription, event.created)
+    return
+  }
+
+  if (event.type === "invoice.paid") {
+    await handlePaidInvoice(event.data.object as Stripe.Invoice)
   }
 }
 
@@ -82,6 +88,22 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session, eventCre
     subscription,
     eventCreated,
   })
+  if (subscription.status === "trialing") {
+    await trackMetric({ action: "trial_started", metadata: { source: "stripe", mode: "subscription" } })
+  }
+}
+
+async function handlePaidInvoice(invoice: Stripe.Invoice): Promise<void> {
+  if (
+    invoice.amount_paid <= 0
+    || invoice.parent?.type !== "subscription_details"
+    || !invoice.parent.subscription_details
+  ) return
+  const subscriptionId = getStripeId(invoice.parent.subscription_details.subscription)
+  if (!subscriptionId) return
+  const subscription = await getStripeClient().subscriptions.retrieve(subscriptionId)
+  if (!isAllowedNamoLuxSubscription(subscription) || subscription.status !== "active") return
+  await trackMetric({ action: "purchase_completed", metadata: { source: "stripe", mode: "subscription" } })
 }
 
 async function handleSubscription(subscription: Stripe.Subscription, eventCreated: number): Promise<void> {

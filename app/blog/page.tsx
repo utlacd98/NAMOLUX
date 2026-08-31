@@ -4,8 +4,8 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { BlogFilter } from "@/components/blog"
 import { getAllCategories, getPublicPosts, type BlogCategory, type BlogPost } from "@/lib/blog"
-import { ArrowLeft, ArrowRight, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowLeft, ArrowRight, ArrowUpRight, Search } from "lucide-react"
+import styles from "@/components/blog/journal.module.css"
 
 export const metadata: Metadata = {
   title: "Journal | Naming Strategy & Domain Due Diligence | NamoLux",
@@ -116,76 +116,64 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className={styles.journalPage}>
       <Navbar />
-      <main id="main-content" className="flex-1">
-        <section className="border-b border-border/30 px-4 pb-12 pt-28 sm:pb-16 sm:pt-32">
-          <div className="mx-auto max-w-4xl text-center">
-            <h1 className="mb-4 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              The NamoLux Journal
+      <main id="main-content">
+        <section className={styles.hero}>
+          <div className={styles.heroInner}>
+            <h1 className={styles.heroTitle}>
+              The NamoLux <span>Journal</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Naming strategy, Founder Signal, domain due diligence, and brand launch guidance for founders making a decision they can defend.
-            </p>
-            <form action="/blog" className="mx-auto mt-8 flex max-w-xl gap-2">
+            <div className={styles.heroSupport}>
+              <p>
+                Naming strategy, Founder Signal, domain due diligence, and brand launch guidance for founders making a decision they can defend.
+              </p>
+              <Link href="/editorial-standards">Editorial standards and corrections</Link>
+            </div>
+            <form action="/blog" className={styles.searchForm}>
               <label htmlFor="journal-search" className="sr-only">Search the Journal</label>
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="journal-search" name="q" defaultValue={query} placeholder="Search naming and domain guidance" className="min-h-12 w-full rounded-lg border border-border bg-background pl-11 pr-4 text-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/10" />
+              <div className={styles.searchField}>
+                <Search className={styles.searchIcon} aria-hidden="true" />
+                <input id="journal-search" name="q" defaultValue={query} placeholder="Search naming and domain guidance" className={styles.searchInput} />
               </div>
-              <button className="min-h-12 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground">Search</button>
+              <button className={styles.searchButton}>Search</button>
             </form>
           </div>
         </section>
 
-        <section aria-labelledby="topic-hubs" className="border-b border-border/20 px-4 py-10">
-          <div className="mx-auto max-w-5xl">
-            <h2 id="topic-hubs" className="mb-6 font-display text-2xl font-semibold">Browse by topic</h2>
-            <div className="grid border border-border/60 sm:grid-cols-2 lg:grid-cols-4">
+        <section aria-labelledby="topic-hubs" className={styles.topicsSection}>
+          <div className={styles.sectionInner}>
+            <div className={styles.sectionHeading}>
+              <div>
+                <span className={styles.sectionIndex}>01 / Explore</span>
+                <h2 id="topic-hubs">Browse by topic</h2>
+              </div>
+              <p>Move from generating possibilities to choosing a name with evidence and clear trade-offs.</p>
+            </div>
+            <nav className={styles.topicGrid} aria-label="Journal topics">
               {topicHubs.map((topic) => (
-                <Link key={topic.id} href={`/blog?topic=${topic.id}`} className="min-h-44 border-b border-border/60 p-5 transition hover:bg-muted/40 sm:border-r lg:border-b-0">
-                  <h3 className="font-semibold text-foreground">{topic.label}</h3>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{topic.description}</p>
+                <Link
+                  key={topic.id}
+                  href={`/blog?topic=${topic.id}`}
+                  className={`${styles.topicLink} ${activeTopic === topic.id ? styles.topicLinkActive : ""}`}
+                  aria-current={activeTopic === topic.id ? "page" : undefined}
+                >
+                  <div>
+                    <h3>{topic.label}</h3>
+                    <p>{topic.description}</p>
+                  </div>
+                  <ArrowUpRight size={18} aria-hidden="true" />
                 </Link>
               ))}
-            </div>
+            </nav>
             {(activeTopic || activeCategory || query) && (
-              <div className="mt-5 flex items-center justify-between gap-4 text-sm text-muted-foreground">
+              <div className={styles.filterStatus}>
                 <span>{filteredPosts.length} article{filteredPosts.length === 1 ? "" : "s"} found</span>
-                <Link href="/blog" className="text-primary underline underline-offset-4">Clear filters</Link>
+                <Link href="/blog">Clear filters</Link>
               </div>
             )}
           </div>
         </section>
-
-        {!activeTopic && !activeCategory && !query && page === 1 ? (
-          <section aria-labelledby="essential-guides" className="border-b border-border/20 px-4 py-10">
-            <div className="mx-auto max-w-5xl">
-              <div className="mb-6 max-w-2xl">
-                <h2 id="essential-guides" className="font-display text-2xl font-semibold">
-                  Essential naming and domain guides
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Start with the decisions that most often delay a launch: legal naming layers, domain fit, search clarity and what to do when the business changes direction.
-                </p>
-              </div>
-              <div className="grid border border-border/60 md:grid-cols-2">
-                {essentialGuides.map((guide) => (
-                  <Link
-                    key={guide.href}
-                    href={guide.href}
-                    className="group border-b border-border/60 p-5 transition last:border-b-0 hover:bg-muted/40 md:odd:border-r"
-                  >
-                    <h3 className="font-semibold text-foreground transition group-hover:text-primary">
-                      {guide.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{guide.description}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
 
         <BlogFilter
           posts={posts}
@@ -197,22 +185,48 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         />
 
         {totalPages > 1 && (
-          <nav aria-label="Journal pagination" className="mx-auto flex max-w-4xl items-center justify-between px-4 pb-16">
-            {page > 1 ? <Link rel="prev" href={pageHref(page - 1)} className="inline-flex min-h-11 items-center gap-2 text-sm text-primary"><ArrowLeft className="h-4 w-4" /> Newer articles</Link> : <span />}
-            <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
-            {page < totalPages ? <Link rel="next" href={pageHref(page + 1)} className="inline-flex min-h-11 items-center gap-2 text-sm text-primary">Older articles <ArrowRight className="h-4 w-4" /></Link> : <span />}
+          <nav aria-label="Journal pagination" className={styles.pagination}>
+            {page > 1 ? <Link rel="prev" href={pageHref(page - 1)} className={styles.paginationLink}><ArrowLeft /> Newer articles</Link> : <span />}
+            <span className={styles.paginationStatus}>Page {page} of {totalPages}</span>
+            {page < totalPages ? <Link rel="next" href={pageHref(page + 1)} className={styles.paginationLink}>Older articles <ArrowRight /></Link> : <span />}
           </nav>
         )}
 
-        <section className="border-t border-border/30 px-4 py-16">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="mb-3 text-2xl font-bold text-foreground">Ready to put the thinking to work?</h2>
-            <p className="mb-6 text-muted-foreground">
-              Bring your candidate names, check six domain extensions, and compare the strongest options in one view.
-            </p>
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/bulk-domain-check">Check a shortlist <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
+        {!activeTopic && !activeCategory && !query && page === 1 ? (
+          <section aria-labelledby="essential-guides" className={styles.guidesSection}>
+            <div className={styles.sectionInner}>
+              <div className={styles.guidesIntro}>
+                <span className={styles.paperLabel}>04 / Start here</span>
+                <h2 id="essential-guides">Essential guides</h2>
+                <p>
+                  Practical starting points for the naming and domain decisions that most often delay a launch.
+                </p>
+              </div>
+              <div className={styles.guideList}>
+                {essentialGuides.map((guide, index) => (
+                  <Link key={guide.href} href={guide.href} className={styles.guideLink}>
+                    <span className={styles.guideNumber}>{String(index + 1).padStart(2, "0")}</span>
+                    <div>
+                      <h3>{guide.title}</h3>
+                      <p>{guide.description}</p>
+                    </div>
+                    <ArrowRight size={17} aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        <section className={styles.ctaSection}>
+          <div className={styles.ctaInner}>
+            <div>
+              <h2>Put the thinking to work.</h2>
+              <p>
+                Bring your candidate names, check six domain extensions, and compare the strongest options in one view.
+              </p>
+            </div>
+            <Link href="/bulk-domain-check" className={styles.ctaButton}>Check a shortlist <ArrowRight size={17} aria-hidden="true" /></Link>
           </div>
         </section>
       </main>

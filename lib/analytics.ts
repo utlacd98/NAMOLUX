@@ -1,5 +1,8 @@
 "use client"
 
+import type { AnalyticsEvent } from "@/lib/analytics-events"
+export type { AnalyticsEvent } from "@/lib/analytics-events"
+
 // Lightweight analytics for NamoLux
 // Tracks anonymous sessions and events for business insights
 
@@ -72,51 +75,6 @@ export function getCurrentRoute(): string {
   return window.location.pathname
 }
 
-export type AnalyticsEvent = 
-  | "name_generation" 
-  | "bulk_check" 
-  | "seo_audit" 
-  | "affiliate_click"
-  | "page_view"
-  | "blog_view"
-  | "generate_started"
-  | "quick_generate_started"
-  | "quick_generate_results"
-  | "results_seen"
-  | "upgrade_clicked"
-  | "upgrade_offer_seen"
-  | "checkout_started"
-  | "checkout_success"
-  | "rate_limit_seen"
-  | "partner_cta_seen"
-  | "shortlist_created"
-  | "launch_kit_started"
-  | "domain_register_clicked"
-  | "brand_export_clicked"
-  | "engaged_10s"
-  | "engaged_30s"
-  | "scroll_50"
-  | "scroll_90"
-  | "content_cta_seen"
-  | "content_cta_clicked"
-  | "brief_submitted"
-  | "pricing_viewed"
-  | "checkout_intent"
-  | "decision_action"
-  | "names_visible"
-  | "save"
-  | "dislike"
-  | "more_like_this"
-  | "advanced_started"
-  | "founder_signal_clicked"
-  | "founder_signal_scored"
-  | "batch_scored"
-  | "decision_saved"
-  | "decision_report_created"
-  | "report_share_created"
-  | "score_sort_used"
-  | "pricing_clicked"
-
 export type AnalyticsMetadata = Partial<{
   source: string
   contentSlug: string
@@ -125,10 +83,16 @@ export type AnalyticsMetadata = Partial<{
   device: "desktop" | "mobile" | "tablet"
   experiment: string
   decisionAction: "shortlist" | "compare" | "register" | "pricing" | "brand_kit"
+  pageType: string
+  industry: string
+  generatorMode: string
+  sourceCta: string
+  mode: string
 }>
 
 const CLIENT_METADATA_KEYS = new Set<keyof AnalyticsMetadata>([
   "source", "contentSlug", "topic", "ctaId", "device", "experiment", "decisionAction",
+  "pageType", "industry", "generatorMode", "sourceCta", "mode",
 ])
 
 export function sanitizeAnalyticsMetadata(metadata: Record<string, unknown> | undefined): AnalyticsMetadata | undefined {

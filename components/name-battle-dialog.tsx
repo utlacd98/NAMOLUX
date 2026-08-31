@@ -7,11 +7,12 @@ import { FOUNDER_SIGNAL_DIMENSIONS, getFounderSignalBand, type FounderSignalDime
 import { getTrendAge } from "@/lib/nameCreativity"
 
 const RAW_SCORE_KEY: Record<FounderSignalDimensionKey, string> = {
-  clarity: "clarity",
+  strategicFit: "strategicFit",
+  distinctiveness: "distinctiveness",
   memorability: "memorability",
   pronunciation: "pronounceability",
   extensionStrength: "extension",
-  characterQuality: "characterQuality",
+  spellingCharacter: "spellingCharacter",
   brandRisk: "brandRisk",
 }
 

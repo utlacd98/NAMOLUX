@@ -1,9 +1,15 @@
-import { scoreName, type ScoreNameResult } from "./founderSignal/scoreName"
 import {
-  FOUNDER_SIGNAL_EVALUATED_ON,
-  FOUNDER_SIGNAL_VERSION,
   type FounderSignalBand,
 } from "./founderSignal/spec"
+import { COLLISION_REGISTRY_EVALUATED_ON, COLLISION_REGISTRY_VERSION, normalizeName } from "./name-sprint/collision-registry"
+import { evaluateEligibility } from "./name-sprint/eligibility"
+import { scoreFounderSignalV2 } from "./name-sprint/founder-signal-v2"
+import {
+  FOUNDER_SIGNAL_V2_VERSION,
+  type FounderSignalV2Result,
+  type NameConstitution,
+  type RawNameCandidate,
+} from "./name-sprint/types"
 import { DOMAIN_EXTENSIONS, PRODUCT_CAPABILITIES } from "./site-content"
 
 export interface NameIdea {
@@ -31,8 +37,9 @@ export interface NicheData {
   industryArticle: "a" | "an"
   publishedNameCount: number
   displayedNameCount: number
-  scoreVersion: typeof FOUNDER_SIGNAL_VERSION
-  lastVerified: typeof FOUNDER_SIGNAL_EVALUATED_ON
+  scoreVersion: typeof FOUNDER_SIGNAL_V2_VERSION
+  collisionRegistryVersion: typeof COLLISION_REGISTRY_VERSION
+  lastVerified: typeof COLLISION_REGISTRY_EVALUATED_ON
   availableExtensions: typeof DOMAIN_EXTENSIONS
   supportsSocialHandleCheck: false
   metaTitle: string
@@ -53,6 +60,7 @@ type NicheSeed = Omit<
   | "publishedNameCount"
   | "displayedNameCount"
   | "scoreVersion"
+  | "collisionRegistryVersion"
   | "lastVerified"
   | "availableExtensions"
   | "supportsSocialHandleCheck"
@@ -1046,8 +1054,58 @@ function domainExtension(domain: string): string {
   return domain.toLowerCase().match(/\.([a-z]{2,})$/)?.[1] ?? "com"
 }
 
-function evaluateName(idea: Pick<NameIdea, "name" | "domain">): ScoreNameResult {
-  return scoreName({ name: idea.name, tld: domainExtension(idea.domain) })
+function publishedConstitution(data: Pick<NicheSeed, "niche" | "intro">): NameConstitution {
+  return {
+    description: data.intro,
+    category: data.niche,
+    audience: ["founders building in this market"],
+    problem: "The founder needs a credible, distinctive name that can support long-term growth.",
+    promise: ["clear positioning", "memorable differentiation", "future expansion"],
+    personality: ["credible", "clear", "distinctive"],
+    geographicMarkets: ["United Kingdom", "Global"],
+    languages: ["English"],
+    futureExpansion: ["adjacent products and markets"],
+    competitors: [],
+    likedNames: [],
+    namingMode: "distinctive_startup",
+    preferredLength: { min: 5, max: 12 },
+    include: [],
+    avoid: [],
+    preferredTlds: ["com", "co"],
+  }
+}
+
+function publishedCandidate(idea: Pick<NameIdea, "name" | "meaning">): RawNameCandidate {
+  const normalizedName = normalizeName(idea.name)
+  return {
+    id: `published-${normalizedName}`,
+    name: idea.name,
+    normalizedName,
+    strategy: "arbitrary_real_word",
+    territoryId: "editorial",
+    roots: [normalizedName],
+    association: idea.meaning,
+    pronunciation: idea.name.toLowerCase(),
+    claimedOrigin: null,
+    originVerified: true,
+  }
+}
+
+function evaluateName(
+  idea: Pick<NameIdea, "name" | "domain" | "meaning">,
+  data: Pick<NicheSeed, "niche" | "intro">,
+): FounderSignalV2Result {
+  const constitution = publishedConstitution(data)
+  const candidate = publishedCandidate(idea)
+  const eligibility = evaluateEligibility(candidate, { constitution })
+  return scoreFounderSignalV2({
+    candidate,
+    constitution,
+    eligibility,
+    preferredTld: domainExtension(idea.domain),
+    domainStatus: "unknown",
+    registryFresh: true,
+  })
 }
 
 function normaliseCountClaim(value: string, publishedNameCount: number): string {
@@ -1056,8 +1114,8 @@ function normaliseCountClaim(value: string, publishedNameCount: number): string 
 
 function buildNicheData(seed: NicheSeed): NicheData {
   const names = seed.names.flatMap((idea) => {
-    const result = evaluateName(idea)
-    if (result.collision.type !== "none") return []
+    const result = evaluateName(idea, seed)
+    if (result.eligibility.status === "reject") return []
 
     return [{ ...idea, score: result.score, band: result.band }]
   })
@@ -1069,8 +1127,9 @@ function buildNicheData(seed: NicheSeed): NicheData {
     industryArticle: /^[aeiou]/i.test(seed.niche) ? "an" : "a",
     publishedNameCount,
     displayedNameCount: names.length,
-    scoreVersion: FOUNDER_SIGNAL_VERSION,
-    lastVerified: FOUNDER_SIGNAL_EVALUATED_ON,
+    scoreVersion: FOUNDER_SIGNAL_V2_VERSION,
+    collisionRegistryVersion: COLLISION_REGISTRY_VERSION,
+    lastVerified: COLLISION_REGISTRY_EVALUATED_ON,
     availableExtensions: DOMAIN_EXTENSIONS,
     supportsSocialHandleCheck: PRODUCT_CAPABILITIES.supportsSocialHandleCheck,
     metaTitle: normaliseCountClaim(seed.metaTitle, publishedNameCount),
@@ -1082,6 +1141,27 @@ function buildNicheData(seed: NicheSeed): NicheData {
 }
 
 export const pseoNiches: NicheData[] = pseoNicheSeeds.map(buildNicheData)
+
+// Search Console has already demonstrated demand for these five industry pages.
+// Keep this list intentionally small: every other niche remains useful and
+// crawlable for people, but is noindex until it earns an editorial/indexing review.
+export const INDEXABLE_PSEO_NICHE_SLUGS = [
+  "ai",
+  "crypto",
+  "fintech",
+  "saas",
+  "travel",
+] as const
+
+const indexablePseoNicheSlugs = new Set<string>(INDEXABLE_PSEO_NICHE_SLUGS)
+
+export function isIndexablePseoNicheSlug(slug: string): boolean {
+  return indexablePseoNicheSlugs.has(slug)
+}
+
+export function getIndexablePseoNiches(): NicheData[] {
+  return pseoNiches.filter((niche) => isIndexablePseoNicheSlug(niche.slug))
+}
 
 export type PseoIntegrityIssueCode =
   | "count"
@@ -1148,24 +1228,25 @@ export function validatePseoContentIntegrity(
     }
 
     if (
-      data.scoreVersion !== FOUNDER_SIGNAL_VERSION ||
-      data.lastVerified !== FOUNDER_SIGNAL_EVALUATED_ON
+      data.scoreVersion !== FOUNDER_SIGNAL_V2_VERSION ||
+      data.collisionRegistryVersion !== COLLISION_REGISTRY_VERSION ||
+      data.lastVerified !== COLLISION_REGISTRY_EVALUATED_ON
     ) {
       issues.push({
         code: "score-version",
         slug: data.slug,
-        message: `Expected Founder Signal v${FOUNDER_SIGNAL_VERSION}, evaluated ${FOUNDER_SIGNAL_EVALUATED_ON}.`,
+        message: `Expected Founder Signal v${FOUNDER_SIGNAL_V2_VERSION}, registry ${COLLISION_REGISTRY_VERSION}, evaluated ${COLLISION_REGISTRY_EVALUATED_ON}.`,
       })
     }
 
     for (const idea of data.names) {
-      const result = evaluateName(idea)
-      if (result.collision.type !== "none") {
+      const result = evaluateName(idea, data)
+      if (result.eligibility.status === "reject") {
         issues.push({
           code: "collision",
           slug: data.slug,
           name: idea.name,
-          message: `${idea.name} is a ${result.collision.type} match for ${result.collision.matchedBrand}.`,
+          message: `${idea.name} failed publication eligibility: ${result.eligibility.failureCodes.join(", ")}.`,
         })
       }
       if (idea.score !== result.score || idea.band !== result.band) {
@@ -1173,7 +1254,7 @@ export function validatePseoContentIntegrity(
           code: "score",
           slug: data.slug,
           name: idea.name,
-          message: `${idea.name} does not match Founder Signal v${FOUNDER_SIGNAL_VERSION}.`,
+          message: `${idea.name} does not match Founder Signal v${FOUNDER_SIGNAL_V2_VERSION}.`,
         })
       }
     }

@@ -11,6 +11,7 @@ import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
 export const metadata: Metadata = {
   title: "7 Startup Naming Mistakes Founders Regret | NamoLux",
   description: "Avoid the naming mistakes that cost startups credibility, memorability, and growth potential.",
+  robots: { index: false, follow: true, noarchive: true },
 }
 
 const mistakes = [

@@ -10,6 +10,15 @@ export const FEEDBACK_TYPES = [
   "copy",
   "domain_check",
   "selected",
+  "reject",
+  "compare",
+  "less_literal",
+  "more_distinctive",
+  "shorter",
+  "more_premium",
+  "avoid_root",
+  "export",
+  "launch_kit",
 ] as const
 
 export type NameFeedbackType = (typeof FEEDBACK_TYPES)[number]
@@ -17,11 +26,20 @@ export type NameFeedbackType = (typeof FEEDBACK_TYPES)[number]
 export const DISLIKE_REASONS = [
   "too_generic",
   "hard_to_pronounce",
+  "hard_to_spell",
   "does_not_fit_business",
   "feels_ai_generated",
+  "feels_copied",
   "too_long",
+  "wrong_industry",
   "wrong_tone",
+  "meaning_is_weak",
+  "too_similar_to_result",
   "similar_to_another_brand",
+  "sounds_cheap",
+  "too_artificial",
+  "dislike_root",
+  "existing_company_or_brand",
   "domain_problem",
   "other",
   "skip",
@@ -49,6 +67,7 @@ export interface NameFeedbackPayload {
   feedbackType: NameFeedbackType
   feedbackReason?: DislikeReason | null
   isFounderFeedback?: boolean
+  eventMetadata?: Json | null
 }
 
 export interface NameFeedbackRecord {
@@ -73,6 +92,10 @@ export interface NameFeedbackRecord {
   feedback_reason?: DislikeReason | null
   is_founder_feedback: boolean
   idempotency_key: string
+  name_sprint_candidate_id?: string | null
+  name_sprint_run_id?: string | null
+  comparison_candidate_id?: string | null
+  event_metadata?: Json
 }
 
 export interface FeedbackPreferenceSummary {
@@ -115,6 +138,13 @@ function cleanNumber(value: unknown): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null
   const integer = Math.floor(value)
   return integer >= 0 && integer <= 1000 ? integer : null
+}
+
+function cleanUuid(value: unknown): string | null {
+  const cleaned = cleanText(value, 80)
+  return cleaned && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleaned)
+    ? cleaned
+    : null
 }
 
 export function normaliseFeedbackPayload(value: unknown, userId?: string | null): NameFeedbackRecord {
@@ -164,6 +194,10 @@ export function normaliseFeedbackPayload(value: unknown, userId?: string | null)
     feedback_reason: feedbackReason as DislikeReason | null,
     is_founder_feedback: input.isFounderFeedback === true,
     idempotency_key: idempotencyKey,
+    name_sprint_candidate_id: cleanUuid(input.nameSprintCandidateId),
+    name_sprint_run_id: cleanUuid(input.nameSprintRunId || input.generationId),
+    comparison_candidate_id: cleanUuid(input.comparisonCandidateId),
+    event_metadata: cleanJsonObject(input.eventMetadata) || {},
   }
 }
 

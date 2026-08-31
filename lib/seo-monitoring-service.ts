@@ -647,7 +647,7 @@ type SeoAuditClaim = {
   audit: SeoAuditRow
 }
 
-async function runPersistedSeoAudit(
+export async function runPersistedSeoAudit(
   site: SeoSiteRow,
   auditType: AuditKind,
   idempotencyKey: string,
@@ -681,10 +681,12 @@ async function runPersistedSeoAudit(
   try {
     const apiKey = process.env.PAGESPEED_INSIGHTS_API_KEY
     const performanceProvider = apiKey ? createGooglePageSpeedProvider(apiKey) : null
+    const launchSite = site as SeoSiteRow & { crawl_page_limit?: number }
     const result = await runSeoAudit({
       url: site.normalized_url,
       auditType,
       performanceProvider,
+      limits: { maxPages: Math.max(1, Math.min(8, launchSite.crawl_page_limit || 3)) },
     })
 
     const previousRow = await findPreviousAudit(site.id, audit.id)
@@ -695,7 +697,7 @@ async function runPersistedSeoAudit(
     const reportResult = reportSafeAuditResult(result, previousResult)
     let reportPayload: Json | null = null
 
-    if (auditType === "daily") {
+    if (auditType === "daily" || auditType === "initial") {
       const report = generateDailySeoReport({ siteUrl: site.normalized_url, current: reportResult, previous: previousResult })
       reportPayload = asJson(buildGeneratedReportPayload({
         auditId: audit.id,
@@ -769,6 +771,42 @@ async function runPersistedSeoAudit(
       p_site_lease_token: siteLeaseToken || null,
     })
     if (completionError) throw completionError
+
+    const currentIssues = [...result.issues]
+      .sort((a, b) => {
+        const weight = { critical: 4, high: 3, medium: 2, low: 1 } as const
+        return (weight[b.severity] || 0) - (weight[a.severity] || 0)
+      })
+      .slice(0, 3)
+    const scoreDelta = previousResult ? result.scores.overall - previousResult.scores.overall : null
+    const changeState = result.partialFailures.length > 0
+      ? "partial"
+      : !previousResult
+        ? "baseline"
+        : Math.abs(scoreDelta || 0) >= 5 || currentIssues.some((issue) => issue.severity === "critical")
+          ? "material_change"
+          : "stable"
+    const { error: assessmentError } = await (service as any).from("seo_agent_assessments").upsert({
+      user_id: site.user_id,
+      site_id: site.id,
+      audit_id: audit.id,
+      change_state: changeState,
+      priorities: currentIssues.map((issue) => ({
+        title: issue.title,
+        severity: issue.severity,
+        action: issue.recommendation,
+        affectedUrl: issue.affectedUrl,
+      })),
+      evidence: currentIssues.map((issue) => ({
+        checkKey: issue.checkKey,
+        affectedUrl: issue.affectedUrl,
+        evidence: issue.evidence,
+      })),
+      model_used: false,
+      model_name: null,
+      model_version: "daily-launch-signal-rules-v1",
+    }, { onConflict: "audit_id" })
+    if (assessmentError) console.error("[daily-launch-signal] assessment_save_failed", { auditId: audit.id, code: assessmentError.code })
     return result
   } catch (error) {
     const completedAt = new Date().toISOString()
@@ -797,6 +835,9 @@ async function runPersistedSeoAudit(
 }
 
 export async function runManualSeoAudit(principal: SeoMonitoringPrincipal, siteId: string) {
+  if (!principal.entitlements.isPro) {
+    throw new SeoMonitoringError("upgrade_required", "Manual SEO rechecks are available on Pro; Free receives one scheduled report per UTC day.", 403)
+  }
   const service = createServiceClient()
   const site = await getOwnedSite(principal.userId, siteId)
   const { data: recent, error: recentError } = await service
@@ -993,7 +1034,19 @@ export async function runSeoCronBatch(kind: CronKind) {
 
         processed += 1
         const entitlement = await getUserEntitlements(site.user_id)
-        if (!entitlement.isPro) {
+        const claimedLaunchSite = claimed as SeoSiteRow & { access_tier?: "free" | "pro"; crawl_page_limit?: number }
+        if ((claimedLaunchSite as any).verification_status !== "verified") {
+          await service.from("seo_sites").update({
+            status: "paused",
+            monitoring_enabled: false,
+            pause_reason: "verification_required",
+            lease_token: null,
+            lease_expires_at: null,
+            updated_at: new Date().toISOString(),
+          } as any).eq("id", site.id).eq("lease_token", leaseToken)
+          return
+        }
+        if (!entitlement.isPro && claimedLaunchSite.access_tier === "pro") {
           await service.from("seo_sites").update({
             status: "paused",
             pause_reason: "subscription_inactive",
@@ -1004,7 +1057,13 @@ export async function runSeoCronBatch(kind: CronKind) {
           return
         }
 
-        await runPersistedSeoAudit(claimed, kind, `${kind}:${site.id}:${key}`, key, leaseToken)
+        if (!entitlement.isPro && claimedLaunchSite.access_tier === "free") {
+          await service.from("seo_sites").update({ crawl_page_limit: 3, updated_at: new Date().toISOString() } as any)
+            .eq("id", site.id).eq("lease_token", leaseToken)
+          claimedLaunchSite.crawl_page_limit = 3
+        }
+
+        await runPersistedSeoAudit(claimedLaunchSite, kind, `${kind}:${site.id}:${key}`, key, leaseToken)
         succeeded += 1
       } catch (error) {
         failed += 1

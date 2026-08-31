@@ -9,6 +9,7 @@ import { ArrowRight, Check, X } from "lucide-react"
 export const metadata: Metadata = {
   title: "Domain Extension vs Brand Strength: What Actually Matters | NamoLux",
   description: "When does .com matter? When is .io fine? Learn when your domain extension helps or hurts trust — and why brand strength beats exact match every time.",
+  robots: { index: false, follow: true, noarchive: true },
 }
 
 const extensionRules = [

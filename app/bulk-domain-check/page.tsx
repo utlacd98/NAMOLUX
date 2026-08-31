@@ -127,8 +127,8 @@ export default function BulkDomainCheckPage() {
           <div className="border border-white/10 bg-white/[0.025] p-6">
             <h3 className="text-lg font-semibold">Where Founder Signal fits</h3>
             <p className="mt-3 leading-7 text-white/55">
-              Choose a primary TLD, then use Founder Signal to compare clarity, memorability, pronunciation,
-              extension strength, character quality, and brand risk on the same basis. Free includes one scored
+              Choose a primary TLD, then use Founder Signal v2 to compare strategic fit, distinctiveness,
+              memorability, pronunciation, spelling, collision risk, and domain strength on the same basis. Free includes one scored
               batch each month; Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It is decision support, not legal or trademark advice.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

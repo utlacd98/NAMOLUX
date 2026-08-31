@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       }, { status: 503 })
     }
     if (error instanceof BulkCheckInputError) {
-      return NextResponse.json({ error: "invalid_bulk_check", message: error.message }, { status: 400 })
+      return NextResponse.json({ error: error.code, message: error.message }, { status: 400 })
     }
     if (error instanceof BulkCheckIdempotencyConflictError) {
       return NextResponse.json({ error: "idempotency_conflict", message: error.message }, { status: 409 })

@@ -736,6 +736,15 @@ export function GenerateNames({
   }
 
   useEffect(() => {
+    void trackEvent({
+      action: "generator_opened",
+      metadata: { ...journeyMetadata, generatorMode: initialMode },
+    })
+    // Attribution describes the landing journey and is intentionally captured once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     return () => {
       generationAbortRef.current?.abort()
       scoringAbortRef.current?.abort()
@@ -1589,6 +1598,7 @@ export function GenerateNames({
       action: "bulk_check",
       metadata: { source: "generate_page", count: domains.length },
     })
+    trackEvent({ action: "generator_started", metadata: { source: "generate_page", generatorMode: "bulk" } })
 
     try {
       const response = await fetch("/api/check-domain", {
@@ -1611,6 +1621,7 @@ export function GenerateNames({
       setIsProUser(Boolean(data.isPro))
       const availabilityResults = Array.isArray(data.results) ? data.results as DomainResult[] : []
       setResults(availabilityResults)
+      trackEvent({ action: "domain_checked", metadata: { source: "generate_page", generatorMode: "bulk" } })
       if (bulkFounderSignalRequested) await scoreBulkResults(availabilityResults)
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300)
     } catch (error: any) {
@@ -1643,6 +1654,7 @@ export function GenerateNames({
       action: "names_visible",
       metadata: { source: "generator", experiment: "generator_redesign_v2" },
     })
+    trackEvent({ action: "generation_completed", metadata: { ...journeyMetadata, generatorMode: "redesign" } })
     window.setTimeout(() => {
       if (activeGenerationRef.current === requestId && !scoringInFlightRef.current) {
         setGenerationPhase("checking_domains")
@@ -1664,6 +1676,7 @@ export function GenerateNames({
     explorationResultsRef.current = merged
     setExplorationResults(merged)
     syncLegacyExplorationResults(merged)
+    trackEvent({ action: "domain_checked", metadata: { ...journeyMetadata, generatorMode: "redesign" } })
     if (failedTlds.length > 0) {
       setAvailabilityError(`Names are ready. Checks for ${failedTlds.map((tld) => `.${tld}`).join(", ")} could not finish; verify those favourites with the registrar.`)
     }
@@ -1694,6 +1707,7 @@ export function GenerateNames({
       action: "brief_submitted",
       metadata: { ...journeyMetadata, mode: "quick", ctaId: "generator-primary", experiment: "generator_redesign_v2" },
     })
+    trackEvent({ action: "generator_started", metadata: { ...journeyMetadata, generatorMode: "quick" } })
     trackEvent({
       action: "quick_generate_started",
       metadata: { source: "generator", experiment: "generator_redesign_v2" },
@@ -2580,6 +2594,7 @@ export function GenerateNames({
       action: "save",
       metadata: { source: "generator", ctaId: "candidate-save", experiment: "generator_redesign_v2" },
     })
+    trackEvent({ action: "result_saved", metadata: { ...journeyMetadata, sourceCta: "candidate-save" } })
   }
 
   const handleExplorationLike = (candidate: GeneratedName) => {
@@ -2792,6 +2807,7 @@ export function GenerateNames({
         action: "batch_scored",
         metadata: { source: "generator", experiment: "generator_redesign_v2" },
       })
+      trackEvent({ action: "founder_signal_viewed", metadata: { ...journeyMetadata, generatorMode: "advanced" } })
     } catch (failure: unknown) {
       if (failure instanceof DOMException && failure.name === "AbortError") return
       if (activeGenerationRef.current !== requestId) return
@@ -3047,11 +3063,11 @@ export function GenerateNames({
   const topResultGroup = topPickName
     ? groupedResults.find((group) => group.name === topPickName)
     : groupedResults[0]
-  const brandKitHref = topResultGroup
-    ? `/dashboard?palette=${encodeURIComponent(topResultGroup.name)}&vibe=${encodeURIComponent(isQuickMode ? quickVibe : selectedVibe || "modern")}`
-    : "/dashboard"
   const topRegisterDomain =
     topResultGroup?.tlds.find((result) => result.available)?.fullDomain || topResultGroup?.best.fullDomain || null
+  const brandKitHref = topResultGroup
+    ? `/brand-launch?domain=${encodeURIComponent(topRegisterDomain || `${topResultGroup.name}.com`)}&vibe=${encodeURIComponent(isQuickMode ? quickVibe : selectedVibe || "modern")}`
+    : "/brand-launch"
   const topFounderScore = topResultGroup ? resultScore(topResultGroup.best) : 0
   const topFounderBand = topFounderScore > 0 ? getFounderSignalBand(topFounderScore) : null
   const orderedExplorationResults = useMemo(
@@ -4914,12 +4930,12 @@ export function GenerateNames({
                         ) : null}
                         {generatorToolsEnabled ? (
                           <Link
-                            href={isProUser ? brandKitHref : "/pricing?from=generate-results&feature=brand-palette#plans"}
+                            href={brandKitHref}
                             onClick={() => handleLaunchKitStarted("generate_results_action_row", topResultGroup?.name)}
                             className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/10 px-3 py-2 text-sm font-semibold text-[#F6E27A] transition-all hover:-translate-y-0.5 hover:bg-[#D4AF37]/15"
                           >
                             <Palette className="h-4 w-4" />
-                            {isProUser ? "Brand palette" : "Unlock palette"}
+                            Brand Launch Kit
                           </Link>
                         ) : null}
                         {topRegisterDomain ? (

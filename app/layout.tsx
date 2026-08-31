@@ -18,10 +18,10 @@ const fraunces = Fraunces({
 })
 
 const defaultDescription =
-  "Check up to 50 candidate names across six domain extensions and add Founder Signal scoring when you are ready to choose."
+  "Generate, reject and rank business names, verify launch-ready domains, compare finalists with Founder Signal, and build the winning brand with NamoLux."
 
 export const metadata: Metadata = {
-  title: "Bulk Domain Checker & Founder Signal | NamoLux",
+  title: "NamoLux | Business Name Generator & Domain Checker",
   description: defaultDescription,
   keywords: [
     "bulk domain checker",
@@ -33,6 +33,13 @@ export const metadata: Metadata = {
     ".com domain search",
     "name shortlist scoring",
     "startup name evaluation",
+    "business name generator",
+    "AI business name generator",
+    "startup name generator",
+    "brand name generator",
+    "brand launch kit",
+    "logo concept generator",
+    "Name Sprint",
     "namolux",
   ],
   authors: [{ name: "NamoLux", url: "https://www.namolux.com" }],
@@ -40,7 +47,7 @@ export const metadata: Metadata = {
   publisher: "NamoLux",
   metadataBase: new URL("https://www.namolux.com"),
   openGraph: {
-    title: "Bulk Domain Checker & Founder Signal | NamoLux",
+    title: "NamoLux | Business Name Generator & Domain Checker",
     description: defaultDescription,
     url: "https://www.namolux.com/",
     siteName: "NamoLux",
@@ -51,13 +58,13 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux bulk domain checker and Founder Signal workspace",
+        alt: "NamoLux business name generator, domain checker and Brand Launch Kit",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bulk Domain Checker & Founder Signal | NamoLux",
+    title: "NamoLux | Business Name Generator & Domain Checker",
     description: defaultDescription,
     images: ["/opengraph-image"],
     site: "@namolux",

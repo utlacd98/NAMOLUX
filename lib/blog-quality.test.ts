@@ -31,7 +31,7 @@ describe("blog editorial quality", () => {
   it("keeps the public Journal intentionally curated while archive pages are reviewed", () => {
     const publicPosts = getPublicPosts()
 
-    expect(publicPosts).toHaveLength(19)
+    expect(publicPosts).toHaveLength(24)
     expect(publicPosts.every(isPublicBlogPost)).toBe(true)
     expect(publicPosts.map((post) => post.slug)).toEqual(expect.arrayContaining([
       "why-i-built-namolux",
@@ -39,6 +39,11 @@ describe("blog editorial quality", () => {
       "bust-a-name-vs-namolux",
       "namify-vs-namolux",
       "best-domain-extensions-2026",
+      "wordoid-vs-namolux",
+      "panabee-vs-namolux",
+      "dot-com-vs-dot-ai-for-startups",
+      "domain-hacks-guide",
+      "namolux-vs-chatgpt-domain-name-generator",
     ]))
     expect(getAllPosts().filter(isMonetizableBlogPost)).toHaveLength(10)
   })

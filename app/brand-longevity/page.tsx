@@ -9,6 +9,7 @@ import { ArrowRight } from "lucide-react"
 export const metadata: Metadata = {
   title: "Will Your Startup Name Age Well? | NamoLux",
   description: "Learn about name decay and how to choose a startup name that stays relevant as your company grows.",
+  robots: { index: false, follow: true, noarchive: true },
 }
 
 const decayCauses = [

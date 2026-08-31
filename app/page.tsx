@@ -2,13 +2,24 @@ import type { Metadata } from "next"
 import { PremiumHome } from "@/components/landing/premium-home"
 
 const siteUrl = "https://www.namolux.com"
-const homeTitle = "Bulk Domain Checker & Founder Signal | NamoLux"
+const homeTitle = "NamoLux | Business Name Generator & Domain Checker"
 const homeDescription =
-  "NamoLux helps founders check up to 50 candidate names across six domain extensions, verify their brand footprint, and use Founder Signal to compare finalists."
+  "NamoLux generates, rejects and ranks business names, checks launch-ready domains, compares finalists with Founder Signal, and turns winning names into brand launch kits."
 
 export const metadata: Metadata = {
   title: homeTitle,
   description: homeDescription,
+  keywords: [
+    "NamoLux",
+    "business name generator",
+    "AI business name generator",
+    "startup name generator",
+    "brand name generator",
+    "bulk domain checker",
+    "domain availability checker",
+    "Founder Signal",
+    "brand launch kit",
+  ],
   alternates: {
     canonical: "/",
   },
@@ -23,7 +34,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "NamoLux bulk domain checker and Founder Signal workspace",
+        alt: "NamoLux business name generator, domain checker and Brand Launch Kit",
       },
     ],
   },
@@ -52,7 +63,7 @@ export default function Home() {
         "@id": `${siteUrl}/#organization`,
         name: "NamoLux",
         description:
-          "A shortlist decision platform powered by Founder Signal. Check six domain extensions, open social-profile, company and official UK, US and EU trade-mark verification links, then compare the strongest options with clear reasoning.",
+          "A selective name intelligence and brand launch platform. Generate and reject candidates with Name Sprint, check domain evidence, compare finalists with Founder Signal, and create a paid Brand Launch Kit for the winner.",
         url: `${siteUrl}/`,
         logo: {
           "@type": "ImageObject",
@@ -63,9 +74,7 @@ export default function Home() {
         sameAs: [
           "https://www.facebook.com/profile.php?id=61587014966281",
           "https://www.instagram.com/namoluxapp/",
-          "https://www.linkedin.com/in/andrew-barrett-587a21390/",
           "https://x.com/NamoLux",
-          "https://ko-fi.com/C0C61SP3NU",
         ],
       },
       {
@@ -74,17 +83,39 @@ export default function Home() {
         url: `${siteUrl}/`,
         name: homeTitle,
         description:
-          "Paste a name shortlist. Get live availability across six TLDs, brand-footprint verification links, optional Founder Signal scoring, and a clear next step for every candidate.",
+          "Generate curated business names or bring a shortlist. Check domain evidence, compare finalists with Founder Signal, verify the brand footprint, and take the winning name into a Brand Launch Kit.",
         isPartOf: { "@id": `${siteUrl}/#website` },
         about: { "@id": `${siteUrl}/#organization` },
         inLanguage: "en-GB",
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${siteUrl}/#software`,
+        name: "NamoLux",
+        url: `${siteUrl}/`,
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        description: homeDescription,
+        featureList: [
+          "Curated AI business name generation with a hard rejection layer",
+          "Verified .com, .co or .ai availability for displayed Name Sprint results",
+          "Bulk domain checks for up to 50 candidate names across six extensions",
+          "Founder Signal v2 name scoring and shortlist comparison",
+          "Official UK IPO, USPTO and EUIPO verification links",
+          "Paid Brand Launch Kits with palettes, landing-page previews and logo concepts",
+        ],
+        offers: [
+          { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "Signed-in free plan with one curated Name Sprint per UTC day" },
+          { "@type": "Offer", price: "7.99", priceCurrency: "GBP", description: "NamoLux Pro monthly plan with a seven-day trial for eligible first-time customers" },
+        ],
+        publisher: { "@id": `${siteUrl}/#organization` },
       },
     ],
   }
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <PremiumHome />
     </>
   )

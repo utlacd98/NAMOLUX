@@ -6,18 +6,18 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Why NamoLux Exists | Built for Founders Who Ship",
-  description: "Why NamoLux gives solo founders a focused workspace to check, compare, and choose a name with evidence.",
+  title: "Why NamoLux Exists | A Name Generator With a Quality Bar",
+  description: "Why NamoLux generates broadly, rejects weak names, verifies launch domains, and helps founders choose and launch a serious finalist.",
 }
 
 const annoyances = [
   {
     problem: "Forced account creation",
-    take: "You should be able to start a Bulk Check before you commit. Accounts are for saving a decision and returning to it, not for creating friction at the first click.",
+    take: "Bulk Check remains easy to start. Name Sprint requires sign-in because its daily allowance, saved feedback, and cross-run quality controls belong to a real founder workspace.",
   },
   {
     problem: "Hidden availability",
-    take: "Other tools show you names, then make you click each one to check availability. We check everything upfront.",
+    take: "Other tools mix taken domains into the suggestion grid. Name Sprint only displays candidates with a verified .com, .co or .ai option.",
   },
   {
     problem: "Affiliate-first results",
@@ -25,7 +25,7 @@ const annoyances = [
   },
   {
     problem: "Overwhelming options",
-    take: "A shortlist spread across dozens of tabs is hard to compare. We put up to 50 names into one consistent view.",
+    take: "A long AI list is not a decision. NamoLux rejects weak candidates first, then puts the survivors into one consistent evidence view.",
   },
   {
     problem: "No signal, just noise",
@@ -35,8 +35,8 @@ const annoyances = [
 
 const beliefs = [
   "Founders don't need more options. They need better filters.",
-  "A name should be available, pronounceable, and memorable. In that order.",
-  "Tools should work instantly. Loading spinners are a failure.",
+  "A displayed Name Sprint candidate should have an available launch domain, be pronounceable, and earn its place.",
+  "A slower curated result is better than an instant page of names to delete.",
   "Saving a serious decision should be optional, clear, and worth the account.",
   "Simplicity isn't laziness. It's respect for your time.",
 ]
@@ -76,7 +76,7 @@ export default function WhyNamoluxPage() {
               You're naming a company, not learning a new tool. The interface should disappear. Paste, check, decide.
             </p>
             <p className="mb-4 text-muted-foreground">
-              Every feature we did not add is intentional. We keep the workspace focused on the evidence a solo founder needs to choose a name, rather than expanding into a general brand suite.
+              The product stays focused on one continuous decision: generate or import the candidates, reject the weak options, compare the survivors, and build the selected identity without restarting elsewhere.
             </p>
             <p className="text-muted-foreground">
               You may return to a serious shortlist more than once. The workspace should preserve the evidence without turning a simple decision into a bloated suite.
@@ -88,7 +88,7 @@ export default function WhyNamoluxPage() {
               Why an account is optional at the start
             </h2>
             <p className="mb-4 text-muted-foreground">
-              You can start a Bulk Check without an account. Sign in only when you want to save a project, export the evidence, share a report, or use the higher Pro allowance.
+              You can start a Bulk Check without an account. Name Sprint requires sign-in so the daily allowance, rejection history, and refinement feedback can be applied consistently.
             </p>
             <p className="text-muted-foreground">
               The value is in a clearer decision, not in trapping you in another workflow.
@@ -116,9 +116,9 @@ export default function WhyNamoluxPage() {
           </section>
 
           <div className="text-center">
-            <Link href="/bulk-domain-check">
+            <Link href="/generate">
               <Button size="lg" className="gap-2">
-                Check your shortlist
+                Start a Name Sprint
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>

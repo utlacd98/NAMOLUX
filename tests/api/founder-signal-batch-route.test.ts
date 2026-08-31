@@ -87,6 +87,23 @@ describe("POST /api/founder-signal/batch", () => {
     { id: createGeneratedNameId("riskname", 2), name: "riskname" },
   ]
 
+  it("rejects the reserved platform name before token, entitlement, or quota work", async () => {
+    const response = await POST(request({
+      workflowToken: "token",
+      candidates: [{ id: "name_reserved", name: "NamoLux.com" }],
+    }))
+    const payload = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(payload).toEqual({
+      error: "system_reserved_name",
+      message: "NamoLux is a reserved platform name and can't be analysed as a candidate.",
+    })
+    expect(mocks.verifyToken).not.toHaveBeenCalled()
+    expect(mocks.getEntitlementState).not.toHaveBeenCalled()
+    expect(mocks.checkFeatureQuotaIdempotent).not.toHaveBeenCalled()
+  })
+
   it("is unavailable until the server rollout flag is enabled", async () => {
     delete process.env.GENERATOR_REDESIGN_V2
     const response = await POST(request({ workflowToken: "token", candidates }))

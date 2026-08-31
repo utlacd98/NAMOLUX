@@ -10,7 +10,12 @@ export const premiumFaqs = [
   {
     question: "What is NamoLux?",
     answer:
-      "NamoLux is a shortlist decision toolkit for founders. It checks candidate names across six domain extensions and can evaluate each option with Founder Signal so you can choose with confidence.",
+      "NamoLux is a selective name intelligence and brand launch workspace for founders. Name Sprint generates a broad working set privately, rejects weak or unusable options, and ranks the survivors with Founder Signal. You can also bring up to 50 names into Bulk Check and turn a winning name into a Brand Launch Kit.",
+  },
+  {
+    question: "How does Name Sprint choose which names to show?",
+    answer:
+      "Name Sprint applies a quality gate for strategic fit, distinctiveness, pronunciation, spelling, generic patterns and known collision signals. It then checks .com, .co and .ai and only displays candidates with at least one verified available launch domain. Fewer names are shown when fewer names pass.",
   },
   {
     question: "Can I bring my own shortlist?",
@@ -33,7 +38,7 @@ export const premiumFaqs = [
   },
   {
     question: "What is included in the free and paid plans?",
-    answer: `The free plan includes ${PRODUCT_OFFER.freeUsageLabel}. ${PRODUCT_OFFER.paidPlanName} is ${PRODUCT_OFFER.paidPriceLabel} and includes ${PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved decisions, CSV exports, shareable reports, and an ad-free workspace. ${PUBLIC_PRODUCT_COPY.renewalNote} ${PRODUCT_OFFER.cancellationLabel}`,
+    answer: `Signed-in Free users receive ${PRODUCT_OFFER.freeQuickUsageLabel.toLowerCase()}, plus ${PRODUCT_OFFER.freeUsageLabel.toLowerCase()}. ${PRODUCT_OFFER.paidPlanName} is ${PRODUCT_OFFER.paidPriceLabel} and includes ${PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved decisions, CSV exports, shareable reports, an ad-free workspace, and the paid-only Brand Launch Kit with three palette directions and logo concepts. ${PUBLIC_PRODUCT_COPY.renewalNote} ${PRODUCT_OFFER.cancellationLabel}`,
   },
   {
     question: "Is Founder Signal legal or trademark advice?",

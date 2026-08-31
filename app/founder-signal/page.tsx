@@ -25,7 +25,7 @@ import styles from "./page.module.css"
 export const metadata: Metadata = {
   title: "Founder Signal methodology | NamoLux",
   description:
-    "See how Founder Signal compares a naming shortlist against a chosen primary domain extension using clarity, memorability, pronunciation, extension strength, character quality, and brand risk.",
+    "See how Founder Signal v2 compares strategic fit, distinctiveness, memorability, pronunciation, spelling, collision risk, and domain strength.",
   alternates: { canonical: "/founder-signal" },
 }
 

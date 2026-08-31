@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { applyAuthNoStoreHeaders } from "@/lib/supabase/middleware"
 import { getAppUrl } from "@/lib/env"
 import { sanitizeRedirectPath } from "@/lib/safe-redirect"
+import { trackMetric } from "@/lib/metrics"
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -44,6 +45,13 @@ export async function GET(request: Request) {
     if (!error) {
       try {
         const user = sessionData?.user
+        if (!isPasswordRecovery && next.startsWith("/api/stripe/checkout")) {
+          await trackMetric({
+            action: "checkout_auth_completed",
+            metadata: { source: "email-confirmation", mode: "email" },
+            route: "/auth/callback",
+          })
+        }
         if (!isPasswordRecovery && user?.email) {
           const createdAt = new Date(user.created_at).getTime()
           const isNewAccount = Date.now() - createdAt < 5 * 60 * 1000
@@ -60,6 +68,7 @@ export async function GET(request: Request) {
               },
               { onConflict: "email", ignoreDuplicates: true }
             )
+            await trackMetric({ action: "signup_completed", metadata: { source: "email-confirmation" } })
           }
         }
       } catch (logErr) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { activateSeoMonitoring, SeoMonitoringError } from "@/lib/seo-monitoring-service"
 import { getSeoMonitoringPrincipal, monitoringAccessError } from "@/lib/seo-monitoring-access"
+import { isDailyLaunchSignalEnabled } from "@/lib/agent-release-flags"
 
 export const maxDuration = 300
 
@@ -21,6 +22,12 @@ export async function POST(request: NextRequest) {
     const principal = await getSeoMonitoringPrincipal()
     const accessError = monitoringAccessError(principal)
     if (accessError) return NextResponse.json(accessError.body, { status: accessError.status })
+    if (isDailyLaunchSignalEnabled()) {
+      return NextResponse.json({ error: "verified_winner_required", message: "Connect SEO monitoring from Daily Launch Signal using a saved winning domain." }, { status: 409 })
+    }
+    if (!principal!.entitlements.isPro) {
+      return NextResponse.json({ error: "upgrade_required", message: "Legacy SEO monitoring setup is unavailable on Free." }, { status: 403 })
+    }
 
     const parsed = activationSchema.safeParse(await request.json())
     if (!parsed.success) {

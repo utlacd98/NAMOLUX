@@ -8153,6 +8153,12 @@ const PROVEN_EVERGREEN_BLOG_SLUGS = new Set([
   "godaddy-domain-generator-vs-namolux",
   "seo-friendly-startup-name",
   "best-domain-extensions-2026",
+  // Search Console winners restored after the 2026-08-25 editorial cleanup.
+  "wordoid-vs-namolux",
+  "panabee-vs-namolux",
+  "dot-com-vs-dot-ai-for-startups",
+  "domain-hacks-guide",
+  "namolux-vs-chatgpt-domain-name-generator",
 ])
 
 export function isPublicBlogPost(post: BlogPost): boolean {

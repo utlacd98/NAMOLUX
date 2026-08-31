@@ -27,6 +27,14 @@ export function buildContentSecurityPolicy(production = isProduction) {
 const nextConfig = {
   ...(cdnUrl ? { assetPrefix: cdnUrl } : {}),
   ...(localDistDir ? { distDir: localDistDir } : {}),
+  // Proxy bundles do not receive arbitrary runtime environment keys. These
+  // non-secret lab controls are intentionally compiled into the deployment so
+  // the public build stays fail-closed while a dedicated lab build can opt in.
+  env: {
+    NAMOLUX_ENABLE_GENERATOR_LAB: process.env.NAMOLUX_ENABLE_GENERATOR_LAB || "false",
+    NAMOLUX_GENERATOR_LAB_HOST: process.env.NAMOLUX_GENERATOR_LAB_HOST || "lab.namolux.com",
+    NAMOLUX_GENERATOR_LAB_V3: process.env.NAMOLUX_GENERATOR_LAB_V3 || "false",
+  },
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
@@ -46,11 +54,6 @@ const nextConfig = {
       ["hidden-problem-ai-name-generators-namelix", "best-namelix-alternatives-2026"],
       ["namelix-gave-me-100-names-none-usable", "best-namelix-alternatives-2026"],
       ["stop-using-namelix-smarter-way-business-names", "best-namelix-alternatives-2026"],
-      // Name generator cluster → startup-name-ideas canonical
-      ["business-name-generator-guide", "startup-name-ideas"],
-      ["brand-name-generator", "startup-name-ideas"],
-      ["ai-business-name-generator-startup-guide", "startup-name-ideas"],
-      ["company-name-ideas-generator", "startup-name-ideas"],
       // .com availability cluster → domain-name-availability-checker-com-guide canonical
       ["domain-name-availability-strategy", "domain-name-availability-checker-com-guide"],
       ["free-domain-name-search", "domain-name-availability-checker-com-guide"],
@@ -101,6 +104,19 @@ const nextConfig = {
         destination: "https://www.namolux.com/:path*",
         permanent: true,
       },
+      // Retired generator articles consolidate directly into the commercial
+      // collection page (not /blog/startup-name-ideas and not a redirect chain).
+      ...[
+        "startup-name-ideas",
+        "business-name-generator-guide",
+        "brand-name-generator",
+        "ai-business-name-generator-startup-guide",
+        "company-name-ideas-generator",
+      ].map((slug) => ({
+        source: `/blog/${slug}`,
+        destination: "/startup-name-ideas",
+        permanent: true,
+      })),
       ...blogConsolidation.map(([from, to]) => ({
         source: `/blog/${from}`,
         destination: `/blog/${to}`,

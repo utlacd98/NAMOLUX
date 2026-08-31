@@ -13,11 +13,14 @@ const mockUpdateSession = vi.mocked(updateSession)
 const originalVercelEnv = process.env.VERCEL_ENV
 const originalLabEnabled = process.env.NAMOLUX_ENABLE_GENERATOR_LAB
 const originalLabHost = process.env.NAMOLUX_GENERATOR_LAB_HOST
+const originalNameSprintEnabled = process.env.NAMOLUX_NAME_SPRINT_ENABLED
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockUpdateSession.mockResolvedValue({ claims: null, supabaseResponse: NextResponse.next() } as never)
   delete process.env.NAMOLUX_ENABLE_GENERATOR_LAB
   delete process.env.NAMOLUX_GENERATOR_LAB_HOST
+  delete process.env.NAMOLUX_NAME_SPRINT_ENABLED
 })
 
 afterEach(() => {
@@ -27,9 +30,35 @@ afterEach(() => {
   else process.env.NAMOLUX_ENABLE_GENERATOR_LAB = originalLabEnabled
   if (originalLabHost === undefined) delete process.env.NAMOLUX_GENERATOR_LAB_HOST
   else process.env.NAMOLUX_GENERATOR_LAB_HOST = originalLabHost
+  if (originalNameSprintEnabled === undefined) delete process.env.NAMOLUX_NAME_SPRINT_ENABLED
+  else process.env.NAMOLUX_NAME_SPRINT_ENABLED = originalNameSprintEnabled
 })
 
 describe("production generator lab routing", () => {
+  it("preserves a signed-in checkout destination when an auth page is revisited", async () => {
+    mockUpdateSession.mockResolvedValue({
+      claims: { sub: "user-1" },
+      supabaseResponse: NextResponse.next(),
+    } as never)
+    const checkout = encodeURIComponent("/api/stripe/checkout?source=pricing")
+
+    const response = await proxy(new NextRequest(`https://www.namolux.com/sign-in?redirect=${checkout}`))
+
+    expect(response.status).toBe(307)
+    expect(response.headers.get("location")).toBe("https://www.namolux.com/api/stripe/checkout?source=pricing")
+  })
+
+  it("does not allow a signed-in auth redirect loop", async () => {
+    mockUpdateSession.mockResolvedValue({
+      claims: { sub: "user-1" },
+      supabaseResponse: NextResponse.next(),
+    } as never)
+
+    const response = await proxy(new NextRequest("https://www.namolux.com/sign-in?redirect=/sign-up"))
+
+    expect(response.headers.get("location")).toBe("https://www.namolux.com/dashboard")
+  })
+
   it("returns a non-cacheable 404 for placeholder article slugs before auth work", async () => {
     process.env.VERCEL_ENV = "production"
     const response = await proxy(new NextRequest("https://www.namolux.com/blog/null"))
@@ -91,6 +120,26 @@ describe("production generator lab routing", () => {
     expect(response.status).toBe(200)
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow")
     expect(mockUpdateSession).toHaveBeenCalledOnce()
+  })
+
+  it("opens the production Name Sprint only behind the public switch and sign-in", async () => {
+    process.env.VERCEL_ENV = "production"
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+
+    const anonymous = await proxy(new NextRequest("https://www.namolux.com/generate"))
+    expect(anonymous.status).toBe(307)
+    expect(anonymous.headers.get("location")).toBe("https://www.namolux.com/sign-in?redirect=%2Fgenerate")
+
+    mockUpdateSession.mockResolvedValue({ claims: { sub: "user-1" }, supabaseResponse: NextResponse.next() } as never)
+    const signedIn = await proxy(new NextRequest("https://www.namolux.com/generate"))
+    expect(signedIn.status).toBe(200)
+  })
+
+  it("keeps preview-gen closed when the public Name Sprint switch is enabled", async () => {
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+    const response = await proxy(new NextRequest("https://www.namolux.com/preview-gen"))
+    expect(response.status).toBe(308)
+    expect(response.headers.get("location")).toBe("https://www.namolux.com/bulk-domain-check")
   })
 
   it.each([
