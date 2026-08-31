@@ -15,7 +15,7 @@ vi.mock("@/lib/domainGen/availability", () => ({
   checkAvailabilityBatch: mocks.availability,
 }))
 
-import { areRelatedNameFamily, passesControlledCoinedForm, runNameSprint } from "./engine"
+import { areRelatedNameFamily, buildGuidedSearchFeedback, passesControlledCoinedForm, runNameSprint } from "./engine"
 import { NAME_SPRINT_STRATEGIES } from "./types"
 import type { NameConstitution, NameSprintStrategy, SemanticTerritory } from "./types"
 
@@ -89,6 +89,35 @@ describe("Name Sprint multi-stage engine", () => {
           webSearchCalls: 1,
         }
       }
+      if (request.schemaName === "name_sprint_guided_search") {
+        const requested = Number(request.input.match(/Create exactly (\d+) focused applicants/)?.[1] || 18)
+        const candidates = ([
+          "suggestive",
+          "metaphorical",
+          "invented",
+          "controlled_coined",
+          "meaningful_compound",
+          "arbitrary_real_word",
+        ] as const).flatMap((strategy) => strategyNames[strategy].slice(0, 3).map((name, index) => ({
+          name,
+          strategy,
+          territoryId: territories[index % territories.length].id,
+          roots: name.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase().split(" "),
+          pronunciation: name.toLowerCase(),
+        }))).slice(0, requested)
+        return {
+          data: {
+            observation: "A balanced first round is appropriate.",
+            strategyDecision: "Use several distinct structures and preserve radio-test clarity.",
+            candidates,
+          },
+          model: "gpt-5.6-luna",
+          inputTokens: 260,
+          outputTokens: 520,
+          estimatedUsd: 0.000676,
+          webSearchCalls: 0,
+        }
+      }
       if (NAME_SPRINT_STRATEGIES.some((strategy) => request.schemaName === `name_sprint_${strategy}`)) {
         const strategy = request.schemaName.replace("name_sprint_", "") as NameSprintStrategy
         const verifiedRoots: Record<string, string[]> = {
@@ -153,7 +182,7 @@ describe("Name Sprint multi-stage engine", () => {
     })
   })
 
-  it("uses one Luna-only strategy wave, one blind judge, and no paid web-search stage", async () => {
+  it("uses one focused guided-search round, one blind judge, and no paid web-search stage", async () => {
     const result = await runNameSprint({
       constitution,
       territories,
@@ -161,20 +190,20 @@ describe("Name Sprint multi-stage engine", () => {
       userIdentifier: "test-user",
     })
 
-    const generationCalls = mocks.structured.mock.calls.filter(([request]) => NAME_SPRINT_STRATEGIES.some((strategy) => request.schemaName === `name_sprint_${strategy}`))
+    const generationCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
     const judgeCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
-    expect(generationCalls).toHaveLength(6)
-    expect(new Set(generationCalls.map(([request]) => request.schemaName))).toHaveLength(6)
+    expect(generationCalls).toHaveLength(1)
     expect(judgeCalls).toHaveLength(1)
     const admissionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_final_admissions")
     expect(collisionCalls).toHaveLength(0)
     expect(admissionCalls).toHaveLength(0)
-    expect(generationCalls.every(([request]) => request.reasoningEffort === "low" && request.maxOutputTokens === 1_400)).toBe(true)
+    expect(generationCalls[0][0].reasoningEffort).toBe("low")
+    expect(generationCalls[0][0].maxOutputTokens).toBe(2_200)
     expect(judgeCalls[0][0].maxOutputTokens).toBe(1_400)
     expect(judgeCalls[0][0].input).not.toContain("association")
     expect(mocks.availability).toHaveBeenCalledTimes(1)
-    expect(result.generatedCount).toBe(48)
+    expect(result.generatedCount).toBe(18)
     expect(mocks.structured.mock.calls.some(([request]) => request.schemaName === "name_sprint_editorial_repair")).toBe(false)
     expect(result.candidates.length).toBeGreaterThan(0)
     expect(result.candidates.length).toBeLessThanOrEqual(12)
@@ -237,34 +266,24 @@ describe("Name Sprint multi-stage engine", () => {
       .rejects.toThrow("name_sprint_live_screen_incomplete")
   })
 
-  it("does not silently retry or lose the whole run when one strategy response is malformed", async () => {
+  it("fails closed instead of silently replaying a malformed guided-search round", async () => {
     const normalImplementation = mocks.structured.getMockImplementation()
-    let failedOnce = false
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string; reasoningEffort?: string }) => {
-      if (request.schemaName === "name_sprint_metaphorical" && !failedOnce) {
-        failedOnce = true
-        throw new Error("name_sprint_metaphorical_empty_response")
-      }
+      if (request.schemaName === "name_sprint_guided_search") throw new Error("name_sprint_guided_search_empty_response")
       if (!normalImplementation) throw new Error("missing_test_implementation")
       return normalImplementation(request)
     })
 
-    const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
-    const result = await runNameSprint({
+    await expect(runNameSprint({
       constitution,
       territories,
       signal: new AbortController().signal,
       userIdentifier: "test-user",
-    })
+    })).rejects.toThrow("name_sprint_guided_search_empty_response")
 
-    const metaphoricalCalls = mocks.structured.mock.calls
-      .filter(([request]) => request.schemaName === "name_sprint_metaphorical")
-    expect(metaphoricalCalls).toHaveLength(1)
-    expect(metaphoricalCalls[0][0].reasoningEffort).toBe("low")
-    expect(result.candidates.length).toBeGreaterThan(0)
-    expect(result.attempts).toBe(1)
-    expect(consoleSpy).toHaveBeenCalledWith("name-sprint-strategy-modules-incomplete", { failedStrategies: 1 })
-    consoleSpy.mockRestore()
+    const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
+    expect(guidedCalls).toHaveLength(1)
+    expect(guidedCalls[0][0].reasoningEffort).toBe("low")
   })
 
   it("rejects candidates when no verified launch domain is available", async () => {
@@ -290,7 +309,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(checkedDomains.length).toBeLessThanOrEqual(128)
     expect(checkedDomains.every((domain) => domain.endsWith(".com") || domain.endsWith(".co") || domain.endsWith(".ai"))).toBe(true)
     expect(new Set(checkedDomains.map((domain) => domain.split(".").at(-1)))).toEqual(new Set(["com", "co", "ai"]))
-    expect(result.attempts).toBe(1)
+    expect(result.attempts).toBe(3)
     expect(mocks.structured.mock.calls.some(([request]) => request.schemaName === "name_sprint_editorial_repair")).toBe(false)
   })
 
@@ -366,6 +385,34 @@ describe("Name Sprint multi-stage engine", () => {
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
   })
 
+  it("turns dominant rejection evidence into a concrete next-round strategy", () => {
+    const rejected = ["Cedar", "Amber", "Harbor"].map((name) => ({
+      id: name,
+      name,
+      normalizedName: name.toLowerCase(),
+      strategy: "arbitrary_real_word" as const,
+      territoryId: "signals",
+      roots: [name.toLowerCase()],
+      association: "A signal.",
+      pronunciation: name.toLowerCase(),
+      claimedOrigin: null,
+      originVerified: true,
+      eligibility: {
+        status: "reject" as const,
+        failureCodes: ["NO_PREFERRED_DOMAIN" as const],
+        reasons: ["No verified launch domain was available."],
+        scoreCap: 0,
+        matchedBrand: null,
+      },
+    }))
+
+    const feedback = buildGuidedSearchFeedback(rejected, 2)
+    expect(feedback.codeCounts.NO_PREFERRED_DOMAIN).toBe(3)
+    expect(feedback.directive).toContain("7-12 letter")
+    expect(feedback.directive).toContain("exact-domain potential")
+    expect(feedback.examples[0]).toContain("Cedar")
+  })
+
   it("requires controlled coinages to keep a clean word shape without cliché endings", () => {
     expect(passesControlledCoinedForm("Caldrin", ["calm", "adrift"])).toBe(true)
     expect(passesControlledCoinedForm("Zuqtrix", ["calm", "signal"])).toBe(false)
@@ -378,7 +425,7 @@ describe("Name Sprint multi-stage engine", () => {
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (!normalImplementation) throw new Error("missing_test_implementation")
       const response = await normalImplementation(request)
-      if (NAME_SPRINT_STRATEGIES.some((strategy) => request.schemaName === `name_sprint_${strategy}`)) {
+      if (request.schemaName === "name_sprint_guided_search") {
         return {
           ...response,
           data: {
@@ -420,20 +467,22 @@ describe("Name Sprint multi-stage engine", () => {
     consoleSpy.mockRestore()
   })
 
-  it("repairs once when final admissions leaves fewer than three shortlist names", async () => {
+  it("uses admissions failures to guide a smaller second search round", async () => {
     process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
     const normalImplementation = mocks.structured.getMockImplementation()
     let admissionCalls = 0
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
-      if (request.schemaName === "name_sprint_editorial_repair") {
+      if (request.schemaName === "name_sprint_guided_search" && request.input.includes("Search round: 2")) {
         const names = ["Caldrin", "Venset", "Ordan", "Tembra", "Keldan", "Rovant", "Selkin", "Dovren", "Marven", "Tavrin"]
         return {
           data: {
+            observation: "The first round failed final admissions.",
+            strategyDecision: "Use coherent longer inventions with different roots.",
             candidates: names.map((name, index) => ({
               name,
-              strategy: "invented",
+              strategy: "controlled_coined",
               territoryId: territories[index % territories.length].id,
-              roots: [name.toLowerCase()],
+              roots: [territories[index % territories.length].roots[0]],
               pronunciation: name.toLowerCase(),
             })),
           },
@@ -474,10 +523,11 @@ describe("Name Sprint multi-stage engine", () => {
       userIdentifier: "test-user",
     })
 
-    const repairCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_editorial_repair")
+    const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
-    expect(repairCalls).toHaveLength(1)
-    expect(repairCalls[0][0].input).toContain("BELOW_QUALITY_BAR")
+    expect(guidedCalls).toHaveLength(2)
+    expect(guidedCalls[1][0].input).toContain("BELOW_QUALITY_BAR")
+    expect(guidedCalls[1][0].input).toContain("Strengthen the immediate semantic bridge")
     expect(admissionCalls).toBe(2)
     expect(collisionCalls).toHaveLength(1)
     expect(result.attempts).toBe(2)
@@ -488,39 +538,26 @@ describe("Name Sprint multi-stage engine", () => {
 
   it("records below-bar names in the rejection audit instead of dropping them silently", async () => {
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
-      if (request.schemaName === "name_sprint_editorial_repair") {
-        const names = ["Caldrin", "Venset", "Ordan", "Tembra", "Keldan", "Rovant", "Selkin", "Dovren", "Marven", "Tavrin"]
+      if (request.schemaName === "name_sprint_guided_search") {
+        const candidates = (["suggestive", "metaphorical", "invented", "controlled_coined", "meaningful_compound", "arbitrary_real_word"] as const)
+          .flatMap((strategy) => strategyNames[strategy].slice(0, 3).map((name, index) => ({
+            name,
+            strategy,
+            territoryId: territories[index % territories.length].id,
+            roots: name.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase().split(" "),
+            pronunciation: name.toLowerCase(),
+          })))
         return {
           data: {
-            candidates: names.map((name, index) => ({
-              name,
-              strategy: "invented",
-              territoryId: territories[index % territories.length].id,
-              roots: [name.toLowerCase()],
-              pronunciation: name.toLowerCase(),
-            })),
-          },
-          model: "gpt-5.6-terra",
-          inputTokens: 300,
-          outputTokens: 300,
-          estimatedUsd: 0.0042,
-        }
-      }
-      if (NAME_SPRINT_STRATEGIES.some((strategy) => request.schemaName === `name_sprint_${strategy}`)) {
-        const strategy = request.schemaName.replace("name_sprint_", "") as NameSprintStrategy
-        return {
-          data: {
-            candidates: strategyNames[strategy].map((name, index) => ({
-              name,
-              territoryId: territories[index % territories.length].id,
-              roots: strategy === "verified_root" ? ["lumen"] : ["cedar", "lane"],
-              pronunciation: name.toLowerCase(),
-            })),
+            observation: "Earlier names did not meet the quality bar.",
+            strategyDecision: "Change the structure without lowering the standard.",
+            candidates,
           },
           model: "gpt-5.6-luna",
-          inputTokens: 100,
-          outputTokens: 120,
-          estimatedUsd: 0.000164,
+          inputTokens: 240,
+          outputTokens: 500,
+          estimatedUsd: 0.000648,
+          webSearchCalls: 0,
         }
       }
       if (request.schemaName === "name_sprint_final_admissions") {
@@ -560,8 +597,8 @@ describe("Name Sprint multi-stage engine", () => {
       userIdentifier: "test-user",
     })
 
-    const repairCall = mocks.structured.mock.calls.find(([request]) => request.schemaName === "name_sprint_editorial_repair")
-    expect(repairCall).toBeUndefined()
+    const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
+    expect(guidedCalls).toHaveLength(1)
     expect(result.attempts).toBe(1)
     expect(result.usage.model).toBe("gpt-5.6-luna")
     expect(result.candidates).toHaveLength(0)

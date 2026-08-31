@@ -112,6 +112,33 @@ const EDITORIAL_REPAIR_SCHEMA = {
   },
 } as const
 
+const GUIDED_SEARCH_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["observation", "strategyDecision", "candidates"],
+  properties: {
+    observation: { type: "string" },
+    strategyDecision: { type: "string" },
+    candidates: {
+      type: "array",
+      minItems: 6,
+      maxItems: 20,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "strategy", "territoryId", "roots", "pronunciation"],
+        properties: {
+          name: { type: "string" },
+          strategy: { type: "string", enum: [...REPAIR_STRATEGIES] },
+          territoryId: { type: "string" },
+          roots: { type: "array", items: { type: "string" }, maxItems: 2 },
+          pronunciation: { type: "string" },
+        },
+      },
+    },
+  },
+} as const
+
 const JUDGE_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -219,6 +246,17 @@ When NO_PREFERRED_DOMAIN dominates the failure pattern, treat short dictionary w
 Every name must work cold on a sales call, contract, search result and product interface. Reject your own output when the meaning needs a paragraph, when two keywords are visibly glued together, when spelling or pronunciation is unstable, or when the name resembles a known active company, product or supplied competitor.
 Do not make availability or legal-clearance claims. Return only the structured candidate fields and no promotional prose.`
 
+const GUIDED_SEARCH_INSTRUCTIONS = `You are the bounded creative search controller for NamoLux Name Sprint.
+You do not spray generic names. You receive a Name Constitution, semantic territories, prior applicants, and structured evidence explaining why earlier applicants failed.
+
+For round one, create a focused and diverse starting batch. For later rounds, explicitly change the naming structure in response to the evidence. If short real words have no viable domains, stop generating short real words. If invented names fail spelling or random-syllable checks, move toward familiar English morphology and clearer suggestive structures. If active-brand collisions dominate, increase distinctiveness without sacrificing pronunciation. If final admissions rejects stretched metaphors, simplify the semantic bridge.
+
+Treat domain evidence as search guidance, never as a reason to recommend a weak name. Prefer exact .com, .co or .ai viability through distinctive seven-to-twelve-letter formations before relying on a clean modified .com. Never repeat, respell, prefix, suffix, or create a close family of a rejected applicant.
+
+Choose the strategy mix for this round from the supplied per-strategy rules. Silently draft at least three times the requested count, compare the drafts, and return only the strongest applicants. Every result must work cold on a sales call, contract, search result and product interface. Reject your own output if it needs its explanation, sounds like random syllables, visibly glues keywords, resembles a familiar active brand, or has unstable spelling or pronunciation.
+
+Keep the observation and strategyDecision factual and under 30 words each. Do not make domain or legal-clearance claims.`
+
 const JUDGE_INSTRUCTIONS = `You are an independent blind naming judge. You did not generate the candidates.
 Compare candidates in small implicit groups against the supplied Name Constitution. You receive no domain availability, generated rationale, or strategy labels.
 Use fatal-flaw codes only for severe pronunciation, spelling, unsafe-meaning, random-syllable, fabricated-etymology or semantic-mismatch defects. Deterministic and current web-backed screens handle competitors, genericity and brand collisions, so do not guess those fatal codes from memory; express softer concerns through dimension scores and mainRisk.
@@ -244,6 +282,8 @@ const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
 const MAX_ESTIMATED_RUN_USD = 0.025
 const STANDARD_CANDIDATES_PER_STRATEGY = 8
 const STANDARD_JUDGE_POOL_SIZE = 16
+const GUIDED_ROUND_COUNTS = [18, 12, 8] as const
+const GUIDED_TARGET_ADMISSIONS = 6
 
 function optionalStageEnabled(name: string) {
   return process.env[name]?.trim().toLowerCase() === "true"
@@ -441,6 +481,7 @@ function parseEditorialRepairCandidates(
   value: unknown,
   territories: readonly SemanticTerritory[],
   constitution: NameConstitution,
+  attempt = 2,
 ) {
   const items = value && typeof value === "object" && Array.isArray((value as { candidates?: unknown[] }).candidates)
     ? (value as { candidates: RepairedCandidatePayload[] }).candidates
@@ -450,8 +491,98 @@ function parseEditorialRepairCandidates(
     strategy,
     territories,
     constitution,
-    2,
+    attempt,
   ))
+}
+
+export type GuidedSearchFeedback = {
+  round: number
+  codeCounts: Record<string, number>
+  examples: string[]
+  directive: string
+}
+
+export function buildGuidedSearchFeedback(
+  rejected: readonly RejectedNameCandidate[],
+  round: number,
+): GuidedSearchFeedback {
+  const codeCounts = rejected.reduce<Record<string, number>>((counts, candidate) => {
+    for (const code of candidate.eligibility.failureCodes) counts[code] = (counts[code] || 0) + 1
+    return counts
+  }, {})
+  const rankedCodes = Object.entries(codeCounts).sort((left, right) => right[1] - left[1])
+  const dominant = new Set(rankedCodes.slice(0, 4).map(([code]) => code))
+  const directives: string[] = []
+  if (dominant.has("NO_PREFERRED_DOMAIN")) {
+    directives.push("Short familiar words are commercially saturated; favour distinctive 7-12 letter suggestive or controlled-coined forms with exact-domain potential.")
+  }
+  if (dominant.has("RANDOM_SYLLABLES") || dominant.has("SPELLING_AMBIGUITY") || dominant.has("PRONUNCIATION_CLUSTER")) {
+    directives.push("Stop arbitrary invention; use familiar English grapheme patterns, stable syllables and a single obvious radio-test spelling.")
+  }
+  if (dominant.has("ACTIVE_BRAND_EXACT") || dominant.has("ACTIVE_BRAND_CLOSE")) {
+    directives.push("Increase structural distinctiveness and avoid every collided root, phonetic family and familiar product-name pattern.")
+  }
+  if (dominant.has("BELOW_QUALITY_BAR") || dominant.has("SEMANTIC_MISMATCH")) {
+    directives.push("Strengthen the immediate semantic bridge; reject names whose rationale does the branding work.")
+  }
+  if (!directives.length) {
+    directives.push(round === 1
+      ? "Start with a balanced mix of suggestive, metaphorical and controlled-coined structures; use compounds and real words sparingly."
+      : "Change both roots and word structure from the previous round while preserving strategic fit and pronunciation.")
+  }
+  const examples = rejected.slice(-18).map((candidate) => {
+    const reason = candidate.eligibility.reasons.at(-1) || candidate.eligibility.failureCodes.join(", ")
+    return `${candidate.name}: ${candidate.eligibility.failureCodes.join("+") || "REJECTED"} — ${reason}`
+  })
+  return {
+    round,
+    codeCounts,
+    examples,
+    directive: directives.join(" "),
+  }
+}
+
+async function generateGuidedRound({
+  round,
+  count,
+  constitution,
+  territories,
+  excludedNames,
+  feedback,
+  signal,
+  userIdentifier,
+}: {
+  round: number
+  count: number
+  constitution: NameConstitution
+  territories: readonly SemanticTerritory[]
+  excludedNames: readonly string[]
+  feedback: GuidedSearchFeedback
+  signal: AbortSignal
+  userIdentifier: string
+}) {
+  const response = await createStructuredResponse<{
+    observation: string
+    strategyDecision: string
+    candidates: RepairedCandidatePayload[]
+  }>({
+    schemaName: "name_sprint_guided_search",
+    schema: GUIDED_SEARCH_SCHEMA as unknown as Record<string, unknown>,
+    instructions: GUIDED_SEARCH_INSTRUCTIONS,
+    input: `Search round: ${round} of ${GUIDED_ROUND_COUNTS.length}\nCreate exactly ${count} focused applicants.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nFailure evidence: ${JSON.stringify(feedback)}\nNever repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}`,
+    maxOutputTokens: round === 1 ? 2_200 : round === 2 ? 1_700 : 1_300,
+    promptCacheKey: "namolux-name-sprint-guided-search-v1",
+    userIdentifier,
+    signal,
+    model: getNameSprintRepairModel(),
+    reasoningEffort: "low",
+  })
+  return {
+    candidates: parseEditorialRepairCandidates(response.data, territories, constitution, round),
+    observation: cleanText(response.data.observation, 240),
+    strategyDecision: cleanText(response.data.strategyDecision, 240),
+    usage: response,
+  }
 }
 
 async function generateEditorialRepair({
@@ -752,16 +883,13 @@ export async function runNameSprint({
   const runStarted = Date.now()
   const rawCandidates: RawNameCandidate[] = []
   let rawGeneratedCount = 0
-  let qualityCandidates: NameSprintCandidate[] = []
   let admissionCandidates: NameSprintCandidate[] = []
   const rejected: RejectedNameCandidate[] = []
-  const evaluatedCandidateIds = new Set<string>()
-  let editorialFeedback: string[] = []
+  const domainReadyCandidates = new Map<string, NameSprintCandidate>()
   let attempts = 0
   const timingMs = { generation: 0, screening: 0, judgeAndEvidence: 0, total: 0 }
   const usage = { model: getNameSprintModel(), inputTokens: 0, outputTokens: 0, estimatedUsd: 0, webSearchCalls: 0 }
   const usageModels = new Set([usage.model])
-  const expensiveRepairEnabled = launchStageEnabled("NAMOLUX_NAME_SPRINT_EXPENSIVE_REPAIR")
   const finalAdmissionsEnabled = launchStageEnabled("NAMOLUX_NAME_SPRINT_AI_ADMISSIONS")
   const webCollisionEnabled = launchStageEnabled("NAMOLUX_NAME_SPRINT_WEB_COLLISION")
 
@@ -776,58 +904,44 @@ export async function runNameSprint({
     if (usage.estimatedUsd > MAX_ESTIMATED_RUN_USD) throw new Error("name_sprint_cost_ceiling_exceeded")
   }
 
-  const maximumAttempts = expensiveRepairEnabled ? 2 : 1
-  for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
-    attempts = attempt
-    const failedPatternCounts = rejected.reduce<Record<string, number>>((counts, candidate) => {
-      for (const code of candidate.eligibility.failureCodes) counts[code] = (counts[code] || 0) + 1
-      return counts
-    }, {})
-    const failedPatterns = Object.entries(failedPatternCounts)
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 6)
-      .map(([code, total]) => `${code}:${total}`)
+  for (let round = 1; round <= GUIDED_ROUND_COUNTS.length; round += 1) {
+    attempts = round
     const generationStarted = Date.now()
-    let generated: Array<Awaited<ReturnType<typeof generateWithStrategy>>>
-    if (attempt === 1) {
-      const settled = await Promise.allSettled(LIVE_GENERATION_STRATEGIES.map((strategy) => generateWithStrategy({
-        strategy,
-        count: STANDARD_CANDIDATES_PER_STRATEGY,
-        constitution,
-        territories,
-        excludedNames: [...previouslyRejected, ...rawCandidates.map((candidate) => candidate.name)],
-        signal,
-        userIdentifier,
-        attempt,
-        failedPatterns,
-      })))
-      generated = settled.flatMap((result) => result.status === "fulfilled" ? [result.value] : [])
-      const failedStrategies = settled.filter((result) => result.status === "rejected").length
-      if (failedStrategies) console.warn("name-sprint-strategy-modules-incomplete", { failedStrategies })
-      if (!generated.length) throw new Error("name_sprint_generation_wave_failed")
-    } else {
-      generated = [await generateEditorialRepair({
-        constitution,
-        territories,
-        excludedNames: [...previouslyRejected, ...rawCandidates.map((candidate) => candidate.name)],
-        rejectionNotes: editorialFeedback.length ? editorialFeedback : failedPatterns,
-        signal,
-        userIdentifier,
-      })]
-    }
+    const feedback = buildGuidedSearchFeedback(rejected, round)
+    const generated = await generateGuidedRound({
+      round,
+      count: GUIDED_ROUND_COUNTS[round - 1],
+      constitution,
+      territories,
+      excludedNames: [...previouslyRejected, ...rawCandidates.map((candidate) => candidate.name)],
+      feedback,
+      signal,
+      userIdentifier,
+    })
     timingMs.generation += Date.now() - generationStarted
-    for (const result of generated) {
-      rawGeneratedCount += result.candidates.length
-      rawCandidates.push(...result.candidates)
-      addUsage(result.usage)
+    rawGeneratedCount += generated.candidates.length
+    const seenBeforeRound = new Set(rawCandidates.map((candidate) => candidate.normalizedName))
+    const novelCandidates: RawNameCandidate[] = []
+    for (const candidate of generated.candidates) {
+      if (!seenBeforeRound.has(candidate.normalizedName)) {
+        novelCandidates.push(candidate)
+        continue
+      }
+      const eligibility = evaluateEligibility(candidate, {
+        constitution,
+        previouslyRejected: [...previouslyRejected, ...seenBeforeRound],
+        recentRootFrequency,
+      })
+      rejected.push({ ...candidate, eligibility })
     }
+    rawCandidates.push(...generated.candidates)
+    addUsage(generated.usage)
 
     const screeningStarted = Date.now()
-    const unique = deDuplicateCandidates(rawCandidates)
-    const admitted: Array<{ candidate: RawNameCandidate; score: number }> = []
-    const admittedSoFar: RawNameCandidate[] = []
-    for (const candidate of unique) {
-      if (evaluatedCandidateIds.has(candidate.id)) continue
+    const existingFamilies = Array.from(domainReadyCandidates.values())
+    const locallyEligible: Array<{ candidate: RawNameCandidate; score: number }> = []
+    const admittedSoFar: RawNameCandidate[] = [...existingFamilies]
+    for (const candidate of deDuplicateCandidates(novelCandidates)) {
       const eligibility = evaluateEligibility(candidate, {
         constitution,
         existingCandidates: admittedSoFar,
@@ -839,59 +953,31 @@ export async function runNameSprint({
         continue
       }
       admittedSoFar.push(candidate)
-      const provisional = scoreFounderSignalV2({ candidate, constitution, eligibility, recentRootFrequency })
-      admitted.push({ candidate, score: provisional.score })
+      locallyEligible.push({
+        candidate,
+        score: scoreFounderSignalV2({ candidate, constitution, eligibility, recentRootFrequency }).score,
+      })
     }
-
-    const provisional = diverseSelection(
-      admitted.sort((left, right) => right.score - left.score).map((item) => item.candidate),
+    const domainPool = diverseSelection(
+      locallyEligible.sort((left, right) => right.score - left.score).map((item) => item.candidate),
       STANDARD_JUDGE_POOL_SIZE,
     )
     timingMs.screening += Date.now() - screeningStarted
-    if (!provisional.length) {
-      if (attempt === 1) {
-        editorialFeedback = failedPatterns.length
-          ? failedPatterns
-          : ["The first pass produced no candidate eligible for blind judging."]
-        continue
-      }
-      break
-    }
+    if (!domainPool.length) continue
 
-    const judgeStarted = Date.now()
-    const [judgedResult, domainResult] = await Promise.allSettled([
-      judgeCandidates(provisional, constitution, signal, userIdentifier),
-      checkCandidateDomains(provisional, signal),
-    ])
-    const judgments = judgedResult.status === "fulfilled" ? judgedResult.value.judgments : new Map<string, JudgedCandidate>()
-    const domainStatuses = domainResult.status === "fulfilled"
-      ? domainResult.value
-      : new Map<string, NameSprintDomainEvidence>()
+    const domainStarted = Date.now()
+    const domainStatuses = await checkCandidateDomains(domainPool, signal)
     const completedDomainChecks = Array.from(domainStatuses.values()).reduce(
       (total, evidence) => total + evidence.domainStatuses.filter((domain) => domain.status !== "unknown").length + (evidence.launchDomain ? 1 : 0),
       0,
     )
-    if (domainResult.status === "rejected" || completedDomainChecks === 0) {
-      throw new Error("name_sprint_domain_screen_incomplete")
-    }
-    if (judgedResult.status === "fulfilled") addUsage(judgedResult.value.usage)
-    else console.warn("name-sprint-judge-incomplete", { reason: judgedResult.reason instanceof Error ? judgedResult.reason.message : "unknown" })
+    if (completedDomainChecks === 0) throw new Error("name_sprint_domain_screen_incomplete")
 
-    const scored = provisional.flatMap((candidate): NameSprintCandidate[] => {
-      const judgment = judgments.get(candidate.normalizedName) || null
-      const eligibility = evaluateEligibility(candidate, {
-        constitution,
-        previouslyRejected,
-        recentRootFrequency,
-        judgeFatalFlaws: judgment?.fatalFlawCodes,
-      })
-      if (eligibility.status !== "pass") {
-        rejected.push({ ...candidate, eligibility })
-        return []
-      }
-      const domainEvidence = domainStatuses.get(candidate.normalizedName)
-      const domains = domainEvidence?.domainStatuses || emptyDomainStatuses()
-      const launchDomain = domainEvidence?.launchDomain || null
+    const roundDomainReady = domainPool.flatMap((candidate): NameSprintCandidate[] => {
+      const eligibility = evaluateEligibility(candidate, { constitution, previouslyRejected, recentRootFrequency })
+      const evidence = domainStatuses.get(candidate.normalizedName)
+      const domains = evidence?.domainStatuses || emptyDomainStatuses()
+      const launchDomain = evidence?.launchDomain || null
       if (!launchDomain) {
         rejected.push({
           ...candidate,
@@ -910,11 +996,96 @@ export async function runNameSprint({
         candidate,
         constitution,
         eligibility,
-        judged: judgment,
         preferredTld: "com",
         domainStatus: primaryStatus,
         availableTlds: domains.filter((domain) => domain.status === "available").map((domain) => domain.tld),
         launchDomainKind: launchDomain.kind,
+        recentRootFrequency,
+      })
+      return [{
+        ...candidate,
+        eligibility,
+        founderSignal,
+        strongestReason: founderSignal.strongestReason,
+        mainRisk: founderSignal.mainRisk,
+        evidenceConfidence: founderSignal.confidence,
+        domainStatuses: domains,
+        launchDomain,
+      }]
+    }).sort(compareFinalists)
+    timingMs.screening += Date.now() - domainStarted
+
+    const admittedThisRound: NameSprintCandidate[] = []
+    if (!finalAdmissionsEnabled) {
+      admittedThisRound.push(...roundDomainReady)
+    } else if (roundDomainReady.length) {
+      const admissionStarted = Date.now()
+      const admissions = await admitFinalists(roundDomainReady, constitution, signal, userIdentifier)
+      addUsage(admissions.usage)
+      timingMs.judgeAndEvidence += Date.now() - admissionStarted
+      for (const candidate of roundDomainReady) {
+        const decision = admissions.decisions.get(candidate.normalizedName)
+        if (decision?.admit) {
+          admittedThisRound.push(candidate)
+          continue
+        }
+        const reason = decision?.reason || "The admissions editor did not return a complete decision."
+        rejected.push({
+          ...candidate,
+          eligibility: {
+            status: "review",
+            failureCodes: [...candidate.eligibility.failureCodes, "BELOW_QUALITY_BAR"],
+            reasons: [...candidate.eligibility.reasons, reason],
+            scoreCap: candidate.eligibility.scoreCap === null ? 59 : Math.min(59, candidate.eligibility.scoreCap),
+            matchedBrand: candidate.eligibility.matchedBrand,
+          },
+        })
+      }
+    }
+    for (const candidate of admittedThisRound) {
+      if (!domainReadyCandidates.has(candidate.normalizedName)) domainReadyCandidates.set(candidate.normalizedName, candidate)
+    }
+
+    const admittedCount = domainReadyCandidates.size
+    if (admittedCount >= GUIDED_TARGET_ADMISSIONS || (round >= 2 && admittedCount >= 3)) break
+  }
+
+  const judgePool = diverseSelection(
+    Array.from(domainReadyCandidates.values()).sort(compareFinalists),
+    STANDARD_JUDGE_POOL_SIZE,
+  )
+  if (judgePool.length) {
+    const judgeStarted = Date.now()
+    let judgments = new Map<string, JudgedCandidate>()
+    try {
+      const judged = await judgeCandidates(judgePool, constitution, signal, userIdentifier)
+      judgments = judged.judgments
+      addUsage(judged.usage)
+    } catch (error) {
+      console.warn("name-sprint-judge-incomplete", { reason: error instanceof Error ? error.message : "unknown" })
+    }
+    admissionCandidates = judgePool.flatMap((candidate): NameSprintCandidate[] => {
+      const judgment = judgments.get(candidate.normalizedName) || null
+      const eligibility = evaluateEligibility(candidate, {
+        constitution,
+        previouslyRejected,
+        recentRootFrequency,
+        judgeFatalFlaws: judgment?.fatalFlawCodes,
+      })
+      if (eligibility.status !== "pass") {
+        rejected.push({ ...candidate, eligibility })
+        return []
+      }
+      const primaryStatus = candidate.domainStatuses.find((domain) => domain.tld === "com")?.status || "unknown"
+      const founderSignal = scoreFounderSignalV2({
+        candidate,
+        constitution,
+        eligibility,
+        judged: judgment,
+        preferredTld: "com",
+        domainStatus: primaryStatus,
+        availableTlds: candidate.domainStatuses.filter((domain) => domain.status === "available").map((domain) => domain.tld),
+        launchDomainKind: candidate.launchDomain.kind,
         recentRootFrequency,
       })
       if (founderSignal.band === "Reconsider") {
@@ -937,76 +1108,9 @@ export async function runNameSprint({
         strongestReason: founderSignal.strongestReason,
         mainRisk: founderSignal.mainRisk,
         evidenceConfidence: founderSignal.confidence,
-        domainStatuses: domains,
-        launchDomain,
       }]
     }).sort(compareFinalists)
-
-    for (const candidate of provisional) evaluatedCandidateIds.add(candidate.id)
-    qualityCandidates = diverseSelection(
-      [...qualityCandidates, ...scored].sort(compareFinalists),
-      24,
-    )
     timingMs.judgeAndEvidence += Date.now() - judgeStarted
-    const admissionStarted = Date.now()
-    const admissionPool = diverseSelection(
-      [...qualityCandidates].sort(compareFinalists),
-      18,
-    )
-    const admittedThisAttempt: NameSprintCandidate[] = []
-    const admissionRejectionNotes: string[] = []
-    if (!finalAdmissionsEnabled) {
-      admittedThisAttempt.push(...admissionPool.slice(0, 12))
-    } else if (admissionPool.length) {
-      const admissions = await admitFinalists(admissionPool, constitution, signal, userIdentifier)
-      addUsage(admissions.usage)
-      for (const candidate of admissionPool) {
-        const decision = admissions.decisions.get(candidate.normalizedName)
-        if (decision?.admit && admittedThisAttempt.length < 12) {
-          admittedThisAttempt.push(candidate)
-          continue
-        }
-        const reason = decision?.reason || "The final admissions editor did not return a complete decision."
-        admissionRejectionNotes.push(`${candidate.name}: ${reason}`)
-        rejected.push({
-          ...candidate,
-          eligibility: {
-            status: "review",
-            failureCodes: [...candidate.eligibility.failureCodes, "BELOW_QUALITY_BAR"],
-            reasons: [...candidate.eligibility.reasons, reason],
-            scoreCap: candidate.eligibility.scoreCap === null ? 59 : Math.min(59, candidate.eligibility.scoreCap),
-            matchedBrand: candidate.eligibility.matchedBrand,
-          },
-        })
-      }
-    }
-    timingMs.judgeAndEvidence += Date.now() - admissionStarted
-
-    const shouldRepair = expensiveRepairEnabled
-      && attempt < maximumAttempts
-      && admittedThisAttempt.length < 3
-    if (!shouldRepair) {
-      admissionCandidates = admittedThisAttempt
-      break
-    }
-
-    // Carry forward the few names that already earned admission, but use the
-    // editor's rejection reasons to create a genuinely different repair wave.
-    // This makes the repair decision reflect the shortlist users would
-    // actually see, not the larger provisional pool before final admissions.
-    qualityCandidates = admittedThisAttempt
-    const repairFailurePatterns = Object.entries(rejected.reduce<Record<string, number>>((counts, candidate) => {
-      for (const code of candidate.eligibility.failureCodes) counts[code] = (counts[code] || 0) + 1
-      return counts
-    }, {}))
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 8)
-      .map(([code, total]) => `${code}:${total}`)
-    editorialFeedback = [
-      `Only ${admittedThisAttempt.length} candidate${admittedThisAttempt.length === 1 ? "" : "s"} survived final admissions.`,
-      ...admissionRejectionNotes.slice(0, 12),
-      ...repairFailurePatterns,
-    ]
   }
 
   const collisionStarted = Date.now()
