@@ -68,4 +68,13 @@ describe("Name Sprint system reservation", () => {
     expect(result.status).toBe("reject")
     expect(result.failureCodes).toContain("GENERIC_CLICHE")
   })
+
+  it("does not hard-reject a name for a fatigued semantic root absent from its surface", () => {
+    const result = evaluateEligibility(
+      { ...candidate("Meldra"), roots: ["grain"] },
+      { constitution, recentRootFrequency: { grain: 12 } },
+    )
+    expect(result.status).toBe("pass")
+    expect(result.failureCodes).not.toContain("GENERIC_CLICHE")
+  })
 })

@@ -136,7 +136,16 @@ function genericityFailures(candidate: RawNameCandidate, context: EligibilityCon
     output.push({ code: "GENERIC_CLICHE", reason: "The name stacks overused category or startup vocabulary.", status: "reject", cap: 0 })
   }
 
-  const fatiguedRoot = roots.find((root) => (context.recentRootFrequency?.[root] || 0) >= 4)
+  // Generator roots can describe a semantic influence without appearing in
+  // the resulting word (for example, `grain` may inspire `Meldra`). A user's
+  // history should cool down visibly repeated name families, not reject a
+  // different surface form because of hidden prompt metadata. Non-visible
+  // root fatigue still contributes to the genericity score below.
+  const fatiguedRoot = roots.find((root) => (
+    root.length >= 4
+    && candidate.normalizedName.includes(root)
+    && (context.recentRootFrequency?.[root] || 0) >= 4
+  ))
   if (fatiguedRoot) {
     output.push({ code: "GENERIC_CLICHE", reason: `The root “${fatiguedRoot}” is in a temporary overuse cooldown.`, status: "reject", cap: 0 })
   }
