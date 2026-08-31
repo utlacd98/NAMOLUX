@@ -450,6 +450,7 @@ describe("Name Sprint multi-stage engine", () => {
     const repairCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_editorial_repair")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
     expect(repairCalls).toHaveLength(1)
+    expect(repairCalls[0][0].input).toContain("BELOW_QUALITY_BAR")
     expect(admissionCalls).toBe(2)
     expect(collisionCalls).toHaveLength(1)
     expect(result.attempts).toBe(2)

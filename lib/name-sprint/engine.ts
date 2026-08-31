@@ -198,6 +198,7 @@ const EDITORIAL_REPAIR_INSTRUCTIONS = `You are the senior naming editor used onl
 The supplied rejection notes are evidence, not suggestions to relax the standard. Create genuinely new replacements; never respell, prefix, suffix, compound with, or otherwise vary a rejected name.
 Generate 14 to 18 candidates across the supplied semantic territories. At least half must be linguistically coherent invented or suggestive formations that are not ordinary dictionary words. Use arbitrary real words sparingly because short common words are usually commercially saturated.
 Apply the supplied per-strategy rules exactly. Do not default to invented words ending in a, ia, ora, era or via; repeated fashionable endings are not diversity. Use no more than three meaningful compounds and reject any compound whose connection is not immediate when spoken without an explanation.
+When NO_PREFERRED_DOMAIN dominates the failure pattern, treat short dictionary words and familiar metaphors as commercially saturated. Prefer coherent, distinctive seven-to-twelve-letter suggestive or invented forms without sacrificing pronunciation, spelling or semantic credibility.
 Every name must work cold on a sales call, contract, search result and product interface. Reject your own output when the meaning needs a paragraph, when two keywords are visibly glued together, when spelling or pronunciation is unstable, or when the name resembles a known active company, product or supplied competitor.
 Do not make availability or legal-clearance claims. Return only the structured candidate fields and no promotional prose.`
 
@@ -965,10 +966,17 @@ export async function runNameSprint({
     // This makes the repair decision reflect the shortlist users would
     // actually see, not the larger provisional pool before final admissions.
     qualityCandidates = admittedThisAttempt
+    const repairFailurePatterns = Object.entries(rejected.reduce<Record<string, number>>((counts, candidate) => {
+      for (const code of candidate.eligibility.failureCodes) counts[code] = (counts[code] || 0) + 1
+      return counts
+    }, {}))
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 8)
+      .map(([code, total]) => `${code}:${total}`)
     editorialFeedback = [
       `Only ${admittedThisAttempt.length} candidate${admittedThisAttempt.length === 1 ? "" : "s"} survived final admissions.`,
       ...admissionRejectionNotes.slice(0, 12),
-      ...failedPatterns,
+      ...repairFailurePatterns,
     ]
   }
 
