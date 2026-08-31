@@ -366,10 +366,11 @@ describe("Name Sprint multi-stage engine", () => {
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
   })
 
-  it("requires controlled coinages to preserve semantic-root sounds without cliché endings", () => {
+  it("requires controlled coinages to keep a clean word shape without cliché endings", () => {
     expect(passesControlledCoinedForm("Caldrin", ["calm", "adrift"])).toBe(true)
     expect(passesControlledCoinedForm("Zuqtrix", ["calm", "signal"])).toBe(false)
     expect(passesControlledCoinedForm("Calmora", ["calm", "aura"])).toBe(false)
+    expect(passesControlledCoinedForm("Tembra", ["signal", "readiness"])).toBe(true)
   })
 
   it("replaces malformed mixed-script pronunciations with a safe fallback", async () => {

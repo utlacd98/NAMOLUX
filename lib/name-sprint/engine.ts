@@ -196,7 +196,7 @@ const STRATEGY_RULES: Record<NameSprintStrategy, string> = {
   suggestive: "Suggest the outcome without describing the category. Prefer one resonant word or one linguistically natural formation over a glued compound. Each name needs a defensible, non-literal connection to the brief. Do not attach bland glue endings such as well, wise or way.",
   metaphorical: "Use one coherent, concrete metaphor from nature, craft, movement, structure, science or culture. Prefer a standalone object, action or phenomenon over joining two metaphor words. Avoid worn startup metaphors, generic navigation language and bland well, wise or way compounds.",
   invented: "Create a single coherent new word with legal sound clusters, one likely pronunciation and one likely spelling in the target language. It must sound intentionally coined rather than like two ordinary words glued together. Never mutate an ordinary root by adding ora, era, ara, ira, via or a similar fashionable suffix.",
-  controlled_coined: "Create a single ownable word of six to twelve letters from one or two supplied semantic roots. Compress or bridge roots at natural sound boundaries so each declared root contributes a recognisable sound fragment. Require one obvious pronunciation and spelling. Reject random syllables, literal glued compounds, and fashionable endings such as ora, era, via, ly, io, ify, ai or verse.",
+  controlled_coined: "Create a single ownable word of six to twelve letters inspired by one or two supplied semantic roots. The roots guide meaning and sound; do not paste, abbreviate or visibly glue them together. Use familiar English grapheme patterns, two or three balanced syllables, one obvious pronunciation and one likely spelling. Reject random syllables, literal compounds, and fashionable endings such as ora, era, via, ly, io, ify, ai or verse.",
   meaningful_compound: "Combine exactly two real concepts only when their relationship is surprising, immediately defensible and natural when spoken. Reject the idea yourself if it sounds like a feature label, consultancy phrase or two keywords pushed together. Do not combine category word + generic helper, and do not use well, wise or way as filler.",
   arbitrary_real_word: "Use a less-saturated existing real word with a surprising but defensible second-order brand association. Avoid generic business nouns such as margin, signal, reserve, cushion, compass, beacon, horizon, apex, base, path and point. Do not use famous or active brands.",
   verified_root: `Use only these verified cross-language roots and their supplied meanings: ${JSON.stringify(VERIFIED_ROOT_GLOSSARY)}. Do not invent translations.`,
@@ -290,22 +290,14 @@ function verifiedOrigin(strategy: NameSprintStrategy, roots: readonly string[]) 
   return roots.map((root) => VERIFIED_ROOT_GLOSSARY[root]).join("; ")
 }
 
-function hasRecognisableRootFragment(name: string, root: string) {
-  if (root.length < 2) return false
-  for (let index = 0; index < root.length - 1; index += 1) {
-    if (name.includes(root.slice(index, index + 2))) return true
-  }
-  return false
-}
-
 export function passesControlledCoinedForm(name: string, roots: readonly string[]) {
   const normalized = normalizeName(name)
   if (!/^[a-z]{6,12}$/.test(normalized)) return false
   if ((normalized.match(/[aeiouy]/g) || []).length < 2) return false
   if (/(?:ora|era|via|ify|verse|labs|ly|io|ai)$/.test(normalized)) return false
-  if (/(.)\1\1|[^aeiouy]{5}/.test(normalized)) return false
+  if (/(.)\1\1|[^aeiouy]{5}|q(?!u)/.test(normalized)) return false
   const meaningfulRoots = roots.map(normalizeName).filter((root) => root.length >= 2).slice(0, 2)
-  return meaningfulRoots.length > 0 && meaningfulRoots.every((root) => hasRecognisableRootFragment(normalized, root))
+  return meaningfulRoots.length > 0
 }
 
 function parseGeneratedCandidates(
@@ -908,32 +900,6 @@ export async function runNameSprint({
             failureCodes: [...eligibility.failureCodes, "NO_PREFERRED_DOMAIN"],
             reasons: [...eligibility.reasons, "No verified exact .com, .co or .ai or clean modified .com launch domain was available after the live scan."],
             scoreCap: 0,
-            matchedBrand: eligibility.matchedBrand,
-          },
-        })
-        return []
-      }
-      const requiresModifiedDomainQualityGate = launchDomain.kind === "modified"
-      const judgedScores = judgment ? Object.values(judgment.scores) : []
-      const judgedAverage = judgedScores.length
-        ? judgedScores.reduce((total, value) => total + value, 0) / judgedScores.length
-        : 0
-      if (requiresModifiedDomainQualityGate && (
-        !judgment
-        || judgedAverage < 60
-        || judgment.scores.strategicFit < 55
-        || judgment.scores.distinctiveness < 58
-        || judgment.scores.memorability < 55
-        || judgment.scores.pronunciation < 58
-        || judgment.scores.spellingCharacter < 58
-      )) {
-        rejected.push({
-          ...candidate,
-          eligibility: {
-            status: "review",
-            failureCodes: [...eligibility.failureCodes, "BELOW_QUALITY_BAR"],
-            reasons: [...eligibility.reasons, "A modified launch domain cannot rescue a name that did not clear the stronger brand-quality gate."],
-            scoreCap: eligibility.scoreCap === null ? 59 : Math.min(59, eligibility.scoreCap),
             matchedBrand: eligibility.matchedBrand,
           },
         })
