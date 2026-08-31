@@ -400,7 +400,7 @@ async function generateWithStrategy({
       schema: GENERATION_SCHEMA as unknown as Record<string, unknown>,
       instructions: `${GENERATION_INSTRUCTIONS}\n\nStrategy rule: ${STRATEGY_RULES[strategy]}`,
       input: `Create ${count} candidates.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nDo not repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}\nEarlier-wave failure patterns to correct: ${JSON.stringify(failedPatterns)}`,
-      maxOutputTokens: 600,
+      maxOutputTokens: 1_200,
       promptCacheKey: `namolux-name-sprint-${strategy}-v2`,
       userIdentifier,
       signal,

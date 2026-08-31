@@ -169,7 +169,7 @@ describe("Name Sprint multi-stage engine", () => {
     const admissionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_final_admissions")
     expect(collisionCalls).toHaveLength(0)
     expect(admissionCalls).toHaveLength(0)
-    expect(generationCalls.every(([request]) => request.reasoningEffort === "low" && request.maxOutputTokens === 600)).toBe(true)
+    expect(generationCalls.every(([request]) => request.reasoningEffort === "low" && request.maxOutputTokens === 1_200)).toBe(true)
     expect(judgeCalls[0][0].maxOutputTokens).toBe(1_400)
     expect(judgeCalls[0][0].input).not.toContain("association")
     expect(mocks.availability).toHaveBeenCalledTimes(1)
