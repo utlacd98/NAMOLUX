@@ -11,7 +11,6 @@ import { scoreFounderSignalV2 } from "./founder-signal-v2"
 import { createStructuredResponse, getNameSprintModel, getNameSprintRepairModel } from "./openai"
 import {
   FOUNDER_SIGNAL_V2_VERSION,
-  NAME_SPRINT_STRATEGIES,
   NAME_SPRINT_TLDS,
   NAME_SPRINT_VERSION,
   type EligibilityFailureCode,
@@ -214,6 +213,7 @@ Return only the requested name, territory ID, up to two roots, and a short pronu
 const EDITORIAL_REPAIR_INSTRUCTIONS = `You are the senior naming editor used only when a selective first pass produced too few serious candidates.
 The supplied rejection notes are evidence, not suggestions to relax the standard. Create genuinely new replacements; never respell, prefix, suffix, compound with, or otherwise vary a rejected name.
 Generate 14 to 18 candidates across the supplied semantic territories. At least half must be linguistically coherent invented or suggestive formations that are not ordinary dictionary words. Use arbitrary real words sparingly because short common words are usually commercially saturated.
+At least six candidates must use the controlled_coined strategy and satisfy its semantic-root and phonetic rules. Do not relabel arbitrary inventions as controlled coinages.
 Apply the supplied per-strategy rules exactly. Do not default to invented words ending in a, ia, ora, era or via; repeated fashionable endings are not diversity. Use no more than three meaningful compounds and reject any compound whose connection is not immediate when spoken without an explanation.
 When NO_PREFERRED_DOMAIN dominates the failure pattern, treat short dictionary words and familiar metaphors as commercially saturated. Prefer coherent, distinctive seven-to-twelve-letter suggestive or invented forms without sacrificing pronunciation, spelling or semantic credibility.
 Every name must work cold on a sales call, contract, search result and product interface. Reject your own output when the meaning needs a paragraph, when two keywords are visibly glued together, when spelling or pronunciation is unstable, or when the name resembles a known active company, product or supplied competitor.
@@ -436,7 +436,7 @@ async function generateWithStrategy({
       schema: GENERATION_SCHEMA as unknown as Record<string, unknown>,
       instructions: `${GENERATION_INSTRUCTIONS}\n\nStrategy rule: ${STRATEGY_RULES[strategy]}`,
       input: `Create ${count} candidates.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nDo not repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}\nEarlier-wave failure patterns to correct: ${JSON.stringify(failedPatterns)}`,
-      maxOutputTokens: 1_200,
+      maxOutputTokens: 1_400,
       promptCacheKey: `namolux-name-sprint-${strategy}-v2`,
       userIdentifier,
       signal,
@@ -914,13 +914,18 @@ export async function runNameSprint({
         return []
       }
       const requiresModifiedDomainQualityGate = launchDomain.kind === "modified"
+      const judgedScores = judgment ? Object.values(judgment.scores) : []
+      const judgedAverage = judgedScores.length
+        ? judgedScores.reduce((total, value) => total + value, 0) / judgedScores.length
+        : 0
       if (requiresModifiedDomainQualityGate && (
         !judgment
-        || judgment.scores.strategicFit < 60
-        || judgment.scores.distinctiveness < 65
-        || judgment.scores.memorability < 60
-        || judgment.scores.pronunciation < 65
-        || judgment.scores.spellingCharacter < 65
+        || judgedAverage < 60
+        || judgment.scores.strategicFit < 55
+        || judgment.scores.distinctiveness < 58
+        || judgment.scores.memorability < 55
+        || judgment.scores.pronunciation < 58
+        || judgment.scores.spellingCharacter < 58
       )) {
         rejected.push({
           ...candidate,
