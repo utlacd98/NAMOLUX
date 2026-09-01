@@ -208,7 +208,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.length).toBeGreaterThan(0)
     expect(result.candidates.length).toBeLessThanOrEqual(12)
     expect(result.candidates.every((candidate) => candidate.eligibility.status === "pass")).toBe(true)
-    expect(result.candidates.every((candidate) => candidate.founderSignal.band !== "Reconsider")).toBe(true)
+    expect(result.candidates.every((candidate) => candidate.founderSignal.band === "Strong" || candidate.founderSignal.band === "Elite")).toBe(true)
     expect(result.candidates.every((candidate) => candidate.collisionScreen?.status === "not_run")).toBe(true)
     expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("SPELLING_AMBIGUITY"))).toBe(true)
     expect(result.timingMs.total).toBeGreaterThanOrEqual(0)
@@ -234,7 +234,13 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => candidate.collisionScreen?.category === constitution.category)).toBe(true)
     expect(result.candidates.every((candidate) => candidate.collisionScreen?.markets.includes("United Kingdom"))).toBe(true)
     expect(result.usage.webSearchCalls).toBeGreaterThan(0)
-    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("ACTIVE_BRAND_EXACT"))).toBe(true)
+    const collisionRejected = result.rejected.find((candidate) => candidate.eligibility.failureCodes.includes("ACTIVE_BRAND_EXACT"))
+    expect(collisionRejected).toBeDefined()
+    const collisionCallIndex = mocks.structured.mock.calls.findIndex(([request]) => request.schemaName === "name_sprint_current_collision_screen")
+    const judgeCallIndex = mocks.structured.mock.calls.findIndex(([request]) => request.schemaName === "name_sprint_blind_judgments")
+    expect(judgeCallIndex).toBeLessThan(collisionCallIndex)
+    expect(mocks.structured.mock.calls[judgeCallIndex][0].input).toContain(collisionRejected!.name)
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")).toHaveLength(1)
   })
 
   it("runs one combined live screen and caps the public shortlist at eight", async () => {
@@ -264,6 +270,19 @@ describe("Name Sprint multi-stage engine", () => {
 
     await expect(runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" }))
       .rejects.toThrow("name_sprint_live_screen_incomplete")
+  })
+
+  it("fails closed when the required independent judge cannot complete", async () => {
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+    const normalImplementation = mocks.structured.getMockImplementation()
+    mocks.structured.mockImplementation(async (request: { schemaName: string }) => {
+      if (request.schemaName === "name_sprint_blind_judgments") throw new Error("judge_output_truncated")
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      return normalImplementation(request)
+    })
+
+    await expect(runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" }))
+      .rejects.toThrow("name_sprint_judge_incomplete")
   })
 
   it("fails closed instead of silently replaying a malformed guided-search round", async () => {
@@ -309,7 +328,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(checkedDomains.length).toBeLessThanOrEqual(128)
     expect(checkedDomains.every((domain) => domain.endsWith(".com") || domain.endsWith(".co") || domain.endsWith(".ai"))).toBe(true)
     expect(new Set(checkedDomains.map((domain) => domain.split(".").at(-1)))).toEqual(new Set(["com", "co", "ai"]))
-    expect(result.attempts).toBe(3)
+    expect(result.attempts).toBe(2)
     expect(mocks.structured.mock.calls.some(([request]) => request.schemaName === "name_sprint_editorial_repair")).toBe(false)
   })
 
@@ -348,7 +367,34 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => candidate.founderSignal.dimensions.domainExtension === 78)).toBe(true)
   })
 
-  it("admits a credible name with a clean modified dot-com and caps modified domains at two", async () => {
+  it("admits dot-ai-only names for a consumer marketplace when they clear quality", async () => {
+    mocks.availability.mockImplementation(async (domains: string[]) => domains.map((domain) => ({
+      domain,
+      available: domain.endsWith(".ai"),
+      provider: "test",
+      confidence: "high",
+      latencyMs: 1,
+    })))
+
+    const result = await runNameSprint({
+      constitution: {
+        ...constitution,
+        description: "A marketplace that helps pet owners find trusted local carers for holidays and busy working days.",
+        category: "pet-care marketplace",
+        problem: "Owners struggle to find a trusted nearby carer.",
+        namingMode: "consumer_friendly",
+      },
+      territories,
+      signal: new AbortController().signal,
+      userIdentifier: "test-user",
+    })
+
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.candidates.every((candidate) => candidate.launchDomain.domain.endsWith(".ai"))).toBe(true)
+    expect(result.attempts).toBe(2)
+  })
+
+  it("rejects modified dot-com fallbacks when exact priority domains are unavailable", async () => {
     mocks.availability.mockImplementation(async (domains: string[]) => domains.map((domain) => ({
       domain,
       available: domain.startsWith("get") && domain.endsWith(".com"),
@@ -359,11 +405,9 @@ describe("Name Sprint multi-stage engine", () => {
 
     const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
 
-    expect(result.candidates.length).toBeGreaterThan(0)
-    expect(result.candidates.length).toBeLessThanOrEqual(2)
-    expect(result.candidates.every((candidate) => candidate.launchDomain.kind === "modified")).toBe(true)
-    expect(result.candidates.every((candidate) => candidate.launchDomain.domain.startsWith("get"))).toBe(true)
-    expect(result.candidates.every((candidate) => candidate.founderSignal.dimensions.domainExtension === 60)).toBe(true)
+    expect(result.candidates).toHaveLength(0)
+    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("NO_PREFERRED_DOMAIN"))).toBe(true)
+    expect((mocks.availability.mock.calls[0]?.[0] as string[]).every((domain) => !domain.startsWith("get"))).toBe(true)
   })
 
   it("treats shared roots, phonetics, and close strings as one related family", () => {
@@ -382,6 +426,7 @@ describe("Name Sprint multi-stage engine", () => {
 
     expect(areRelatedNameFamily(raw("CedarLane", ["cedar"]), raw("CedarArc", ["cedar"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Novara", ["nova"]), raw("Novaro", ["novaro"]))).toBe(true)
+    expect(areRelatedNameFamily(raw("Morrowen", ["continuity"]), raw("Morrowfield", ["welcome"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
   })
 
@@ -443,7 +488,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => /^[A-Za-z\s'-]+$/.test(candidate.pronunciation))).toBe(true)
   })
 
-  it("falls back to deterministic scoring instead of retrying a failed judge", async () => {
+  it("does not publish a candidate when the optional judge fallback cannot reach Strong", async () => {
     const normalImplementation = mocks.structured.getMockImplementation()
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_blind_judgments") throw new Error("judge_output_truncated")
@@ -461,17 +506,27 @@ describe("Name Sprint multi-stage engine", () => {
 
     const judgeCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")
     expect(judgeCalls).toHaveLength(1)
-    expect(result.candidates.length).toBeGreaterThan(0)
-    expect(result.attempts).toBe(1)
+    expect(result.candidates).toHaveLength(0)
+    expect(result.attempts).toBe(2)
     expect(result.usage.model).toBe("gpt-5.6-luna")
     expect(consoleSpy).toHaveBeenCalledWith("name-sprint-judge-incomplete", { reason: "judge_output_truncated" })
     consoleSpy.mockRestore()
   })
 
-  it("uses admissions failures to guide a smaller second search round", async () => {
+  it("uses domain failures to guide one smaller repair round", async () => {
     process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
     const normalImplementation = mocks.structured.getMockImplementation()
-    let admissionCalls = 0
+    let availabilityCalls = 0
+    mocks.availability.mockImplementation(async (domains: string[]) => {
+      availabilityCalls += 1
+      return domains.map((domain) => ({
+        domain,
+        available: availabilityCalls > 1 && domain.endsWith(".com"),
+        provider: "test",
+        confidence: "high",
+        latencyMs: 1,
+      }))
+    })
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_guided_search" && request.input.includes("Search round: 2")) {
         const names = ["Caldrin", "Venset", "Ordan", "Tembra", "Keldan", "Rovant", "Selkin", "Dovren", "Marven", "Tavrin"]
@@ -493,26 +548,6 @@ describe("Name Sprint multi-stage engine", () => {
           estimatedUsd: 0.00042,
         }
       }
-      if (request.schemaName === "name_sprint_final_admissions") {
-        admissionCalls += 1
-        const candidates = JSON.parse(request.input.split("Candidate set: ")[1]) as Array<{ name: string }>
-        const admit = admissionCalls > 1
-        return {
-          data: {
-            decisions: candidates.map(({ name }, index) => ({
-              name,
-              admit: admit && index < 8,
-              reason: admit && index < 8
-                ? "A serious shortlist candidate."
-                : "Not strong enough to shortlist.",
-            })),
-          },
-          model: "gpt-5.6-luna",
-          inputTokens: 160,
-          outputTokens: 120,
-          estimatedUsd: 0.000176,
-        }
-      }
       if (!normalImplementation) throw new Error("missing_test_implementation")
       return normalImplementation(request)
     })
@@ -527,9 +562,9 @@ describe("Name Sprint multi-stage engine", () => {
     const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
     expect(guidedCalls).toHaveLength(2)
-    expect(guidedCalls[1][0].input).toContain("BELOW_QUALITY_BAR")
-    expect(guidedCalls[1][0].input).toContain("Strengthen the immediate semantic bridge")
-    expect(admissionCalls).toBe(2)
+    expect(guidedCalls[1][0].input).toContain("NO_PREFERRED_DOMAIN")
+    expect(guidedCalls[1][0].input).toContain("exact-domain potential")
+    expect(availabilityCalls).toBe(2)
     expect(collisionCalls).toHaveLength(1)
     expect(result.attempts).toBe(2)
     expect(result.candidates.length).toBeGreaterThan(0)
@@ -577,9 +612,9 @@ describe("Name Sprint multi-stage engine", () => {
           judgments: blinded.map(({ name }) => ({
             name,
             fatalFlawCodes: [],
-            scores: { strategicFit: 0, distinctiveness: 0, memorability: 0, pronunciation: 50, spellingCharacter: 50 },
-            strongestReason: "No persuasive advantage was identified.",
-            mainRisk: "The name is not strong enough to shortlist.",
+            scores: { strategicFit: 70, distinctiveness: 70, memorability: 70, pronunciation: 70, spellingCharacter: 70 },
+            strongestReason: "The name is coherent but not exceptional.",
+            mainRisk: "Overall quality remains below the public shortlist standard.",
             confidence: "high",
             preferredWithinGroup: 0,
           })),
@@ -599,10 +634,42 @@ describe("Name Sprint multi-stage engine", () => {
     })
 
     const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
-    expect(guidedCalls).toHaveLength(1)
-    expect(result.attempts).toBe(1)
+    expect(guidedCalls).toHaveLength(2)
+    expect(guidedCalls[1][0].input).toContain("BELOW_QUALITY_BAR")
+    expect(guidedCalls[1][0].input).toContain("Strengthen the immediate semantic bridge")
+    expect(result.attempts).toBe(2)
     expect(result.usage.model).toBe("gpt-5.6-luna")
     expect(result.candidates).toHaveLength(0)
     expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("BELOW_QUALITY_BAR"))).toBe(true)
+  })
+
+  it("turns an explanation-dependent judge risk into a hard semantic rejection", async () => {
+    const normalImplementation = mocks.structured.getMockImplementation()
+    mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
+      if (request.schemaName === "name_sprint_blind_judgments") {
+        const blinded = JSON.parse(request.input.split("Shuffled candidate set: ")[1]) as Array<{ name: string }>
+        return {
+          data: { judgments: blinded.map(({ name }) => ({
+            name,
+            fatalFlawCodes: [],
+            scores: { strategicFit: 72, distinctiveness: 82, memorability: 80, pronunciation: 88, spellingCharacter: 86 },
+            strongestReason: "The sound is clean and commercially polished.",
+            mainRisk: "Weak semantic connection; the name requires substantial brand-building.",
+            confidence: "high",
+            preferredWithinGroup: 80,
+          })) },
+          model: "gpt-5.6-luna",
+          inputTokens: 200,
+          outputTokens: 260,
+          estimatedUsd: 0.000352,
+        }
+      }
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      return normalImplementation(request)
+    })
+
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+    expect(result.candidates).toHaveLength(0)
+    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("SEMANTIC_MISMATCH"))).toBe(true)
   })
 })

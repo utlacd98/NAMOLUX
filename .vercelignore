@@ -12,5 +12,7 @@ videos/
 test-results/
 playwright-report/
 tests/
+CLAUDE.md
+experiments/
 lib/naming-specialist/pilot-excluded-material.ts
 lib/naming-specialist/excluded-material.test.ts

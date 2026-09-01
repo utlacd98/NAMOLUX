@@ -97,11 +97,11 @@ function text(value: unknown, fallback: string, max = 300) {
   return result || fallback
 }
 
-function list(value: unknown, fallback: readonly string[] = [], max = 12) {
+function list(value: unknown, fallback: readonly string[] = [], max = 12, itemMax = 80) {
   const input = Array.isArray(value) ? value : []
   const output = input
     .filter((item): item is string => typeof item === "string")
-    .map((item) => item.replace(/\s+/g, " ").trim().slice(0, 80))
+    .map((item) => item.replace(/\s+/g, " ").trim().slice(0, itemMax))
     .filter(Boolean)
   return Array.from(new Set(output.length ? output : fallback)).slice(0, max)
 }
@@ -159,7 +159,7 @@ function sanitizeConstitution(raw: Record<string, unknown>, input: ConstitutionI
     personality: list(input.tone?.length ? input.tone : raw.personality, ["credible", "clear"], 8),
     geographicMarkets: list(input.markets?.length ? input.markets : raw.geographicMarkets, ["Global"], 6),
     languages: list(input.languages?.length ? input.languages : raw.languages, ["English"], 6),
-    futureExpansion: list(raw.futureExpansion, ["adjacent products and markets"], 6),
+    futureExpansion: list(raw.futureExpansion, ["adjacent products and markets"], 6, 180),
     competitors: list([...(input.competitors || []), ...list(raw.competitors)], [], 12),
     likedNames: list([...(input.likedNames || []), ...list(raw.likedNames)], [], 12),
     namingMode,
@@ -237,7 +237,7 @@ export function parseCompiledNameSprintPayload(value: unknown): {
   constitution.audience = list(rawConstitution.audience, constitution.audience, 8)
   constitution.problem = text(rawConstitution.problem, constitution.problem, 300)
   constitution.promise = list(rawConstitution.promise, constitution.promise, 8)
-  constitution.futureExpansion = list(rawConstitution.futureExpansion, constitution.futureExpansion, 6)
+  constitution.futureExpansion = list(rawConstitution.futureExpansion, constitution.futureExpansion, 6, 180)
   const territories = sanitizeTerritories(source.territories)
   return territories.length >= 4 ? { constitution, territories } : null
 }

@@ -5,9 +5,9 @@ const component = readFileSync("components/lab-name-generator.tsx", "utf8")
 
 describe("Name Sprint Namecheap CTA", () => {
   it("is created only from a verified available domain", () => {
-    expect(component).toContain('find((domain) => domain.status === "available")')
-    expect(component).toContain("availableDomain ? `${candidate.normalizedName}.${availableDomain.tld}` : null")
-    expect(component).toContain("{fullDomain &&")
+    expect(component).toContain("const fullDomain = candidate.launchDomain.domain")
+    expect(component).toContain("The domain exactly matches the candidate name.")
+    expect(component).not.toContain('find((domain) => domain.status === "available")')
   })
 
   it("uses the tracked partner link with safe external-link semantics", () => {

@@ -186,7 +186,7 @@ export function scoreFounderSignalV2(input: ScoreFounderSignalV2Input): FounderS
   score = clamp(score + ((input.judged?.preferredWithinGroup ?? 50) - 50) * 0.12 - genericity * 0.18)
   if (input.eligibility.scoreCap !== null) score = Math.min(score, input.eligibility.scoreCap)
   if (genericity >= 40) score = Math.min(score, 59)
-  if (dimensions.distinctiveness < 60 || dimensions.strategicFit < 55) score = Math.min(score, 74)
+  if (dimensions.distinctiveness < 60 || dimensions.strategicFit < 60 || dimensions.memorability < 55 || dimensions.pronunciation < 55 || dimensions.spellingCharacter < 55) score = Math.min(score, 74)
   if (Object.values(dimensions).some((value) => value < 45)) score = Math.min(score, 74)
   const confidence = confidenceFor(input)
   const calculatedBand = getFounderSignalBand(score)

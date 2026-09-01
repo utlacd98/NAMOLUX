@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { headers } from "next/headers"
-import { permanentRedirect } from "next/navigation"
+import { redirect } from "next/navigation"
 import { GenerateNames } from "@/components/generate-names-premium"
 import { isGeneratorLabRequestAllowed } from "@/lib/generator-lab"
 
@@ -12,7 +12,7 @@ export const metadata = {
 export default async function TestGeneratePage() {
   const requestHeaders = await headers()
   if (!isGeneratorLabRequestAllowed(requestHeaders.get("host"))) {
-    permanentRedirect("/bulk-domain-check")
+    redirect("/bulk-domain-check")
   }
   return (
     <div>

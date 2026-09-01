@@ -9,7 +9,7 @@ import { isGeneratorLabV3Enabled } from "@/lib/generator-flags"
 import { isGeneratorLabRequestAllowed, isPublicNameSprintEnabled } from "@/lib/generator-lab"
 import { LabNameGenerator } from "@/components/lab-name-generator"
 import { headers } from "next/headers"
-import { permanentRedirect, redirect } from "next/navigation"
+import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
@@ -57,7 +57,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
   const labRequest = isGeneratorLabRequestAllowed(requestHeaders.get("host"))
   const publicSprint = isPublicNameSprintEnabled()
   if (!labRequest && !publicSprint) {
-    permanentRedirect("/bulk-domain-check")
+    redirect("/bulk-domain-check")
   }
   if (publicSprint || (labRequest && isGeneratorLabV3Enabled())) {
     const supabase = await createClient()
