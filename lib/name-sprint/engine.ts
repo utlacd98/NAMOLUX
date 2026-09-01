@@ -37,6 +37,7 @@ const VERIFIED_ROOT_GLOSSARY: Readonly<Record<string, string>> = {
 }
 
 const JUDGE_FATAL_CODES: readonly EligibilityFailureCode[] = [
+  "GENERIC_CLICHE",
   "PRONUNCIATION_CLUSTER",
   "SPELLING_AMBIGUITY",
   "UNSAFE_MEANING",
@@ -133,7 +134,7 @@ const CURRENT_COLLISION_SCHEMA = {
           status: { type: "string", enum: ["clear", "reject", "review"] },
           matchedName: { type: ["string", "null"] },
           reason: { type: "string" },
-          sourceUrls: { type: "array", items: { type: "string" }, maxItems: 3 },
+          sourceUrls: { type: "array", items: { type: "string" }, maxItems: 2 },
         },
       },
     },
@@ -165,7 +166,7 @@ Keep the observation and strategyDecision factual and under 30 words each. Do no
 
 const JUDGE_INSTRUCTIONS = `You are an independent blind naming judge. You did not generate the candidates.
 Compare candidates in small implicit groups against the supplied Name Constitution. You receive no domain availability, generated rationale, or strategy labels.
-Use fatal-flaw codes only for severe pronunciation, spelling, unsafe-meaning, random-syllable, fabricated-etymology or semantic-mismatch defects. Deterministic and current web-backed screens handle competitors, genericity and brand collisions, so do not guess those fatal codes from memory; express softer concerns through dimension scores and mainRisk.
+Use fatal-flaw codes only for severe pronunciation, spelling, unsafe-meaning, random-syllable, fabricated-etymology, semantic-mismatch, or clearly generic defects. Use GENERIC_CLICHE only when a candidate is an ordinary category/trust word, a commodity phrase, a feature label, or unmistakably generic. Current web-backed screens handle brand collisions, so do not guess those from memory; express softer concerns through dimension scores and mainRisk.
 Scores are comparative signals, not legal clearance. Most raw candidates are not shortlist quality: use 45-59 for names a founder should discard, 60-74 for serious but imperfect options, and 75-89 only for the small minority you would genuinely build a company around. Do not award 75+ merely because a name is relevant or pronounceable. Descriptive compounds, forced constructions, weak semantic bridges, and names that need explanation must not receive Strong dimension scores.
 Use SEMANTIC_MISMATCH when the metaphor or root relationship is stretched enough that the supplied explanation is doing the branding work. Use RANDOM_SYLLABLES for a forced invented construction. At most one third of a typical candidate set should receive preferredWithinGroup above 70.
 If mainRisk says pronunciation or spelling may vary, include SPELLING_AMBIGUITY. If a pronunciation cluster is severe, include PRONUNCIATION_CLUSTER. The risk text and fatal codes must agree.
@@ -314,7 +315,10 @@ export function areRelatedNameFamily(left: RawNameCandidate, right: RawNameCandi
   const longer = shorter === left.normalizedName ? right.normalizedName : left.normalizedName
   if (shorter.length >= 5 && longer.startsWith(shorter) && longer.length - shorter.length <= 3) return true
   const sharedPrefix = sharedPrefixLength(left.normalizedName, right.normalizedName)
-  if (sharedPrefix >= 5 && sharedPrefix / Math.min(left.normalizedName.length, right.normalizedName.length) >= 0.6) return true
+  // A five-character visible stem is already a recognisable family at the
+  // short lengths used by Name Sprint. This catches pairs such as
+  // Gaugecraft/Gaugework even when model-supplied semantic roots differ.
+  if (sharedPrefix >= 5) return true
   return stringSimilarity(left.normalizedName, right.normalizedName) >= 0.72
 }
 
@@ -505,6 +509,10 @@ function parseJudgments(value: unknown, candidates: readonly RawNameCandidate[])
       /forced (?:invented )?(?:construction|coinage|formation)|random syllables|arbitrary syllables/i.test(mainRisk)
       && !fatalFlawCodes.includes("RANDOM_SYLLABLES")
     ) fatalFlawCodes.push("RANDOM_SYLLABLES")
+    if (
+      /\b(?:generic|commodity|feature label|category label|ordinary (?:word|adjective|noun)|common (?:word|phrase)|limited distinctiveness|directly descriptive)\b/i.test(mainRisk)
+      && !fatalFlawCodes.includes("GENERIC_CLICHE")
+    ) fatalFlawCodes.push("GENERIC_CLICHE")
     judgments.set(normalized, {
       name: exactName,
       fatalFlawCodes,
@@ -596,12 +604,31 @@ async function screenCurrentBrandCollisions(
   signal: AbortSignal,
   userIdentifier: string,
 ) {
+  const candidateNames = candidates.map((candidate) => candidate.name)
+  const schema = {
+    ...CURRENT_COLLISION_SCHEMA,
+    properties: {
+      ...CURRENT_COLLISION_SCHEMA.properties,
+      checks: {
+        ...CURRENT_COLLISION_SCHEMA.properties.checks,
+        minItems: candidateNames.length,
+        maxItems: candidateNames.length,
+        items: {
+          ...CURRENT_COLLISION_SCHEMA.properties.checks.items,
+          properties: {
+            ...CURRENT_COLLISION_SCHEMA.properties.checks.items.properties,
+            name: { type: "string", enum: candidateNames },
+          },
+        },
+      },
+    },
+  } as const
   const response = await createStructuredResponse<{ checks: Array<Record<string, unknown>> }>({
     schemaName: "name_sprint_current_collision_screen",
-    schema: CURRENT_COLLISION_SCHEMA as unknown as Record<string, unknown>,
+    schema: schema as unknown as Record<string, unknown>,
     instructions: CURRENT_COLLISION_INSTRUCTIONS,
-    input: `Target category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates: ${JSON.stringify(candidates.map((candidate) => candidate.name))}`,
-    maxOutputTokens: 1_800,
+    input: `Return exactly ${candidateNames.length} checks, one for every candidate.\nTarget category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates: ${JSON.stringify(candidateNames)}`,
+    maxOutputTokens: Math.max(1_400, 700 + candidateNames.length * 220),
     promptCacheKey: "namolux-name-sprint-current-collision-v1",
     userIdentifier,
     signal,

@@ -255,6 +255,14 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => candidate.collisionScreen?.status === "clear")).toBe(true)
     expect(result.candidates.every((candidate) => candidate.evidenceConfidence === "high")).toBe(true)
     expect(result.candidates.filter((candidate) => candidate.founderSignal.band === "Elite").length).toBeLessThanOrEqual(1)
+    const collisionRequest = mocks.structured.mock.calls.find(([request]) => request.schemaName === "name_sprint_current_collision_screen")?.[0] as {
+      schema: { properties: { checks: { minItems: number; maxItems: number; items: { properties: { name: { enum: string[] } } } } } }
+      input: string
+    }
+    const requestedNames = JSON.parse(collisionRequest.input.split("Candidates: ")[1]) as string[]
+    expect(collisionRequest.schema.properties.checks.minItems).toBe(requestedNames.length)
+    expect(collisionRequest.schema.properties.checks.maxItems).toBe(requestedNames.length)
+    expect(collisionRequest.schema.properties.checks.items.properties.name.enum).toEqual(requestedNames)
   })
 
   it("fails closed when the required live screen does not actually search", async () => {
@@ -427,7 +435,38 @@ describe("Name Sprint multi-stage engine", () => {
     expect(areRelatedNameFamily(raw("CedarLane", ["cedar"]), raw("CedarArc", ["cedar"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Novara", ["nova"]), raw("Novaro", ["novaro"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Morrowen", ["continuity"]), raw("Morrowfield", ["welcome"]))).toBe(true)
+    expect(areRelatedNameFamily(raw("Gaugecraft", ["measurement"]), raw("Gaugework", ["calibration"]))).toBe(true)
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
+  })
+
+  it("rejects an explicitly generic judge result before Founder Signal can inflate it", async () => {
+    const normalImplementation = mocks.structured.getMockImplementation()
+    mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
+      if (request.schemaName === "name_sprint_blind_judgments") {
+        const blinded = JSON.parse(request.input.split("Shuffled candidate set: ")[1]) as Array<{ name: string }>
+        return {
+          data: { judgments: blinded.map(({ name }, index) => ({
+            name,
+            fatalFlawCodes: [],
+            scores: { strategicFit: 86, distinctiveness: 84, memorability: 82, pronunciation: 88, spellingCharacter: 87 },
+            strongestReason: "The name communicates trust.",
+            mainRisk: index === 0 ? "Generic trust language with limited distinctiveness." : "Confirm broader commercial evidence.",
+            confidence: "high",
+            preferredWithinGroup: 90 - index,
+          })) },
+          model: "gpt-5.6-luna",
+          inputTokens: 200,
+          outputTokens: 300,
+          estimatedUsd: 0.0004,
+        }
+      }
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      return normalImplementation(request)
+    })
+
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("GENERIC_CLICHE"))).toBe(true)
+    expect(result.candidates.every((candidate) => !/generic/i.test(candidate.mainRisk))).toBe(true)
   })
 
   it("turns dominant rejection evidence into a concrete next-round strategy", () => {
