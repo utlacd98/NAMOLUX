@@ -102,7 +102,7 @@ const BLOCKED_EXACT_PATHS = new Set<string>([
 // 2. App routing config
 // ─────────────────────────────────────────────────────────────────────────
 
-const PROTECTED_USER_ROUTES = new Set<string>(["/dashboard", "/account", "/generate"])
+const PROTECTED_USER_ROUTES = new Set<string>(["/dashboard", "/account"])
 
 // ─────────────────────────────────────────────────────────────────────────
 // 3. Helpers
@@ -127,7 +127,6 @@ function isProtectedUserPath(path: string): boolean {
     PROTECTED_USER_ROUTES.has(path) ||
     path.startsWith("/dashboard/") ||
     path.startsWith("/account/") ||
-    path.startsWith("/generate/") ||
     path === "/admin" ||
     path.startsWith("/admin/") ||
     path === "/namo-metrics-x7k9" ||
