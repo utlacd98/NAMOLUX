@@ -278,6 +278,31 @@ describe("Name Sprint multi-stage engine", () => {
 
     await expect(runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" }))
       .rejects.toThrow("name_sprint_live_screen_incomplete")
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")).toHaveLength(2)
+  })
+
+  it("retries once when the first collision response skips its required web search", async () => {
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+    const normalImplementation = mocks.structured.getMockImplementation()
+    let collisionAttempts = 0
+    mocks.structured.mockImplementation(async (request: { schemaName: string }) => {
+      if (request.schemaName === "name_sprint_current_collision_screen") {
+        collisionAttempts += 1
+        if (collisionAttempts === 1) {
+          return { data: { checks: {} }, model: "gpt-5.6-luna", inputTokens: 20, outputTokens: 10, estimatedUsd: 0.000016, webSearchCalls: 0 }
+        }
+      }
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      return normalImplementation(request)
+    })
+
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+
+    expect(collisionAttempts).toBe(2)
+    expect(result.usage.webSearchCalls).toBe(1)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.candidates.every((candidate) => candidate.collisionScreen?.status === "clear")).toBe(true)
+    expect(result.usage.estimatedUsd).toBeLessThan(0.025)
   })
 
   it("fails closed when the required independent judge cannot complete", async () => {

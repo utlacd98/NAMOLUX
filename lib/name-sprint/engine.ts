@@ -613,19 +613,48 @@ async function screenCurrentBrandCollisions(
       },
     },
   } as const
-  const response = await createStructuredResponse<{ checks: Record<string, Record<string, unknown>> }>({
-    schemaName: "name_sprint_current_collision_screen",
-    schema: schema as unknown as Record<string, unknown>,
-    instructions: CURRENT_COLLISION_INSTRUCTIONS,
-    input: `Fill every required candidate-ID property exactly once.\nTarget category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates by required ID: ${JSON.stringify(Object.fromEntries(candidates.map((candidate) => [candidate.normalizedName, candidate.name])))}`,
-    maxOutputTokens: Math.max(1_400, 700 + candidateNames.length * 220),
-    promptCacheKey: "namolux-name-sprint-current-collision-v1",
-    userIdentifier,
-    signal,
-    webSearch: true,
-    maxToolCalls: 1,
-  })
-  return { checks: parseCurrentCollisionChecks(response.data, candidates), usage: response }
+  const responses: Array<Awaited<ReturnType<typeof createStructuredResponse<{ checks: Record<string, Record<string, unknown>> }>>>> = []
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const response = await createStructuredResponse<{ checks: Record<string, Record<string, unknown>> }>({
+      schemaName: "name_sprint_current_collision_screen",
+      schema: schema as unknown as Record<string, unknown>,
+      instructions: CURRENT_COLLISION_INSTRUCTIONS,
+      input: `${attempt === 2 ? "The previous response did not invoke web search. Invoke the required combined web search before answering.\n" : ""}Fill every required candidate-ID property exactly once.\nTarget category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates by required ID: ${JSON.stringify(Object.fromEntries(candidates.map((candidate) => [candidate.normalizedName, candidate.name])))}`,
+      maxOutputTokens: Math.max(1_400, 700 + candidateNames.length * 220),
+      promptCacheKey: attempt === 1 ? "namolux-name-sprint-current-collision-v2" : "namolux-name-sprint-current-collision-v2-tool-retry",
+      userIdentifier,
+      signal,
+      webSearch: true,
+      maxToolCalls: 1,
+    })
+    responses.push(response)
+    if (response.webSearchCalls === 1) {
+      return {
+        checks: parseCurrentCollisionChecks(response.data, candidates),
+        usage: {
+          ...response,
+          model: Array.from(new Set(responses.map((item) => item.model))).join("+"),
+          inputTokens: responses.reduce((total, item) => total + item.inputTokens, 0),
+          outputTokens: responses.reduce((total, item) => total + item.outputTokens, 0),
+          estimatedUsd: responses.reduce((total, item) => total + item.estimatedUsd, 0),
+          webSearchCalls: responses.reduce((total, item) => total + item.webSearchCalls, 0),
+        },
+      }
+    }
+    if (response.webSearchCalls > 1) break
+  }
+  const lastResponse = responses[responses.length - 1]
+  return {
+    checks: parseCurrentCollisionChecks(lastResponse?.data, candidates),
+    usage: {
+      ...lastResponse,
+      model: Array.from(new Set(responses.map((item) => item.model))).join("+"),
+      inputTokens: responses.reduce((total, item) => total + item.inputTokens, 0),
+      outputTokens: responses.reduce((total, item) => total + item.outputTokens, 0),
+      estimatedUsd: responses.reduce((total, item) => total + item.estimatedUsd, 0),
+      webSearchCalls: responses.reduce((total, item) => total + item.webSearchCalls, 0),
+    },
+  }
 }
 
 function currentCollisionRejection(candidate: RawNameCandidate, check: CurrentCollisionCheck): RejectedNameCandidate {
@@ -945,7 +974,13 @@ export async function runNameSprint({
     if (collisionCandidates.length) {
       const batch = collisionCandidates.slice(0, CURRENT_COLLISION_BATCH_SIZE)
       const currentCollision = await screenCurrentBrandCollisions(batch, constitution, signal, userIdentifier)
-      if (currentCollision.usage.webSearchCalls !== 1) throw new Error("name_sprint_live_screen_incomplete")
+      if (currentCollision.usage.webSearchCalls !== 1) {
+        console.error("name-sprint-live-screen-tool-incomplete", {
+          requestedCount: batch.length,
+          webSearchCalls: currentCollision.usage.webSearchCalls,
+        })
+        throw new Error("name_sprint_live_screen_incomplete")
+      }
       if (Array.from(currentCollision.checks.values()).some((check) => /did not return a complete check/i.test(check.reason))) {
         console.error("name-sprint-live-screen-incomplete", {
           requestedCount: batch.length,
