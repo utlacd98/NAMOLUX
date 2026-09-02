@@ -1,5 +1,4 @@
 import {
-  FREE_FOUNDER_SIGNAL_BATCH_LIMIT,
   FREE_MONTHLY_BULK_CHECK_LIMIT,
   FREE_NAME_SPRINT_DAILY_LIMIT,
   PRO_FOUNDER_SIGNAL_BATCH_LIMIT,
@@ -33,7 +32,7 @@ export const CTA_LABELS = {
 // surfaces use these strings so the published offer stays consistent.
 export const PUBLIC_PRODUCT_COPY = {
   positioning: "A selective name intelligence and brand launch workspace for founders.",
-  freePlanSummary: `${FREE_MONTHLY_BULK_CHECK_LIMIT} Bulk Check runs and ${FREE_FOUNDER_SIGNAL_BATCH_LIMIT} Founder Signal run per UTC calendar month, plus ${FREE_NAME_SPRINT_DAILY_LIMIT} Name Sprint per UTC day.`,
+  freePlanSummary: `${FREE_MONTHLY_BULK_CHECK_LIMIT} Bulk Check runs per UTC calendar month plus ${FREE_NAME_SPRINT_DAILY_LIMIT} Name Sprint per UTC day. Founder Signal is available with Pro.`,
   proPlanSummary: `${PRO_MONTHLY_BULK_CHECK_LIMIT} Bulk Check runs, ${PRO_FOUNDER_SIGNAL_BATCH_LIMIT} Founder Signal runs, and ${PRO_NAME_SPRINT_MONTHLY_LIMIT} Name Sprints per UTC calendar month.`,
   proPlanFeatures: [
     `${PRO_MONTHLY_BULK_CHECK_LIMIT} Bulk Check runs per UTC calendar month`,

@@ -6,6 +6,7 @@ import { ADVANCED_SCORING_TOKEN_TTL_MS, verifyGenerationWorkflowToken } from "@/
 import { isGeneratorRedesignEnabled } from "@/lib/generator-flags"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
+import { getFounderSignalAccessDecision } from "@/lib/founder-signal-access"
 import {
   checkBurstLimit,
   checkFeatureQuotaIdempotent,
@@ -91,6 +92,14 @@ export async function POST(request: NextRequest) {
     // consuming the monthly scoring allowance. A Quick or availability token
     // cannot be replayed against this endpoint because the scope is signed.
     const entitlement = await getEntitlementState(request)
+    const access = getFounderSignalAccessDecision({ userId: entitlement.userId, isPro: entitlement.isPro })
+    if (!access.allowed) {
+      return NextResponse.json({
+        error: access.error,
+        message: access.message,
+        upgradeUrl: access.actionUrl,
+      }, { status: access.status })
+    }
     const subject = `advanced-founder-signal:${workflowIdentity(request, entitlement.userId)}`
     const names = safeCandidates.map((candidate) => candidate.name)
     if (!verifyGenerationWorkflowToken(
@@ -145,9 +154,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: unavailable ? "usage_check_unavailable" : "founder_signal_monthly_limit_reached",
-          message: unavailable
-            ? preflight.message
-            : "The free plan includes one complete Founder Signal batch per month. Upgrade for unlimited fair-use scoring.",
+          message: unavailable ? preflight.message : "This month's Founder Signal allowance has been used.",
           upgradeUrl: "/pricing",
           resetAt: preflight.resetAt,
           tokensUsed: preflight.used,
@@ -198,9 +205,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: unavailable ? "usage_check_unavailable" : "founder_signal_monthly_limit_reached",
-          message: unavailable
-            ? allowance.message
-            : "The free plan includes one complete Founder Signal batch per month. Upgrade for unlimited fair-use scoring.",
+          message: unavailable ? allowance.message : "This month's Founder Signal allowance has been used.",
           upgradeUrl: "/pricing",
           resetAt: allowance.resetAt,
           tokensUsed: allowance.used,

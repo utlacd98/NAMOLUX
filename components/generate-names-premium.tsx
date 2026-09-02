@@ -3424,7 +3424,7 @@ export function GenerateNames({
                       />
                       <span>
                         <strong className="block text-xs font-semibold text-[#D4AF37]">Add Founder Signal</strong>
-                        <span className="mt-1 block text-[10px] leading-4 text-white/38">One free scored batch each month. Pro is unlimited under fair use.</span>
+                        <span className="mt-1 block text-[10px] leading-4 text-white/38">Founder Signal scoring is available with Pro.</span>
                       </span>
                     </label>
                   </div>

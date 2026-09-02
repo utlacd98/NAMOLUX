@@ -2,7 +2,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Reveal } from "@/components/landing/reveal"
 
-const assurances = ["3 free Bulk Check runs", "1 free Founder Signal run", "Up to 50 names per batch"]
+const assurances = ["3 free Bulk Check runs", "Founder Signal with Pro", "Up to 50 names per batch"]
 
 export function FinalCTA() {
   return (

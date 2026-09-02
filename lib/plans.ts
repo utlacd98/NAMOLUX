@@ -2,7 +2,7 @@
 export const FREE_MONTHLY_BULK_CHECK_LIMIT = 3
 export const PRO_MONTHLY_BULK_CHECK_LIMIT = 120
 export const FREE_ADVANCED_GENERATION_LIMIT = 3
-export const FREE_FOUNDER_SIGNAL_BATCH_LIMIT = 1
+export const FREE_FOUNDER_SIGNAL_BATCH_LIMIT = 0
 export const PRO_FOUNDER_SIGNAL_BATCH_LIMIT = 120
 export const FREE_NAME_SPRINT_DAILY_LIMIT = 1
 export const PRO_NAME_SPRINT_MONTHLY_LIMIT = 40
@@ -49,7 +49,7 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     shortName: "Free",
     price: "\u00a30",
     billingLabel: "free",
-    description: "One curated Name Sprint per UTC day, plus three bulk shortlist checks and one complete Founder Signal batch each month.",
+    description: "One curated Name Sprint per UTC day and three bulk shortlist checks each month. Founder Signal is available with Pro.",
     isPaid: false,
     adFree: false,
     unlimitedUsage: false,
@@ -66,7 +66,7 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     features: [
       "3 bulk shortlist checks per month",
       "Up to 50 candidate names per batch",
-      "1 complete Founder Signal batch per month",
+      "Founder Signal available with Pro",
       "Live checks across six domain extensions",
       "Clear available, unavailable, or verify states",
       "Advertising-supported",

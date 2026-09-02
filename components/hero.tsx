@@ -11,7 +11,7 @@ const editorialSerif =
 const supportingPoints = [
   "No account required",
   "Live availability across 6 TLDs",
-  "One free Founder Signal batch monthly",
+  "Founder Signal scoring with Pro",
 ]
 
 const heroProof = [
@@ -158,7 +158,7 @@ export function Hero() {
             <motion.div {...getReveal(0.22, Boolean(reducedMotion))} className="relative mt-6 flex flex-col items-start gap-4 lg:mt-7">
               <p className="max-w-xl text-[15px] leading-7 text-[#ddd6c5]/78 sm:text-[17px]">
                 Explore freely with Quick, or use three Advanced batches each month. Live domain checks
-                update without blocking your shortlist; run one complete Founder Signal batch free when
+                update without blocking your shortlist; upgrade to Pro when you are ready to run Founder Signal and
                 you are ready to compare the evidence.
               </p>
 

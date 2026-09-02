@@ -173,7 +173,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               <div>
                 <h2 className="text-xl font-semibold text-white">How do the free allowances work?</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#999]">
-                  Signed-in Free users receive {PRODUCT_OFFER.freeNameSprintDailyRuns} Name Sprint per UTC day, {PRODUCT_OFFER.freeMonthlyUses} Bulk Check runs, and {PRODUCT_OFFER.freeFounderSignalBatches} Founder Signal run each month. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It adds paid Brand Launch Kits, saved projects, CSV exports, and shareable decision reports. {PUBLIC_PRODUCT_COPY.renewalNote}
+                  Signed-in Free users receive {PRODUCT_OFFER.freeNameSprintDailyRuns} Name Sprint per UTC day and {PRODUCT_OFFER.freeMonthlyUses} Bulk Check runs each month. Founder Signal is available with Pro. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It adds paid Brand Launch Kits, saved projects, CSV exports, and shareable decision reports. {PUBLIC_PRODUCT_COPY.renewalNote}
                 </p>
               </div>
               <Link

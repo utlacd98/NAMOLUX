@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { scoreName, type BrandVibe } from "@/lib/founderSignal/scoreName"
 import { hasSystemReservedName, systemReservedNameError } from "@/lib/reserved-names"
+import { getFounderSignalAccessDecision } from "@/lib/founder-signal-access"
 import { FREE_FOUNDER_SIGNAL_BATCH_LIMIT, PRO_FOUNDER_SIGNAL_BATCH_LIMIT } from "@/lib/plans"
 import {
   checkBurstLimit,
@@ -132,12 +133,17 @@ export async function POST(request: NextRequest) {
     }
 
     const subject = await getQuotaSubject(request)
-    if (subject.accessState === "expired") {
+    const access = getFounderSignalAccessDecision({
+      userId: subject.userId,
+      isPro: subject.plan === "pro",
+      accessState: subject.accessState,
+    })
+    if (!access.allowed) {
       return NextResponse.json({
-        error: "subscription_lapsed_read_only",
-        message: "Your saved decision work remains available to read, export, or delete. Renew Pro to run Founder Signal again.",
-        upgradeUrl: "/pricing?reason=renew-workspace&from=founder-signal",
-      }, { status: 403 })
+        error: access.error,
+        message: access.message,
+        upgradeUrl: access.actionUrl,
+      }, { status: access.status })
     }
     const replay = await getPlanFeatureQuotaReplayStateForSubject(subject, "founder-signal-batch-monthly", quotaKey)
     if (replay.unavailable) return quotaError({ status: 503, used: 0, limit: 0, remaining: 0, resetAt: null })

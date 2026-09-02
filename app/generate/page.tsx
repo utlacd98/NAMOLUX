@@ -12,6 +12,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { isNameSprintPreviewUser } from "@/lib/name-sprint/preview-access"
+import { getUserEntitlements } from "@/lib/entitlements"
 import Link from "next/link"
 import { ArrowRight, LockKeyhole, SearchCheck, ShieldCheck } from "lucide-react"
 
@@ -115,7 +116,8 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!isNameSprintPreviewUser(user)) return <NameSprintComingSoon />
-    return <LabNameGenerator internalTools={labRequest} />
+    const entitlements = user ? await getUserEntitlements(user.id) : null
+    return <LabNameGenerator internalTools={labRequest} founderSignalEnabled={entitlements?.isPro === true} />
   }
   const params = await searchParams
   const rawBrief = params?.q ?? params?.keyword
@@ -135,7 +137,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      "Explore names free in Quick, use three Advanced batches and one complete Founder Signal batch each month, then check domains without interrupting ideation.",
+      "Explore names, verify launch domains, and upgrade to Pro when you are ready to run Founder Signal on your shortlist.",
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "GBP", description: PRODUCT_OFFER.freeUsageLabel },
       { "@type": "Offer", price: PRODUCT_OFFER.proMonthlyPrice, priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },

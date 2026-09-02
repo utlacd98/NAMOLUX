@@ -780,8 +780,8 @@ export async function getFeatureQuotaState(
 
 function validatePlanQuotaLimits(limits: PlanFeatureQuotaLimits) {
   for (const limit of [limits.free, limits.pro]) {
-    if (!Number.isSafeInteger(limit) || limit < 1) {
-      throw new Error("Plan feature quota limits must be positive integers")
+    if (!Number.isSafeInteger(limit) || limit < 0) {
+      throw new Error("Plan feature quota limits must be non-negative integers")
     }
   }
 }
@@ -829,6 +829,17 @@ export async function getPlanFeatureQuotaStateForSubject(
 
   const window = getQuotaWindow(periods[subject.plan])
   const limit = planQuotaLimit(subject.plan, limits)
+  if (limit === 0) {
+    return buildPlanFeatureQuotaResult({
+      subject,
+      allowed: false,
+      used: 0,
+      limit: 0,
+      resetAt: window.reset.toISOString(),
+      statusCode: 429,
+      message: "This feature is not included with the current plan.",
+    })
+  }
   try {
     const used = Math.max(0, Number(await readCounter(subject.subjectType, subject.subjectHash, feature, window)) || 0)
     return buildPlanFeatureQuotaResult({
@@ -905,6 +916,21 @@ export async function checkPlanFeatureQuotaIdempotentForSubject(
 
   const window = getQuotaWindow(periods[subject.plan])
   const limit = planQuotaLimit(subject.plan, limits)
+  if (limit === 0) {
+    return {
+      ...buildPlanFeatureQuotaResult({
+        subject,
+        allowed: false,
+        used: 0,
+        limit: 0,
+        resetAt: window.reset.toISOString(),
+        statusCode: 429,
+        message: "This feature is not included with the current plan.",
+      }),
+      replayed: false,
+      receiptCreatedAt: null,
+    }
+  }
   try {
     const result = await consumeCounterIdempotent({
       subjectType: subject.subjectType,

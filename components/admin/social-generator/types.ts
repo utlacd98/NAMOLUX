@@ -85,7 +85,7 @@ export const DEFAULT_CONFIG: PostConfig = {
   screenshots: [],
   features: [
     "3 free Bulk Check runs each month.",
-    "1 free Founder Signal run each month.",
+    "Founder Signal scoring with Pro.",
     "Live checks across six domain extensions.",
   ],
   domainName: "CloudSync.io",

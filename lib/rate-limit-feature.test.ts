@@ -108,6 +108,25 @@ describe("isolated feature allowances", () => {
     })
   })
 
+  it("supports a feature that is excluded from Free without touching the counter", async () => {
+    const result = await getPlanFeatureQuotaState(
+      request(),
+      "founder-signal-batch-monthly",
+      { free: 0, pro: 120 },
+    )
+
+    expect(result).toMatchObject({
+      allowed: false,
+      isPro: false,
+      used: 0,
+      limit: 0,
+      remaining: 0,
+      statusCode: 429,
+    })
+    expect(mocks.rpc).not.toHaveBeenCalled()
+    expect(mocks.from).not.toHaveBeenCalled()
+  })
+
   it("atomically consumes the exact feature key and reports its own remaining allowance", async () => {
     const result = await checkFeatureQuota(request(), "advanced-generation-monthly", 3)
 

@@ -671,6 +671,7 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
     [activeReport?.id, savedWorkspace?.reportShares],
   )
   const canWriteSavedWork = savedWorkspace?.principal.isPro === true
+  const canRunFounderSignal = usage?.isPro === true
 
   const refreshUsage = useCallback(async () => {
     try {
@@ -857,6 +858,14 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
   }
 
   const requestFounderSignal = async () => {
+    if (!canRunFounderSignal) {
+      setError({
+        error: "founder_signal_pro_required",
+        message: "Founder Signal is available with NamoLux Pro.",
+        upgradeUrl: "/pricing?reason=founder-signal-pro&from=bulk-check",
+      })
+      return
+    }
     if (!job || activeJob || !job.results.length) {
       setError({ message: "Wait for at least one availability result before scoring this shortlist." })
       return
@@ -1535,10 +1544,16 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
                     <p className="font-semibold text-[#f4efe5]">Ready to score this shortlist?</p>
                     <p className="mt-1 text-sm leading-5 text-white/55">Founder Signal will compare every candidate against .{primaryTld}.</p>
                   </div>
-                  <button type="button" onClick={requestFounderSignal} disabled={!job || activeJob || !job.results.length || isScoring} className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 border border-[#c4a15b]/60 bg-[#c4a15b]/10 px-4 text-sm font-semibold text-[#e1c27f] transition hover:bg-[#c4a15b]/18 disabled:cursor-not-allowed disabled:opacity-40">
-                    {isScoring ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                    {isScoring ? "Scoring shortlist..." : `Run Founder Signal for .${primaryTld}`}
-                  </button>
+                  {usage && !canRunFounderSignal ? (
+                    <Link href="/pricing?reason=founder-signal-pro&from=bulk-check" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 border border-[#c4a15b]/60 bg-[#c4a15b]/10 px-4 text-sm font-semibold text-[#e1c27f] transition hover:bg-[#c4a15b]/18">
+                      <Sparkles className="h-4 w-4" /> Unlock Founder Signal
+                    </Link>
+                  ) : (
+                    <button type="button" onClick={requestFounderSignal} disabled={!canRunFounderSignal || !job || activeJob || !job.results.length || isScoring} className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 border border-[#c4a15b]/60 bg-[#c4a15b]/10 px-4 text-sm font-semibold text-[#e1c27f] transition hover:bg-[#c4a15b]/18 disabled:cursor-not-allowed disabled:opacity-40">
+                      {isScoring ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                      {isScoring ? "Scoring shortlist..." : usage ? `Run Founder Signal for .${primaryTld}` : "Checking Pro access..."}
+                    </button>
+                  )}
                 </section>
 
                 {activeNoteName ? (
@@ -1585,7 +1600,7 @@ export function BulkDecisionWorkspace({ initialNames = "" }: BulkDecisionWorkspa
 
             <div className="mt-6 border-t border-white/10 pt-5 text-xs leading-5 text-white/42">
               <span>{usageError ? "Usage meter is temporarily unavailable." : usage?.isPro ? "Pro workspace allowance resets on the first UTC day of each month." : "Free allowance resets on the first UTC day of each month."}</span>
-              <button type="button" onClick={requestFounderSignal} disabled={!job || activeJob || !job.results.length || isScoring} className="hidden">
+              <button type="button" onClick={requestFounderSignal} disabled={!canRunFounderSignal || !job || activeJob || !job.results.length || isScoring} className="hidden">
                 {isScoring ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 {isScoring ? "Scoring shortlist..." : `Run Founder Signal for .${primaryTld}`}
               </button>

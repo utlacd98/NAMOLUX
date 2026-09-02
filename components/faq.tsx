@@ -16,7 +16,7 @@ const faqs = [
   {
     question: "What do I get for free?",
     answer:
-      "The free plan includes 3 Bulk Check runs and 1 Founder Signal run per UTC calendar month. Each Bulk Check can include up to 50 candidate names across six domain extensions.",
+      "The free plan includes 3 Bulk Check runs per UTC calendar month. Each Bulk Check can include up to 50 candidate names across six domain extensions. Founder Signal is available with Pro.",
   },
   {
     question: "Is there a paid plan?",
