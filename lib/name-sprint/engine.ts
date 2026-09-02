@@ -476,7 +476,7 @@ async function screenCurrentBrandCollisions(
       maxToolCalls: 1,
     })
     responses.push(response)
-    if (response.webSearchCalls === 1) {
+    if (response.webSearchCalls >= 1 && response.webSearchCalls <= 2) {
       return {
         checks: parseCurrentCollisionChecks(response.data, candidates),
         usage: {
@@ -604,7 +604,7 @@ export async function runNameSprint({
     usage.outputTokens += item.outputTokens
     usage.estimatedUsd += item.estimatedUsd
     usage.webSearchCalls += item.webSearchCalls || 0
-    if (usage.webSearchCalls > 1) throw new Error("name_sprint_web_search_ceiling_exceeded")
+    if (usage.webSearchCalls > 2) throw new Error("name_sprint_web_search_ceiling_exceeded")
     if (usage.estimatedUsd > MAX_ESTIMATED_RUN_USD) throw new Error("name_sprint_cost_ceiling_exceeded")
   }
 
@@ -762,7 +762,7 @@ export async function runNameSprint({
     if (collisionCandidates.length) {
       const batch = collisionCandidates.slice(0, CURRENT_COLLISION_BATCH_SIZE)
       const currentCollision = await screenCurrentBrandCollisions(batch, constitution, signal, userIdentifier)
-      if (currentCollision.usage.webSearchCalls !== 1) {
+      if (currentCollision.usage.webSearchCalls < 1 || currentCollision.usage.webSearchCalls > 2) {
         console.error("name-sprint-live-screen-tool-incomplete", {
           requestedCount: batch.length,
           webSearchCalls: currentCollision.usage.webSearchCalls,

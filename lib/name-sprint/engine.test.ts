@@ -303,6 +303,24 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.usage.estimatedUsd).toBeLessThan(0.025)
   })
 
+  it("accepts a completed bounded collision screen when the provider reports two search operations", async () => {
+    process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
+    const normalImplementation = mocks.structured.getMockImplementation()
+    mocks.structured.mockImplementation(async (request: { schemaName: string }) => {
+      if (!normalImplementation) throw new Error("missing_test_implementation")
+      const response = await normalImplementation(request)
+      return request.schemaName === "name_sprint_current_collision_screen"
+        ? { ...response, webSearchCalls: 2 }
+        : response
+    })
+
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.usage.webSearchCalls).toBe(2)
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")).toHaveLength(1)
+  })
+
   it("does not depend on an automatic independent judge", async () => {
     process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
     const normalImplementation = mocks.structured.getMockImplementation()
