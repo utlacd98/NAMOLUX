@@ -73,15 +73,15 @@ describe("Name Sprint multi-stage engine", () => {
     let collisionRejected = false
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_current_collision_screen") {
-        const candidates = JSON.parse(request.input.split("Candidates: ")[1]) as string[]
+        const candidates = JSON.parse(request.input.split("Candidates by required ID: ")[1]) as Record<string, string>
         return {
-          data: { checks: candidates.map((name) => {
+          data: { checks: Object.fromEntries(Object.entries(candidates).map(([id, name]) => {
             if (!collisionRejected) {
               collisionRejected = true
-              return { name, status: "reject", matchedName: name, reason: "An exact active software match was found.", sourceUrls: ["https://example.com/evidence"] }
+              return [id, { status: "reject", matchedName: name, reason: "An exact active software match was found.", sourceUrls: ["https://example.com/evidence"] }]
             }
-            return { name, status: "clear", matchedName: null, reason: "No active exact or adjacent match found.", sourceUrls: [] }
-          }) },
+            return [id, { status: "clear", matchedName: null, reason: "No active exact or adjacent match found.", sourceUrls: [] }]
+          })) },
           model: "gpt-5.6-luna",
           inputTokens: 180,
           outputTokens: 120,
@@ -256,13 +256,13 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => candidate.evidenceConfidence === "high")).toBe(true)
     expect(result.candidates.filter((candidate) => candidate.founderSignal.band === "Elite").length).toBeLessThanOrEqual(1)
     const collisionRequest = mocks.structured.mock.calls.find(([request]) => request.schemaName === "name_sprint_current_collision_screen")?.[0] as {
-      schema: { properties: { checks: { minItems: number; maxItems: number; items: { properties: { name: { enum: string[] } } } } } }
+      schema: { properties: { checks: { required: string[]; properties: Record<string, unknown> } } }
       input: string
     }
-    const requestedNames = JSON.parse(collisionRequest.input.split("Candidates: ")[1]) as string[]
-    expect(collisionRequest.schema.properties.checks.minItems).toBe(requestedNames.length)
-    expect(collisionRequest.schema.properties.checks.maxItems).toBe(requestedNames.length)
-    expect(collisionRequest.schema.properties.checks.items.properties.name.enum).toEqual(requestedNames)
+    const requestedNames = JSON.parse(collisionRequest.input.split("Candidates by required ID: ")[1]) as Record<string, string>
+    expect(collisionRequest.schema.properties.checks.required).toEqual(Object.keys(requestedNames))
+    expect(Object.keys(collisionRequest.schema.properties.checks.properties)).toEqual(Object.keys(requestedNames))
+    expect(new Set(collisionRequest.schema.properties.checks.required).size).toBe(Object.keys(requestedNames).length)
   })
 
   it("fails closed when the required live screen does not actually search", async () => {

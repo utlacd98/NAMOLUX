@@ -118,26 +118,15 @@ const JUDGE_SCHEMA = {
   },
 } as const
 
-const CURRENT_COLLISION_SCHEMA = {
+const CURRENT_COLLISION_CHECK_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["checks"],
+  required: ["status", "matchedName", "reason", "sourceUrls"],
   properties: {
-    checks: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["name", "status", "matchedName", "reason", "sourceUrls"],
-        properties: {
-          name: { type: "string" },
-          status: { type: "string", enum: ["clear", "reject", "review"] },
-          matchedName: { type: ["string", "null"] },
-          reason: { type: "string" },
-          sourceUrls: { type: "array", items: { type: "string" }, maxItems: 2 },
-        },
-      },
-    },
+    status: { type: "string", enum: ["clear", "reject", "review"] },
+    matchedName: { type: ["string", "null"] },
+    reason: { type: "string" },
+    sourceUrls: { type: "array", items: { type: "string" }, maxItems: 2 },
   },
 } as const
 
@@ -176,7 +165,7 @@ const CURRENT_COLLISION_INSTRUCTIONS = `You are the current-evidence collision g
 You receive no more than eight candidates. Use exactly one combined web query containing every exact quoted name plus company, brand, product, and software terms. Investigate every supplied name; do not infer that evidence for one candidate covers another.
 Reject an exact active company, brand, or product match. Reject a confusingly similar active match in the same or an adjacent market. Famous exact brands are rejected across markets.
 Use review only when evidence is genuinely ambiguous. Use clear only when no credible active exact or adjacent-market conflict is found after searching. Domain unavailability alone is not collision evidence.
-This is automated screening, not legal clearance. Return one check for every supplied candidate, keep reasons factual and short, and include up to three direct evidence URLs.`
+This is automated screening, not legal clearance. Fill every required candidate-ID property exactly once, keep reasons factual and short, and include up to two direct evidence URLs.`
 
 const CURRENT_COLLISION_BATCH_SIZE = 8
 const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
@@ -562,9 +551,14 @@ type CurrentCollisionCheck = {
 }
 
 function parseCurrentCollisionChecks(value: unknown, candidates: readonly RawNameCandidate[]) {
-  const items = value && typeof value === "object" && Array.isArray((value as { checks?: unknown[] }).checks)
-    ? (value as { checks: Array<Record<string, unknown>> }).checks
-    : []
+  const rawChecks = value && typeof value === "object" ? (value as { checks?: unknown }).checks : null
+  const items: Array<Record<string, unknown>> = Array.isArray(rawChecks)
+    ? rawChecks as Array<Record<string, unknown>>
+    : rawChecks && typeof rawChecks === "object"
+      ? Object.entries(rawChecks as Record<string, unknown>).flatMap(([name, check]) => (
+          check && typeof check === "object" ? [{ name, ...check as Record<string, unknown> }] : []
+        ))
+      : []
   const allowedNames = new Map(candidates.map((candidate) => [candidate.normalizedName, candidate.name]))
   const checks = new Map<string, CurrentCollisionCheck>()
   for (const item of items) {
@@ -605,29 +599,25 @@ async function screenCurrentBrandCollisions(
   userIdentifier: string,
 ) {
   const candidateNames = candidates.map((candidate) => candidate.name)
+  const candidateIds = candidates.map((candidate) => candidate.normalizedName)
   const schema = {
-    ...CURRENT_COLLISION_SCHEMA,
+    type: "object",
+    additionalProperties: false,
+    required: ["checks"],
     properties: {
-      ...CURRENT_COLLISION_SCHEMA.properties,
       checks: {
-        ...CURRENT_COLLISION_SCHEMA.properties.checks,
-        minItems: candidateNames.length,
-        maxItems: candidateNames.length,
-        items: {
-          ...CURRENT_COLLISION_SCHEMA.properties.checks.items,
-          properties: {
-            ...CURRENT_COLLISION_SCHEMA.properties.checks.items.properties,
-            name: { type: "string", enum: candidateNames },
-          },
-        },
+        type: "object",
+        additionalProperties: false,
+        required: candidateIds,
+        properties: Object.fromEntries(candidateIds.map((id) => [id, CURRENT_COLLISION_CHECK_SCHEMA])),
       },
     },
   } as const
-  const response = await createStructuredResponse<{ checks: Array<Record<string, unknown>> }>({
+  const response = await createStructuredResponse<{ checks: Record<string, Record<string, unknown>> }>({
     schemaName: "name_sprint_current_collision_screen",
     schema: schema as unknown as Record<string, unknown>,
     instructions: CURRENT_COLLISION_INSTRUCTIONS,
-    input: `Return exactly ${candidateNames.length} checks, one for every candidate.\nTarget category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates: ${JSON.stringify(candidateNames)}`,
+    input: `Fill every required candidate-ID property exactly once.\nTarget category: ${constitution.category}\nMarkets: ${JSON.stringify(constitution.geographicMarkets)}\nSupplied competitors: ${JSON.stringify(constitution.competitors)}\nCandidates by required ID: ${JSON.stringify(Object.fromEntries(candidates.map((candidate) => [candidate.normalizedName, candidate.name])))}`,
     maxOutputTokens: Math.max(1_400, 700 + candidateNames.length * 220),
     promptCacheKey: "namolux-name-sprint-current-collision-v1",
     userIdentifier,
@@ -957,6 +947,10 @@ export async function runNameSprint({
       const currentCollision = await screenCurrentBrandCollisions(batch, constitution, signal, userIdentifier)
       if (currentCollision.usage.webSearchCalls !== 1) throw new Error("name_sprint_live_screen_incomplete")
       if (Array.from(currentCollision.checks.values()).some((check) => /did not return a complete check/i.test(check.reason))) {
+        console.error("name-sprint-live-screen-incomplete", {
+          requestedCount: batch.length,
+          completedCount: Array.from(currentCollision.checks.values()).filter((check) => !/did not return a complete check/i.test(check.reason)).length,
+        })
         throw new Error("name_sprint_live_screen_incomplete")
       }
       addUsage(currentCollision.usage)
