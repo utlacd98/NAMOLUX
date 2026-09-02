@@ -988,6 +988,13 @@
     border-right: 0;
   }
 
+  /* .articleCard is declared after .featuredCard in this breakpoint; make
+     the featured card's single-column layout win so its copy cannot be
+     squeezed into the arrow column on narrow screens. */
+  .articleCard.featuredCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .articleCard > .cardTitle {
     grid-column: 1;
     grid-row: 1;
