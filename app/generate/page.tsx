@@ -11,6 +11,9 @@ import { LabNameGenerator } from "@/components/lab-name-generator"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { isNameSprintPreviewUser } from "@/lib/name-sprint/preview-access"
+import Link from "next/link"
+import { ArrowRight, LockKeyhole, SearchCheck, ShieldCheck } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "NamoLux Name Sprint | Curated Business Name Generator",
@@ -52,6 +55,55 @@ export const metadata: Metadata = {
 
 type GeneratePageProps = { searchParams?: Promise<Record<string, string | string[] | undefined>> }
 
+function NameSprintComingSoon() {
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-[#090a0b] px-5 pb-20 pt-32 text-stone-100 sm:px-8 sm:pt-40">
+        <section className="mx-auto max-w-6xl overflow-hidden border border-[#d6b15e]/25 bg-[#0d0f10]">
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="border-b border-white/10 p-7 sm:p-12 lg:border-b-0 lg:border-r lg:p-16">
+              <div className="mb-8 inline-flex items-center gap-2 border border-[#d6b15e]/30 bg-[#d6b15e]/[0.06] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#e9ca82]">
+                <LockKeyhole size={15} /> Private quality testing
+              </div>
+              <h1 className="max-w-3xl font-serif text-5xl leading-[0.98] tracking-[-0.035em] text-stone-50 sm:text-6xl lg:text-7xl">
+                Name Sprint is coming soon.
+              </h1>
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-stone-400 sm:text-xl">
+                We are tightening the quality bar before opening generation publicly. NamoLux will only release it when the names, domain evidence and collision screening are consistently worth trusting.
+              </p>
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                <Link href="/bulk-domain-check" className="inline-flex min-h-12 items-center justify-center gap-2 bg-[#d6b15e] px-6 font-semibold text-[#090a0b] transition hover:bg-[#e4c576]">
+                  Check names you already have <ArrowRight size={17} />
+                </Link>
+                <Link href="/founder-signal" className="inline-flex min-h-12 items-center justify-center border border-white/15 px-6 font-semibold text-stone-200 transition hover:border-white/30 hover:bg-white/[0.04]">
+                  Explore Founder Signal
+                </Link>
+              </div>
+            </div>
+            <aside className="bg-[#0a0c0d] p-7 sm:p-12 lg:p-14">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d6b15e]">Available now</p>
+              <div className="mt-8 space-y-8">
+                <div className="flex gap-4">
+                  <SearchCheck className="mt-1 shrink-0 text-emerald-300" size={22} />
+                  <div><h2 className="text-lg font-semibold">Bulk Domain Check</h2><p className="mt-2 leading-7 text-stone-500">Compare your existing shortlist across six extensions with one consistent evidence view.</p></div>
+                </div>
+                <div className="h-px bg-white/10" />
+                <div className="flex gap-4">
+                  <ShieldCheck className="mt-1 shrink-0 text-[#e9ca82]" size={22} />
+                  <div><h2 className="text-lg font-semibold">Founder Signal</h2><p className="mt-2 leading-7 text-stone-500">Evaluate memorability, pronunciation, strategic fit, domain strength and collision risk.</p></div>
+                </div>
+              </div>
+              <p className="mt-12 border-l-2 border-[#d6b15e]/60 pl-4 text-sm leading-6 text-stone-500">No waiting list or payment is required. The rest of the NamoLux workspace remains available while Name Sprint is calibrated.</p>
+            </aside>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
+  )
+}
+
 export default async function GeneratePage({ searchParams }: GeneratePageProps) {
   const requestHeaders = await headers()
   const labRequest = isGeneratorLabRequestAllowed(requestHeaders.get("host"))
@@ -62,7 +114,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
   if (publicSprint || (labRequest && isGeneratorLabV3Enabled())) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) redirect("/sign-in?redirect=%2Fgenerate")
+    if (!isNameSprintPreviewUser(user)) return <NameSprintComingSoon />
     return <LabNameGenerator internalTools={labRequest} />
   }
   const params = await searchParams

@@ -5,6 +5,8 @@ import { persistNameConstitution } from "@/lib/name-sprint/persistence"
 import { consumeNameSprintBriefQuota, getNameSprintQuotaState, refundNameSprintBriefQuota } from "@/lib/name-sprint/access"
 import { getGeneratorLabApiBlockResponse } from "@/lib/generator-lab"
 import { checkBurstLimit, getQuotaSubject } from "@/lib/rate-limit"
+import { NAME_SPRINT_COMING_SOON_MESSAGE, isNameSprintPreviewUser } from "@/lib/name-sprint/preview-access"
+import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
 export const maxDuration = 30
@@ -12,6 +14,9 @@ export const maxDuration = 30
 export async function GET(request: NextRequest) {
   const blocked = getGeneratorLabApiBlockResponse(request)
   if (blocked) return blocked
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!isNameSprintPreviewUser(user)) return NextResponse.json({ error: NAME_SPRINT_COMING_SOON_MESSAGE }, { status: 403 })
   const subject = await getQuotaSubject(request)
   if (!subject.userId) return NextResponse.json({ error: "Sign in is required to use Name Sprint." }, { status: 401 })
   const quota = await getNameSprintQuotaState(subject)
@@ -21,6 +26,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const blocked = getGeneratorLabApiBlockResponse(request)
   if (blocked) return blocked
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!isNameSprintPreviewUser(user)) return NextResponse.json({ error: NAME_SPRINT_COMING_SOON_MESSAGE }, { status: 403 })
   const subject = await getQuotaSubject(request)
   if (!subject.userId) return NextResponse.json({ error: "Sign in is required to use Name Sprint." }, { status: 401 })
   const quota = await getNameSprintQuotaState(subject)
