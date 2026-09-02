@@ -102,8 +102,18 @@ export async function POST(request: NextRequest) {
         emptyResultRefunded = refund.refunded
       }
     }
+    const discoveryCandidates = result.candidates.map((candidate) => {
+      const publicCandidate = { ...candidate } as Partial<typeof candidate>
+      delete publicCandidate.founderSignal
+      return {
+        ...publicCandidate,
+        strongestReason: "Passed the Name Sprint hard gate and has a verified exact launch domain.",
+        mainRisk: "Run Founder Signal and check the official registers before committing to this name.",
+      }
+    })
     return NextResponse.json({
       ...result,
+      candidates: discoveryCandidates,
       briefId,
       runId,
       emptyResultRefunded,

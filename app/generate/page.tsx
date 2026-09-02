@@ -18,7 +18,7 @@ import { ArrowRight, LockKeyhole, SearchCheck, ShieldCheck } from "lucide-react"
 export const metadata: Metadata = {
   title: "NamoLux Name Sprint | Curated Business Name Generator",
   description:
-    "Describe your business and let NamoLux generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
+    "Describe your business, discover focused names with verified .com, .co or .ai domains, then run Founder Signal on the names you choose.",
   keywords: [
     "curated business name generator",
     "AI business name generator",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "NamoLux Name Sprint | Curated Business Name Generator",
     description:
-      "Generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
+      "Discover focused names with verified launch domains, then evaluate your favourites with Founder Signal on demand.",
     url: "https://www.namolux.com/generate",
     type: "website",
     images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "NamoLux Name Sprint | Curated Business Name Generator",
     description:
-      "Generate broadly, reject weak or unavailable candidates, and rank the survivors with Founder Signal.",
+      "Discover focused names with verified launch domains, then evaluate your favourites with Founder Signal on demand.",
     images: ["/opengraph-image"],
   },
 }
@@ -70,7 +70,7 @@ function NameSprintComingSoon() {
                 Name Sprint is coming soon.
               </h1>
               <p className="mt-7 max-w-2xl text-lg leading-8 text-stone-400 sm:text-xl">
-                We are tightening the quality bar before opening generation publicly. NamoLux will only release it when the names, domain evidence and collision screening are consistently worth trusting.
+                We are testing a simpler discovery-first flow before opening generation publicly. Names must have verified launch domains and clear preliminary screening; Founder Signal is then available when you choose a favourite.
               </p>
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <Link href="/bulk-domain-check" className="inline-flex min-h-12 items-center justify-center gap-2 bg-[#d6b15e] px-6 font-semibold text-[#090a0b] transition hover:bg-[#e4c576]">

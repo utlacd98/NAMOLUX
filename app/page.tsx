@@ -4,7 +4,7 @@ import { PremiumHome } from "@/components/landing/premium-home"
 const siteUrl = "https://www.namolux.com"
 const homeTitle = "NamoLux | Business Name Generator & Domain Checker"
 const homeDescription =
-  "NamoLux generates, rejects and ranks business names, checks launch-ready domains, compares finalists with Founder Signal, and turns winning names into brand launch kits."
+  "NamoLux discovers focused business names, checks launch-ready domains, evaluates chosen finalists with Founder Signal, and turns winning names into brand launch kits."
 
 export const metadata: Metadata = {
   title: homeTitle,

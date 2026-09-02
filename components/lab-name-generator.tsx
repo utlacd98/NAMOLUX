@@ -34,6 +34,13 @@ import {
 type Stage = "brief" | "constitution" | "results" | "compare" | "audit"
 type Compiled = { constitution: NameConstitution; territories: SemanticTerritory[]; briefId: string | null }
 type Run = NameSprintRunResult & { briefId?: string | null; runId?: string | null; emptyResultRefunded?: boolean; retryAllowed?: boolean }
+type OnDemandFounderSignal = {
+  score: number
+  band: string
+  rawScores: Record<string, number>
+  reasons: string[]
+  version: string
+}
 type Quota = {
   allowed: boolean
   plan: "free" | "pro"
@@ -144,6 +151,9 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
   const [auditCode, setAuditCode] = useState("all")
   const [auditStrategy, setAuditStrategy] = useState("all")
   const [quota, setQuota] = useState<Quota | null>(null)
+  const [founderSignals, setFounderSignals] = useState<Record<string, OnDemandFounderSignal>>({})
+  const [scoringCandidate, setScoringCandidate] = useState<string | null>(null)
+  const [scoreErrors, setScoreErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -250,6 +260,8 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
       if (!response.ok) throw new Error(data.error || "The quality pass could not complete.")
       setRun(data)
       setSaved([])
+      setFounderSignals({})
+      setScoreErrors({})
       setRejecting(null)
       setStage("results")
     } catch (cause) {
@@ -303,7 +315,7 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
           promptVersion: run.version,
           namingStyle: candidate.strategy,
           vibe: compiled?.constitution.personality.join(", "),
-          displayedScores: candidate.founderSignal,
+          displayedScores: founderSignals[candidate.id] || null,
           domainAvailabilitySnapshot: { domains: candidate.domainStatuses },
           feedbackType,
           feedbackReason: feedbackReason || null,
@@ -316,6 +328,29 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
     }
   }
 
+  async function scoreCandidate(candidate: NameSprintCandidate) {
+    const primaryTld = candidate.launchDomain.domain.split(".").at(-1) || "com"
+    setScoringCandidate(candidate.id)
+    setScoreErrors((current) => ({ ...current, [candidate.id]: "" }))
+    try {
+      const response = await fetch("/api/founder-signal/shortlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ names: [candidate.name], primaryTld, vibe: "" }),
+      })
+      const data = await response.json()
+      const signal = data?.results?.[0]?.founderSignal as OnDemandFounderSignal | undefined
+      if (!response.ok || !signal) throw new Error(data?.message || "Founder Signal could not score this name.")
+      setFounderSignals((current) => ({ ...current, [candidate.id]: signal }))
+      setNotice(`${candidate.name} received a Founder Signal score of ${signal.score}/100.`)
+      void sendFeedback(candidate, "selected")
+    } catch (cause) {
+      setScoreErrors((current) => ({ ...current, [candidate.id]: cause instanceof Error ? cause.message : "Founder Signal could not score this name." }))
+    } finally {
+      setScoringCandidate(null)
+    }
+  }
+
   function startOver() {
     setStage("brief")
     setCompiled(null)
@@ -325,6 +360,8 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
     setRejecting(null)
     setError("")
     setNotice("")
+    setFounderSignals({})
+    setScoreErrors({})
   }
 
   return (
@@ -334,7 +371,7 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
           <div>
             <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#d6b15e]"><FlaskConical size={15} /> NamoLux Name Sprint</p>
             <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-tight sm:text-5xl">A shortlist worth building on. Not 100 names to delete.</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-stone-400">NamoLux creates the broad list privately, rejects weak applicants before scoring, and shows only names that clear the quality bar.</p>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-stone-400">NamoLux creates a focused set, removes obvious failures, verifies launch domains and screens active brands. Run Founder Signal only on names you want to evaluate more deeply.</p>
           </div>
           {stage !== "brief" && <button type="button" onClick={startOver} className={secondary}><RotateCcw size={16} /> New brief</button>}
         </header>
@@ -344,8 +381,8 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
         <Progress stage={stage} />
         {stage === "brief" && <BriefScreen draft={draft} update={updateDraft} busy={busy === "compile"} onSubmit={compileBrief} />}
         {stage === "constitution" && compiled && <ConstitutionScreen compiled={compiled} busy={busy === "generate"} canGenerate={quota?.allowed !== false} update={updateConstitution} onBack={() => setStage("brief")} onGenerate={generateNames} />}
-        {stage === "results" && run && <ResultsScreen run={run} grouped={grouped} saved={saved} rejecting={rejecting} onSave={toggleSave} onRejecting={setRejecting} onReject={rejectCandidate} onPreference={preference} onCompare={() => setStage("compare")} onAudit={internalTools ? () => setStage("audit") : null} onRefine={generateNames} refining={busy === "generate"} notice={notice} />}
-        {stage === "compare" && run && <CompareScreen candidates={savedCandidates} onBack={() => setStage("results")} />}
+        {stage === "results" && run && <ResultsScreen run={run} grouped={grouped} saved={saved} rejecting={rejecting} founderSignals={founderSignals} scoringCandidate={scoringCandidate} scoreErrors={scoreErrors} onScore={scoreCandidate} onSave={toggleSave} onRejecting={setRejecting} onReject={rejectCandidate} onPreference={preference} onCompare={() => setStage("compare")} onAudit={internalTools ? () => setStage("audit") : null} onRefine={generateNames} refining={busy === "generate"} notice={notice} />}
+        {stage === "compare" && run && <CompareScreen candidates={savedCandidates} founderSignals={founderSignals} onBack={() => setStage("results")} />}
         {stage === "audit" && run && <AuditScreen run={run} codes={auditCodes} strategies={auditStrategies} candidates={filteredAudit} code={auditCode} strategy={auditStrategy} setCode={setAuditCode} setStrategy={setAuditStrategy} onBack={() => setStage("results")} />}
         {error && <p role="alert" className="mt-6 border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
       </section>
@@ -355,7 +392,7 @@ export function LabNameGenerator({ internalTools = false }: { internalTools?: bo
 
 function Progress({ stage }: { stage: Stage }) {
   const current = stage === "brief" ? 1 : stage === "constitution" ? 2 : stage === "results" || stage === "audit" ? 3 : 4
-  return <ol className="mb-8 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4" aria-label="Name Sprint progress">{["Brief", "Constitution", "Curated results", "Compare"].map((label, index) => <li key={label} className={`border-t-2 pt-3 ${index + 1 <= current ? "border-[#d6b15e] text-[#e9ca82]" : "border-white/10 text-stone-600"}`}><span className="mr-2 font-mono">0{index + 1}</span>{label}</li>)}</ol>
+  return <ol className="mb-8 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4" aria-label="Name Sprint progress">{["Brief", "Constitution", "Verified names", "Compare"].map((label, index) => <li key={label} className={`border-t-2 pt-3 ${index + 1 <= current ? "border-[#d6b15e] text-[#e9ca82]" : "border-white/10 text-stone-600"}`}><span className="mr-2 font-mono">0{index + 1}</span>{label}</li>)}</ol>
 }
 
 function BriefScreen({ draft, update, busy, onSubmit }: { draft: Draft; update: (value: Partial<Draft>) => void; busy: boolean; onSubmit: () => void }) {
@@ -383,30 +420,31 @@ function ConstitutionScreen({ compiled, busy, canGenerate, update, onBack, onGen
     <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Confirm before generation</p><h2 className="mt-3 font-serif text-3xl">Build the Name Constitution</h2><p className="mt-3 max-w-3xl leading-7 text-stone-400">Correct anything we misunderstood. This becomes the admissions policy for every generated candidate.</p></div><div className="flex gap-2"><VersionBadge label="Founder Signal v2.0" /><VersionBadge label="Registry 2026.08.30.1" /></div></div>
     <div className="mt-8 grid gap-5 md:grid-cols-2"><TextField label="Category" value={c.category} onChange={(value) => update("category", value)} /><label className="block text-sm font-medium text-stone-200">Naming mode<select value={c.namingMode} onChange={(event) => update("namingMode", event.target.value as NamingMode)} className={`${field} mt-2`}>{NAMING_MODES.map((mode) => <option key={mode} value={mode}>{MODE_LABELS[mode]}</option>)}</select></label><label className="block text-sm font-medium text-stone-200 md:col-span-2">Problem being solved<textarea value={c.problem} onChange={(event) => update("problem", event.target.value)} rows={3} className={`${field} mt-2`} /></label><ChipEditor label="Audience" value={c.audience} onChange={(value) => update("audience", value)} /><ChipEditor label="Promise" value={c.promise} onChange={(value) => update("promise", value)} /><ChipEditor label="Personality" value={c.personality} onChange={(value) => update("personality", value)} /><ChipEditor label="Markets" value={c.geographicMarkets} onChange={(value) => update("geographicMarkets", value)} /><ChipEditor label="Languages" value={c.languages} onChange={(value) => update("languages", value)} /><ChipEditor label="Future expansion" value={c.futureExpansion} onChange={(value) => update("futureExpansion", value)} /><ChipEditor label="Include" value={c.include} onChange={(value) => update("include", value)} /><ChipEditor label="Avoid" value={c.avoid} onChange={(value) => update("avoid", value)} /></div>
     <div className="mt-10"><h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Semantic territories</h3><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">{compiled.territories.map((territory) => <article key={territory.id} className="border border-white/12 bg-black/20 p-5"><p className="font-serif text-xl">{territory.label}</p><p className="mt-2 text-sm leading-6 text-stone-400">{territory.meaning}</p><p className="mt-4 text-xs uppercase tracking-wide text-stone-500">Roots</p><p className="mt-1 text-sm text-stone-300">{territory.roots.join(" · ") || "No literal roots required"}</p><p className="mt-3 text-xs text-[#d6b15e]">{territory.phoneticCharacter}</p></article>)}</div></div>
-    <div className="mt-8 flex flex-wrap justify-between gap-3 border-t border-white/10 pt-6"><button type="button" onClick={onBack} disabled={busy} className={secondary}><ArrowLeft size={16} /> Edit original brief</button><button type="button" onClick={onGenerate} disabled={busy || !canGenerate} className={primary}>{busy ? <><LoaderCircle className="animate-spin" size={17} /> Generating, rejecting and judging</> : canGenerate ? <><Sparkles size={17} /> Generate names from this brief</> : <>Name Sprint allowance used</>}</button></div>
+    <div className="mt-8 flex flex-wrap justify-between gap-3 border-t border-white/10 pt-6"><button type="button" onClick={onBack} disabled={busy} className={secondary}><ArrowLeft size={16} /> Edit original brief</button><button type="button" onClick={onGenerate} disabled={busy || !canGenerate} className={primary}>{busy ? <><LoaderCircle className="animate-spin" size={17} /> Generating and checking domains</> : canGenerate ? <><Sparkles size={17} /> Find available names</> : <>Name Sprint allowance used</>}</button></div>
   </section>
 }
 
-function ResultsScreen({ run, grouped, saved, rejecting, onSave, onRejecting, onReject, onPreference, onCompare, onAudit, onRefine, refining, notice }: { run: Run; grouped: Array<{ territory: SemanticTerritory; candidates: NameSprintCandidate[] }>; saved: string[]; rejecting: string | null; onSave: (candidate: NameSprintCandidate) => void; onRejecting: (id: string | null) => void; onReject: (candidate: NameSprintCandidate, reason: string) => void; onPreference: (candidate: NameSprintCandidate, type: NameFeedbackType, message: string) => void; onCompare: () => void; onAudit: (() => void) | null; onRefine: () => void; refining: boolean; notice: string }) {
+function ResultsScreen({ run, grouped, saved, rejecting, founderSignals, scoringCandidate, scoreErrors, onScore, onSave, onRejecting, onReject, onPreference, onCompare, onAudit, onRefine, refining, notice }: { run: Run; grouped: Array<{ territory: SemanticTerritory; candidates: NameSprintCandidate[] }>; saved: string[]; rejecting: string | null; founderSignals: Record<string, OnDemandFounderSignal>; scoringCandidate: string | null; scoreErrors: Record<string, string>; onScore: (candidate: NameSprintCandidate) => void; onSave: (candidate: NameSprintCandidate) => void; onRejecting: (id: string | null) => void; onReject: (candidate: NameSprintCandidate, reason: string) => void; onPreference: (candidate: NameSprintCandidate, type: NameFeedbackType, message: string) => void; onCompare: () => void; onAudit: (() => void) | null; onRefine: () => void; refining: boolean; notice: string }) {
   return <section>
-    <div className="border border-[#d6b15e]/25 bg-[#0d0e0f] p-5 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Curated results</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">{run.survivorCount} {run.survivorCount === 1 ? "name passed" : "names passed"} the quality bar</h2><p className="mt-3 text-stone-400">Guided search generated {run.generatedCount} candidates across {run.attempts} adaptive {run.attempts === 1 ? "round" : "rounds"} · recorded {run.rejected.length} rejection decisions. Each later round responded to the failures before it.</p><p className="mt-2 text-sm text-emerald-300">Every displayed name has a verified exact .com, .co or .ai launch domain.</p></div><div className="flex flex-wrap gap-2"><VersionBadge label={`Founder Signal v${run.founderSignalVersion}`} /><VersionBadge label={`Registry ${run.registryVersion}`} /><VersionBadge label={`AI $${run.usage.estimatedUsd.toFixed(4)}`} /></div></div>{run.survivorCount === 0 && <p className="mt-5 border-l-2 border-[#d6b15e] pl-4 text-sm leading-6 text-[#ead5a3]">No candidate cleared both the naming-quality and launch-domain requirements. {run.emptyResultRefunded ? "Your allowance was refunded once for today, so you can adjust the brief and retry." : "Refine the brief or exclusions; NamoLux will not return taken or unverified fallback domains."}</p>}{notice && <p className="mt-5 border-l-2 border-[#d6b15e] pl-4 text-sm text-[#ead5a3]">{notice}</p>}</div>
-    <div className="mt-8 space-y-10">{grouped.map(({ territory, candidates }) => <section key={territory.id}><div className="mb-4"><p className="font-serif text-2xl">{territory.label}</p><p className="mt-1 text-sm text-stone-500">{territory.meaning}</p></div><div className="grid gap-4 lg:grid-cols-2">{candidates.map((candidate) => <CandidateCard key={candidate.id} candidate={candidate} saved={saved.includes(candidate.id)} rejecting={rejecting === candidate.id} onSave={() => onSave(candidate)} onRejecting={() => onRejecting(rejecting === candidate.id ? null : candidate.id)} onReject={(reason) => onReject(candidate, reason)} onPreference={(type, message) => onPreference(candidate, type, message)} />)}</div></section>)}</div>
+    <div className="border border-[#d6b15e]/25 bg-[#0d0e0f] p-5 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Verified discoveries</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">{run.survivorCount} {run.survivorCount === 1 ? "name has" : "names have"} a launch-ready domain</h2><p className="mt-3 text-stone-400">Name Sprint generated {run.generatedCount} candidates, removed hard failures, checked exact domains and screened the finalists for obvious current-brand conflicts.</p><p className="mt-2 text-sm text-emerald-300">Every displayed name has a verified exact .com, .co or .ai domain. Founder Signal is available on demand.</p></div><div className="flex flex-wrap gap-2"><VersionBadge label="Founder Signal on demand" /><VersionBadge label={`Registry ${run.registryVersion}`} /><VersionBadge label={`AI $${run.usage.estimatedUsd.toFixed(4)}`} /></div></div>{run.survivorCount === 0 && <p className="mt-5 border-l-2 border-[#d6b15e] pl-4 text-sm leading-6 text-[#ead5a3]">No candidate cleared the hard safety, active-brand and exact-domain requirements. {run.emptyResultRefunded ? "Your allowance was refunded once for today, so you can adjust the brief and retry." : "Refine the brief or exclusions; NamoLux will not return taken or unverified fallback domains."}</p>}{notice && <p className="mt-5 border-l-2 border-[#d6b15e] pl-4 text-sm text-[#ead5a3]">{notice}</p>}</div>
+    <div className="mt-8 space-y-10">{grouped.map(({ territory, candidates }) => <section key={territory.id}><div className="mb-4"><p className="font-serif text-2xl">{territory.label}</p><p className="mt-1 text-sm text-stone-500">{territory.meaning}</p></div><div className="grid gap-4 lg:grid-cols-2">{candidates.map((candidate) => <CandidateCard key={candidate.id} candidate={candidate} signal={founderSignals[candidate.id] || null} scoring={scoringCandidate === candidate.id} scoreError={scoreErrors[candidate.id] || ""} saved={saved.includes(candidate.id)} rejecting={rejecting === candidate.id} onScore={() => onScore(candidate)} onSave={() => onSave(candidate)} onRejecting={() => onRejecting(rejecting === candidate.id ? null : candidate.id)} onReject={(reason) => onReject(candidate, reason)} onPreference={(type, message) => onPreference(candidate, type, message)} />)}</div></section>)}</div>
     <div className="sticky bottom-3 z-20 mt-8 flex flex-wrap items-center justify-between gap-3 border border-[#d6b15e]/30 bg-[#101112]/95 p-4 shadow-2xl backdrop-blur"><div><p className="font-medium">{saved.length} saved for comparison</p><p className="text-sm text-stone-500">Save at least three names for a head-to-head view.</p></div><div className="flex flex-wrap gap-2">{onAudit && <button type="button" onClick={onAudit} className={secondary}><FlaskConical size={16} /> Rejection audit ({run.rejected.length})</button>}<button type="button" onClick={onRefine} disabled={refining} className={secondary}>{refining ? <LoaderCircle className="animate-spin" size={16} /> : <RotateCcw size={16} />} Refine from feedback</button><button type="button" onClick={onCompare} disabled={saved.length < 3} className={primary}><Scale size={16} /> Compare shortlist ({saved.length})</button></div></div>
   </section>
 }
 
-function CandidateCard({ candidate, saved, rejecting, onSave, onRejecting, onReject, onPreference }: { candidate: NameSprintCandidate; saved: boolean; rejecting: boolean; onSave: () => void; onRejecting: () => void; onReject: (reason: string) => void; onPreference: (type: NameFeedbackType, message: string) => void }) {
+function CandidateCard({ candidate, signal, scoring, scoreError, saved, rejecting, onScore, onSave, onRejecting, onReject, onPreference }: { candidate: NameSprintCandidate; signal: OnDemandFounderSignal | null; scoring: boolean; scoreError: string; saved: boolean; rejecting: boolean; onScore: () => void; onSave: () => void; onRejecting: () => void; onReject: (reason: string) => void; onPreference: (type: NameFeedbackType, message: string) => void }) {
   const fullDomain = candidate.launchDomain.domain
   const domainKindLabel = candidate.launchDomain.kind === "exact" ? "Exact-match domain" : "Legacy launch domain"
 
   return <article className="border border-white/12 bg-[#0d0e0f] p-5 sm:p-6">
-    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-serif text-3xl">{candidate.name}</h3><span className="border border-emerald-400/35 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold tracking-wide text-emerald-300">PASS</span></div><p className="mt-2 text-xs uppercase tracking-[0.16em] text-stone-500">{candidate.strategy.replace(/_/g, " ")}</p></div><div className="text-right"><p className="font-serif text-3xl text-[#e3c67f]">{candidate.founderSignal.score}</p><p className="text-[11px] uppercase tracking-wide text-stone-500">Founder Signal</p></div></div>
-    <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2"><Fact label="Evidence confidence" value={candidate.evidenceConfidence} /><Fact label="Pronunciation" value={candidate.pronunciation || "Confirm with a speaker"} /><Fact label="Intended meaning" value={candidate.association} /><Fact label="Main risk" value={candidate.mainRisk} /></dl>
-    <div className="mt-5 border border-white/8 bg-black/20 p-3"><p className="text-[11px] uppercase tracking-wide text-stone-500">Strongest reason</p><p className="mt-1 text-sm leading-6 text-stone-300">{candidate.strongestReason}</p></div>
+    <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5"><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-serif text-3xl">{candidate.name}</h3><span className="border border-emerald-400/35 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold tracking-wide text-emerald-300">DOMAIN VERIFIED</span></div><p className="mt-2 text-xs uppercase tracking-[0.16em] text-stone-500">{candidate.strategy.replace(/_/g, " ")}</p></div><div className="text-right">{signal ? <><p className="font-serif text-3xl text-[#e3c67f]">{signal.score}</p><p className="text-[11px] uppercase tracking-wide text-stone-500">Founder Signal · {signal.band}</p></> : <><p className="text-sm font-medium text-stone-300">Not scored</p><p className="mt-1 text-[11px] uppercase tracking-wide text-stone-600">Founder Signal</p></>}</div></div>
+    <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2"><Fact label="Pronunciation" value={candidate.pronunciation || "Confirm with a speaker"} /><Fact label="Discovery status" value="Domain and current-brand screen passed" /><div className="sm:col-span-2"><Fact label="Intended association" value={candidate.association} /></div></dl>
+    {signal && <div className="mt-5 border border-[#d6b15e]/20 bg-[#d6b15e]/[0.035] p-3"><p className="text-[11px] uppercase tracking-wide text-[#d6b15e]">Founder Signal assessment</p><p className="mt-1 text-sm leading-6 text-stone-300">{signal.reasons.slice(0, 2).join(" ") || `${signal.band} decision-support result.`}</p></div>}
     <TrademarkEvidence candidate={candidate} />
     <div className="mt-4 flex flex-wrap gap-2">{candidate.domainStatuses.map((domain) => <span key={domain.tld} className={`border px-2 py-1 text-xs ${domain.status === "available" ? "border-emerald-400/30 text-emerald-300" : domain.status === "unavailable" ? "border-red-400/25 text-red-300" : "border-white/12 text-stone-500"}`}>.{domain.tld} · {domain.status}</span>)}</div>
     <div className="mt-4 flex flex-wrap items-center gap-3 border border-emerald-400/20 bg-emerald-500/[0.05] p-3"><div className="min-w-0 flex-1"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-300">{domainKindLabel}</p><p className="mt-1 text-sm font-medium text-emerald-200">{fullDomain} is available</p><p className="mt-0.5 text-xs leading-5 text-stone-500">{candidate.launchDomain.kind === "modified" ? "This result came from an older saved run; rerun Name Sprint for the current exact-domain policy." : "The domain exactly matches the candidate name."} Confirm the final price and availability at Namecheap.</p></div><a href={namecheapLink(fullDomain, { source: "name_sprint", content: candidate.launchDomain.kind })} target="_blank" rel="sponsored noopener noreferrer" className={primary} aria-label={`Buy ${fullDomain} on Namecheap`}>Buy on Namecheap <ExternalLink size={15} /></a></div>
-    <div className="mt-5 flex flex-wrap gap-2"><button type="button" onClick={onSave} className={saved ? primary : secondary}>{saved ? <Check size={15} /> : <Save size={15} />}{saved ? "Saved" : "Save"}</button><button type="button" onClick={onRejecting} className={secondary}><X size={15} /> Reject</button><button type="button" onClick={() => onPreference("more_like_this", `Preference saved: more names in the ${candidate.name} direction.`)} className={secondary}>More like this</button></div>
+    <div className="mt-5 flex flex-wrap gap-2"><button type="button" onClick={onScore} disabled={scoring || Boolean(signal)} className={signal ? secondary : primary}>{scoring ? <LoaderCircle className="animate-spin" size={15} /> : <Sparkles size={15} />}{scoring ? "Scoring" : signal ? `Founder Signal ${signal.score}` : "Run Founder Signal"}</button><button type="button" onClick={onSave} className={saved ? primary : secondary}>{saved ? <Check size={15} /> : <Save size={15} />}{saved ? "Saved" : "Save"}</button><button type="button" onClick={onRejecting} className={secondary}><X size={15} /> Reject</button><button type="button" onClick={() => onPreference("more_like_this", `Preference saved: more names in the ${candidate.name} direction.`)} className={secondary}>More like this</button></div>
+    {scoreError && <p role="alert" className="mt-3 text-sm text-red-300">{scoreError}</p>}
     {rejecting && <div className="mt-4 border border-red-400/20 bg-red-500/[0.06] p-4"><p className="text-sm font-medium text-red-100">Why reject {candidate.name}?</p><div className="mt-3 flex flex-wrap gap-2">{REJECT_REASONS.map(([value, label]) => <button key={value} type="button" onClick={() => onReject(value)} className="border border-red-300/20 px-3 py-2 text-xs text-red-100 hover:border-red-300/50">{label}</button>)}</div></div>}
     <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-stone-500"><button type="button" onClick={() => onPreference("less_literal", "Preference saved: the next wave will be less literal.")} className="hover:text-[#d6b15e]">Less literal</button><button type="button" onClick={() => onPreference("more_distinctive", "Preference saved: the next wave will push distinctiveness.")} className="hover:text-[#d6b15e]">More distinctive</button><button type="button" onClick={() => onPreference("shorter", "Preference saved: the next wave will favour shorter names.")} className="hover:text-[#d6b15e]">Shorter</button><button type="button" onClick={() => onPreference("more_premium", "Preference saved: the next wave will favour a more premium tone.")} className="hover:text-[#d6b15e]">More premium</button></div>
   </article>
@@ -416,14 +454,13 @@ function TrademarkEvidence({ candidate }: { candidate: NameSprintCandidate }) {
   const screen = candidate.collisionScreen
   const webScreenRan = screen?.status === "clear"
   const scope = [screen?.category, ...(screen?.markets || [])].filter(Boolean).join(" · ")
-  const collisionScore = candidate.founderSignal.dimensions.brandCollisionRisk
 
   return <section className="mt-5 border border-[#d6b15e]/20 bg-[#d6b15e]/[0.035] p-4 sm:p-5" aria-label={`Brand and trade-mark evidence for ${candidate.name}`}>
     <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d6b15e]"><ShieldCheck size={14} /> Brand &amp; trade-mark evidence</p>
     <h4 className="mt-3 text-lg font-medium text-stone-100">Official register check required</h4>
     <p className="mt-2 text-sm leading-6 text-stone-400">NamoLux found no obvious issue in the checks completed below. This is not official trade-mark clearance.</p>
     <dl className="mt-4 divide-y divide-white/10 border-y border-white/10 text-xs">
-      <EvidenceStatus label="NamoLux internal screen" value={`Passed · ${collisionScore}/100`} complete />
+      <EvidenceStatus label="NamoLux internal screen" value="Passed" complete />
       <EvidenceStatus label="Current web brand screen" value={webScreenRan ? "Checked" : "Not run"} complete={webScreenRan} />
       <EvidenceStatus label="Official registers" value="Not checked" complete={false} />
     </dl>
@@ -438,8 +475,8 @@ function EvidenceStatus({ label, value, complete }: { label: string; value: stri
   return <div className="flex items-center justify-between gap-4 py-2.5"><dt className="text-stone-400">{label}</dt><dd className={`shrink-0 text-right ${complete ? "text-emerald-300" : "text-amber-200"}`}>{value}</dd></div>
 }
 
-function CompareScreen({ candidates, onBack }: { candidates: NameSprintCandidate[]; onBack: () => void }) {
-  return <section><button type="button" onClick={onBack} className={secondary}><ArrowLeft size={16} /> Back to results</button><div className="mt-6 border border-[#d6b15e]/25 bg-[#0d0e0f] p-5 sm:p-7"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Head-to-head</p><h2 className="mt-2 font-serif text-3xl">Compare the shortlist</h2><p className="mt-3 text-stone-400">Founder Signal is comparative decision support. The “kill question” keeps each candidate’s main risk visible.</p></div>{candidates.length < 3 ? <p className="mt-6 border border-white/10 p-5 text-stone-400">Save at least three names to compare them.</p> : <div className="mt-6 overflow-x-auto border border-white/10"><table className="min-w-[920px] w-full border-collapse text-left text-sm"><thead className="bg-[#111213]"><tr><th className="p-4 text-stone-500">Evidence</th>{candidates.map((candidate) => <th key={candidate.id} className="p-4 font-serif text-2xl text-stone-100">{candidate.name}</th>)}</tr></thead><tbody><ComparisonRow label="Founder Signal" candidates={candidates} value={(candidate) => String(candidate.founderSignal.score)} /><ComparisonRow label="Strategic fit" candidates={candidates} value={(candidate) => String(candidate.founderSignal.dimensions.strategicFit)} /><ComparisonRow label="Distinctiveness" candidates={candidates} value={(candidate) => String(candidate.founderSignal.dimensions.distinctiveness)} /><ComparisonRow label="Memorability" candidates={candidates} value={(candidate) => String(candidate.founderSignal.dimensions.memorability)} /><ComparisonRow label="Pronunciation" candidates={candidates} value={(candidate) => candidate.pronunciation} /><ComparisonRow label="Brand/collision screen" candidates={candidates} value={(candidate) => candidate.collisionScreen?.status === "clear" ? "Automated checks passed; official registers not scanned" : "Internal check passed; official registers not scanned"} /><ComparisonRow label="Recommended launch domain" candidates={candidates} value={(candidate) => `${candidate.launchDomain.domain} · ${candidate.launchDomain.kind === "exact" ? "exact match" : "legacy saved result"}`} /><ComparisonRow label="Exact-match checks" candidates={candidates} value={(candidate) => candidate.domainStatuses.map((domain) => `.${domain.tld} ${domain.status}`).join(" · ")} /><ComparisonRow label="What could kill this name?" candidates={candidates} value={(candidate) => candidate.mainRisk} /><ComparisonRow label="Long-term fit" candidates={candidates} value={(candidate) => candidate.association} /></tbody></table></div>}<p className="mt-5 text-sm leading-6 text-stone-500">Automated conflict screening, not legal clearance. Confirm finalists through the relevant official registers or a qualified professional.</p></section>
+function CompareScreen({ candidates, founderSignals, onBack }: { candidates: NameSprintCandidate[]; founderSignals: Record<string, OnDemandFounderSignal>; onBack: () => void }) {
+  return <section><button type="button" onClick={onBack} className={secondary}><ArrowLeft size={16} /> Back to results</button><div className="mt-6 border border-[#d6b15e]/25 bg-[#0d0e0f] p-5 sm:p-7"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">Head-to-head</p><h2 className="mt-2 font-serif text-3xl">Compare the shortlist</h2><p className="mt-3 text-stone-400">Domain and collision evidence is available for every saved name. Founder Signal appears only for names you chose to score.</p></div>{candidates.length < 3 ? <p className="mt-6 border border-white/10 p-5 text-stone-400">Save at least three names to compare them.</p> : <div className="mt-6 overflow-x-auto border border-white/10"><table className="min-w-[920px] w-full border-collapse text-left text-sm"><thead className="bg-[#111213]"><tr><th className="p-4 text-stone-500">Evidence</th>{candidates.map((candidate) => <th key={candidate.id} className="p-4 font-serif text-2xl text-stone-100">{candidate.name}</th>)}</tr></thead><tbody><ComparisonRow label="Founder Signal" candidates={candidates} value={(candidate) => founderSignals[candidate.id] ? `${founderSignals[candidate.id].score} · ${founderSignals[candidate.id].band}` : "Not scored"} /><ComparisonRow label="Strategic fit" candidates={candidates} value={(candidate) => founderSignals[candidate.id] ? String(founderSignals[candidate.id].rawScores.strategicFit ?? "—") : "Run Founder Signal"} /><ComparisonRow label="Distinctiveness" candidates={candidates} value={(candidate) => founderSignals[candidate.id] ? String(founderSignals[candidate.id].rawScores.distinctiveness ?? "—") : "Run Founder Signal"} /><ComparisonRow label="Memorability" candidates={candidates} value={(candidate) => founderSignals[candidate.id] ? String(founderSignals[candidate.id].rawScores.memorability ?? "—") : "Run Founder Signal"} /><ComparisonRow label="Pronunciation" candidates={candidates} value={(candidate) => candidate.pronunciation} /><ComparisonRow label="Brand/collision screen" candidates={candidates} value={(candidate) => candidate.collisionScreen?.status === "clear" ? "Automated checks passed; official registers not scanned" : "Internal check passed; official registers not scanned"} /><ComparisonRow label="Recommended launch domain" candidates={candidates} value={(candidate) => `${candidate.launchDomain.domain} · exact match`} /><ComparisonRow label="Exact-match checks" candidates={candidates} value={(candidate) => candidate.domainStatuses.map((domain) => `.${domain.tld} ${domain.status}`).join(" · ")} /><ComparisonRow label="Official-register status" candidates={candidates} value={() => "Not checked — verify manually"} /><ComparisonRow label="Intended association" candidates={candidates} value={(candidate) => candidate.association} /></tbody></table></div>}<p className="mt-5 text-sm leading-6 text-stone-500">Automated conflict screening, not legal clearance. Confirm finalists through the relevant official registers or a qualified professional.</p></section>
 }
 
 function AuditScreen({ run, codes, strategies, candidates, code, strategy, setCode, setStrategy, onBack }: { run: Run; codes: string[]; strategies: string[]; candidates: Run["rejected"]; code: string; strategy: string; setCode: (value: string) => void; setStrategy: (value: string) => void; onBack: () => void }) {

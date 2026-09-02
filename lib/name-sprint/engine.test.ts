@@ -182,7 +182,7 @@ describe("Name Sprint multi-stage engine", () => {
     })
   })
 
-  it("uses one focused guided-search round, one blind judge, and no paid web-search stage", async () => {
+  it("uses one focused guided-search round without automatically running Founder Signal", async () => {
     const result = await runNameSprint({
       constitution,
       territories,
@@ -194,23 +194,21 @@ describe("Name Sprint multi-stage engine", () => {
     const judgeCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
     expect(generationCalls).toHaveLength(1)
-    expect(judgeCalls).toHaveLength(1)
+    expect(judgeCalls).toHaveLength(0)
     const admissionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_final_admissions")
     expect(collisionCalls).toHaveLength(0)
     expect(admissionCalls).toHaveLength(0)
     expect(generationCalls[0][0].reasoningEffort).toBe("none")
     expect(generationCalls[0][0].maxOutputTokens).toBe(3_200)
-    expect(judgeCalls[0][0].maxOutputTokens).toBe(1_400)
-    expect(judgeCalls[0][0].input).not.toContain("association")
     expect(mocks.availability).toHaveBeenCalledTimes(1)
     expect(result.generatedCount).toBe(18)
     expect(mocks.structured.mock.calls.some(([request]) => request.schemaName === "name_sprint_editorial_repair")).toBe(false)
     expect(result.candidates.length).toBeGreaterThan(0)
     expect(result.candidates.length).toBeLessThanOrEqual(12)
     expect(result.candidates.every((candidate) => candidate.eligibility.status === "pass")).toBe(true)
-    expect(result.candidates.every((candidate) => candidate.founderSignal.band === "Strong" || candidate.founderSignal.band === "Elite")).toBe(true)
+    expect(result.candidates.every((candidate) => candidate.launchDomain.kind === "exact")).toBe(true)
     expect(result.candidates.every((candidate) => candidate.collisionScreen?.status === "not_run")).toBe(true)
-    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("SPELLING_AMBIGUITY"))).toBe(true)
+    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("RANDOM_SYLLABLES"))).toBe(true)
     expect(result.timingMs.total).toBeGreaterThanOrEqual(0)
     expect(result.usage.estimatedUsd).toBeGreaterThan(0)
     expect(result.usage.estimatedUsd).toBeLessThan(0.01)
@@ -237,9 +235,9 @@ describe("Name Sprint multi-stage engine", () => {
     const collisionRejected = result.rejected.find((candidate) => candidate.eligibility.failureCodes.includes("ACTIVE_BRAND_EXACT"))
     expect(collisionRejected).toBeDefined()
     const collisionCallIndex = mocks.structured.mock.calls.findIndex(([request]) => request.schemaName === "name_sprint_current_collision_screen")
-    const judgeCallIndex = mocks.structured.mock.calls.findIndex(([request]) => request.schemaName === "name_sprint_blind_judgments")
-    expect(judgeCallIndex).toBeLessThan(collisionCallIndex)
-    expect(mocks.structured.mock.calls[judgeCallIndex][0].input).toContain(collisionRejected!.name)
+    const judgeCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")
+    expect(judgeCalls).toHaveLength(0)
+    expect(collisionCallIndex).toBeGreaterThanOrEqual(0)
     expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")).toHaveLength(1)
   })
 
@@ -305,7 +303,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.usage.estimatedUsd).toBeLessThan(0.025)
   })
 
-  it("fails closed when the required independent judge cannot complete", async () => {
+  it("does not depend on an automatic independent judge", async () => {
     process.env.NAMOLUX_NAME_SPRINT_ENABLED = "true"
     const normalImplementation = mocks.structured.getMockImplementation()
     mocks.structured.mockImplementation(async (request: { schemaName: string }) => {
@@ -314,8 +312,9 @@ describe("Name Sprint multi-stage engine", () => {
       return normalImplementation(request)
     })
 
-    await expect(runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" }))
-      .rejects.toThrow("name_sprint_judge_incomplete")
+    const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")).toHaveLength(0)
   })
 
   it("fails closed instead of silently replaying a malformed guided-search round", async () => {
@@ -464,7 +463,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(areRelatedNameFamily(raw("Tembra", ["tembra"]), raw("Harbor", ["harbor"]))).toBe(false)
   })
 
-  it("rejects an explicitly generic judge result before Founder Signal can inflate it", async () => {
+  it("keeps Founder Signal judgment out of the discovery admission path", async () => {
     const normalImplementation = mocks.structured.getMockImplementation()
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_blind_judgments") {
@@ -490,8 +489,9 @@ describe("Name Sprint multi-stage engine", () => {
     })
 
     const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
-    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("GENERIC_CLICHE"))).toBe(true)
-    expect(result.candidates.every((candidate) => !/generic/i.test(candidate.mainRisk))).toBe(true)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")).toHaveLength(0)
+    expect(result.candidates.every((candidate) => candidate.eligibility.status === "pass")).toBe(true)
   })
 
   it("turns dominant rejection evidence into a concrete next-round strategy", () => {
@@ -552,7 +552,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.candidates.every((candidate) => /^[A-Za-z\s'-]+$/.test(candidate.pronunciation))).toBe(true)
   })
 
-  it("does not publish a candidate when the optional judge fallback cannot reach Strong", async () => {
+  it("publishes screened discoveries without an optional judge fallback", async () => {
     const normalImplementation = mocks.structured.getMockImplementation()
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_blind_judgments") throw new Error("judge_output_truncated")
@@ -569,11 +569,11 @@ describe("Name Sprint multi-stage engine", () => {
     })
 
     const judgeCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")
-    expect(judgeCalls).toHaveLength(1)
-    expect(result.candidates).toHaveLength(0)
-    expect(result.attempts).toBe(2)
+    expect(judgeCalls).toHaveLength(0)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.attempts).toBe(1)
     expect(result.usage.model).toBe("gpt-5.6-luna")
-    expect(consoleSpy).toHaveBeenCalledWith("name-sprint-judge-incomplete", { reason: "judge_output_truncated" })
+    expect(consoleSpy).not.toHaveBeenCalled()
     consoleSpy.mockRestore()
   })
 
@@ -637,7 +637,7 @@ describe("Name Sprint multi-stage engine", () => {
     expect(result.usage.estimatedUsd).toBeLessThan(0.025)
   })
 
-  it("records below-bar names in the rejection audit instead of dropping them silently", async () => {
+  it("does not manufacture a below-score repair wave during discovery", async () => {
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_guided_search") {
         const candidates = (["suggestive", "metaphorical", "invented", "controlled_coined", "meaningful_compound", "arbitrary_real_word"] as const)
@@ -699,16 +699,14 @@ describe("Name Sprint multi-stage engine", () => {
     })
 
     const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
-    expect(guidedCalls).toHaveLength(2)
-    expect(guidedCalls[1][0].input).toContain("BELOW_QUALITY_BAR")
-    expect(guidedCalls[1][0].input).toContain("Strengthen the immediate semantic bridge")
-    expect(result.attempts).toBe(2)
+    expect(guidedCalls).toHaveLength(1)
+    expect(result.attempts).toBe(1)
     expect(result.usage.model).toBe("gpt-5.6-luna")
-    expect(result.candidates).toHaveLength(0)
-    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("BELOW_QUALITY_BAR"))).toBe(true)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("BELOW_QUALITY_BAR"))).toBe(false)
   })
 
-  it("turns an explanation-dependent judge risk into a hard semantic rejection", async () => {
+  it("defers explanation-sensitive judgment until the founder requests scoring", async () => {
     const normalImplementation = mocks.structured.getMockImplementation()
     mocks.structured.mockImplementation(async (request: { schemaName: string; input: string }) => {
       if (request.schemaName === "name_sprint_blind_judgments") {
@@ -734,7 +732,7 @@ describe("Name Sprint multi-stage engine", () => {
     })
 
     const result = await runNameSprint({ constitution, territories, signal: new AbortController().signal, userIdentifier: "test-user" })
-    expect(result.candidates).toHaveLength(0)
-    expect(result.rejected.some((candidate) => candidate.eligibility.failureCodes.includes("SEMANTIC_MISMATCH"))).toBe(true)
+    expect(result.candidates.length).toBeGreaterThan(0)
+    expect(mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_blind_judgments")).toHaveLength(0)
   })
 })

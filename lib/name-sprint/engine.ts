@@ -13,10 +13,6 @@ import {
   FOUNDER_SIGNAL_V2_VERSION,
   NAME_SPRINT_TLDS,
   NAME_SPRINT_VERSION,
-  type EligibilityFailureCode,
-  type EvidenceConfidence,
-  type FounderSignalV2Dimensions,
-  type JudgedCandidate,
   type NameConstitution,
   type NameSprintCandidate,
   type NameSprintRunResult,
@@ -35,16 +31,6 @@ const VERIFIED_ROOT_GLOSSARY: Readonly<Record<string, string>> = {
   vera: "true (Latin feminine form)",
   via: "way or road (Latin)",
 }
-
-const JUDGE_FATAL_CODES: readonly EligibilityFailureCode[] = [
-  "GENERIC_CLICHE",
-  "PRONUNCIATION_CLUSTER",
-  "SPELLING_AMBIGUITY",
-  "UNSAFE_MEANING",
-  "RANDOM_SYLLABLES",
-  "FABRICATED_ETYMOLOGY",
-  "SEMANTIC_MISMATCH",
-]
 
 const REPAIR_STRATEGIES = [
   "suggestive",
@@ -76,42 +62,6 @@ const GUIDED_SEARCH_SCHEMA = {
           territoryId: { type: "string" },
           roots: { type: "array", items: { type: "string" }, maxItems: 2 },
           pronunciation: { type: "string" },
-        },
-      },
-    },
-  },
-} as const
-
-const JUDGE_SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  required: ["judgments"],
-  properties: {
-    judgments: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["name", "fatalFlawCodes", "scores", "strongestReason", "mainRisk", "confidence", "preferredWithinGroup"],
-        properties: {
-          name: { type: "string" },
-          fatalFlawCodes: { type: "array", items: { type: "string", enum: [...JUDGE_FATAL_CODES] } },
-          scores: {
-            type: "object",
-            additionalProperties: false,
-            required: ["strategicFit", "distinctiveness", "memorability", "pronunciation", "spellingCharacter"],
-            properties: {
-              strategicFit: { type: "integer", minimum: 0, maximum: 100 },
-              distinctiveness: { type: "integer", minimum: 0, maximum: 100 },
-              memorability: { type: "integer", minimum: 0, maximum: 100 },
-              pronunciation: { type: "integer", minimum: 0, maximum: 100 },
-              spellingCharacter: { type: "integer", minimum: 0, maximum: 100 },
-            },
-          },
-          strongestReason: { type: "string" },
-          mainRisk: { type: "string" },
-          confidence: { type: "string", enum: ["high", "moderate", "low"] },
-          preferredWithinGroup: { type: "integer", minimum: 0, maximum: 100 },
         },
       },
     },
@@ -153,14 +103,6 @@ Silently draft at least three times the requested count, compare the drafts, and
 
 Keep the observation and strategyDecision factual and under 30 words each. Do not make domain or legal-clearance claims.`
 
-const JUDGE_INSTRUCTIONS = `You are an independent blind naming judge. You did not generate the candidates.
-Compare candidates in small implicit groups against the supplied Name Constitution. You receive no domain availability, generated rationale, or strategy labels.
-Use fatal-flaw codes only for severe pronunciation, spelling, unsafe-meaning, random-syllable, fabricated-etymology, semantic-mismatch, or clearly generic defects. Use GENERIC_CLICHE only when a candidate is an ordinary category/trust word, a commodity phrase, a feature label, or unmistakably generic. Current web-backed screens handle brand collisions, so do not guess those from memory; express softer concerns through dimension scores and mainRisk.
-Scores are comparative signals, not legal clearance. Most raw candidates are not shortlist quality: use 45-59 for names a founder should discard, 60-74 for serious but imperfect options, and 75-89 only for the small minority you would genuinely build a company around. Do not award 75+ merely because a name is relevant or pronounceable. Descriptive compounds, forced constructions, weak semantic bridges, and names that need explanation must not receive Strong dimension scores.
-Use SEMANTIC_MISMATCH only when the name clearly contradicts the brief, is plainly category-inappropriate, or its metaphor is so stretched that an explanation must do all the branding work. A distinctive invented name with an initially opaque meaning should receive a lower strategic-fit score, not an automatic fatal flaw. Use RANDOM_SYLLABLES for a forced invented construction. At most one third of a typical candidate set should receive preferredWithinGroup above 70.
-If mainRisk says pronunciation or spelling may vary, include SPELLING_AMBIGUITY. If a pronunciation cluster is severe, include PRONUNCIATION_CLUSTER. The risk text and fatal codes must agree.
-Keep strongestReason and mainRisk under 18 words each. Return one judgment for every supplied name and never invent a new candidate.`
-
 const CURRENT_COLLISION_INSTRUCTIONS = `You are the current-evidence collision gate for a selective business-name generator.
 You receive no more than eight candidates. Use exactly one combined web query containing every exact quoted name plus company, brand, product, and software terms. Investigate every supplied name; do not infer that evidence for one candidate covers another.
 Reject an exact active company, brand, or product match. Reject a confusingly similar active match in the same or an adjacent market. Famous exact brands are rejected across markets.
@@ -170,7 +112,7 @@ This is automated screening, not legal clearance. Fill every required candidate-
 const CURRENT_COLLISION_BATCH_SIZE = 8
 const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
 const MAX_ESTIMATED_RUN_USD = 0.025
-const STANDARD_JUDGE_POOL_SIZE = 16
+const STANDARD_DOMAIN_POOL_SIZE = 16
 const GUIDED_ROUND_COUNTS = [20, 20] as const
 const GUIDED_TARGET_ADMISSIONS = 3
 
@@ -320,14 +262,6 @@ function deDuplicateCandidates(candidates: readonly RawNameCandidate[]) {
   return selected
 }
 
-function deterministicShuffle<T extends { name: string }>(items: readonly T[]) {
-  return [...items].sort((left, right) => {
-    const leftKey = `${phoneticKey(left.name)}-${left.name.length}`
-    const rightKey = `${phoneticKey(right.name)}-${right.name.length}`
-    return leftKey.localeCompare(rightKey)
-  })
-}
-
 function diverseSelection<T extends RawNameCandidate>(items: readonly T[], count: number) {
   const selected: T[] = []
   const territoryCounts = new Map<string, number>()
@@ -454,92 +388,6 @@ async function generateGuidedRound({
     strategyDecision: cleanText(response.data.strategyDecision, 240),
     usage: response,
   }
-}
-
-function parseJudgments(value: unknown, candidates: readonly RawNameCandidate[]): Map<string, JudgedCandidate> {
-  const items = value && typeof value === "object" && Array.isArray((value as { judgments?: unknown[] }).judgments)
-    ? (value as { judgments: Array<Record<string, unknown>> }).judgments
-    : []
-  const allowedNames = new Map(candidates.map((candidate) => [candidate.normalizedName, candidate.name]))
-  const judgments = new Map<string, JudgedCandidate>()
-  for (const item of items) {
-    const normalized = normalizeName(cleanText(item.name, 80))
-    const exactName = allowedNames.get(normalized)
-    if (!exactName || judgments.has(normalized)) continue
-    const rawScores = item.scores && typeof item.scores === "object" ? item.scores as Record<string, unknown> : {}
-    const score = (key: keyof Omit<FounderSignalV2Dimensions, "domainExtension" | "brandCollisionRisk">) => Math.max(0, Math.min(100, Math.round(Number(rawScores[key]) || 0)))
-    const fatalFlawCodes = Array.isArray(item.fatalFlawCodes)
-      ? item.fatalFlawCodes.filter((code): code is EligibilityFailureCode => typeof code === "string" && (JUDGE_FATAL_CODES as readonly string[]).includes(code))
-      : []
-    const confidence = ["high", "moderate", "low"].includes(String(item.confidence)) ? item.confidence as EvidenceConfidence : "low"
-    const strongestReason = cleanText(item.strongestReason, 220)
-    const mainRisk = cleanText(item.mainRisk, 220)
-    const pronunciation = score("pronunciation")
-    const spellingCharacter = score("spellingCharacter")
-    if (
-      pronunciation < 45
-      && !fatalFlawCodes.includes("PRONUNCIATION_CLUSTER")
-    ) fatalFlawCodes.push("PRONUNCIATION_CLUSTER")
-    if (
-      (
-        spellingCharacter < 45
-        || /(?:pronunciation|spelling|spacing) (?:may|might|could|can) vary|multiple (?:pronunciations|spellings)|verbal separation|unclear pronunciation|pronunciation ambiguity|hard to spell|radio test/i.test(mainRisk)
-      )
-      && !fatalFlawCodes.includes("SPELLING_AMBIGUITY")
-    ) fatalFlawCodes.push("SPELLING_AMBIGUITY")
-    if (
-      (
-        score("strategicFit") < 45
-        || /weak (?:category|semantic|strategic) (?:fit|relevance|connection)|little intrinsic connection|meaning (?:is )?opaque|needs? (?:an )?explanation|without (?:the )?explanation|explanation-dependent|requires? (?:substantial )?(?:brand-building|brand storytelling)/i.test(mainRisk)
-      )
-      && !fatalFlawCodes.includes("SEMANTIC_MISMATCH")
-    ) fatalFlawCodes.push("SEMANTIC_MISMATCH")
-    if (
-      /forced (?:invented )?(?:construction|coinage|formation)|random syllables|arbitrary syllables/i.test(mainRisk)
-      && !fatalFlawCodes.includes("RANDOM_SYLLABLES")
-    ) fatalFlawCodes.push("RANDOM_SYLLABLES")
-    if (
-      /\b(?:generic|commodity|feature label|category label|ordinary (?:word|adjective|noun)|common (?:word|phrase)|limited distinctiveness|directly descriptive)\b/i.test(mainRisk)
-      && !fatalFlawCodes.includes("GENERIC_CLICHE")
-    ) fatalFlawCodes.push("GENERIC_CLICHE")
-    judgments.set(normalized, {
-      name: exactName,
-      fatalFlawCodes,
-      scores: {
-        strategicFit: score("strategicFit"),
-        distinctiveness: score("distinctiveness"),
-        memorability: score("memorability"),
-        pronunciation,
-        spellingCharacter,
-      },
-      strongestReason,
-      mainRisk,
-      confidence,
-      preferredWithinGroup: Math.max(0, Math.min(100, Math.round(Number(item.preferredWithinGroup) || 0))),
-    })
-  }
-  return judgments
-}
-
-async function judgeCandidates(
-  candidates: readonly RawNameCandidate[],
-  constitution: NameConstitution,
-  signal: AbortSignal,
-  userIdentifier: string,
-) {
-  const blinded = deterministicShuffle(candidates).map((candidate) => ({ name: candidate.name, pronunciation: candidate.pronunciation }))
-  const response = await createStructuredResponse<{ judgments: Array<Record<string, unknown>> }>({
-    schemaName: "name_sprint_blind_judgments",
-    schema: JUDGE_SCHEMA as unknown as Record<string, unknown>,
-    instructions: JUDGE_INSTRUCTIONS,
-    input: `Name Constitution: ${JSON.stringify(constitution)}\nShuffled candidate set: ${JSON.stringify(blinded)}`,
-    maxOutputTokens: 1_400,
-    promptCacheKey: "namolux-name-sprint-judge-v2",
-    userIdentifier,
-    signal,
-    reasoningEffort: "low",
-  })
-  return { judgments: parseJudgments(response.data, candidates), usage: response }
 }
 
 type CurrentCollisionCheck = {
@@ -674,7 +522,7 @@ function currentCollisionRejection(candidate: RawNameCandidate, check: CurrentCo
 }
 
 async function checkCandidateDomains(candidates: readonly RawNameCandidate[], constitution: NameConstitution, signal: AbortSignal) {
-  const checkedCandidates = candidates.slice(0, STANDARD_JUDGE_POOL_SIZE)
+  const checkedCandidates = candidates.slice(0, STANDARD_DOMAIN_POOL_SIZE)
   const domains = checkedCandidates.flatMap((candidate) => buildNameSprintDomainOptions(candidate.normalizedName).map((option) => option.domain))
   if (!domains.length || process.env.NAMOLUX_NAME_SPRINT_DOMAIN_CHECKS?.trim().toLowerCase() === "false") return new Map<string, NameSprintDomainEvidence>()
   try {
@@ -742,7 +590,6 @@ export async function runNameSprint({
   let admissionCandidates: NameSprintCandidate[] = []
   const rejected: RejectedNameCandidate[] = []
   const domainReadyCandidates = new Map<string, NameSprintCandidate>()
-  const preliminaryJudgments = new Map<string, JudgedCandidate>()
   let attempts = 0
   const timingMs = { generation: 0, screening: 0, judgeAndEvidence: 0, total: 0 }
   const usage = { model: getNameSprintModel(), inputTokens: 0, outputTokens: 0, estimatedUsd: 0, webSearchCalls: 0 }
@@ -831,7 +678,7 @@ export async function runNameSprint({
     }
     const domainPool = diverseSelection(
       locallyEligible.sort((left, right) => right.score - left.score).map((item) => item.candidate),
-      STANDARD_JUDGE_POOL_SIZE,
+      STANDARD_DOMAIN_POOL_SIZE,
     )
     timingMs.screening += Date.now() - screeningStarted
     if (!domainPool.length) continue
@@ -888,69 +735,10 @@ export async function runNameSprint({
 
     if (!roundDomainReady.length) continue
 
-    const judgeStarted = Date.now()
-    let roundJudgments = new Map<string, JudgedCandidate>()
-    try {
-      const judged = await judgeCandidates(roundDomainReady, constitution, signal, userIdentifier)
-      roundJudgments = judged.judgments
-      addUsage(judged.usage)
-    } catch (error) {
-      if (optionalStageEnabled("NAMOLUX_NAME_SPRINT_ENABLED")) throw new Error("name_sprint_judge_incomplete")
-      console.warn("name-sprint-judge-incomplete", { reason: error instanceof Error ? error.message : "unknown" })
-    }
-
-    const roundQualityReady = roundDomainReady.flatMap((candidate): NameSprintCandidate[] => {
-      const judgment = roundJudgments.get(candidate.normalizedName) || null
-      if (!judgment && optionalStageEnabled("NAMOLUX_NAME_SPRINT_ENABLED")) throw new Error("name_sprint_judge_incomplete")
-      if (judgment) preliminaryJudgments.set(candidate.normalizedName, judgment)
-      const eligibility = evaluateEligibility(candidate, {
-        constitution,
-        previouslyRejected,
-        recentRootFrequency,
-        judgeFatalFlaws: judgment?.fatalFlawCodes,
-      })
-      if (eligibility.status !== "pass") {
-        rejected.push({ ...candidate, eligibility })
-        return []
-      }
-      const primaryStatus = candidate.domainStatuses.find((domain) => domain.tld === "com")?.status || "unknown"
-      const founderSignal = scoreFounderSignalV2({
-        candidate,
-        constitution,
-        eligibility,
-        judged: judgment,
-        preferredTld: "com",
-        domainStatus: primaryStatus,
-        availableTlds: candidate.domainStatuses.filter((domain) => domain.status === "available" && eligibleLaunchTlds.includes(domain.tld as (typeof NAME_SPRINT_TLDS)[number])).map((domain) => domain.tld),
-        launchDomainKind: candidate.launchDomain.kind,
-        liveScreenCompleted: false,
-        recentRootFrequency,
-      })
-      if (founderSignal.band !== "Strong" && founderSignal.band !== "Elite") {
-        rejected.push({
-          ...candidate,
-          eligibility: {
-            status: "review",
-            failureCodes: [...eligibility.failureCodes, "BELOW_QUALITY_BAR"],
-            reasons: [...eligibility.reasons, `Founder Signal ${founderSignal.score} did not reach the preliminary Strong quality bar.`],
-            scoreCap: eligibility.scoreCap === null ? 59 : Math.min(59, eligibility.scoreCap),
-            matchedBrand: eligibility.matchedBrand,
-          },
-        })
-        return []
-      }
-      return [{
-        ...candidate,
-        eligibility,
-        founderSignal,
-        strongestReason: founderSignal.strongestReason,
-        mainRisk: founderSignal.mainRisk,
-        evidenceConfidence: founderSignal.confidence,
-      }]
-    }).sort(compareFinalists)
-    timingMs.judgeAndEvidence += Date.now() - judgeStarted
-
-    for (const candidate of roundQualityReady) {
+    // Discovery is intentionally separate from Founder Signal. Candidates that
+    // pass the deterministic hard gate and exact-domain check proceed to the
+    // bounded current-brand screen; founders score only the names they choose.
+    for (const candidate of roundDomainReady) {
       if (!domainReadyCandidates.has(candidate.normalizedName)) domainReadyCandidates.set(candidate.normalizedName, candidate)
     }
 
@@ -1019,15 +807,11 @@ export async function runNameSprint({
   timingMs.judgeAndEvidence += Date.now() - collisionStarted
 
   if (screenedCandidates.length) {
-    const judgeStarted = Date.now()
     admissionCandidates = screenedCandidates.flatMap((candidate): NameSprintCandidate[] => {
-      const judgment = preliminaryJudgments.get(candidate.normalizedName) || null
-      if (!judgment && optionalStageEnabled("NAMOLUX_NAME_SPRINT_ENABLED")) throw new Error("name_sprint_judge_incomplete")
       const eligibility = evaluateEligibility(candidate, {
         constitution,
         previouslyRejected,
         recentRootFrequency,
-        judgeFatalFlaws: judgment?.fatalFlawCodes,
       })
       if (eligibility.status !== "pass") {
         rejected.push({ ...candidate, eligibility })
@@ -1039,7 +823,6 @@ export async function runNameSprint({
         candidate,
         constitution,
         eligibility,
-        judged: judgment,
         preferredTld: "com",
         domainStatus: primaryStatus,
         availableTlds: candidate.domainStatuses.filter((domain) => domain.status === "available" && eligibleLaunchTlds.includes(domain.tld as (typeof NAME_SPRINT_TLDS)[number])).map((domain) => domain.tld),
@@ -1047,19 +830,6 @@ export async function runNameSprint({
         liveScreenCompleted,
         recentRootFrequency,
       })
-      if (founderSignal.band !== "Strong" && founderSignal.band !== "Elite") {
-        rejected.push({
-          ...candidate,
-          eligibility: {
-            status: "review",
-            failureCodes: [...eligibility.failureCodes, "BELOW_QUALITY_BAR"],
-            reasons: [...eligibility.reasons, `Founder Signal ${founderSignal.score} did not reach the public Strong quality bar.`],
-            scoreCap: eligibility.scoreCap === null ? 59 : Math.min(59, eligibility.scoreCap),
-            matchedBrand: eligibility.matchedBrand,
-          },
-        })
-        return []
-      }
       return [{
         ...candidate,
         eligibility,
@@ -1069,7 +839,6 @@ export async function runNameSprint({
         evidenceConfidence: founderSignal.confidence,
       }]
     }).sort(compareFinalists)
-    timingMs.judgeAndEvidence += Date.now() - judgeStarted
   }
 
   let eliteAwarded = false

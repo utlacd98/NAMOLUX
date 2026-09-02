@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 })
 
 const defaultDescription =
-  "Generate, reject and rank business names, verify launch-ready domains, compare finalists with Founder Signal, and build the winning brand with NamoLux."
+  "Discover focused business names, verify launch-ready domains, evaluate chosen finalists with Founder Signal, and build the winning brand with NamoLux."
 
 export const metadata: Metadata = {
   title: "NamoLux | Business Name Generator & Domain Checker",
