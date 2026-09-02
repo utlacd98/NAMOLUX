@@ -76,6 +76,10 @@ export async function POST(request: NextRequest) {
       previouslyRejected: Array.from(new Set([...previouslyRejected, ...fatigue.previouslySeen])),
       recentRootFrequency: fatigue.recentRootFrequency,
     })
+    const rejectionCodeCounts = result.rejected.reduce<Record<string, number>>((counts, candidate) => {
+      for (const code of candidate.eligibility.failureCodes) counts[code] = (counts[code] || 0) + 1
+      return counts
+    }, {})
     console.info("name-sprint-generation-complete", {
       generatedCount: result.generatedCount,
       survivorCount: result.survivorCount,
@@ -87,6 +91,7 @@ export async function POST(request: NextRequest) {
       estimatedUsd: result.usage.estimatedUsd,
       webSearchCalls: result.usage.webSearchCalls,
       timingMs: result.timingMs,
+      rejectionCodeCounts,
     })
     await completeNameSprintRun({ userId: subject.userId, runId, constitution: parsed.constitution, result, latencyMs: Date.now() - started })
     let emptyResultRefunded = false

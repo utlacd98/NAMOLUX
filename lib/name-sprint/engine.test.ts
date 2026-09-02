@@ -626,6 +626,7 @@ describe("Name Sprint multi-stage engine", () => {
     const guidedCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_guided_search")
     const collisionCalls = mocks.structured.mock.calls.filter(([request]) => request.schemaName === "name_sprint_current_collision_screen")
     expect(guidedCalls).toHaveLength(2)
+    expect(guidedCalls[1][0].input).toContain("Create exactly 16 focused applicants")
     expect(guidedCalls[1][0].input).toContain("NO_PREFERRED_DOMAIN")
     expect(guidedCalls[1][0].input).toContain("exact-domain potential")
     expect(availabilityCalls).toBe(2)

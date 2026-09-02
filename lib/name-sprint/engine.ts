@@ -171,7 +171,7 @@ const CURRENT_COLLISION_BATCH_SIZE = 8
 const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
 const MAX_ESTIMATED_RUN_USD = 0.025
 const STANDARD_JUDGE_POOL_SIZE = 16
-const GUIDED_ROUND_COUNTS = [20, 10] as const
+const GUIDED_ROUND_COUNTS = [20, 16] as const
 const GUIDED_TARGET_ADMISSIONS = 3
 
 function optionalStageEnabled(name: string) {
@@ -441,7 +441,7 @@ async function generateGuidedRound({
     schema: GUIDED_SEARCH_SCHEMA as unknown as Record<string, unknown>,
     instructions: GUIDED_SEARCH_INSTRUCTIONS,
     input: `Search round: ${round} of ${GUIDED_ROUND_COUNTS.length}\nCreate exactly ${count} focused applicants.\nName Constitution: ${JSON.stringify(constitution)}\nSemantic territories: ${JSON.stringify(territories)}\nLiteral territory roots forbidden inside coined names: ${JSON.stringify(Array.from(new Set(territories.flatMap((territory) => territory.roots))).slice(0, 80))}\nPer-strategy rules: ${JSON.stringify(Object.fromEntries(REPAIR_STRATEGIES.map((strategy) => [strategy, STRATEGY_RULES[strategy]])))}\nFailure evidence: ${JSON.stringify(feedback)}\nNever repeat or closely vary: ${JSON.stringify(excludedNames.slice(-180))}`,
-    maxOutputTokens: round === 1 ? 3_200 : round === 2 ? 2_400 : 1_800,
+    maxOutputTokens: round === 1 ? 3_200 : round === 2 ? 3_000 : 1_800,
     promptCacheKey: "namolux-name-sprint-guided-search-v1",
     userIdentifier,
     signal,

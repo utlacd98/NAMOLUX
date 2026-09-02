@@ -1,4 +1,4 @@
-export const NAME_SPRINT_VERSION = "2026.09.02.1" as const
+export const NAME_SPRINT_VERSION = "2026.09.02.2" as const
 export const FOUNDER_SIGNAL_V2_VERSION = "2.0" as const
 export const NAME_SPRINT_TLDS = ["com", "co", "ai"] as const
 
