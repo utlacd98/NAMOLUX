@@ -164,7 +164,7 @@ async function ownerAndService() {
   if (!user) throw new BrandLaunchError("authentication_required", "Sign in to build a brand launch kit.", 401)
   const entitlements = await getUserEntitlements(user.id)
   if (!entitlements.isPro) {
-    throw new BrandLaunchError("upgrade_required", "Brand Launch is included with Pro and the 7-day Pro trial.", 403)
+    throw new BrandLaunchError("upgrade_required", "Brand Launch is included with an active Pro subscription.", 403)
   }
   return { userId: user.id, service: createServiceClient(), entitlements }
 }
@@ -199,7 +199,7 @@ export async function createBrandLaunchKit(input: {
   // rejects before consuming an allowance.
   const subject = await getQuotaSubject(new NextRequest("https://www.namolux.com/api/brand-launch/kits"))
   if (!subject.userId) throw new BrandLaunchError("authentication_required", "Sign in to build a brand launch kit.", 401)
-  if (subject.plan !== "pro") throw new BrandLaunchError("upgrade_required", "Brand Launch is included with Pro and the 7-day Pro trial.", 403)
+  if (subject.plan !== "pro") throw new BrandLaunchError("upgrade_required", "Brand Launch is included with an active Pro subscription.", 403)
   const service = createServiceClient()
 
   const allowance = await checkPlanFeatureQuotaIdempotentForSubject(subject, KIT_FEATURE, KIT_LIMITS, input.idempotencyKey)

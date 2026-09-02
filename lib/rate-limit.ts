@@ -815,7 +815,7 @@ function buildPlanFeatureQuotaResult(input: {
 
 /**
  * Reads a finite Free/Pro allowance without consuming it. Unlike the legacy
- * fair-use helpers, Pro is deliberately metered here as part of the £7.99
+ * fair-use helpers, Pro is deliberately metered here as part of the paid
  * decision-workspace offer.
  */
 export async function getPlanFeatureQuotaStateForSubject(

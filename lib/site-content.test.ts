@@ -21,7 +21,7 @@ describe("public decision-workspace positioning", () => {
     ])
   })
 
-  it("publishes the £7.99 Pro workspace allowance consistently", () => {
+  it("publishes the Pro workspace allowance consistently", () => {
     expect(PUBLIC_PRODUCT_COPY.proPlanSummary).toContain("120 Bulk Check runs")
     expect(PUBLIC_PRODUCT_COPY.proPlanSummary).toContain("120 Founder Signal runs")
     expect(PUBLIC_PRODUCT_COPY.proPlanSummary).toContain("UTC calendar month")

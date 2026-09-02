@@ -57,16 +57,14 @@ export function Pricing() {
             </div>
             <h3 className="text-2xl font-bold text-foreground">{PRODUCT_OFFER.paidPlanName}</h3>
             <p className="mt-2 text-muted-foreground">Generate more often, compare and save decisions, then turn the winner into a Brand Launch Kit.</p>
-            <div className="mt-6 flex items-baseline gap-2">
-              <span className="text-5xl font-bold text-foreground">{PRODUCT_OFFER.paidPrice}</span>
-              <span className="text-muted-foreground">/ month</span>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+              <div className="rounded-xl border border-border p-4"><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Monthly</p><p className="mt-2 text-3xl font-bold text-foreground">{PRODUCT_OFFER.paidPrice}<span className="ml-1 text-sm font-normal text-muted-foreground">/month</span></p></div>
+              <div className="rounded-xl border border-primary/40 bg-primary/5 p-4"><p className="text-xs font-bold uppercase tracking-wider text-primary">Annual · best value</p><p className="mt-2 text-3xl font-bold text-foreground">{PRODUCT_OFFER.paidAnnualPrice}<span className="ml-1 text-sm font-normal text-muted-foreground">/year</span></p><p className="mt-1 text-xs text-primary">£8.25/month equivalent</p></div>
             </div>
-            <Button asChild size="lg" className="mt-8 w-full px-8 py-6 text-base font-semibold">
-              <Link href={PRODUCT_OFFER.paidCheckoutHref}>
-                <Zap className="mr-2 h-5 w-5" />
-                Start 7-day free trial
-              </Link>
-            </Button>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+              <Button asChild size="lg" variant="outline" className="px-4 py-6 text-base font-semibold"><Link href={`${PRODUCT_OFFER.paidCheckoutHref}?billing=monthly`}>Choose monthly</Link></Button>
+              <Button asChild size="lg" className="px-4 py-6 text-base font-semibold"><Link href={`${PRODUCT_OFFER.paidCheckoutHref}?billing=annual`}><Zap className="mr-2 h-5 w-5" />Choose annual</Link></Button>
+            </div>
             <ul className="mt-8 space-y-3">
               {PUBLIC_PRODUCT_COPY.proPlanFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -84,7 +82,7 @@ export function Pricing() {
         >
           <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
             <Lock className="h-4 w-4 text-primary" />
-            Card required. First-time customers get 7 days free, then £7.99/month unless cancelled before renewal.
+            No free trial. Billing starts at checkout. Cancel any time through the billing portal.
           </p>
           <p className="text-sm text-muted-foreground">
             Domain registration links may use our Namecheap partner link.{" "}

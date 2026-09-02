@@ -25,7 +25,7 @@ export const CTA_LABELS = {
   primary: "Start a Name Sprint",
   secondaryProduct: "Check a shortlist",
   editorial: "Open Bulk Check",
-  paid: "Start 7-day free trial",
+  paid: "Choose Pro",
 } as const
 
 // This is deliberately presentation copy rather than an entitlement source of
@@ -45,7 +45,7 @@ export const PUBLIC_PRODUCT_COPY = {
     "Direct social-profile, company and official trade-mark verification links",
     "Ad-free workspace",
     "Brand Launch Kit: 10 kits, three palettes, and logo concepts each month",
-    "7-day free trial for first-time customers; card required",
+    "£12.99 monthly or £99 annually",
     "Cancel through the billing portal",
   ],
   renewalNote: "Usage resets at the start of each UTC calendar month.",

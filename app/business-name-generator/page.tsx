@@ -50,7 +50,8 @@ export default function BusinessNameGeneratorPage() {
     description,
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "One signed-in Name Sprint per UTC day" },
-      { "@type": "Offer", price: "7.99", priceCurrency: "GBP", description: "NamoLux Pro with 40 Name Sprints monthly" },
+      { "@type": "Offer", price: "12.99", priceCurrency: "GBP", description: "NamoLux Pro monthly with 40 Name Sprints" },
+      { "@type": "Offer", price: "99", priceCurrency: "GBP", description: "NamoLux Pro annual with 40 Name Sprints monthly" },
     ],
   }
 
@@ -68,7 +69,7 @@ export default function BusinessNameGeneratorPage() {
                 <Link href="/generate" className="inline-flex min-h-12 items-center gap-2 bg-[#d6b15e] px-6 font-semibold text-black transition hover:bg-[#e2c274]">Start Name Sprint <ArrowRight size={17} /></Link>
                 <Link href="/bulk-domain-check" className="inline-flex min-h-12 items-center border border-white/15 px-6 font-medium text-stone-200 transition hover:border-[#d6b15e]/60">Already have names? Bulk Check</Link>
               </div>
-              <p className="mt-4 text-sm text-stone-500">Sign-in required. Free: one Name Sprint daily. Pro and trial: 40 monthly.</p>
+              <p className="mt-4 text-sm text-stone-500">Sign-in required. Free: one Name Sprint daily. Pro: 40 monthly.</p>
             </div>
             <aside className="border border-[#d6b15e]/25 bg-[#0d0e0f] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d6b15e]">What earns a place</p>

@@ -5,8 +5,8 @@ import { getAppUrl } from "@/lib/env"
 import { trackMetric } from "@/lib/metrics"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { getStripeClient } from "@/lib/stripe-client"
-import { getStripePaidPriceId } from "@/lib/stripe-plans"
-import { isAllowedNamoLuxSubscription } from "@/lib/stripe-plans"
+import { getStripePaidPriceId, type StripeBillingInterval } from "@/lib/stripe-plans"
+import { PRO_ANNUAL_PRICE_GBP, PRO_MONTHLY_PRICE_GBP } from "@/lib/plans"
 import { parsePricingAttribution, withPricingAttribution } from "@/lib/pricing-attribution"
 
 export async function GET(request: NextRequest) {
@@ -16,15 +16,16 @@ export async function GET(request: NextRequest) {
     content: request.nextUrl.searchParams.get("content"),
     return: request.nextUrl.searchParams.get("return"),
   })
-  const attributedCheckoutPath = withPricingAttribution("/api/stripe/checkout", attribution)
+  const billing: StripeBillingInterval = request.nextUrl.searchParams.get("billing") === "annual" ? "annual" : "monthly"
+  const attributedCheckoutPath = withPricingAttribution(`/api/stripe/checkout?billing=${billing}`, attribution)
 
   try {
-    const priceId = getStripePaidPriceId()
+    const priceId = getStripePaidPriceId(billing)
     if (!priceId) {
       console.error("Stripe checkout failed: no price ID configured")
       await trackMetric({
         action: "checkout_failed",
-        metadata: { source: attribution.source, fallbackReason: "price-not-configured" },
+        metadata: { source: attribution.source, billing, fallbackReason: "price-not-configured" },
         route: "/api/stripe/checkout",
       })
       return NextResponse.redirect(new URL("/pricing?checkout=unavailable", request.url))
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     const { data: profile, error: profileError } = await service
       .from("profiles")
       .select(
-        "plan, entitlement_source, subscription_status, subscription_end, stripe_status, access_expires_at, cancel_at_period_end, stripe_customer_id, trial_started_at, trial_subscription_id",
+        "plan, entitlement_source, subscription_status, subscription_end, stripe_status, access_expires_at, cancel_at_period_end, stripe_customer_id",
       )
       .eq("id", user.id)
       .maybeSingle()
@@ -58,17 +59,19 @@ export async function GET(request: NextRequest) {
 
     const stripe = getStripeClient()
     const price = await stripe.prices.retrieve(priceId)
+    const expectedAmount = billing === "annual" ? PRO_ANNUAL_PRICE_GBP * 100 : PRO_MONTHLY_PRICE_GBP * 100
+    const expectedInterval = billing === "annual" ? "year" : "month"
     const isExpectedPaidPrice =
       price.active &&
       price.type === "recurring" &&
       price.currency === "gbp" &&
-      price.unit_amount === 799 &&
-      price.recurring?.interval === "month"
+      price.unit_amount === expectedAmount &&
+      price.recurring?.interval === expectedInterval
     if (!isExpectedPaidPrice) {
-      console.error("Stripe checkout failed: paid tier must use an active recurring GBP 7.99 monthly Price")
+      console.error(`Stripe checkout failed: paid tier must use the expected active recurring GBP Price for ${billing} billing`)
       await trackMetric({
         action: "checkout_failed",
-        metadata: { source: attribution.source, fallbackReason: "price-validation-failed" },
+        metadata: { source: attribution.source, billing, fallbackReason: "price-validation-failed" },
         route: "/api/stripe/checkout",
       })
       return NextResponse.redirect(new URL("/pricing?checkout=unavailable", request.url))
@@ -88,23 +91,11 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // A trial is a one-time customer benefit. The stored marker makes the
-    // decision durable; Stripe history closes the gap for customers created
-    // before this migration or after a database repair.
-    let isTrialEligible = !profile?.trial_started_at && !profile?.trial_subscription_id
-    if (isTrialEligible) {
-      for await (const subscription of stripe.subscriptions.list({ customer: customerId, status: "all", limit: 100 })) {
-        if (isAllowedNamoLuxSubscription(subscription)) {
-          isTrialEligible = false
-          break
-        }
-      }
-    }
-
     const metadata = {
       supabase_user_id: user.id,
       plan: "pro",
       price_id: priceId,
+      billing_interval: billing,
       attribution_source: attribution.source,
       ...(attribution.content ? { attribution_content: attribution.content } : {}),
     }
@@ -126,7 +117,6 @@ export async function GET(request: NextRequest) {
         metadata,
         subscription_data: {
           metadata,
-          ...(isTrialEligible ? { trial_period_days: 7 } : {}),
         },
       },
       { idempotencyKey: `namolux-checkout-${user.id}-${priceId}-${fiveMinuteBucket}` },
@@ -140,8 +130,8 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         priceId,
         plan: "pro",
+        billing,
         mode: "subscription",
-        trialEligible: isTrialEligible,
         source: attribution.source,
         ...(attribution.content ? { contentSlug: attribution.content } : {}),
       },

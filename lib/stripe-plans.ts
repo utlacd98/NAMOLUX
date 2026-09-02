@@ -5,8 +5,14 @@ function cleanEnv(value: string | undefined): string | undefined {
   return cleaned || undefined
 }
 
-export function getStripePaidPriceId(): string | undefined {
+export type StripeBillingInterval = "monthly" | "annual"
+
+export function getStripePaidPriceId(interval: StripeBillingInterval = "monthly"): string | undefined {
+  if (interval === "annual") {
+    return cleanEnv(process.env.STRIPE_PRICE_PRO_ANNUAL)
+  }
   return (
+    cleanEnv(process.env.STRIPE_PRICE_PRO_MONTHLY) ||
     cleanEnv(process.env.STRIPE_PRICE_PRO) ||
     cleanEnv(process.env.STRIPE_PRICE_PAID) ||
     cleanEnv(process.env.STRIPE_PRICE_ID)
@@ -17,6 +23,8 @@ export function getStripeAllowedPriceIds(): Set<string> {
   return new Set(
     [
       cleanEnv(process.env.STRIPE_PRICE_PRO),
+      cleanEnv(process.env.STRIPE_PRICE_PRO_MONTHLY),
+      cleanEnv(process.env.STRIPE_PRICE_PRO_ANNUAL),
       cleanEnv(process.env.STRIPE_PRICE_PAID),
       cleanEnv(process.env.STRIPE_PRICE_ID),
       cleanEnv(process.env.STRIPE_PRICE_STARTER),

@@ -139,6 +139,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "GBP", description: PRODUCT_OFFER.freeUsageLabel },
       { "@type": "Offer", price: PRODUCT_OFFER.proMonthlyPrice, priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
+      { "@type": "Offer", price: PRODUCT_OFFER.proAnnualPrice, priceCurrency: "GBP", description: "NamoLux Pro annual plan" },
     ],
     publisher: { "@id": "https://www.namolux.com/#organization" },
   }

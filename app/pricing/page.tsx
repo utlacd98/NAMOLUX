@@ -11,7 +11,7 @@ import { PUBLIC_PRODUCT_COPY } from "@/lib/site-content"
 
 export const metadata: Metadata = {
   title: "Pricing | NamoLux",
-  description: `Start with one curated Name Sprint per UTC day plus ${PRODUCT_OFFER.freeUsageLabel.toLowerCase()}, or try ${PRODUCT_OFFER.paidPlanName} for seven days before ${PRODUCT_OFFER.paidPriceLabel}. Pro adds 40 Name Sprints and paid Brand Launch Kits.`,
+  description: `Start with one curated Name Sprint per UTC day plus ${PRODUCT_OFFER.freeUsageLabel.toLowerCase()}, or choose ${PRODUCT_OFFER.paidPlanName} for ${PRODUCT_OFFER.paidPriceLabel} or ${PRODUCT_OFFER.paidAnnualPriceLabel}. Pro adds 40 Name Sprints and paid Brand Launch Kits.`,
   alternates: {
     canonical: "/pricing",
   },
@@ -36,6 +36,8 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
     return: params?.return,
   })
   const checkoutHref = withPricingAttribution(PRODUCT_OFFER.paidCheckoutHref, attribution)
+  const monthlyCheckoutHref = `${checkoutHref}&billing=monthly`
+  const annualCheckoutHref = `${checkoutHref}&billing=annual`
   const isLimitRedirect = redirectReason === "monthly-limit"
   const sourceLabel = redirectSource === "bulk-check"
     ? "bulk domain checks"
@@ -66,7 +68,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               Start free. Upgrade when the decision deserves more.
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-[#999]">
-              Signed-in Free users receive {PRODUCT_OFFER.freeQuickUsageLabel.toLowerCase()}, plus {PRODUCT_OFFER.freeUsageLabel.toLowerCase()}. Start Pro with a 7-day free trial, then pay £7.99/month. Pro includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} Saved decisions, paid Brand Launch Kits, CSV exports, shareable reports, and an ad-free workspace are included.
+              Signed-in Free users receive {PRODUCT_OFFER.freeQuickUsageLabel.toLowerCase()}, plus {PRODUCT_OFFER.freeUsageLabel.toLowerCase()}. Pro is {PRODUCT_OFFER.paidPriceLabel} or {PRODUCT_OFFER.paidAnnualPriceLabel}. It includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} Saved decisions, paid Brand Launch Kits, CSV exports, shareable reports, and an ad-free workspace are included.
             </p>
           </div>
 
@@ -131,21 +133,27 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               <p className="mb-6 text-sm text-[#999]">
                 {PRODUCT_OFFER.tiers[1].description}
               </p>
-              <div className="mb-6 flex items-baseline gap-2">
-                <span className="text-5xl font-bold text-white">{PRODUCT_OFFER.paidPrice}</span>
-                <span className="text-[#777]">{PRODUCT_OFFER.paidBillingLabel}</span>
+              <div className="mb-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#aaa]">Monthly</p>
+                  <p className="mt-2 text-3xl font-bold text-white">{PRODUCT_OFFER.paidPrice}<span className="ml-1 text-sm font-normal text-[#777]">/month</span></p>
+                </div>
+                <div className="rounded-xl border border-[#D4A843]/45 bg-[#D4A843]/10 p-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3D98B]">Annual · best value</p>
+                  <p className="mt-2 text-3xl font-bold text-white">{PRODUCT_OFFER.paidAnnualPrice}<span className="ml-1 text-sm font-normal text-[#a99a75]">/year</span></p>
+                  <p className="mt-1 text-xs text-[#d8bd76]">Equivalent to £8.25/month</p>
+                </div>
               </div>
-              <TrackedCheckoutLink
-                href={checkoutHref}
-                attribution={attribution}
-                ctaId="pricing_pro_primary"
-                className="mb-8 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-[#D4A843] px-6 py-3 font-semibold text-black transition hover:bg-[#c49a3d]"
-              >
-                <Zap className="h-4 w-4" />
-                {PRODUCT_OFFER.proCtaLabel}
-              </TrackedCheckoutLink>
-              <p className="-mt-5 mb-7 text-center text-xs leading-relaxed text-[#8f887c]">
-                Card required. First-time customers get 7 days free, then £7.99/month unless cancelled before renewal. Already signed in? You will continue securely to Stripe.
+              <div className="mb-5 grid gap-3 sm:grid-cols-2">
+                <TrackedCheckoutLink href={monthlyCheckoutHref} attribution={attribution} ctaId="pricing_pro_monthly" className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-[#D4A843]/45 px-4 py-3 font-semibold text-[#F3D98B] transition hover:bg-[#D4A843]/10">
+                  Choose monthly
+                </TrackedCheckoutLink>
+                <TrackedCheckoutLink href={annualCheckoutHref} attribution={attribution} ctaId="pricing_pro_annual" className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-[#D4A843] px-4 py-3 font-semibold text-black transition hover:bg-[#c49a3d]">
+                  <Zap className="h-4 w-4" /> Choose annual
+                </TrackedCheckoutLink>
+              </div>
+              <p className="mb-7 text-center text-xs leading-relaxed text-[#8f887c]">
+                No free trial. Billing starts at checkout. Cancel any time through the billing portal. Already signed in? You will continue securely to Stripe.
               </p>
               <ul className="space-y-3">
                 {PUBLIC_PRODUCT_COPY.proPlanFeatures.map((feature) => (

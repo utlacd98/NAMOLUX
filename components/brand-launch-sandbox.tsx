@@ -101,7 +101,7 @@ const TEMPLATES: TemplateConfig[] = [
     matchTerms: ["saas", "ai", "automation", "analytics", "b2b", "workflow", "productivity"],
     badge: "AI operating layer",
     nav: ["Platform", "Workflow", "Customers"],
-    cta: "Start trial",
+    cta: "Get started",
     secondaryCta: "View demo",
     serif: false,
     radius: "soft",

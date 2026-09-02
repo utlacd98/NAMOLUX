@@ -123,16 +123,16 @@ function SignUpForm() {
     <AuthShowcase variant="sign-up">
       <AuthCard>
         <AuthTitle
-          title={isCheckoutReturn ? "Create your account to start the trial" : "Create your NamoLux account"}
+          title={isCheckoutReturn ? "Create your account to continue to Pro" : "Create your NamoLux account"}
           subtitle={isCheckoutReturn
-            ? `Continue to secure Stripe checkout for 7 days free, then ${PRODUCT_OFFER.paidPriceLabel}. ${PRODUCT_OFFER.cancellationLabel}`
+            ? `Continue to secure Stripe checkout and choose monthly or annual Pro billing. ${PRODUCT_OFFER.cancellationLabel}`
             : "Check, score, and compare the candidate names your team is considering."}
           icon="sparkles"
         />
 
         {isCheckoutReturn && (
           <div className="mb-6 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-sm leading-6 text-white/62">
-            Your shortlist stays free. Creating an account here preserves your trial choice and sends you directly to Stripe after sign-up.
+            Your shortlist stays free. Creating an account here preserves your Pro choice and sends you directly to Stripe after sign-up.
           </div>
         )}
 

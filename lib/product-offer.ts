@@ -7,6 +7,8 @@ import {
   PRO_FOUNDER_SIGNAL_BATCH_LIMIT,
   PRO_MONTHLY_BULK_CHECK_LIMIT,
   PRO_NAME_SPRINT_MONTHLY_LIMIT,
+  PRO_ANNUAL_PRICE_GBP,
+  PRO_MONTHLY_PRICE_GBP,
 } from "@/lib/plans"
 
 export const PRODUCT_OFFER = {
@@ -23,15 +25,18 @@ export const PRODUCT_OFFER = {
   paidPlanName: PLAN_CONFIG.pro.name,
   paidPrice: PLAN_CONFIG.pro.price,
   paidPriceLabel: `${PLAN_CONFIG.pro.price}/month`,
+  paidAnnualPrice: `£${PRO_ANNUAL_PRICE_GBP}`,
+  paidAnnualPriceLabel: `£${PRO_ANNUAL_PRICE_GBP}/year`,
   paidBillingLabel: PLAN_CONFIG.pro.billingLabel,
   paidCheckoutHref: "/api/stripe/checkout",
   proPlanName: PLAN_CONFIG.pro.name,
   proPrice: PLAN_CONFIG.pro.price,
   proMonthlyPrice: PLAN_CONFIG.pro.price.replace("£", ""),
+  proAnnualPrice: String(PRO_ANNUAL_PRICE_GBP),
   proPriceLabel: `${PLAN_CONFIG.pro.price}/month`,
   proBillingLabel: PLAN_CONFIG.pro.billingLabel,
-  proCtaLabel: "Start 7-day free trial",
-  proCtaWithPrice: `Start 7-day free trial, then ${PLAN_CONFIG.pro.price}/month`,
+  proCtaLabel: "Choose Pro",
+  proCtaWithPrice: `Choose ${PLAN_CONFIG.pro.price}/month or £${PRO_ANNUAL_PRICE_GBP}/year`,
   proBulkCheckRuns: PRO_MONTHLY_BULK_CHECK_LIMIT,
   proFounderSignalRuns: PRO_FOUNDER_SIGNAL_BATCH_LIMIT,
   proNameSprintRuns: PRO_NAME_SPRINT_MONTHLY_LIMIT,
@@ -46,7 +51,7 @@ export const PRODUCT_OFFER = {
     `${PRO_NAME_SPRINT_MONTHLY_LIMIT} Pro Name Sprints per month`,
     "Live domain availability",
     "Cancel through the billing portal",
-    "7-day card-required free trial for first-time customers",
+    `Save £${(PRO_MONTHLY_PRICE_GBP * 12 - PRO_ANNUAL_PRICE_GBP).toFixed(2)} with annual billing`,
   ],
   caveats: [
     "Domain availability is checked live and should be confirmed with the registrar before purchase.",

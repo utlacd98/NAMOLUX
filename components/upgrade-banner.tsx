@@ -54,7 +54,7 @@ export function UpgradeBanner() {
         <div className="mx-10 min-w-0 truncate text-center text-[12px] text-[#a0a0a0] sm:text-[13px]">
           <span className="truncate">
             Quick is <span className="text-amber-500 font-medium">free without a monthly quota</span>. Pro adds unlimited fair-use tools for{" "}
-            <span className="text-amber-500 font-medium">{"\u00a3"}7.99/month</span>.
+            <span className="text-amber-500 font-medium">{"\u00a3"}12.99/month or {"\u00a3"}99/year</span>.
           </span>
         </div>
 
