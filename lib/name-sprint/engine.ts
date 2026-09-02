@@ -157,7 +157,7 @@ const JUDGE_INSTRUCTIONS = `You are an independent blind naming judge. You did n
 Compare candidates in small implicit groups against the supplied Name Constitution. You receive no domain availability, generated rationale, or strategy labels.
 Use fatal-flaw codes only for severe pronunciation, spelling, unsafe-meaning, random-syllable, fabricated-etymology, semantic-mismatch, or clearly generic defects. Use GENERIC_CLICHE only when a candidate is an ordinary category/trust word, a commodity phrase, a feature label, or unmistakably generic. Current web-backed screens handle brand collisions, so do not guess those from memory; express softer concerns through dimension scores and mainRisk.
 Scores are comparative signals, not legal clearance. Most raw candidates are not shortlist quality: use 45-59 for names a founder should discard, 60-74 for serious but imperfect options, and 75-89 only for the small minority you would genuinely build a company around. Do not award 75+ merely because a name is relevant or pronounceable. Descriptive compounds, forced constructions, weak semantic bridges, and names that need explanation must not receive Strong dimension scores.
-Use SEMANTIC_MISMATCH when the metaphor or root relationship is stretched enough that the supplied explanation is doing the branding work. Use RANDOM_SYLLABLES for a forced invented construction. At most one third of a typical candidate set should receive preferredWithinGroup above 70.
+Use SEMANTIC_MISMATCH only when the name clearly contradicts the brief, is plainly category-inappropriate, or its metaphor is so stretched that an explanation must do all the branding work. A distinctive invented name with an initially opaque meaning should receive a lower strategic-fit score, not an automatic fatal flaw. Use RANDOM_SYLLABLES for a forced invented construction. At most one third of a typical candidate set should receive preferredWithinGroup above 70.
 If mainRisk says pronunciation or spelling may vary, include SPELLING_AMBIGUITY. If a pronunciation cluster is severe, include PRONUNCIATION_CLUSTER. The risk text and fatal codes must agree.
 Keep strongestReason and mainRisk under 18 words each. Return one judgment for every supplied name and never invent a new candidate.`
 
@@ -171,7 +171,7 @@ const CURRENT_COLLISION_BATCH_SIZE = 8
 const MAX_FINALISTS_FOR_LIVE_SCREEN = 8
 const MAX_ESTIMATED_RUN_USD = 0.025
 const STANDARD_JUDGE_POOL_SIZE = 16
-const GUIDED_ROUND_COUNTS = [20, 16] as const
+const GUIDED_ROUND_COUNTS = [20, 20] as const
 const GUIDED_TARGET_ADMISSIONS = 3
 
 function optionalStageEnabled(name: string) {
@@ -489,7 +489,7 @@ function parseJudgments(value: unknown, candidates: readonly RawNameCandidate[])
     ) fatalFlawCodes.push("SPELLING_AMBIGUITY")
     if (
       (
-        score("strategicFit") < 60
+        score("strategicFit") < 45
         || /weak (?:category|semantic|strategic) (?:fit|relevance|connection)|little intrinsic connection|meaning (?:is )?opaque|needs? (?:an )?explanation|without (?:the )?explanation|explanation-dependent|requires? (?:substantial )?(?:brand-building|brand storytelling)/i.test(mainRisk)
       )
       && !fatalFlawCodes.includes("SEMANTIC_MISMATCH")
