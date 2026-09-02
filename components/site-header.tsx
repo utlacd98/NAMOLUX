@@ -43,6 +43,7 @@ function isCurrentPage(pathname: string, href: string) {
 export function SiteHeader() {
   const pathname = usePathname()
   const isHome = pathname === "/"
+  const isJournal = pathname === "/blog"
   const visibleNavigation = isHome ? HOME_NAVIGATION : SITE_NAVIGATION
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const firstMobileLinkRef = useRef<HTMLAnchorElement>(null)
@@ -125,7 +126,7 @@ export function SiteHeader() {
     || pathname === "/blog"
 
   return (
-    <header className={styles.siteHeader}>
+    <header className={styles.siteHeader} data-journal-header={isJournal ? "true" : undefined}>
       <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
       <nav className={styles.headerRail} aria-label="Main navigation">
         <Link href="/" prefetch={false} className={styles.wordmark} aria-label="NamoLux home">

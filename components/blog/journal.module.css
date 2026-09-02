@@ -18,6 +18,16 @@
   letter-spacing: -0.012em;
 }
 
+/* The Journal is long-form content. Keep its navigation in the document flow
+   so it never obscures an archive row while the reader scrolls on mobile. */
+.journalPage [data-journal-header="true"] {
+  position: sticky;
+}
+
+.journalPage:has([data-journal-header="true"]) .hero {
+  padding-top: 76px;
+}
+
 .journalPage a {
   color: inherit;
   text-decoration: none;
@@ -783,7 +793,7 @@
   }
 
   .hero {
-    padding: 124px 0 57px;
+    padding: 46px 0 57px;
   }
 
   .hero::before {
