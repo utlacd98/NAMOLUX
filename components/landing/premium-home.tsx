@@ -23,12 +23,31 @@ import styles from "./premium-home.module.css"
 // 2026. They mirror the current discovery-first interface: domains and the
 // current-brand screen come first, while Founder Signal is run on demand.
 const verifiedQaResults = [
-  { name: "Jointure", domain: "jointure.co", tld: ".co" },
-  { name: "Cuekeeper", domain: "cuekeeper.co", tld: ".co" },
-  { name: "Patinelle", domain: "patinelle.com", tld: ".com" },
+  {
+    name: "Daylatch",
+    score: 85,
+    band: "Strong",
+    strategy: "Suggestive",
+    pronunciation: "DAY-latch",
+    domain: "daylatch.com",
+    tld: ".com",
+    domains: [[".com", "available"], [".co", "available"], [".ai", "available"]],
+    association: "A timely opening: practical conditions become a clear reason to go.",
+  },
+  {
+    name: "Trellivo",
+    score: 59,
+    band: "Reconsider",
+    strategy: "Controlled coined",
+    pronunciation: "Trel-EE-voh",
+    domain: "trellivo.co",
+    tld: ".co",
+    domains: [[".com", "unavailable"], [".co", "available"], [".ai", "available"]],
+    association: "Easy to say, but the name needs more strategic distinction before commitment.",
+  },
 ] as const
 
-const jointureSignal = { score: 65, band: "Viable" } as const
+const featuredSignal = verifiedQaResults[0]
 
 const extensions = DOMAIN_EXTENSIONS
 
@@ -47,21 +66,22 @@ function SolidButton({ href, children, tone = "brass" }: { href: string; childre
 
 function HeroShortlistPanel() {
   return (
-    <aside className={styles.heroShortlistPanel} aria-label="Example shortlist analysis">
-      <p>What happens before a name appears</p>
-      <div className={styles.heroScoreRows}>
-        {[
-          ["Naming brief", "Confirm"],
-          ["Focused search", "Generate"],
-          ["Exact domain", "Verify"],
-          ["Current brand", "Screen"],
-        ].map(([name, status]) => (
-          <Link href="/generate" key={name} className={styles.heroScoreRow}>
-            <strong>{name}</strong><span>{status}</span><ArrowRight size={20} strokeWidth={1.5} />
-          </Link>
+    <aside className={`${styles.heroShortlistPanel} ${styles.heroVerdictPanel}`} aria-label="Two names from one NamoLux naming brief">
+      <p>Same brief. Different verdicts.</p>
+      <div className={styles.heroVerdictList}>
+        {verifiedQaResults.map((result) => (
+          <div className={styles.heroVerdictCard} key={result.name}>
+            <div className={styles.heroVerdictHeading}>
+              <div><strong>{result.name}</strong><span>{result.strategy}</span></div>
+              <div><b>{result.score}</b><em>{result.band}</em></div>
+            </div>
+            <div className={styles.heroVerdictDomains}>
+              {result.domains.map(([tld, status]) => <span key={tld} data-status={status}>{tld} {status}</span>)}
+            </div>
+          </div>
         ))}
       </div>
-      <Link href="/generate" className={styles.heroPanelLink}>See the private-preview workflow <ArrowRight size={20} strokeWidth={1.5} /></Link>
+      <Link href="/generate" className={styles.heroPanelLink}>Start with your own brief <ArrowRight size={20} strokeWidth={1.5} /></Link>
     </aside>
   )
 }
@@ -69,7 +89,7 @@ function HeroShortlistPanel() {
 function HeroContext() {
   return (
     <div className={styles.heroContext}>
-      <p>Built for solo founders and indie hackers naming their next product.</p>
+      <p>Sign in free for one Name Sprint each UTC day. Pro includes 40 per month.</p>
     </div>
   )
 }
@@ -83,39 +103,39 @@ function ShortlistTransform() {
       </div>
       <div className={styles.sprintSummary}>
         <div>
-          <span>Domain and current-brand screen complete</span>
-          <h3>5 names have a launch-ready domain</h3>
-          <p>Generated 40 candidates · 15 rejected before display · no filler added.</p>
+          <span>One brief, two honest outcomes</span>
+          <h3>A score should help you choose—not flatter every name.</h3>
+          <p>Real Name Sprint results · Founder Signal run on demand · official registers still require manual review.</p>
         </div>
-        <strong>5</strong>
+        <strong>2</strong>
       </div>
       <div className={styles.sprintResultList}>
         {verifiedQaResults.map((result) => (
           <div className={styles.sprintResultRow} key={result.name}>
             <div><strong>{result.name}</strong><span>Domain verified</span></div>
             <p><span>{result.tld} available</span>{result.domain}</p>
-            <b className={styles.unscoredSignal}>Not scored<small>Founder Signal · on demand</small></b>
+            <b>{result.score}<small>Founder Signal · {result.band}</small></b>
           </div>
         ))}
       </div>
-      <p className={styles.sprintFootnote}>Production QA result from 2 September 2026. Domain availability is time-sensitive and must be confirmed before purchase.</p>
+      <p className={styles.sprintFootnote}>Product examples from 2 September 2026. Domain availability is time-sensitive and must be confirmed before purchase.</p>
     </div>
   )
 }
 
 function SignalGauge() {
   const circumference = 515
-  const scoredArc = Math.round((jointureSignal.score / 100) * circumference)
+  const scoredArc = Math.round((featuredSignal.score / 100) * circumference)
 
   return (
     <div className={styles.gaugeWrap}>
-      <svg className={styles.gauge} viewBox="0 0 220 220" aria-label={`Jointure Founder Signal score ${jointureSignal.score}, ${jointureSignal.band}`}>
+      <svg className={styles.gauge} viewBox="0 0 220 220" aria-label={`${featuredSignal.name} Founder Signal score ${featuredSignal.score}, ${featuredSignal.band}`}>
         <circle cx="110" cy="110" r="95" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
         <circle cx="110" cy="110" r="82" fill="none" stroke="rgba(196,161,91,0.18)" strokeWidth="1" />
         <circle cx="110" cy="110" r="82" fill="none" stroke="#c4a15b" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${scoredArc} ${circumference}`} transform="rotate(-90 110 110)" />
         <circle cx="110" cy="110" r="7" fill="#c4a15b" />
       </svg>
-      <div className={styles.gaugeCopy}><span>Jointure</span><strong>{jointureSignal.score}</strong><em>{jointureSignal.band} · run on demand</em></div>
+      <div className={styles.gaugeCopy}><span>{featuredSignal.name}</span><strong>{featuredSignal.score}</strong><em>{featuredSignal.band} · run on demand</em></div>
     </div>
   )
 }
@@ -124,7 +144,7 @@ const signalEvidence = [
   ["Discovery status", "Passed"],
   ["Exact launch domain", "Verified"],
   ["Current-brand screen", "Checked"],
-  ["Founder Signal", "65 · Viable"],
+  ["Founder Signal", "85 · Strong"],
 ] as const
 
 function SignalLedger() {
@@ -173,13 +193,13 @@ function CurrentResultPreview() {
   return (
     <div className={styles.currentResultPreview} aria-label="Current Name Sprint candidate result">
       <div className={styles.currentResultTop}>
-        <div><span>Suggestive</span><h3>Jointure <em>Domain verified</em></h3></div>
-        <strong className={styles.notScored}>Not scored<small>Founder Signal</small></strong>
+        <div><span>{featuredSignal.strategy}</span><h3>{featuredSignal.name} <em>Domain verified</em></h3></div>
+        <strong>{featuredSignal.score}<small>Founder Signal · {featuredSignal.band}</small></strong>
       </div>
       <div className={styles.currentResultFacts}>
-        <div><span>Pronunciation</span><strong>JOYNT-yer</strong></div>
+        <div><span>Pronunciation</span><strong>{featuredSignal.pronunciation}</strong></div>
         <div><span>Discovery status</span><strong>Domain and brand screen passed</strong></div>
-        <div><span>Next decision</span><p>Run Founder Signal only if this is a name you want to evaluate more deeply.</p></div>
+        <div><span>Intended association</span><p>{featuredSignal.association}</p></div>
       </div>
       <div className={styles.tradeMarkPreview}>
         <span>Brand &amp; trade-mark evidence</span>
@@ -192,12 +212,12 @@ function CurrentResultPreview() {
         </dl>
       </div>
       <div className={styles.currentDomains}>
-        <span className={styles.domainUnavailable}>.com · unavailable</span>
+        <span className={styles.domainAvailable}>.com · available</span>
         <span className={styles.domainAvailable}>.co · available</span>
         <span className={styles.domainAvailable}>.ai · available</span>
       </div>
-      <div className={styles.previewAction}>Run Founder Signal</div>
-      <p className={styles.previewDisclosure}>Actual production QA result from 2 September 2026. Availability changes; official searches are still required.</p>
+      <div className={styles.previewAction}>Strong candidate for the shortlist</div>
+      <p className={styles.previewDisclosure}>Product example from 2 September 2026. Availability changes; official searches are still required.</p>
     </div>
   )
 }
@@ -289,19 +309,19 @@ export function PremiumHome() {
           <div className={styles.contourField} aria-hidden="true" />
           <div className={styles.heroInner}>
             <div className={styles.heroCopy}>
-              <span className={styles.heroEyebrow}>Selective name intelligence for founders</span>
-              <h1 id="hero-heading">The name generator<br />with a <span>quality bar.</span></h1>
-              <p>NamoLux generates focused candidates, rejects weak options, and displays only names with a verified exact .com, .co or .ai launch domain. Founder Signal is available on demand for the names you keep.</p>
+              <span className={styles.heroEyebrow}>Name intelligence for founders</span>
+              <h1 id="hero-heading">Find a name<br /><span>worth building on.</span></h1>
+              <p>Describe the business. NamoLux discovers focused names, verifies an exact .com, .co or .ai launch domain, and helps you judge the finalists instead of sorting through a wall of filler.</p>
               <div className={styles.referenceHeroActions}>
-                <Link href="/bulk-domain-check" className={styles.heroPrimaryButton}>Check a shortlist now <ArrowRight size={22} strokeWidth={1.5} /></Link>
-                <Link href="/generate" className={styles.heroSecondaryButton}>Preview Name Sprint <span><ArrowRight size={11} strokeWidth={1.5} /></span></Link>
+                <Link href="/generate" className={styles.heroPrimaryButton}>Start a free Name Sprint <ArrowRight size={22} strokeWidth={1.5} /></Link>
+                <Link href="/bulk-domain-check" className={styles.heroSecondaryButton}>Check names I already have <span><ArrowRight size={11} strokeWidth={1.5} /></span></Link>
               </div>
               <HeroContext />
             </div>
             <HeroShortlistPanel />
           </div>
           <div className={styles.capabilityRail}>
-            <div><span className={styles.capabilityIcon}><Sparkles size={25} strokeWidth={1.45} /></span><p>Name Sprint preview<small>private quality testing</small></p></div>
+            <div><span className={styles.capabilityIcon}><Sparkles size={25} strokeWidth={1.45} /></span><p>Name Sprint<small>Free daily · Pro monthly</small></p></div>
             <div><span className={styles.capabilityIcon}><Globe2 size={25} strokeWidth={1.45} /></span><p>.com · .co · .ai<small>verified survivor rule</small></p></div>
             <div><span className={styles.capabilityIcon}><ShieldCheck size={25} strokeWidth={1.45} /></span><p>Founder Signal<small>run on chosen names</small></p></div>
             <div><span className={styles.capabilityIcon}><Palette size={25} strokeWidth={1.45} /></span><p>Brand Launch Kit<small>palettes, mockups + logos</small></p></div>
@@ -309,11 +329,11 @@ export function PremiumHome() {
         </section>
 
         <section className={styles.paperSection} aria-labelledby="decision-heading">
-          <div className={styles.sectionInner}><PageMarker number="02" /><div className={styles.decisionGrid}><div className={styles.decisionCopy}><h2 id="decision-heading">Generate selectively—or bring the names you already have.</h2><p>Name Sprint is in private preview. It starts from a proper business brief and refuses to fill the screen with weak or unavailable candidates. Bulk Check is available now and puts up to 50 existing ideas into one consistent evidence view.</p><div className={styles.subRule} /><h3>A shortlist should reveal a winner.</h3><p>Both routes lead to domain evidence and verification links. Founder Signal is then run on demand for the names you genuinely want to compare.</p><SolidButton href="/generate" tone="ink">See the Name Sprint preview</SolidButton></div><ShortlistTransform /></div></div>
+          <div className={styles.sectionInner}><PageMarker number="02" /><div className={styles.decisionGrid}><div className={styles.decisionCopy}><h2 id="decision-heading">The useful result is a decision—not a longer list.</h2><p>Name Sprint starts from a proper business brief, searches across distinct naming directions, and removes obvious failures before the shortlist appears. Bring up to 50 existing ideas into Bulk Check when you already have names to compare.</p><div className={styles.subRule} /><h3>Good evidence can still produce different verdicts.</h3><p>Daylatch and Trellivo came from the same brief. Both had an available launch domain; Founder Signal separated the Strong candidate from the one worth reconsidering.</p><SolidButton href="/generate" tone="ink">Start Name Sprint</SolidButton></div><ShortlistTransform /></div></div>
         </section>
 
         <section className={`${styles.signalSection} ${styles.darkSection}`} id="features" aria-labelledby="signal-heading">
-          <div className={styles.sectionInner}><PageMarker number="03" /><div className={styles.signalGrid}><SignalGauge /><div className={styles.signalText}><h2 id="signal-heading">A disciplined read on a chosen finalist.</h2><p>Founder Signal is no longer attached automatically to every generated name. Run it when a candidate earns your attention to compare strategic fit, distinctiveness, memorability, pronunciation, spelling, collision risk, and domain strength.</p><SignalLedger /><p className={styles.caveat}>This 65/100 result came from the production QA run shown above. Founder Signal supports judgment; it is not legal or trade-mark advice.</p></div></div><AvailabilityLedger /></div>
+          <div className={styles.sectionInner}><PageMarker number="03" /><div className={styles.signalGrid}><SignalGauge /><div className={styles.signalText}><h2 id="signal-heading">A disciplined read on the names you choose.</h2><p>Founder Signal is a paid decision layer, run only when a candidate earns your attention. It compares strategic fit, distinctiveness, memorability, pronunciation, spelling, collision risk, and domain strength.</p><SignalLedger /><p className={styles.caveat}>This 85/100 result is the Daylatch product example shown above. Founder Signal supports judgment; it is not legal or trade-mark advice.</p></div></div><AvailabilityLedger /></div>
         </section>
 
         <ProductProof />
@@ -323,7 +343,7 @@ export function PremiumHome() {
         </section>
 
         <section className={`${styles.pricingSection} ${styles.darkSection}`} id="pricing" aria-labelledby="pricing-heading">
-          <div className={styles.sectionInner}><PageMarker number="06" /><div className={styles.pricingIntro}><h2 id="pricing-heading">Start free. Keep the decision moving with NamoLux Pro.</h2><p>Bulk Check is available now with direct social-profile, company, and official UK, US and EU trade-mark verification links. Name Sprint remains in a private quality preview while the discovery engine is validated. Pro includes the paid Brand Launch Kit, with three palette directions, matching logo concepts, saved decisions, exports, and an ad-free workspace.</p></div><div className={styles.pricingLedger}><div className={styles.planColumn}><h3>{PRODUCT_OFFER.freePlanName}</h3><div className={styles.price}>{PRODUCT_OFFER.tiers[0].price}</div><p className={styles.priceDetail}>{PRODUCT_OFFER.freeUsageLabel}</p><ul>{PRODUCT_OFFER.freeFeatures.slice(0, 4).map((feature) => <li key={feature}><Check size={16} />{feature}</li>)}</ul><SolidButton href="/bulk-domain-check" tone="outline">Open Bulk Check</SolidButton></div><div className={`${styles.planColumn} ${styles.planPaid}`}><h3>{PRODUCT_OFFER.paidPlanName}</h3><div className={styles.price}>{PRODUCT_OFFER.paidPrice}</div><p className={styles.priceDetail}>{PUBLIC_PRODUCT_COPY.proPlanSummary}</p><ul>{PUBLIC_PRODUCT_COPY.proPlanFeatures.filter((feature, index) => index < 6 || feature.startsWith("Brand Launch Kit")).map((feature) => <li key={feature}><Check size={16} />{feature}</li>)}</ul><SolidButton href={PRODUCT_OFFER.paidCheckoutHref}>{PRODUCT_OFFER.proCtaLabel}</SolidButton></div></div><p className={styles.legalNote}>Name Sprint access is currently limited to the private preview account. {PRODUCT_OFFER.caveats.join(" ")} {PUBLIC_PRODUCT_COPY.renewalNote}</p></div>
+          <div className={styles.sectionInner}><PageMarker number="06" /><div className={styles.pricingIntro}><h2 id="pricing-heading">Start free. Go deeper when a name earns it.</h2><p>Signed-in Free users get one Name Sprint each UTC day. Pro adds 40 Name Sprints monthly, Founder Signal, saved decisions, reports, exports, an ad-free workspace, and ten paid Brand Launch Kits per month.</p></div><div className={styles.pricingLedger}><div className={styles.planColumn}><h3>{PRODUCT_OFFER.freePlanName}</h3><div className={styles.price}>{PRODUCT_OFFER.tiers[0].price}</div><p className={styles.priceDetail}>{PRODUCT_OFFER.freeUsageLabel}</p><ul>{PRODUCT_OFFER.freeFeatures.slice(0, 4).map((feature) => <li key={feature}><Check size={16} />{feature}</li>)}</ul><SolidButton href="/generate" tone="outline">Start free</SolidButton></div><div className={`${styles.planColumn} ${styles.planPaid}`}><h3>{PRODUCT_OFFER.paidPlanName}</h3><div className={styles.price}>{PRODUCT_OFFER.paidPrice}</div><p className={styles.priceDetail}>{PUBLIC_PRODUCT_COPY.proPlanSummary}</p><ul>{PUBLIC_PRODUCT_COPY.proPlanFeatures.filter((feature, index) => index < 6 || feature.startsWith("Brand Launch Kit")).map((feature) => <li key={feature}><Check size={16} />{feature}</li>)}</ul><SolidButton href={PRODUCT_OFFER.paidCheckoutHref}>{PRODUCT_OFFER.proCtaLabel}</SolidButton></div></div><p className={styles.legalNote}>{PRODUCT_OFFER.caveats.join(" ")} {PUBLIC_PRODUCT_COPY.renewalNote}</p></div>
         </section>
 
         <section className={styles.faqSection} id="faq" aria-labelledby="faq-heading">

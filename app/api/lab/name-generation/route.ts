@@ -7,8 +7,6 @@ import { completeNameSprintRun, failNameSprintRun, loadRecentNameSprintFatigue, 
 import { consumeNameSprintEmptyRefundAllowance, consumeNameSprintQuota, refundNameSprintQuota } from "@/lib/name-sprint/access"
 import { getNameSprintModel } from "@/lib/name-sprint/openai"
 import { checkBurstLimit, getQuotaSubject } from "@/lib/rate-limit"
-import { NAME_SPRINT_COMING_SOON_MESSAGE, isNameSprintPreviewUser } from "@/lib/name-sprint/preview-access"
-import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
 export const maxDuration = 90
@@ -16,9 +14,6 @@ export const maxDuration = 90
 export async function POST(request: NextRequest) {
   const blocked = getGeneratorLabApiBlockResponse(request)
   if (blocked) return blocked
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!isNameSprintPreviewUser(user)) return NextResponse.json({ error: NAME_SPRINT_COMING_SOON_MESSAGE }, { status: 403 })
   const subject = await getQuotaSubject(request)
   if (!subject.userId) return NextResponse.json({ error: "Sign in is required to use Name Sprint." }, { status: 401 })
   const burst = await checkBurstLimit(request, "lab-name-generation", 2, 60)

@@ -6,7 +6,7 @@ import { isVercelHostname } from "@/lib/site-url"
 import { getIndexablePseoNiches } from "@/lib/pseo-niches"
 
 const BASE_URL = "https://www.namolux.com"
-const STATIC_LAST_MODIFIED = new Date("2026-08-31")
+const STATIC_LAST_MODIFIED = new Date("2026-09-04")
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>
 

@@ -15,6 +15,15 @@ describe("Name Sprint Namecheap CTA", () => {
     expect(component).toContain('rel="sponsored noopener noreferrer"')
     expect(component).toContain('aria-label={`Buy ${fullDomain} on Namecheap`}')
   })
+
+  it("shows only result-card actions that produce a visible outcome", () => {
+    for (const deadAction of ["More like this", "Less literal", "More distinctive", "Shorter", "More premium"]) {
+      expect(component).not.toContain(`>${deadAction}<`)
+    }
+    for (const workingAction of ["Run Founder Signal", "Save", "Reject"]) {
+      expect(component).toContain(workingAction)
+    }
+  })
 })
 
 describe("Name Sprint trade-mark evidence", () => {

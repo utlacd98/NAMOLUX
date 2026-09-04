@@ -217,7 +217,8 @@ export async function proxy(request: NextRequest) {
   const isSignedIn = Boolean(claims?.sub)
 
   // (3) Authentication gate. Owners re-check authorization server-side.
-  if (isProtectedUserPath(path) && !(labRequestAllowed && isPublicNameSprintPagePath(path))) {
+  const isPublicNameSprintPage = isPublicNameSprintEnabled() && isPublicNameSprintPagePath(path)
+  if ((isProtectedUserPath(path) || isPublicNameSprintPage) && !(labRequestAllowed && isPublicNameSprintPagePath(path))) {
     if (!isSignedIn) {
       const redirectUrl = new URL("/sign-in", request.url)
       redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)

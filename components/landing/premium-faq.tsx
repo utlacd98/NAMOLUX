@@ -10,7 +10,7 @@ export const premiumFaqs = [
   {
     question: "What is NamoLux?",
     answer:
-      "NamoLux is a selective name intelligence and brand launch workspace for founders. Name Sprint generates a broad working set privately, rejects weak or unusable options, and ranks the survivors with Founder Signal. You can also bring up to 50 names into Bulk Check and turn a winning name into a Brand Launch Kit.",
+      "NamoLux is a selective name intelligence and brand launch workspace for founders. Name Sprint creates a focused working set, rejects weak or unusable options, and verifies an exact launch domain before a name appears. Paid users can run Founder Signal on chosen finalists. You can also bring up to 50 names into Bulk Check and turn a winning name into a Brand Launch Kit.",
   },
   {
     question: "How does Name Sprint choose which names to show?",
