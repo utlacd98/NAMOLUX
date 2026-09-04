@@ -71,6 +71,10 @@ test("Name Sprint landing page stays accurate and responsive", async ({ page }, 
 
     await page.getByRole("heading", { name: /From brief to launch/i }).scrollIntoViewIfNeeded()
     await page.screenshot({ path: testInfo.outputPath(`landing-${viewport.name}-process.png`) })
+    if (viewport.name === "phone") {
+      const headerBox = await page.locator("header").first().boundingBox()
+      expect(headerBox?.y ?? 0, "the mobile header should scroll away instead of covering section content").toBeLessThan(0)
+    }
     await page.getByRole("heading", { name: /Start free\. Go deeper when a name earns it/i }).scrollIntoViewIfNeeded()
     await page.screenshot({ path: testInfo.outputPath(`landing-${viewport.name}-pricing.png`) })
   }

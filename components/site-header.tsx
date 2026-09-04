@@ -113,18 +113,6 @@ export function SiteHeader() {
 
   const accountAction = authState === "authenticated" ? SITE_ACTIONS.dashboard : authState === "anonymous" ? SITE_ACTIONS.signIn : SITE_ACTIONS.dashboard
   const accountLabel = authState === "unknown" ? "Account" : accountAction.label
-  // The landing hero owns its primary action. Keeping the mobile sticky action
-  // there covers the shortlist preview and duplicates the visible CTA.
-  const hideStickyAction = pathname === "/"
-    || pathname.startsWith("/generate")
-    || pathname.startsWith("/bulk-domain-check/workspace")
-    || pathname.startsWith("/sign-in")
-    || pathname.startsWith("/sign-up")
-    || pathname.startsWith("/dashboard")
-    || pathname.startsWith("/brand-launch")
-    || pathname === "/about"
-    || pathname === "/blog"
-
   return (
     <header className={styles.siteHeader} data-journal-header={isJournal ? "true" : undefined}>
       <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
@@ -219,11 +207,6 @@ export function SiteHeader() {
         </nav>
       ) : null}
 
-      {!menuOpen && !hideStickyAction ? (
-        <Link href={SITE_ACTIONS.startNaming.href} prefetch={false} className={styles.mobileStickyCta}>
-          {SITE_ACTIONS.startNaming.label}
-        </Link>
-      ) : null}
     </header>
   )
 }
