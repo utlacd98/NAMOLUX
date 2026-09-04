@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import styles from "./founder-story.module.css"
@@ -53,6 +53,7 @@ export default function FounderStoryPage() {
         "@type": "Person",
         "@id": `${SITE_URL}/journal/andrew-barrett#person`,
         name: "Andrew Barrett",
+        sameAs: ["https://x.com/AndrewBuilds98"],
       },
     },
   }
@@ -251,6 +252,15 @@ export default function FounderStoryPage() {
                 <Link href="/journal/andrew-barrett" className={styles.secondaryAction}>
                   Meet the founder
                 </Link>
+                <a
+                  href="https://x.com/AndrewBuilds98"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.secondaryAction}
+                >
+                  Follow Andrew on X
+                  <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.7} />
+                </a>
               </div>
             </div>
           </footer>

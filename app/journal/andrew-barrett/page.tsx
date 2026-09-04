@@ -33,6 +33,7 @@ export default function AndrewBarrettPage() {
         sameAs: [
           "https://andrewbarrett.dev/",
           "https://www.linkedin.com/in/andrew-barrett-587a21390/",
+          "https://x.com/AndrewBuilds98",
         ],
         jobTitle: "Founder and Developer",
         worksFor: { "@id": `${siteUrl}/#organization` },
@@ -92,6 +93,15 @@ export default function AndrewBarrettPage() {
                   className="inline-flex min-h-11 items-center gap-2 text-[#e1c27f] underline decoration-[#c4a15b]/50 underline-offset-4"
                 >
                   LinkedIn
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://x.com/AndrewBuilds98"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-11 items-center gap-2 text-[#e1c27f] underline decoration-[#c4a15b]/50 underline-offset-4"
+                >
+                  Follow Andrew on X
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
               </div>

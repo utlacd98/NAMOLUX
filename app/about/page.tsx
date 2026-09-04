@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { CTA_LABELS } from "@/lib/site-content"
@@ -149,6 +149,15 @@ export default function AboutPage() {
                   Read the founder story
                   <ArrowRight aria-hidden="true" size={17} strokeWidth={1.6} />
                 </Link>
+                <a
+                  href="https://x.com/NamoLux"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.paperLink}
+                >
+                  Follow NamoLux on X
+                  <ArrowUpRight aria-hidden="true" size={17} strokeWidth={1.6} />
+                </a>
               </article>
 
               <div className={styles.principlesBlock}>

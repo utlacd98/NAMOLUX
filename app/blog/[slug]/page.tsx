@@ -8,7 +8,7 @@ import { Breadcrumbs, generateBreadcrumbSchema, BlogCard, Callout, BlogTracker }
 import { Button } from "@/components/ui/button"
 import { getPostBySlug, getPostReadTime, getPublicPosts, getRelatedPosts, isMonetizableBlogPost, isPublicBlogPost, isValidBlogSlug, type BlogPost } from "@/lib/blog"
 import { planArticleAds } from "@/lib/article-ad-plan"
-import { Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react"
+import { Clock, Calendar, ArrowRight, ArrowLeft, ArrowUpRight } from "lucide-react"
 import { Fragment } from "react"
 import { AdBanner } from "@/components/ad-banner"
 import { ContextualMiniGenerator } from "@/components/contextual-mini-generator"
@@ -179,6 +179,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         sameAs: [
           "https://andrewbarrett.dev/",
           "https://www.linkedin.com/in/andrew-barrett-587a21390/",
+          "https://x.com/AndrewBuilds98",
         ],
         jobTitle: "Founder and Developer",
         worksFor: { "@id": "https://www.namolux.com/#organization" },
@@ -377,6 +378,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {post.author}
                 </Link>
               </p>
+              <a
+                href="https://x.com/AndrewBuilds98"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary"
+              >
+                Follow Andrew on X
+                <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+              </a>
               {post.updatedAt && post.updatedAt !== post.publishedAt ? (
                 <p className="mt-2 text-xs text-muted-foreground">
                   Last reviewed {new Date(post.updatedAt).toLocaleDateString("en-US", {
