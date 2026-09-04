@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { PremiumHome } from "@/components/landing/premium-home"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
 
 const siteUrl = "https://www.namolux.com"
 const homeTitle = "NamoLux | Business Name Generator & Domain Checker"
@@ -106,8 +107,8 @@ export default function Home() {
         ],
         offers: [
           { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "Signed-in free plan with one curated Name Sprint per UTC day" },
-          { "@type": "Offer", price: "9.99", priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
-          { "@type": "Offer", price: "69", priceCurrency: "GBP", description: "NamoLux Pro annual plan" },
+          { "@type": "Offer", price: PRODUCT_OFFER.proMonthlyPrice, priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
+          { "@type": "Offer", price: PRODUCT_OFFER.proAnnualPrice, priceCurrency: "GBP", description: "NamoLux Pro annual plan" },
         ],
         publisher: { "@id": `${siteUrl}/#organization` },
       },

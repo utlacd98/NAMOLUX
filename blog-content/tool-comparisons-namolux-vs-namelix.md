@@ -21,7 +21,7 @@ NamoLux is a decision-first workspace: bring a shortlist from any source, check 
 | Domain availability check | ✓ (real-time) | ✓ (limited) |
 | Name quality scoring | ✓ Founder Signal™ (0–100) | ✗ |
 | Logo preview | ✗ | ✓ |
-| Pricing | 3 Bulk Check runs and 1 Founder Signal run free each month; Pro at GBP 7.99/month includes 120 of each | Free generation; paid Brandmark assets |
+| Pricing | 1 signed-in Name Sprint/day and 3 Bulk Checks/month; Pro at GBP 9.99/month or GBP 69/year | Free generation; paid Brandmark assets |
 | Account required | No to start; account needed to save work or use Pro | No |
 | Free checks | 3 Bulk Check runs | Unlimited generation |
 | Extension options | .com, .io, .ai, .co | .com, .io, .co |
@@ -31,7 +31,7 @@ NamoLux is a decision-first workspace: bring a shortlist from any source, check 
 
 Namelix is free, supported by ads and an optional premium tier for logo creation. If you're generating casually and don't need a quality signal, Namelix's free tier has no real cost barrier.
 
-NamoLux Free includes three Bulk Check runs and one Founder Signal™ run each UTC calendar month. NamoLux Pro is GBP 7.99/month and includes 120 Bulk Check runs and 120 Founder Signal runs, saved projects, CSV exports, shareable reports, and an ad-free workspace.
+NamoLux Free includes one signed-in Name Sprint per UTC day and three Bulk Check runs each UTC calendar month. Founder Signal™ is part of Pro. NamoLux Pro is GBP 9.99/month or GBP 69/year and includes 40 Name Sprints, 120 Bulk Check runs, 120 Founder Signal runs and 10 Brand Launch Kits each month, plus saved projects, CSV exports, shareable reports, and an ad-free workspace. There is no free trial.
 
 ## Name Quality and Scoring
 

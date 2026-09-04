@@ -4,6 +4,7 @@ import { ArrowRight, Check, Layers3, SearchCheck, ShieldCheck } from "lucide-rea
 
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
+import { PRODUCT_OFFER } from "@/lib/product-offer"
 
 const title = "Business Name Generator With Domain Checks | NamoLux"
 const description = "Turn a business brief into a focused shortlist with verified .com, .co or .ai domains, then use Founder Signal to compare the names worth keeping."
@@ -71,8 +72,8 @@ export default function BusinessNameGeneratorPage() {
     description,
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "One signed-in Name Sprint per UTC day" },
-      { "@type": "Offer", price: "9.99", priceCurrency: "GBP", description: "NamoLux Pro monthly with 40 Name Sprints" },
-      { "@type": "Offer", price: "69", priceCurrency: "GBP", description: "NamoLux Pro annual with 40 Name Sprints monthly" },
+      { "@type": "Offer", price: PRODUCT_OFFER.proMonthlyPrice, priceCurrency: "GBP", description: "NamoLux Pro monthly with 40 Name Sprints" },
+      { "@type": "Offer", price: PRODUCT_OFFER.proAnnualPrice, priceCurrency: "GBP", description: "NamoLux Pro annual with 40 Name Sprints monthly" },
     ],
   }
 

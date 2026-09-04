@@ -17,7 +17,7 @@ This comparison covers 7 tools I've tested with the same brief: a fintech startu
 
 | Tool | Name Quality | Domain Check | Scoring | Pricing |
 |---|---|---|---|---|
-| NamoLux | ★★★★★ | Bulk Check across six TLDs | Optional Founder Signal™ (0–100) | 3 checks and 1 score/month free; Pro at GBP 7.99/month includes 120 of each |
+| NamoLux | ★★★★★ | Bulk Check across six TLDs | Optional Founder Signal™ (0–100) | 1 signed-in Name Sprint/day and 3 Bulk Checks/month; Pro at GBP 9.99/month or GBP 69/year |
 | Namelix | ★★★★☆ | Basic | None | Free |
 | Looka | ★★★☆☆ | Basic | None | Free / paid logos |
 | Shopify | ★★☆☆☆ | .com only | None | Free |
@@ -31,7 +31,7 @@ This comparison covers 7 tools I've tested with the same brief: a fintech startu
 
 **Best for:** Founders who want to make a naming decision with objective quality data rather than pure aesthetic judgment.
 
-**Pricing:** Free includes three Bulk Check runs and one Founder Signal run per UTC calendar month. Pro is GBP 7.99/month for 120 Bulk Check runs and 120 Founder Signal runs, saved decisions, CSV exports, shareable reports, and an ad-free workspace.
+**Pricing:** Free includes one signed-in Name Sprint per UTC day and three Bulk Check runs per UTC calendar month. Founder Signal is part of Pro. Pro is GBP 9.99/month or GBP 69/year and includes 40 Name Sprints, 120 Bulk Check runs, 120 Founder Signal runs and 10 Brand Launch Kits each month, plus saved decisions, CSV exports, shareable reports, and an ad-free workspace. There is no free trial.
 
 **Honest take:** The decision layer is what distinguishes the workflow. You can bring candidates from a team, agency, or generator, check what is available, then request structured evidence only when you need it. Namelix still offers richer logo mockups.
 

@@ -57,7 +57,7 @@ Subscription pricing is everywhere in software. Monthly recurring charges for to
 
 A naming decision tool needs to balance a useful free allowance with the cost of live checks. A limited free tier lets founders verify candidates before deciding whether saved work, more capacity, exports, and Founder Signal scoring are worth paying for.
 
-NamoLux Free includes three Bulk Check runs and one Founder Signal run per UTC calendar month. The GBP 7.99/month Pro tier includes 120 Bulk Check runs and 120 Founder Signal runs, plus saved projects, CSV exports, shareable reports, and an ad-free workspace.
+NamoLux Free includes one signed-in Name Sprint per UTC day and three Bulk Check runs per UTC calendar month. Founder Signal is part of Pro. The GBP 9.99/month or GBP 69/year Pro tier includes 40 Name Sprints, 120 Bulk Check runs, 120 Founder Signal runs and 10 Brand Launch Kits each month, plus saved projects, CSV exports, shareable reports, and an ad-free workspace. There is no free trial.
 
 ## Getting to a Shortlist Fast
 
@@ -73,7 +73,7 @@ The whole process takes a day, not months. And you won't need to spend £30,000 
 
 ---
 
-✨ *NamoLux Free includes three Bulk Check runs and one Founder Signal™ run per UTC calendar month. Pro adds 120 of each, saved decisions, exports, and an ad-free workspace.*
+✨ *NamoLux Free includes one signed-in Name Sprint per UTC day and three Bulk Check runs per UTC calendar month. Pro is GBP 9.99/month or GBP 69/year and adds Founder Signal™, higher monthly allowances, Brand Launch Kits, saved decisions, exports, and an ad-free workspace.*
 
 [Check a Shortlist Free →](https://www.namolux.com/bulk-domain-check)
 

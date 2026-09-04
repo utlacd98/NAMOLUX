@@ -27,7 +27,7 @@ access to these tables or their quota functions.
 
 ## 2. Stripe
 
-- Configure `STRIPE_PRICE_PRO` with the active recurring GBP £7.99 monthly Price.
+- Configure `STRIPE_PRICE_PRO_MONTHLY` and `STRIPE_PRICE_PRO_ANNUAL` with the active recurring GBP £9.99/month and £69/year Prices on the same Pro product. Keep `STRIPE_PRICE_PRO` only as a legacy fallback.
 - Point the live webhook to `https://www.namolux.com/api/stripe/webhook`.
 - Subscribe to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`.
 - Set `STRIPE_WEBHOOK_SECRET`, then test checkout, renewal, failed payment/grace, cancellation, reactivation, duplicate webhook delivery, and Customer Portal return.
