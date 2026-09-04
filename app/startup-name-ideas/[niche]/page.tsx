@@ -170,14 +170,19 @@ export default async function NichePage({ params }: NichePageProps) {
               <p className="text-[#888] text-lg max-w-2xl leading-relaxed mb-8">
                 {data.intro}
               </p>
-              <Link
-                href={generatorHref}
-                className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-6 py-3 rounded-lg transition"
-              >
-                <Sparkles className="h-4 w-4" />
-                Generate {data.industryName} names
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <Link
+                  href={generatorHref}
+                  className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-6 py-3 rounded-lg transition"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Generate {data.industryName} names
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href="/business-name-generator" className="text-sm font-medium text-[#D4A843] transition hover:text-[#e1c27f]">
+                  How Name Sprint works →
+                </Link>
+              </div>
             </div>
           </section>
 

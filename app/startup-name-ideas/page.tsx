@@ -79,11 +79,11 @@ export default function StartupNameIdeasPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/bulk-domain-check"
+                  href="/business-name-generator"
                   className="inline-flex items-center gap-2 bg-[#D4A843] hover:bg-[#c49a3d] text-black font-semibold px-6 py-3 rounded-lg transition"
                 >
                   <Sparkles className="h-4 w-4" />
-                  {CTA_LABELS.primary}
+                  Explore Name Sprint
                 </Link>
                 <Link
                   href="#niches"
