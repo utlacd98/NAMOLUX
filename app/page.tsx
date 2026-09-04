@@ -106,8 +106,8 @@ export default function Home() {
         ],
         offers: [
           { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "Signed-in free plan with one curated Name Sprint per UTC day" },
-          { "@type": "Offer", price: "12.99", priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
-          { "@type": "Offer", price: "99", priceCurrency: "GBP", description: "NamoLux Pro annual plan" },
+          { "@type": "Offer", price: "9.99", priceCurrency: "GBP", description: "NamoLux Pro monthly plan" },
+          { "@type": "Offer", price: "69", priceCurrency: "GBP", description: "NamoLux Pro annual plan" },
         ],
         publisher: { "@id": `${siteUrl}/#organization` },
       },

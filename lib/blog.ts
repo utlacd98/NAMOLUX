@@ -1209,7 +1209,7 @@ export const blogPosts: BlogPost[] = [
     ],
     faqs: [
       { question: "What makes a good startup name in 2026?", answer: "A good startup name in 2026 is short (five to nine characters), pronounceable on first hearing, registrable as a .com, and broad enough to survive a product pivot. The strongest pattern today is invented words with clear phonetics, because real words and obvious compounds are mostly taken. Trademark defensibility and clean URL form in lowercase matter more than cleverness." },
-      { question: "Where can I find startup name ideas for free?", answer: "NamoLux Quick Generate has no monthly quota. The free tier also includes three Advanced naming batches and one complete Founder Signal batch each month. Domain results remain best effort and should be confirmed with a registrar." },
+      { question: "Where can I find startup name ideas for free?", answer: "Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Founder Signal is part of Pro. Domain results remain time-sensitive and should be confirmed with a registrar before purchase." },
       { question: "How do I come up with a unique name for my startup?", answer: "Work through a structured brainstorm: write a one sentence positioning, generate fifty root keywords across three themes (what the product does, what the customer feels, and the metaphor), then apply the four naming patterns (invented, real word in new context, compound, modified) to each root. You will have 150 plus candidates — score them for pronounceability, length, and URL form, then verify the .com on your top 30. Unique names come from volume plus structured scoring, not from waiting for inspiration." },
       { question: "Should my startup name describe what I do?", answer: "Usually no. Descriptive names box you into a category and are almost always taken as .coms in 2026. Google is not a searchable verb; Apple is not a fruit seller; Stripe does not describe payments. A slightly abstract name gives you room to expand the product and more chance of finding an available .com. Descriptive names work for local services and some ecommerce niches — not for software." },
       { question: "How long should a startup name be?", answer: "Five to nine characters is the sweet spot. Shorter names are more memorable but almost impossible to register as .coms in 2026. Longer names work if they are easy to type and pronounce, but each extra character increases the chance someone will mistype the URL. If you go past ten characters, the name needs a very good reason — typically a clear compound that reads unambiguously." },
@@ -3344,8 +3344,8 @@ export const blogPosts: BlogPost[] = [
         ["Category selector", "Business categories", "Vibe selector (tone and style)"],
         ["Steps to results", "Keyword plus category", "Keyword plus vibe, then instant results"],
         ["Decision support", "Manual review", "Scored ranking"],
-        ["Free usage", "Yes, unlimited", "Quick unlimited; 3 Advanced batches and 1 scored batch/month"],
-        ["Paid plan", "Not required", "GBP 12.99/month or GBP 99/year"],
+        ["Free usage", "Yes, unlimited", "1 signed-in Name Sprint/day plus 3 Bulk Checks/month"],
+        ["Paid plan", "Not required", "GBP 9.99/month or GBP 69/year"],
         ["Best for", "Consumer and ecommerce brands", "Founders and startup naming"],
       ] },
       { type: "heading", level: 2, content: "UX and Path to Results" },
@@ -3355,8 +3355,8 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Namify checks Twitter, Instagram, and Facebook username availability alongside domain names. For consumer brands and ecommerce businesses where social identity is as important as the domain, this is a genuinely useful feature. If you need to confirm that your chosen name is available everywhere before committing, Namify's multi-platform check saves time." },
       { type: "callout", calloutType: "tip", content: "If social handle availability matters for your brand, explore and score your shortlist in NamoLux, then run the finalists through Namify's social check." },
       { type: "heading", level: 2, content: "Name Quality and the Scoring Difference" },
-      { type: "paragraph", content: "Both tools produce a range of output quality — some names will be excellent, some will be mediocre. NamoLux keeps that creative range visible, then offers Founder Signal as an explicit evaluation step. Free users can score one complete Advanced batch each month; Pro removes that scoring limit and adds comparison, stress tests, exports, and brand tools." },
-      { type: "callout", calloutType: "cta", content: "Start with unlimited Quick exploration, then use your free monthly Founder Signal batch when the shortlist needs a deeper read.", ctaLink: "/generate", ctaText: "Start naming →" },
+      { type: "paragraph", content: "Both tools produce a range of output quality — some names will be excellent, some will be mediocre. NamoLux uses domain and current-brand evidence to shape the shortlist, then offers Founder Signal as a paid, explicit evaluation step. Pro adds saved comparison, reports, exports, and Brand Launch Kits." },
+      { type: "callout", calloutType: "cta", content: "Start with one signed-in Name Sprint per UTC day, then use Founder Signal with Pro when the shortlist needs a deeper read.", ctaLink: "/generate", ctaText: "Start naming →" },
       { type: "heading", level: 2, content: "Who Is Namify Best For?" },
       { type: "list", content: "", items: [
         "Consumer brands and ecommerce projects where social handle availability matters from the start",
@@ -3376,7 +3376,7 @@ export const blogPosts: BlogPost[] = [
     ],
     faqs: [
       { question: "Does Namify check social media username availability?", answer: "Yes. Namify checks availability on Twitter, Instagram, and Facebook alongside the domain name. This is one of Namify's standout features for consumer brand founders. NamoLux currently focuses on domain availability across .com, .io, .co, and .ai." },
-      { question: "Is Namify free?", answer: "Namify is free to use with no account required. NamoLux Quick Generate also has no monthly quota, while free includes three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Is Namify free?", answer: "Namify is free to use with no account required. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month." },
       { question: "How does NamoLux use Founder Signal?", answer: "NamoLux first presents the creative shortlist in generation order. Founder Signal is an optional decision layer that evaluates each Advanced candidate across five brand signals; it annotates rather than removes names, and the user can choose to sort the batch by score." },
       { question: "Can I use Namify and NamoLux together?", answer: "Yes. Use NamoLux to explore candidates, check domains, and optionally score the complete shortlist; then run the finalists through Namify to confirm social handle availability. The tools complement each other without making scoring a gate on creativity." },
     ]
@@ -3422,7 +3422,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 3, content: "1. NamoLux" },
       { type: "paragraph", content: "NamoLux combines open-ended generation with a later decision layer. A keyword or vibe brief produces a creative shortlist first, preserving every candidate and its original order. Domain checks continue asynchronously on the cards. In Advanced, the founder can then run Founder Signal across the complete batch and choose whether to sort by its evidence-based score." },
       { type: "paragraph", content: "Two design choices distinguish NamoLux in a crowded field. The first is style rotation. NamoLux treats invented, blended, metaphor, and real word names as separate generation passes, which forces creative range rather than the narrow pattern output most tools drift into. The second is the absence of logo mockups. Logos sell names, and names that photograph well in a specific sans serif often outcompete genuinely stronger names in plain text. NamoLux leaves the visual for later, on purpose, so the decision rests on the name itself." },
-      { type: "paragraph", content: "Quick Generate has no monthly quota. Free founders also receive three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience; domain registration remains available through helpful partner links." },
+      { type: "paragraph", content: "Signed-in founders receive one curated Name Sprint per UTC day and three Bulk Checks per month. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month; domain registration remains available through helpful partner links." },
 
       { type: "heading", level: 3, content: "2. Squadhelp" },
       { type: "paragraph", content: "Squadhelp occupies a different category. The AI generator is basic; the curated marketplace is the draw. You are buying a pre vetted premium name, typically between a thousand and fifty thousand pounds, often with trademark clearance and a polished logo included. Good fit if you have budget and want a finished brand you can register in an afternoon. Poor fit if you are bootstrapping or you want an invented name rather than a curated English compound." },
@@ -3458,7 +3458,7 @@ export const blogPosts: BlogPost[] = [
         ["Style rotation", "Invented, blended, metaphor, real word", "Narrow", "Curated marketplace", "Keyword combinations", "Varies", "Curated premium"],
         ["Social handle check", "No", "No", "No", "No", "Yes", "No"],
         ["Logo mockups", "No (by design)", "Yes", "Yes (premium)", "No", "No", "Yes"],
-        ["Price", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year", "Free + paid tiers", "Premium names from £1000", "Free", "Free", "Premium listings"],
+        ["Price", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year", "Free + paid tiers", "Premium names from £1000", "Free", "Free", "Premium listings"],
         ["Best for", "Scored decisions with .com guarantee", "Quick browsing", "Budget buyers of premium names", "Two word descriptive domains", "Social first brands", "Boutique premium brands"],
       ] },
 
@@ -3515,7 +3515,7 @@ export const blogPosts: BlogPost[] = [
       { question: "Which AI domain name generator is the best in 2026?", answer: "For founders who want creative range followed by structured decision support, NamoLux is a strong all-round choice: Quick is open-ended, domain checks update after names appear, and Founder Signal is optional. For curated premium names you buy outright, Squadhelp is a legitimate alternative. For descriptive two-word domains, Lean Domain Search is excellent. The best tool depends on whether you want to explore, evaluate, buy a finished premium, or anchor on a specific keyword." },
       { question: "Are AI domain name generators worth using at all in 2026?", answer: "Yes, if the tool does more than generate. The value is not in producing names, any model can do that — it is in evaluating them, filtering out unavailable ones, and helping you make a confident decision quickly. Generators that score, verify, and explain are worth the time. Generators that only produce unranked walls of suggestions are increasingly a step backwards." },
       { question: "Why do so many names from AI generators turn out to be unavailable?", answer: "Two reasons. Most tools do not perform a live registry check on every name at generation time, so availability indicators lag reality. And because the most popular tools have trained a generation of founders to pull from the same narrow creative zone, the strongest sounding names in that zone were registered years ago by earlier users or squatters. Generators that verify live and rotate creative styles avoid both problems." },
-      { question: "Is NamoLux free to use?", answer: "Yes. Quick Generate has no monthly quota, and free includes three Advanced batches plus one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Is NamoLux free to use?", answer: "Yes. Signed-in users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Founder Signal is part of Pro. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month." },
       { question: "Should I use Namelix, NamoLux, or Squadhelp?", answer: "Different jobs. Namelix is useful for open-ended browsing. NamoLux combines free creative exploration with optional Founder Signal analysis and asynchronous live domain checks when you are ready to decide. Squadhelp is a premium marketplace for founders who want to buy a curated finished name." },
       { question: "Can ChatGPT replace a dedicated AI domain name generator?", answer: "ChatGPT is a strong brainstorming partner, but a dedicated workflow can add structured styles, live domain evidence, local preference actions, and an optional batch analysis. NamoLux deliberately keeps availability and Founder Signal from filtering creative admission, while keeping those decision tools close at hand." },
       { question: "How long should picking a domain name take?", answer: "With the right workflow, you can build and evaluate a serious shortlist in an afternoon. Generate broadly, review the raw names before scores bias judgement, confirm domain and trademark evidence, and test the finalists with real people. Keeping those stages connected saves time without collapsing them into a score-first pass." },
@@ -3667,14 +3667,14 @@ export const blogPosts: BlogPost[] = [
       { type: "callout", calloutType: "tip", content: "Founder Signal™ applies a consistent quality framework across clarity, memorability, pronunciation, extension strength, character quality, and brand risk. Free users can score one complete Advanced batch each month; Pro adds unlimited fair-use scoring." },
       { type: "heading", level: 2, content: "The Layered Free Tier Advantage" },
       { type: "paragraph", content: "Subscription pricing is everywhere in software. Monthly charges for tools that become background infrastructure are a poor fit for early naming work, where founders need speed, confidence, and a path to registration rather than another recurring bill." },
-      { type: "paragraph", content: "NamoLux Quick Generate has no monthly quota. Free founders also receive three Advanced batches and one complete Founder Signal batch each month. Upgrade to Pro for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { type: "paragraph", content: "Signed-in founders receive one curated Name Sprint per UTC day and three Bulk Checks per month. Upgrade to Pro for 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month." },
       { type: "heading", level: 2, content: "Getting to a Shortlist Fast" },
       { type: "list", content: "The fastest path to a good name doesn't involve more options — it involves better filtering:", items: ["Write a brief: what the product does, who it's for, 3 adjectives that should describe the brand, 3 that shouldn't", "Generate broadly: run your core concept through an AI generator and get 20–30 options", "Eliminate, don't rank: cut anything that fails the phonetic test, trademark check, or availability check — get to 5–8", "Score the survivors: apply the quality framework or use a scoring tool", "Sleep on your top 2: the name that still feels right after 48 hours is your name"] },
       { type: "callout", calloutType: "cta", content: "Explore freely in Quick, then use Advanced and Founder Signal when your shortlist is ready for evidence.", ctaLink: "/generate", ctaText: "Start naming →" }
     ],
     faqs: [
-      { question: "Can I really get a good startup name for free?", answer: "Yes. NamoLux Quick Generate has no monthly quota, and free tools like Namelix also produce useful options. The difference between a self-serve tool and a £30,000 naming agency is the depth of linguistic research, trademark screening across territories, and account management. NamoLux also includes three Advanced batches and one complete Founder Signal batch each month for deeper evaluation." },
-      { question: "Is a paid naming tool better than a free one?", answer: "Sometimes, but only when the paid feature saves real decision time. Free Quick exploration can create the first shortlist. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and Founder Signal scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Can I really get a good startup name for free?", answer: "Yes. Signed-in NamoLux users receive one curated Name Sprint per UTC day, while tools like Namelix also provide free exploration. The difference between a self-serve tool and a £30,000 naming agency is the depth of linguistic research, trademark screening across territories, and account management. NamoLux does not present its preliminary screening as legal clearance." },
+      { question: "Is a paid naming tool better than a free one?", answer: "Sometimes, but only when the paid feature saves real decision time. A free Name Sprint can create the first shortlist. NamoLux Pro is GBP 9.99/month or GBP 69/year for Founder Signal, higher monthly allowances, saved comparisons, reports, exports, Brand Launch Kits, and an ad-free workspace." },
       { question: "When does it make sense to hire a naming agency?", answer: "For well-funded companies (Series A+) launching flagship consumer brands where the name is a significant strategic asset, and where international trademark clearance is required. For seed-stage and bootstrapped founders, a structured DIY approach using good AI tools produces outcomes that are hard to distinguish from agency work at a fraction of the cost." },
     ]
   } as BlogPost,
@@ -3952,14 +3952,14 @@ export const blogPosts: BlogPost[] = [
     content: [
       { type: "paragraph", content: "Squadhelp and NamoLux represent two different philosophies about how you arrive at a great startup name. Squadhelp bet on human creativity at scale — thousands of real namers competing to win your brief. NamoLux bet on AI generation with structured quality evaluation. This comparison looks at the practical trade-offs for founders who need a name they can actually build a company on." },
       { type: "heading", level: 2, content: "Feature Comparison" },
-      { type: "paragraph", content: "Squadhelp runs naming contests: you submit a brief, 100–400 human namers submit ideas over 7–10 days, you select a winner, and Squadhelp conducts trademark screening on the winning name. Brand identity packages are available as add-ons. NamoLux generates a creative shortlist from a brand brief, updates domain availability in the background, and lets you opt in to Founder Signal™ once you are ready to evaluate. Quick has no monthly quota; free also includes three Advanced batches and one complete scored batch each month. Pro is GBP 12.99/month or GBP 99/year." },
+      { type: "paragraph", content: "Squadhelp runs naming contests: you submit a brief, human namers submit ideas, you select a winner, and the service provides screening options around the winning name. Brand identity packages are available as add-ons. NamoLux generates a focused shortlist from a brand brief, checks launch-domain availability, and lets paid users run Founder Signal™ when they are ready to evaluate. Signed-in users receive one Name Sprint per UTC day and three Bulk Checks per month; Pro is GBP 9.99/month or GBP 69/year." },
       { type: "heading", level: 2, content: "Name Quality: Can AI Match Human Creativity?" },
       { type: "paragraph", content: "Squadhelp's ceiling is higher. 300 human namers bring cultural intuition, wordplay, and creative leaps that AI generation doesn't consistently replicate. But Squadhelp's floor is also lower — the majority of submissions in a typical contest are not usable. The median quality across 300 submissions is often lower than the top 10 NamoLux results, because human namers submit filler alongside genuine creativity to increase their chances of winning the contest fee." },
       { type: "heading", level: 2, content: "Speed and Iteration" },
       { type: "paragraph", content: "If you need a name this week, Squadhelp's 7–10 day minimum window is a blocker. NamoLux produces results in under a minute. For founders doing iterative naming work — testing briefs, exploring different directions, refining based on what comes back — AI generation's speed is a significant practical advantage. You can run five different brief variations in the time it takes to write a Squadhelp contest brief." },
       { type: "callout", calloutType: "tip", content: "Consider using NamoLux first for fast, free exploration and optional shortlist scoring, then Squadhelp only if several brief iterations still produce nothing compelling. The combination gives you AI speed first and human creativity as a fallback for unusually difficult briefs." },
       { type: "heading", level: 2, content: "Pricing" },
-      { type: "paragraph", content: "Squadhelp contests start at £150 and scale to £500 or more for premium contests with guaranteed winner selection. Trademark screening may cost more. NamoLux starts with unlimited Quick exploration, three Advanced batches, and one complete Founder Signal batch per month; Pro is GBP 12.99/month or GBP 99/year. The cost difference for a self-serve naming project remains stark." },
+      { type: "paragraph", content: "Naming contests cost materially more than a self-serve naming tool, and professional trade-mark work may cost more again. NamoLux starts with one signed-in Name Sprint per UTC day and three Bulk Checks per month; Pro is GBP 9.99/month or GBP 69/year. The cost difference for a self-serve naming project remains stark." },
       { type: "heading", level: 2, content: "Who Each Tool Is For" },
       { type: "paragraph", content: "Squadhelp is the right choice for funded companies (Seed stage or beyond) who want maximum creative input, need trademark clearance built into the process, and have a 1–2 week timeline. NamoLux is the right choice for bootstrapped and early-stage founders who need a decision in days rather than weeks, want objective quality scoring rather than pure volume of options, and prefer a low-cost self-serve workflow before paying for a contest." },
       { type: "callout", calloutType: "cta", content: "Explore startup names first, watch live domain checks update, and run Founder Signal™ only when the shortlist is ready.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
@@ -3991,7 +3991,7 @@ export const blogPosts: BlogPost[] = [
       { type: "paragraph", content: "Looka's names are generated to be aesthetically pleasing alongside a logo preview — they are evaluated for how they look, not for phonetic strength, trademark risk, or brand scalability. NamoLux keeps visual wordmarks lightweight during exploration, then lets you apply Founder Signal™ to a serious Advanced shortlist and explicitly sort by score if that view helps." },
       { type: "callout", calloutType: "tip", content: "Logo design and name selection should be sequential, not simultaneous. Pick a name first using objective quality criteria — phonetics, memorability, domain availability, trademark risk. Then design a logo around the name. Picking a name because it looks good in a specific typeface is optimising for the wrong variable." },
       { type: "heading", level: 2, content: "Pricing Comparison" },
-      { type: "paragraph", content: "Looka is free to explore but requires payment to download. NamoLux Quick has no monthly quota, while free accounts receive three Advanced batches and one complete Founder Signal batch each month. Pro is GBP 12.99/month or GBP 99/year and adds unlimited fair-use scoring plus comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { type: "paragraph", content: "Looka is free to explore but requires payment to download. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Pro is GBP 9.99/month or GBP 69/year and adds Founder Signal, higher monthly allowances, saved comparisons, reports, exports, Brand Launch Kits, and an ad-free workspace." },
       { type: "heading", level: 2, content: "The Two-Tool Approach" },
       { type: "paragraph", content: "The most efficient workflow: use NamoLux to find and score your name, confirm domain availability, and run your shortlist through Founder Signal™. Once you have a final candidate that scores well and has a clean domain, use Looka to generate logo concepts around that confirmed name. The combination costs less than a freelance designer for equivalent output and gives you full control over both decisions." },
       { type: "callout", calloutType: "cta", content: "Generate the creative shortlist, watch domain checks update, then run Founder Signal™ before investing in the logo.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
@@ -4027,7 +4027,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 2, content: "When NamoLux Is the Right Tool" },
       { type: "paragraph", content: "When you're starting from a blank page with only a brief — what the product does, who it's for, the feeling you want the brand to evoke — and you want quality scoring to help evaluate which generated names are actually worth committing to. NamoLux is built for the naming decision phase; GoDaddy is built for the registration phase. They're sequential tools, not competing alternatives." },
       { type: "heading", level: 2, content: "Pricing" },
-      { type: "paragraph", content: "GoDaddy's generator is free to use; you pay only for domain registration. NamoLux Quick also has no monthly quota, while free accounts receive three Advanced batches and one complete Founder Signal batch each month. Register the chosen domain through your preferred registrar after confirming availability." },
+      { type: "paragraph", content: "GoDaddy's generator is free to use; you pay only for domain registration. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Register the chosen domain through your preferred registrar after confirming availability." },
       { type: "callout", calloutType: "cta", content: "Explore startup names first, then add Founder Signal™ and real-time domain evidence before you register.", ctaLink: "/generate", ctaText: "Generate Names Free →" }
     ],
     faqs: [
@@ -5080,7 +5080,7 @@ export const blogPosts: BlogPost[] = [
         ["Multi-TLD checking", "✅ Basic check", "✅ .com .io .ai .co .app .dev"],
         ["Social handle check", "✅ Basic", "✅ Twitter, IG, TikTok"],
         ["Industry examples", "❌", "✅ 13 industry libraries"],
-        ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year"],
+        ["Pricing", "Free", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year"],
       ]},
       { type: "heading", level: 2, content: "The Core Difference" },
       { type: "paragraph", content: "Panabee tells you what's available. NamoLux tells you what's good and available. If you're doing an initial brainstorm and want to quickly see domain availability for names you've already thought of, Panabee is a reasonable starting point. If you want AI to generate creative candidates and then score them for brand strength, NamoLux is the right tool." },
@@ -5124,7 +5124,7 @@ export const blogPosts: BlogPost[] = [
         ["Industry context", "❌ None", "✅ 13 industry example libraries"],
         ["Deep .com hunting", "❌ Shows results for your keywords", "✅ Hunts across 90 candidates per search"],
         ["Brand risk check", "❌", "✅ Phonetic conflict, trademark signals"],
-        ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year"],
+        ["Pricing", "Free", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year"],
       ]},
       { type: "heading", level: 2, content: "What NamoLux Does Differently" },
       { type: "paragraph", content: "Instead of combining your keywords, NamoLux uses them as a brief for AI generation. The AI applies naming frameworks (invented words, borrowed metaphors, root+suffix, compounds) informed by examples from successful companies in your industry. The output isn't a list of keyword combinations — it's a curated set of creative candidates, each scored for brand quality." },
@@ -5166,7 +5166,7 @@ export const blogPosts: BlogPost[] = [
         ["Quality assurance", "✅ Human editorial filter", "✅ Founder Signal™ 0–100"],
         ["Domain included", "✅ .com included in price", "✅ Check availability, register separately"],
         ["Logo included", "✅ Basic logo concept", "❌ Not included"],
-        ["Price range", "£300–£3,000+", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year"],
+        ["Price range", "£300–£3,000+", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year"],
         ["Industry targeting", "Limited browse filters", "✅ 13 industry libraries"],
         ["Speed", "Immediate (inventory exists)", "Under 60 seconds"],
       ]},
@@ -5950,7 +5950,7 @@ export const blogPosts: BlogPost[] = [
           ["Industry / niche targeting", "Basic keyword", "Full context input"],
           ["Name styles (invented, blend, metaphor)", "None", "4 style modes"],
           ["Brand colour palette", "None", "Paid plan"],
-          ["Pricing", "Free", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year"],
+          ["Pricing", "Free", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year"],
         ],
       },
       {
@@ -5981,7 +5981,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       {
         question: "Is Namecheap's business name generator free?",
-        answer: "Yes. Quick Generate has no monthly quota. Free accounts also receive three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
+        answer: "Yes. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month.",
       },
       {
         question: "Does NamoLux register domains directly?",
@@ -7001,7 +7001,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "NamoLux Quick Generate has no monthly quota. Free also includes three Advanced batches and one complete Founder Signal batch each month. Pro adds unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
+        content: "Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Pro adds Founder Signal, higher monthly allowances, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace.",
         ctaLink: "/generate",
         ctaText: "Try NamoLux Free →",
       },
@@ -7039,7 +7039,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Some tools provide deeper scoring analysis — detailed breakdowns of why a name scored high or low, competitive analysis, and phonetic quality reports. NamoLux gives free users one complete Founder Signal batch each month; Pro adds unlimited fair-use scoring because this data becomes most valuable across repeated serious shortlists.",
+        content: "Some tools provide deeper scoring analysis — detailed breakdowns of why a name scored high or low, competitive analysis, and phonetic quality reports. NamoLux keeps Founder Signal in Pro because this decision layer becomes most valuable across repeated serious shortlists; Pro includes 120 runs per month.",
       },
       {
         type: "heading",
@@ -7118,7 +7118,7 @@ export const blogPosts: BlogPost[] = [
         content: "",
         headers: ["Tool", "Free Tier", "Paid Price", "Key Paid Feature"],
         rows: [
-          ["NamoLux", "Quick unlimited; 3 Advanced + 1 Founder Signal batch/month", "GBP 12.99/month or GBP 99/year", "Unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, ad-free"],
+          ["NamoLux", "1 signed-in Name Sprint/day + 3 Bulk Checks/month", "GBP 9.99/month or GBP 69/year", "40 Name Sprints, 120 Bulk Checks, 120 Founder Signal runs, saved comparisons, reports, exports, Brand Launch Kits, ad-free"],
           ["Namelix", "Unlimited (ad-supported)", "From $15/mo", "Premium name purchases"],
           ["Squadhelp", "Basic AI generator", "Contest from $199", "Expert naming contests + marketplace"],
           ["Looka", "Name generation free", "From $20 one-time", "Logo design (main product)"],
@@ -7142,7 +7142,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "callout",
         calloutType: "cta",
-        content: "Start with unlimited Quick Generate, then use three Advanced batches and one complete Founder Signal batch free each month. Upgrade for GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
+        content: "Start with one signed-in Name Sprint per UTC day and three Bulk Checks per month. Upgrade for GBP 9.99/month or GBP 69/year for Founder Signal, higher monthly allowances, saved comparisons, reports, exports, Brand Launch Kits, and an ad-free workspace.",
         ctaLink: "/generate",
         ctaText: "Start Generating Names Free →",
       },
@@ -7154,7 +7154,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "What's the best free AI name generator?",
-        answer: "For pure domain combinations, Lean Domain Search is completely free. NamoLux offers unlimited Quick exploration, three free Advanced batches, and one complete free Founder Signal batch each month. Namelix offers free generation with visual mockups. The best choice depends on whether you value raw volume, decision support, or presentation.",
+        answer: "For pure domain combinations, Lean Domain Search is completely free. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Namelix offers free generation with visual mockups. The best choice depends on whether you value raw volume, decision support, or presentation.",
       },
       {
         question: "Should I pay for a premium domain instead of a generator?",
@@ -7162,7 +7162,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "How many free generations do most tools offer?",
-        answer: "It varies widely. NamoLux Quick Generate has no monthly quota; free also includes three Advanced batches and one complete Founder Signal batch each month. Namelix and Lean Domain Search are effectively unlimited for their core free workflows. Other AI tools may cap usage by day, month, or session.",
+        answer: "It varies widely. Signed-in NamoLux users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Namelix and Lean Domain Search offer free core workflows, while other AI tools may cap usage by day, month, or session.",
       },
     ],
   },
@@ -7388,7 +7388,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         question: "Do I have to pay to use NamoLux?",
-        answer: "No. Quick Generate has no monthly quota, and free includes three Advanced batches and one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.",
+        answer: "No. Signed-in users receive one curated Name Sprint per UTC day and three Bulk Checks per month. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month.",
       },
     ],
   },
@@ -7436,7 +7436,7 @@ export const blogPosts: BlogPost[] = [
       { type: "heading", level: 3, content: "1. NamoLux" },
       { type: "paragraph", content: "NamoLux is a direct Namelix alternative that preserves open-ended exploration while adding a separate decision layer. Quick has no monthly quota and shows no locked scores. Advanced presents all 12 candidates in creative order, updates availability asynchronously, and lets the founder run Founder Signal across the complete batch later. Scoring never silently removes names or changes the default order." },
       { type: "paragraph", content: "Two things matter more than the feature list. First, names appear before domain checks finish, so availability never suppresses or silently reorders the creative shortlist. Second, Auto mode deliberately rotates brandable, evocative, compound, alternate-spelling, real-word, short-phrase, and non-English constructions instead of producing a hundred variations on one pattern." },
-      { type: "paragraph", content: "The free tier is meaningful: Quick Generate has no monthly quota, while three Advanced batches and one complete Founder Signal batch are included each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { type: "paragraph", content: "The free tier is meaningful: signed-in founders receive one curated Name Sprint per UTC day and three Bulk Checks per month. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month." },
 
       { type: "heading", level: 3, content: "2. Squadhelp" },
       { type: "paragraph", content: "Squadhelp is a different category of tool and a legitimate alternative in specific cases. The AI generator itself is basic, but the curated marketplace is where the value lives. You are buying a pre vetted premium name at a premium price, typically between a thousand and fifty thousand pounds, with trademark clearance work already done and a polished logo included." },
@@ -7465,7 +7465,7 @@ export const blogPosts: BlogPost[] = [
         ["Style range", "Narrow", "Invented, blended, metaphor, real word", "Curated marketplace", "Keyword combinations", "Varies", "Curated premium"],
         ["Social handle check", "No", "No", "No", "No", "Yes", "No"],
         ["Logo mockups", "Yes (can bias decisions)", "No (by design)", "Yes (premium tier)", "No", "No", "Yes"],
-        ["Price", "Free + paid tiers", "Quick free; 3 Advanced + 1 scored batch/month; Pro GBP 12.99/month or GBP 99/year", "Premium names from £1000", "Free", "Free", "Premium listings"],
+        ["Price", "Free + paid tiers", "1 signed-in Name Sprint/day + 3 Bulk Checks/month; Pro GBP 9.99/month or GBP 69/year", "Premium names from £1000", "Free", "Free", "Premium listings"],
         ["Best for", "Quick browsing", "Scored decisions with .com guarantee", "Budget buyers of premium names", "Descriptive two word domains", "Social first brands", "Boutique premium brands"],
       ]},
 
@@ -7520,7 +7520,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       { question: "What is the best Namelix alternative in 2026?", answer: "For founders who value both creative range and decision support, NamoLux is a close direct replacement. Quick supports open exploration across several styles, availability updates after names appear, and Advanced offers optional Founder Signal analysis on the complete batch. The score annotates rather than filters, and sorting by score is always an explicit choice." },
       { question: "Why do so many Namelix names turn out to be unavailable?", answer: "Two reasons. Namelix does not perform a live registry check on every name at generation time, so its availability indicators lag reality. And because the tool has trained a generation of founders to pull from the same narrow creative zone, the strongest sounding names in that zone were registered years ago. A tool that verifies availability live and generates across more distinct style modes avoids both problems." },
-      { question: "Is NamoLux free to use?", answer: "Yes. Quick Generate has no monthly quota, and free includes three Advanced batches plus one complete Founder Signal batch each month. NamoLux Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience." },
+      { question: "Is NamoLux free to use?", answer: "Yes. Signed-in users receive one curated Name Sprint per UTC day and three Bulk Checks per month. Founder Signal is part of Pro. NamoLux Pro is GBP 9.99/month or GBP 69/year and adds 40 Name Sprints, 120 Founder Signal runs, 120 Bulk Checks, saved comparisons, reports, exports, 10 Brand Launch Kits, and an ad-free workspace each month." },
       { question: "Should I use Squadhelp or NamoLux?", answer: "They solve different problems. NamoLux helps you explore original directions first, then optionally apply Founder Signal and live domain checks to your shortlist. Squadhelp is a marketplace of pre-vetted premium names you buy outright. Choose NamoLux to create and evaluate your own direction; choose a marketplace when you want to purchase a curated name." },
       { question: "Can Lean Domain Search replace Namelix?", answer: "Only if you specifically want descriptive two word domains. Lean Domain Search is a keyword combiner, not a brand builder — it pairs your keyword with a large dictionary of prefixes and suffixes and shows only the combinations with an available .com. Every result is available, but every result also feels templated. Use it as a supplement when a descriptive domain fits, not as a primary generator." },
       { question: "How many names should I generate before deciding?", answer: "Explore enough styles to find at least eight genuinely usable candidates, then narrow to three or four through raw-name review, domain and trademark checks, Founder Signal evidence, and real-person testing. More volume is not automatically better, but neither should an early score prevent an attractive idea from appearing." },
@@ -7681,7 +7681,7 @@ export const blogPosts: BlogPost[] = [
     title: "Why Paying for NamoLux Beats Free Namelix When the Name Really Matters",
     description: "Namelix is useful for free brainstorming, but serious founders need scoring, availability checks, and a decision workflow. Here's why NamoLux is worth paying for.",
     seoTitle: "Why Paid NamoLux Beats Free Namelix for Serious Naming",
-    metaDescription: "Namelix gives free name ideas. NamoLux adds unlimited Quick exploration, optional Founder Signal analysis, live domain updates, and paid decision tools.",
+    metaDescription: "Namelix gives free name ideas. NamoLux adds a curated daily Name Sprint, verified launch-domain evidence, paid Founder Signal analysis, and comparison tools.",
     category: "Tool Comparisons",
     readTime: 8,
     publishedAt: "2026-06-21",
@@ -7701,7 +7701,7 @@ export const blogPosts: BlogPost[] = [
         "Bulk checks and shortlisting, so you can move from a messy idea set to a usable decision list quickly",
         "Brand palette access, so the visual identity follows a validated name rather than distracting you before the name is proven"
       ]},
-      { type: "callout", calloutType: "cta", content: "Quick Generate has no monthly quota. Free also includes three Advanced batches and one complete Founder Signal batch each month. Pro is GBP 12.99/month or GBP 99/year for unlimited fair-use Advanced generation and scoring, comparison, stress tests, exports, brand tools, and an ad-free experience.", ctaLink: "/pricing", ctaText: "See NamoLux Pricing" },
+      { type: "callout", calloutType: "cta", content: "Signed-in founders receive one curated Name Sprint per UTC day and three Bulk Checks per month. Pro is GBP 9.99/month or GBP 69/year for Founder Signal, higher monthly allowances, saved comparisons, reports, exports, Brand Launch Kits, and an ad-free workspace.", ctaLink: "/pricing", ctaText: "See NamoLux Pricing" },
       { type: "heading", level: 2, content: "Why This Matters More Than Logo Mockups" },
       { type: "paragraph", content: "A polished logo mockup can make a weak name look better than it is. That is dangerous during naming because founders are visual. A clean wordmark, a nice gradient, and a tidy colour palette can create false confidence before the basic name checks have passed." },
       { type: "paragraph", content: "NamoLux deliberately puts the name decision first. Does the word sound right? Is the .com available? Is it short enough? Does it avoid obvious brand risk? Does it fit the market? Only after that should a palette or visual direction enter the workflow." },

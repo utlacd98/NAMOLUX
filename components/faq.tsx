@@ -21,7 +21,7 @@ const faqs = [
   {
     question: "Is there a paid plan?",
     answer:
-      `Yes. Pro is GBP 12.99 per month or GBP 99 per year and includes ${PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved projects, CSV exports, shareable decision reports, and an ad-free workspace. There is no free trial.`,
+      `Yes. Pro is GBP 9.99 per month or GBP 69 per year and includes ${PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} It also adds saved projects, CSV exports, shareable decision reports, and an ad-free workspace. There is no free trial.`,
   },
   {
     question: "How does NamoLux make money?",

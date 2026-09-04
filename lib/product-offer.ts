@@ -27,6 +27,8 @@ export const PRODUCT_OFFER = {
   paidPriceLabel: `${PLAN_CONFIG.pro.price}/month`,
   paidAnnualPrice: `£${PRO_ANNUAL_PRICE_GBP}`,
   paidAnnualPriceLabel: `£${PRO_ANNUAL_PRICE_GBP}/year`,
+  paidAnnualEquivalent: `£${(PRO_ANNUAL_PRICE_GBP / 12).toFixed(2)}`,
+  paidAnnualSaving: `£${(PRO_MONTHLY_PRICE_GBP * 12 - PRO_ANNUAL_PRICE_GBP).toFixed(2)}`,
   paidBillingLabel: PLAN_CONFIG.pro.billingLabel,
   paidCheckoutHref: "/api/stripe/checkout",
   proPlanName: PLAN_CONFIG.pro.name,

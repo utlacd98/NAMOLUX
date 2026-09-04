@@ -71,8 +71,8 @@ export default function BusinessNameGeneratorPage() {
     description,
     offers: [
       { "@type": "Offer", price: "0", priceCurrency: "GBP", description: "One signed-in Name Sprint per UTC day" },
-      { "@type": "Offer", price: "12.99", priceCurrency: "GBP", description: "NamoLux Pro monthly with 40 Name Sprints" },
-      { "@type": "Offer", price: "99", priceCurrency: "GBP", description: "NamoLux Pro annual with 40 Name Sprints monthly" },
+      { "@type": "Offer", price: "9.99", priceCurrency: "GBP", description: "NamoLux Pro monthly with 40 Name Sprints" },
+      { "@type": "Offer", price: "69", priceCurrency: "GBP", description: "NamoLux Pro annual with 40 Name Sprints monthly" },
     ],
   }
 

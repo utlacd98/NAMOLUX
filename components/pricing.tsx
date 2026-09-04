@@ -22,8 +22,8 @@ export function Pricing() {
           className={cn("mt-12 grid gap-5 md:grid-cols-2 animate-fade-up")}
           style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
         >
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+          <div className="rounded-2xl border border-[#D4A843]/20 bg-[#11110f] p-8 shadow-lg">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-[#D4A843]/20 bg-[#D4A843]/[0.06] text-[#d8bd76]">
               <Sparkles className="h-5 w-5" />
             </div>
             <h3 className="text-2xl font-bold text-foreground">{PRODUCT_OFFER.freePlanName}</h3>
@@ -41,7 +41,7 @@ export function Pricing() {
             <ul className="mt-8 space-y-3">
               {PRODUCT_OFFER.freeFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <Check className="h-4 w-4 shrink-0 text-[#d8bd76]" />
                   {feature}
                 </li>
               ))}
@@ -59,7 +59,7 @@ export function Pricing() {
             <p className="mt-2 text-muted-foreground">Generate more often, compare and save decisions, then turn the winner into a Brand Launch Kit.</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
               <div className="rounded-xl border border-border p-4"><p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Monthly</p><p className="mt-2 text-3xl font-bold text-foreground">{PRODUCT_OFFER.paidPrice}<span className="ml-1 text-sm font-normal text-muted-foreground">/month</span></p></div>
-              <div className="rounded-xl border border-primary/40 bg-primary/5 p-4"><p className="text-xs font-bold uppercase tracking-wider text-primary">Annual · best value</p><p className="mt-2 text-3xl font-bold text-foreground">{PRODUCT_OFFER.paidAnnualPrice}<span className="ml-1 text-sm font-normal text-muted-foreground">/year</span></p><p className="mt-1 text-xs text-primary">£8.25/month equivalent</p></div>
+              <div className="rounded-xl border border-primary/40 bg-primary/5 p-4"><p className="text-xs font-bold uppercase tracking-wider text-primary">Annual · launch offer</p><p className="mt-2 text-3xl font-bold text-foreground">{PRODUCT_OFFER.paidAnnualPrice}<span className="ml-1 text-sm font-normal text-muted-foreground">/year</span></p><p className="mt-1 text-xs text-primary">{PRODUCT_OFFER.paidAnnualEquivalent}/month · save {PRODUCT_OFFER.paidAnnualSaving}</p></div>
             </div>
             <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
               <Button asChild size="lg" variant="outline" className="px-4 py-6 text-base font-semibold"><Link href={`${PRODUCT_OFFER.paidCheckoutHref}?billing=monthly`}>Choose monthly</Link></Button>

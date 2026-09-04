@@ -7,8 +7,8 @@ export const PRO_FOUNDER_SIGNAL_BATCH_LIMIT = 120
 export const FREE_NAME_SPRINT_DAILY_LIMIT = 1
 export const PRO_NAME_SPRINT_MONTHLY_LIMIT = 40
 export const PRO_BRAND_LAUNCH_KIT_LIMIT = 10
-export const PRO_MONTHLY_PRICE_GBP = 12.99
-export const PRO_ANNUAL_PRICE_GBP = 99
+export const PRO_MONTHLY_PRICE_GBP = 9.99
+export const PRO_ANNUAL_PRICE_GBP = 69
 
 /** @deprecated Use FREE_MONTHLY_BULK_CHECK_LIMIT for new decision-workspace code. */
 export const FREE_MONTHLY_USAGE_LIMIT = FREE_MONTHLY_BULK_CHECK_LIMIT
@@ -78,7 +78,7 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     id: "pro",
     name: "Pro",
     shortName: "Pro",
-    price: "\u00a312.99",
+    price: "\u00a39.99",
     billingLabel: "per month",
     description: "A focused decision workspace for choosing a name with confidence.",
     isPaid: true,

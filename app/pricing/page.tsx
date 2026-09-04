@@ -61,15 +61,27 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
       <main id="main-content" className="flex-1 px-4 pb-12 pt-24">
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.26em] text-[#D4A843]">
-              Pricing
-            </p>
-            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
-              Start free. Upgrade when the decision deserves more.
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.26em] text-[#D4A843]">Founder launch pricing</p>
+            <h1 className="mx-auto mb-5 max-w-4xl font-serif text-5xl font-medium leading-[1.02] tracking-[-0.035em] text-white sm:text-6xl">
+              Explore free. Pay for the evidence that helps you decide.
             </h1>
-            <p className="mx-auto max-w-2xl text-lg text-[#999]">
-              Signed-in Free users receive {PRODUCT_OFFER.freeQuickUsageLabel.toLowerCase()}, plus {PRODUCT_OFFER.freeUsageLabel.toLowerCase()}. Pro is {PRODUCT_OFFER.paidPriceLabel} or {PRODUCT_OFFER.paidAnnualPriceLabel}. It includes {PUBLIC_PRODUCT_COPY.proPlanSummary.toLowerCase()} Saved decisions, paid Brand Launch Kits, CSV exports, shareable reports, and an ad-free workspace are included.
+            <p className="mx-auto max-w-3xl text-lg leading-8 text-[#aaa39a]">
+              Name Sprint and Bulk Check get a shortlist moving. Pro adds Founder Signal, saved comparisons, decision reports, and direct Companies House and official trade-mark search links—without pretending those searches are legal clearance.
             </p>
+          </div>
+
+          <div className="mx-auto mb-8 grid max-w-4xl border border-[#D4A843]/25 bg-[#11110f] sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["40", "Name Sprints / month"],
+              ["120", "Founder Signal runs"],
+              ["120", "Bulk Check runs"],
+              ["UK + US + EU", "Official search routes"],
+            ].map(([value, label]) => (
+              <div key={label} className="border-b border-white/10 p-5 text-center last:border-b-0 sm:border-r sm:[&:nth-child(2)]:border-r-0 lg:border-b-0 lg:[&:nth-child(2)]:border-r lg:last:border-r-0">
+                <strong className="font-serif text-3xl font-medium text-[#e3c574]">{value}</strong>
+                <span className="mt-1 block text-xs uppercase tracking-[0.12em] text-stone-500">{label}</span>
+              </div>
+            ))}
           </div>
 
           {isLimitRedirect && (
@@ -93,9 +105,9 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           )}
 
           <div id="plans" className="mx-auto grid max-w-4xl scroll-mt-28 gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[#244231] bg-[#101714] p-8">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-400/10">
-                <Search className="h-6 w-6 text-emerald-300" />
+            <div className="rounded-2xl border border-white/10 bg-[#11110f] p-8">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-[#D4A843]/20 bg-[#D4A843]/[0.06]">
+                <Search className="h-6 w-6 text-[#d8bd76]" />
               </div>
               <h2 className="mb-2 text-2xl font-semibold text-white">{PRODUCT_OFFER.freePlanName}</h2>
               <p className="mb-6 text-sm text-[#9aa59f]">
@@ -139,9 +151,9 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
                   <p className="mt-2 text-3xl font-bold text-white">{PRODUCT_OFFER.paidPrice}<span className="ml-1 text-sm font-normal text-[#777]">/month</span></p>
                 </div>
                 <div className="rounded-xl border border-[#D4A843]/45 bg-[#D4A843]/10 p-4">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3D98B]">Annual · best value</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#F3D98B]">Annual · launch offer</p>
                   <p className="mt-2 text-3xl font-bold text-white">{PRODUCT_OFFER.paidAnnualPrice}<span className="ml-1 text-sm font-normal text-[#a99a75]">/year</span></p>
-                  <p className="mt-1 text-xs text-[#d8bd76]">Equivalent to £8.25/month</p>
+                  <p className="mt-1 text-xs text-[#d8bd76]">{PRODUCT_OFFER.paidAnnualEquivalent}/month · save {PRODUCT_OFFER.paidAnnualSaving}</p>
                 </div>
               </div>
               <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -167,6 +179,21 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           </div>
 
           <RestorePurchase />
+
+          <section className="mx-auto mt-12 max-w-4xl border border-[#D4A843]/20 bg-[#0e0e0d] p-6 sm:p-8" aria-labelledby="uk-checks-heading">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#D4A843]">Built for a real naming decision</p>
+            <h2 id="uk-checks-heading" className="mt-3 font-serif text-3xl font-medium text-white sm:text-4xl">The domain is only one check.</h2>
+            <div className="mt-7 grid gap-6 sm:grid-cols-2">
+              <div>
+                <h3 className="font-semibold text-white">Direct UK company search</h3>
+                <p className="mt-2 text-sm leading-7 text-stone-400">Open an exact Companies House search for a shortlisted name, then review active, dissolved, spelling and sound-alike results yourself.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">Official trade-mark routes</h3>
+                <p className="mt-2 text-sm leading-7 text-stone-400">Move from the same evidence panel into UK IPO, USPTO and EUIPO searches. These are preliminary checks, not legal clearance.</p>
+              </div>
+            </div>
+          </section>
 
           <div className="mx-auto mt-12 max-w-4xl rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
