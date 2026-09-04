@@ -128,7 +128,7 @@ function SignalGauge() {
   const scoredArc = Math.round((featuredSignal.score / 100) * circumference)
 
   return (
-    <div className={styles.gaugeWrap}>
+    <div className={styles.gaugeWrap} data-testid="founder-signal-gauge">
       <svg className={styles.gauge} viewBox="0 0 220 220" aria-label={`${featuredSignal.name} Founder Signal score ${featuredSignal.score}, ${featuredSignal.band}`}>
         <circle cx="110" cy="110" r="95" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
         <circle cx="110" cy="110" r="82" fill="none" stroke="rgba(196,161,91,0.18)" strokeWidth="1" />
@@ -151,10 +151,10 @@ function SignalLedger() {
   return (
     <div className={styles.signalLedger}>
       {signalEvidence.map(([label, value]) => (
-        <div className={styles.dimension} key={label}>
+        <div className={styles.dimension} data-testid="founder-signal-dimension" key={label}>
           <span>{label}</span>
           <div className={styles.dimensionBars} aria-hidden="true">{Array.from({ length: 18 }).map((_, index) => <i key={index} className={styles.barOn} />)}</div>
-          <strong>{value}</strong>
+          <strong data-testid="founder-signal-dimension-value">{value}</strong>
         </div>
       ))}
     </div>

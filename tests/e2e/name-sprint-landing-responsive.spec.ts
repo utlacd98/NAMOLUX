@@ -47,6 +47,25 @@ test("Name Sprint landing page stays accurate and responsive", async ({ page }, 
     const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     expect(horizontalOverflow, `${viewport.name} has horizontal overflow`).toBeLessThanOrEqual(1)
 
+    if (viewport.name === "phone") {
+      const gauge = page.getByTestId("founder-signal-gauge")
+      await gauge.scrollIntoViewIfNeeded()
+      const gaugeBox = await gauge.boundingBox()
+      const gaugeCaptionBox = await gauge.locator("em").boundingBox()
+      expect(gaugeBox).not.toBeNull()
+      expect(gaugeCaptionBox).not.toBeNull()
+      expect(gaugeCaptionBox!.x).toBeGreaterThan(gaugeBox!.x + 30)
+      expect(gaugeCaptionBox!.x + gaugeCaptionBox!.width).toBeLessThan(gaugeBox!.x + gaugeBox!.width - 30)
+
+      for (const row of await page.getByTestId("founder-signal-dimension").all()) {
+        const rowBox = await row.boundingBox()
+        const valueBox = await row.getByTestId("founder-signal-dimension-value").boundingBox()
+        expect(rowBox).not.toBeNull()
+        expect(valueBox).not.toBeNull()
+        expect(valueBox!.x + valueBox!.width).toBeLessThanOrEqual(rowBox!.x + rowBox!.width + 1)
+      }
+    }
+
     if (viewport.name === "desktop") {
       await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Name Sprint" })).toBeVisible()
     } else {
